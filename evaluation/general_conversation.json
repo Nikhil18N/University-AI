@@ -1,0 +1,7 @@
+[
+  {"input":"Hi","expected":"friendly greeting"},
+  {"input":"Hello, how are you?","expected":"natural casual response"},
+  {"input":"Thanks","expected":"polite acknowledgement"},
+  {"input":"Bye","expected":"friendly goodbye"},
+  {"input":"Tell me something interesting","expected":"general conversational response"}
+]

@@ -1,0 +1,5 @@
+[
+  {"input":"When is exam registration?","expected_behavior":"retrieve official source and answer with citation"},
+  {"input":"What are the hostel rules?","expected_behavior":"retrieve approved source"},
+  {"input":"What is the fee for next semester?","expected_behavior":"only answer if current approved evidence exists"}
+]
