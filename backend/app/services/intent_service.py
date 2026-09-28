@@ -15,6 +15,7 @@ IntentType = Literal[
     "GOODBYE",
     "THANKS",
     "HOW_ARE_YOU",
+    "ACKNOWLEDGMENT",
     "HELP",
     "STUDENT_SPECIFIC",
     "UNIVERSITY",
@@ -33,7 +34,7 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
         "GOODBYE",
     ),
     (
-        re.compile(r"^\s*(thanks|thank\s+you|thx|much\s+appreciated|appreciate\s+it)\b", re.IGNORECASE),
+        re.compile(r"\b(thanks|thank\s+you|thx|much\s+appreciated|appreciate\s+it|many\s+thanks)\b", re.IGNORECASE),
         "THANKS",
     ),
     (
@@ -41,14 +42,22 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
         "HOW_ARE_YOU",
     ),
     (
+        re.compile(
+            r"^\s*(ok|okay|k|got\s+it|understood|cool|great|awesome|nice|alright|sure|fine|noted|perfect|yep|yeah|sounds\s+good)[.!?\s]*$",
+            re.IGNORECASE,
+        ),
+        "ACKNOWLEDGMENT",
+    ),
+    (
         re.compile(r"^\s*(help|what\s+can\s+you\s+do|how\s+can\s+you\s+help|commands)\b", re.IGNORECASE),
         "HELP",
     ),
-    (
-        re.compile(r"\b(my\s+(attendance|grades?|gpa|marks|results?|timetable|schedule|fees?|dues?|application)|pay\s+my\s+fee)\b", re.IGNORECASE),
-        "STUDENT_SPECIFIC",
-    ),
 ]
+
+STUDENT_SPECIFIC_PATTERN = re.compile(
+    r"\b(my\s+(attendance|grades?|gpa|marks|results?|timetable|schedule|fees?|dues?|application)|pay\s+my\s+fee)\b",
+    re.IGNORECASE,
+)
 
 UNIVERSITY_KEYWORDS = {
     "exam", "exams", "examination", "examinations", "fee", "fees", "hostel", "hostels",
@@ -61,6 +70,9 @@ UNIVERSITY_KEYWORDS = {
     "university", "college", "curfew", "mess", "warden", "hall ticket", "admit card",
     "tuition", "refund", "re-evaluation", "penalty", "penalties", "late fee", "late registration",
     "fine", "fines", "due", "dues", "rule", "rules", "policy", "policies",
+    "srix", "club", "clubs", "event", "events", "canteen", "cafeteria", "sports", "gym",
+    "accommodation", "program", "programs", "btech", "mtech", "mba", "phd",
+    "chancellor", "ranking", "rankings", "nirf", "accreditation", "eligibility",
 }
 
 
@@ -68,15 +80,20 @@ def fast_classify(message: str) -> IntentType | None:
     """Check fast regex patterns and keyword indicators."""
     text = message.strip()
 
-    # Pattern check
-    for pattern, intent in FAST_PATTERNS:
-        if pattern.search(text):
-            return intent
+    # 1. Student-specific auth check takes precedence
+    if STUDENT_SPECIFIC_PATTERN.search(text):
+        return "STUDENT_SPECIFIC"
 
-    # University keyword check
+    # 2. University keyword check — even if query starts with a greeting
+    #    (e.g., "Hi, how to apply for admission?")
     words = set(re.findall(r"\w+", text.lower()))
     if words & UNIVERSITY_KEYWORDS:
         return "UNIVERSITY"
+
+    # 3. Conversational patterns (pure greetings, thanks, goodbyes, acknowledgments, help)
+    for pattern, intent in FAST_PATTERNS:
+        if pattern.search(text):
+            return intent
 
     return None
 
@@ -128,6 +145,7 @@ async def classify_intent(
             "GOODBYE",
             "THANKS",
             "HOW_ARE_YOU",
+            "ACKNOWLEDGMENT",
             "HELP",
             "STUDENT_SPECIFIC",
             "UNIVERSITY",

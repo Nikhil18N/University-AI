@@ -29,10 +29,22 @@ def test_needs_reformulation_with_pronouns():
 
 
 def test_no_reformulation_needed_for_standalone():
-    context = "user: Tell me about hostel regulations\nassistant: Hostels have rules."
+    context = "user: Tell me about labs\nassistant: SR University has modern engineering labs."
     # Long standalone query without coreferences
     query = "What is the tuition fee structure for undergraduate engineering programs?"
     assert needs_reformulation(query, context) is False
+    # Short standalone topic queries must NOT be reformulated with previous context
+    assert needs_reformulation("about placements?", context) is False
+    assert needs_reformulation("placements?", context) is False
+    assert needs_reformulation("hostel fees?", context) is False
+    assert needs_reformulation("bus routes?", context) is False
+
+
+def test_needs_reformulation_for_continuation():
+    context = "user: Tell me about admissions\nassistant: Admissions are open."
+    assert needs_reformulation("tell me more", context) is True
+    assert needs_reformulation("more details", context) is True
+    assert needs_reformulation("details please", context) is True
 
 
 @pytest.mark.asyncio

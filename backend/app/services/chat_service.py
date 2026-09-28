@@ -21,6 +21,33 @@ STUDENT_AUTH_MESSAGE = (
     "In anonymous public mode, I do not have access to individual student records."
 )
 
+FAST_CONVERSATIONAL_RESPONSES: dict[str, str] = {
+    "GREETING": (
+        "Hello! I'm your SR University AI Companion. How can I help you today? "
+        "Feel free to ask about admissions, programs, labs, hostels, placements, or campus facilities!"
+    ),
+    "ACKNOWLEDGMENT": (
+        "Glad to help! Let me know if you have any other questions about SR University."
+    ),
+    "THANKS": (
+        "You're very welcome! If there's anything else you'd like to know about SR University, feel free to ask."
+    ),
+    "GOODBYE": (
+        "Goodbye! Best of luck with your academic journey at SR University. Have a wonderful day!"
+    ),
+    "HOW_ARE_YOU": (
+        "I'm doing well, thank you for asking! How can I assist you with SR University today?"
+    ),
+    "HELP": (
+        "I'm here to assist you with everything at SR University! You can ask me about:\n\n"
+        "• **Admissions & Eligibility**: Application process, requirements, and deadlines\n"
+        "• **Academics & Labs**: Programs, departments, curriculum, and modern lab facilities\n"
+        "• **Campus & Hostels**: Accommodation details, mess, transport, and campus amenities\n"
+        "• **Placements & Innovation**: Career opportunities, campus placements, and SRiX incubator\n\n"
+        "What would you like to explore?"
+    ),
+}
+
 
 async def handle_chat(
     db: AsyncSession,
@@ -93,6 +120,10 @@ async def handle_chat(
         answer = STUDENT_AUTH_MESSAGE
         logger.info("Handled via STUDENT_SPECIFIC auth guardrail")
 
+    elif intent in FAST_CONVERSATIONAL_RESPONSES:
+        answer = FAST_CONVERSATIONAL_RESPONSES[intent]
+        logger.info("Handled via fast conversational response (%s)", intent)
+
     elif intent == "UNIVERSITY" and rag_service:
         answer, sources = await rag_service.query(
             question=search_query,
@@ -101,7 +132,7 @@ async def handle_chat(
         logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
 
     else:
-        # General conversation / greeting / help → conversational LLM
+        # General conversation / open-ended → conversational LLM
         system_prompt = prompt_service.load_prompt("system")
         messages = [{"role": "system", "content": system_prompt}] + recent
         answer = await llm_provider.generate(messages)

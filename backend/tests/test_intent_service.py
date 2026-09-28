@@ -18,12 +18,25 @@ class MockLLM(LLMProvider):
 
 def test_fast_classify():
     assert fast_classify("hello") == "GREETING"
+    assert fast_classify("hi") == "GREETING"
     assert fast_classify("goodbye") == "GOODBYE"
     assert fast_classify("thanks") == "THANKS"
+    assert fast_classify("thank you") == "THANKS"
     assert fast_classify("how are you") == "HOW_ARE_YOU"
     assert fast_classify("what can you do") == "HELP"
     assert fast_classify("my attendance") == "STUDENT_SPECIFIC"
     assert fast_classify("exam schedule") == "UNIVERSITY"
+    # Acknowledgment tests
+    assert fast_classify("ok") == "ACKNOWLEDGMENT"
+    assert fast_classify("okay") == "ACKNOWLEDGMENT"
+    assert fast_classify("got it") == "ACKNOWLEDGMENT"
+    assert fast_classify("cool") == "ACKNOWLEDGMENT"
+    assert fast_classify("great") == "ACKNOWLEDGMENT"
+    # Mixed greeting + university question should be UNIVERSITY
+    assert fast_classify("how to apply for admission?") == "UNIVERSITY"
+    assert fast_classify("Hi, how to apply for admission?") == "UNIVERSITY"
+    assert fast_classify("Hello, tell me about placements") == "UNIVERSITY"
+    assert fast_classify("about placements?") == "UNIVERSITY"
 
 
 @pytest.mark.asyncio

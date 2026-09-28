@@ -32,3 +32,24 @@ def test_general_query_returns_none_for_llm_routing():
     assert fast_classify("Write a python function to reverse a string") is None
     assert fast_classify("What is quantum computing?") is None
     assert fast_classify("Who wrote Hamlet?") is None
+
+
+def test_acknowledgment_detection():
+    assert fast_classify("ok") == "ACKNOWLEDGMENT"
+    assert fast_classify("got it") == "ACKNOWLEDGMENT"
+    assert fast_classify("cool") == "ACKNOWLEDGMENT"
+    assert fast_classify("great") == "ACKNOWLEDGMENT"
+    assert fast_classify("sure") == "ACKNOWLEDGMENT"
+
+
+def test_fast_conversational_responses_exist():
+    from app.services.chat_service import FAST_CONVERSATIONAL_RESPONSES
+
+    assert "GREETING" in FAST_CONVERSATIONAL_RESPONSES
+    assert "ACKNOWLEDGMENT" in FAST_CONVERSATIONAL_RESPONSES
+    assert "THANKS" in FAST_CONVERSATIONAL_RESPONSES
+    assert "GOODBYE" in FAST_CONVERSATIONAL_RESPONSES
+    assert "HOW_ARE_YOU" in FAST_CONVERSATIONAL_RESPONSES
+    assert "HELP" in FAST_CONVERSATIONAL_RESPONSES
+    # Ensure greeting response mentions SR University
+    assert "SR University" in FAST_CONVERSATIONAL_RESPONSES["GREETING"]
