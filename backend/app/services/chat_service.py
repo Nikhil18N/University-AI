@@ -59,23 +59,31 @@ async def handle_chat(
         f"{m['role']}: {m['content']}" for m in recent[:-1]  # exclude current message
     )
 
-    # 4. Contextual query reformulation for follow-ups
-    search_query = request.message
-    is_follow_up = needs_reformulation(request.message, conversation_context)
-    if is_follow_up:
-        search_query = await reformulate_query(
-            request.message,
-            conversation_context=conversation_context,
-            llm_provider=llm_provider,
-        )
-
-    # 5. Classify intent
+    # 4. Classify intent on the RAW message first — before any reformulation.
+    #    This ensures greetings/chitchat are never accidentally routed to RAG
+    #    even when there is prior university conversation context.
     intent, confidence = await classify_intent(
-        search_query,
+        request.message,
         conversation_context=conversation_context,
         llm_provider=llm_provider,
     )
-    logger.info("Message '%s...' classified as %s (confidence=%.2f)", request.message[:30], intent, confidence)
+    logger.info(
+        "Message '%s...' classified as %s (confidence=%.2f)",
+        request.message[:30], intent, confidence,
+    )
+
+    # 5. Contextual query reformulation — ONLY for university queries.
+    #    Skipping reformulation for greetings/chitchat prevents "hi" from
+    #    being expanded into the previous topic and misrouted to RAG.
+    search_query = request.message
+    if intent == "UNIVERSITY":
+        is_follow_up = needs_reformulation(request.message, conversation_context)
+        if is_follow_up:
+            search_query = await reformulate_query(
+                request.message,
+                conversation_context=conversation_context,
+                llm_provider=llm_provider,
+            )
 
     # 6. Route and generate response
     sources: list[dict] = []
