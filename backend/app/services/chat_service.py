@@ -1,6 +1,7 @@
 """Chat service — orchestrator for intent routing, query reformulation, and RAG."""
 
 import logging
+import random
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,32 +22,83 @@ STUDENT_AUTH_MESSAGE = (
     "In anonymous public mode, I do not have access to individual student records."
 )
 
-FAST_CONVERSATIONAL_RESPONSES: dict[str, str] = {
-    "GREETING": (
-        "Hello! I'm your SR University AI Companion. How can I help you today? "
-        "Feel free to ask about admissions, programs, labs, hostels, placements, or campus facilities!"
-    ),
-    "ACKNOWLEDGMENT": (
-        "Glad to help! Let me know if you have any other questions about SR University."
-    ),
-    "THANKS": (
-        "You're very welcome! If there's anything else you'd like to know about SR University, feel free to ask."
-    ),
-    "GOODBYE": (
-        "Goodbye! Best of luck with your academic journey at SR University. Have a wonderful day!"
-    ),
-    "HOW_ARE_YOU": (
-        "I'm doing well, thank you for asking! How can I assist you with SR University today?"
-    ),
-    "HELP": (
-        "I'm here to assist you with everything at SR University! You can ask me about:\n\n"
-        "• **Admissions & Eligibility**: Application process, requirements, and deadlines\n"
-        "• **Academics & Labs**: Programs, departments, curriculum, and modern lab facilities\n"
-        "• **Campus & Hostels**: Accommodation details, mess, transport, and campus amenities\n"
-        "• **Placements & Innovation**: Career opportunities, campus placements, and SRiX incubator\n\n"
-        "What would you like to explore?"
-    ),
+GREETING_RESPONSES_INITIAL: list[str] = [
+    "Hello! How can I help you today with SR University? Feel free to ask about admissions, programs, hostels, or campus life.",
+    "Hi there! Great to chat with you. What would you like to know about SR University?",
+    "Hey! Welcome to the SR University companion. What can I help you explore today?",
+    "Hello! Looking for information on admissions, courses, placements, or facilities? Ask away!",
+    "Hi! How can I assist you right now? Ask me anything about programs, campus events, hostels, or student life at SR University.",
+    "Welcome! What's on your mind today regarding SR University?",
+    "Hello! Good to see you. How can I assist with your SR University journey today?",
+    "Hey there! Ready to help. What can I look up for you at SR University?",
+]
+
+GREETING_RESPONSES_FOLLOWUP: list[str] = [
+    "Hey again! What else can I help you with?",
+    "Hi! Still here to help — what would you like to check next?",
+    "Hello again! How can I assist you further?",
+    "Hi there! Feel free to ask your next question about SR University.",
+    "Hey! What's next on your mind regarding SR University?",
+    "Hello! Ready for your next question.",
+]
+
+ACKNOWLEDGMENT_RESPONSES: list[str] = [
+    "Glad to help! Let me know if you have any other questions about SR University.",
+    "Got it! Feel free to ask if you need anything else.",
+    "Sounds good! I'm here whenever you need more details.",
+    "Awesome! Let me know if there's anything else you'd like to explore.",
+    "Great! Just let me know if you have any more questions.",
+]
+
+THANKS_RESPONSES: list[str] = [
+    "You're very welcome! If there's anything else you'd like to know about SR University, feel free to ask.",
+    "Happy to help! Let me know if more questions come up.",
+    "Anytime! Best of luck, and don't hesitate to reach out if you need more info.",
+    "My pleasure! Have a wonderful day, and let me know if you need further assistance.",
+]
+
+GOODBYE_RESPONSES: list[str] = [
+    "Goodbye! Best of luck with your academic journey at SR University. Have a wonderful day!",
+    "Take care! Feel free to come back anytime you have more questions about SR University.",
+    "See you! Wishing you all the best with everything at SR University.",
+]
+
+HOW_ARE_YOU_RESPONSES: list[str] = [
+    "I'm doing well, thank you for asking! How can I assist you with SR University today?",
+    "Doing great and ready to help! What would you like to know about SR University?",
+    "I'm doing well, thanks! How can I help you with your queries today?",
+]
+
+HELP_RESPONSE: str = (
+    "I'm here to assist you with everything at SR University! You can ask me about:\n\n"
+    "• **Admissions & Eligibility**: Application process, requirements, and deadlines\n"
+    "• **Academics & Labs**: Programs, departments, curriculum, and modern lab facilities\n"
+    "• **Campus & Hostels**: Accommodation details, mess, transport, and campus amenities\n"
+    "• **Placements & Innovation**: Career opportunities, campus placements, and SRiX incubator\n\n"
+    "What would you like to explore?"
+)
+
+FAST_CONVERSATIONAL_RESPONSES: dict[str, list[str]] = {
+    "GREETING": GREETING_RESPONSES_INITIAL,
+    "ACKNOWLEDGMENT": ACKNOWLEDGMENT_RESPONSES,
+    "THANKS": THANKS_RESPONSES,
+    "GOODBYE": GOODBYE_RESPONSES,
+    "HOW_ARE_YOU": HOW_ARE_YOU_RESPONSES,
+    "HELP": [HELP_RESPONSE],
 }
+
+
+def get_conversational_response(intent: str, has_context: bool = False) -> str:
+    """Return a varied, natural conversational response based on intent and context."""
+    if intent == "GREETING":
+        options = GREETING_RESPONSES_FOLLOWUP if has_context else GREETING_RESPONSES_INITIAL
+        return random.choice(options)
+
+    options = FAST_CONVERSATIONAL_RESPONSES.get(intent)
+    if options:
+        return random.choice(options)
+
+    return "Hello! How can I help you today?"
 
 
 async def handle_chat(
@@ -121,7 +173,8 @@ async def handle_chat(
         logger.info("Handled via STUDENT_SPECIFIC auth guardrail")
 
     elif intent in FAST_CONVERSATIONAL_RESPONSES:
-        answer = FAST_CONVERSATIONAL_RESPONSES[intent]
+        has_context = bool(conversation_context.strip())
+        answer = get_conversational_response(intent, has_context=has_context)
         logger.info("Handled via fast conversational response (%s)", intent)
 
     elif intent == "UNIVERSITY" and rag_service:

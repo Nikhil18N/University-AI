@@ -43,7 +43,10 @@ def test_acknowledgment_detection():
 
 
 def test_fast_conversational_responses_exist():
-    from app.services.chat_service import FAST_CONVERSATIONAL_RESPONSES
+    from app.services.chat_service import (
+        FAST_CONVERSATIONAL_RESPONSES,
+        get_conversational_response,
+    )
 
     assert "GREETING" in FAST_CONVERSATIONAL_RESPONSES
     assert "ACKNOWLEDGMENT" in FAST_CONVERSATIONAL_RESPONSES
@@ -51,5 +54,13 @@ def test_fast_conversational_responses_exist():
     assert "GOODBYE" in FAST_CONVERSATIONAL_RESPONSES
     assert "HOW_ARE_YOU" in FAST_CONVERSATIONAL_RESPONSES
     assert "HELP" in FAST_CONVERSATIONAL_RESPONSES
-    # Ensure greeting response mentions SR University
-    assert "SR University" in FAST_CONVERSATIONAL_RESPONSES["GREETING"]
+
+    # Ensure multiple diverse greeting options exist
+    assert len(FAST_CONVERSATIONAL_RESPONSES["GREETING"]) > 1
+
+    # Ensure dynamic response returns valid strings for both initial and follow-up
+    initial_greeting = get_conversational_response("GREETING", has_context=False)
+    assert len(initial_greeting) > 10
+
+    followup_greeting = get_conversational_response("GREETING", has_context=True)
+    assert len(followup_greeting) > 5
