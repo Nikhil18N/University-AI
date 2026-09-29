@@ -37,6 +37,10 @@ def test_fast_classify():
     assert fast_classify("Hi, how to apply for admission?") == "UNIVERSITY"
     assert fast_classify("Hello, tell me about placements") == "UNIVERSITY"
     assert fast_classify("about placements?") == "UNIVERSITY"
+    # Document and requirement queries must be UNIVERSITY (not STUDENT_SPECIFIC)
+    assert fast_classify("what are the required documents?") == "UNIVERSITY"
+    assert fast_classify("required documents") == "UNIVERSITY"
+    assert fast_classify("what documents do i need?") == "UNIVERSITY"
 
 
 @pytest.mark.asyncio

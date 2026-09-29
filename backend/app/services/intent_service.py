@@ -64,7 +64,10 @@ UNIVERSITY_KEYWORDS = {
     "attendance", "semester", "semesters", "course", "courses", "syllabus", "department",
     "departments", "faculty", "scholarship", "scholarships", "transport", "bus", "library",
     "timetable", "result", "results", "grade", "grades", "marks", "regulation", "regulations",
-    "calendar", "admission", "admissions", "registration", "register", "certificate",
+    "calendar", "admission", "admissions", "registration", "register", "certificate", "certificates",
+    "document", "documents", "documentation", "marksheet", "marksheets", "memo", "memos",
+    "requirement", "requirements", "eligibility", "criteria", "qualification", "qualifications",
+    "apply", "applying", "application", "enroll", "enrollment", "procedure", "process",
     "convocation", "placement", "placements", "internship", "internships", "laboratory",
     "lab", "labs", "campus", "notice", "notices", "circular", "deadline", "deadlines",
     "university", "college", "curfew", "mess", "warden", "hall ticket", "admit card",
@@ -72,7 +75,7 @@ UNIVERSITY_KEYWORDS = {
     "fine", "fines", "due", "dues", "rule", "rules", "policy", "policies",
     "srix", "club", "clubs", "event", "events", "canteen", "cafeteria", "sports", "gym",
     "accommodation", "program", "programs", "btech", "mtech", "mba", "phd",
-    "chancellor", "ranking", "rankings", "nirf", "accreditation", "eligibility",
+    "chancellor", "ranking", "rankings", "nirf", "accreditation",
 }
 
 

@@ -34,6 +34,8 @@ STANDALONE_TOPICS = {
     "library", "sports", "srix", "club", "clubs", "canteen", "mess", "cafeteria",
     "admission", "admissions", "ranking", "rankings", "chancellor", "vice chancellor",
     "leadership", "laboratory", "labs", "curfew", "scholarship", "scholarships",
+    "document", "documents", "certificate", "certificates", "requirement", "requirements",
+    "eligibility", "qualification", "qualifications",
 }
 
 
