@@ -42,9 +42,44 @@ CHROMA_SECTION_KEY = "section"
 CHROMA_QUESTION_KEY = "question"
 
 
+async def _clear_existing_inline_docs(db, collection) -> None:
+    """Remove previous inline:docx documents from PostgreSQL and ChromaDB."""
+    from sqlalchemy import select
+    from app.models.document import Document, DocumentVersion
+
+    ver_stmt = select(DocumentVersion).where(DocumentVersion.storage_location == "inline:docx")
+    ver_res = await db.execute(ver_stmt)
+    versions = ver_res.scalars().all()
+    doc_ids = {v.document_id for v in versions}
+
+    for v in versions:
+        await db.delete(v)
+
+    for doc_id in doc_ids:
+        doc = await db.get(Document, doc_id)
+        if doc:
+            await db.delete(doc)
+        if collection is not None:
+            try:
+                existing = collection.get(
+                    where={"document_id": str(doc_id)},
+                    include=["metadatas"],
+                )
+                chunk_ids = existing.get("ids", [])
+                if chunk_ids:
+                    collection.delete(ids=chunk_ids)
+                    logger.info("Deleted %d existing chunks for doc_id=%s from ChromaDB", len(chunk_ids), doc_id)
+            except Exception as e:
+                logger.warning("Error clearing ChromaDB chunks for doc_id=%s: %s", doc_id, e)
+
+    await db.commit()
+    logger.info("Cleared %d existing inline docx records from database", len(doc_ids))
+
+
 async def _ingest_entries(
     entries: list[ParsedEntry],
     department_override: str | None,
+    clear_existing: bool = False,
 ) -> None:
     """Embed and store parsed entries in ChromaDB + PostgreSQL."""
     import chromadb
@@ -68,6 +103,10 @@ async def _ingest_entries(
         name=COLLECTION_NAME,
         metadata={"hnsw:space": "cosine"},
     )
+
+    if clear_existing:
+        async with async_session_factory() as db:
+            await _clear_existing_inline_docs(db, collection)
 
     # Group entries by section so each section becomes one Document record
     sections: dict[str, list[ParsedEntry]] = {}
@@ -191,6 +230,10 @@ def main() -> None:
         "--verbose", action="store_true",
         help="Print each parsed Q&A entry.",
     )
+    parser.add_argument(
+        "--clear-existing", action="store_true",
+        help="Clear existing inline:docx records from DB and Chroma before ingestion.",
+    )
     args = parser.parse_args()
 
     file_path = Path(args.file)
@@ -223,7 +266,7 @@ def main() -> None:
         return
 
     print("Ingesting into knowledge base...")
-    asyncio.run(_ingest_entries(entries, args.department))
+    asyncio.run(_ingest_entries(entries, args.department, clear_existing=args.clear_existing))
     print("\n[OK] University data ingested successfully!")
 
 

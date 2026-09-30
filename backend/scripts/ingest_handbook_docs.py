@@ -1,0 +1,157 @@
+"""Script to ingest SR University Student Handbook markdown documents into ChromaDB & PostgreSQL."""
+
+import asyncio
+import logging
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+# Add backend directory to sys.path
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
+from sqlalchemy import select
+from app.config import settings
+from app.db.session import async_session_factory
+from app.models.document import Document, DocumentVersion
+from app.providers.embedding_ollama import OllamaEmbeddingProvider
+from app.services.ingestion_service import IngestionService
+from app.services.rag_service import COLLECTION_NAME
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(message)s")
+logger = logging.getLogger(__name__)
+
+HANDBOOK_DOCS = [
+    {
+        "file": "01_campus_life_and_facilities.md",
+        "title": "SRU Student Handbook — Campus Life, Facilities & Contacts",
+        "document_type": "handbook",
+        "department": "Student Affairs",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "file": "02_academic_regulations_and_examinations.md",
+        "title": "SRU Student Handbook — Academic Regulations & Examinations",
+        "document_type": "regulation",
+        "department": "Academic Affairs",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "file": "03_phd_and_research_regulations.md",
+        "title": "SRU Student Handbook — Ph.D. Regulations & Research",
+        "document_type": "regulation",
+        "department": "Research & Development",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "file": "04_hostels_rules_and_discipline_code.md",
+        "title": "SRU Student Handbook — Hostel Rules & Discipline Code",
+        "document_type": "regulation",
+        "department": "Student Welfare",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "file": "05_career_and_placement_policy.md",
+        "title": "SRU Student Handbook — Placement & Career Policy",
+        "document_type": "policy",
+        "department": "Centre for Student Services and Placements",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "file": "06_curricula_and_course_structures.md",
+        "title": "SRU Student Handbook — Curricula & Course Structures",
+        "document_type": "curriculum",
+        "department": "Academic Affairs",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "file": "07_attendance_and_detention_policy.md",
+        "title": "SRU Student Handbook — Attendance Regulations & Condonation",
+        "document_type": "policy",
+        "department": "Academic Affairs",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+]
+
+
+async def clear_existing_handbook_docs(db, collection):
+    """Remove previously ingested handbook documents to prevent duplicate chunks."""
+    handbook_titles = {d["title"] for d in HANDBOOK_DOCS}
+    stmt = select(Document).where(Document.title.in_(handbook_titles))
+    res = await db.execute(stmt)
+    docs = res.scalars().all()
+
+    for doc in docs:
+        logger.info("Removing old handbook version: %s (id=%s)", doc.title, doc.id)
+        if collection is not None:
+            try:
+                existing = collection.get(where={"document_id": str(doc.id)}, include=["metadatas"])
+                chunk_ids = existing.get("ids", [])
+                if chunk_ids:
+                    collection.delete(ids=chunk_ids)
+                    logger.info("  Deleted %d chunks from ChromaDB", len(chunk_ids))
+            except Exception as e:
+                logger.warning("  Chroma error: %s", e)
+
+        ver_stmt = select(DocumentVersion).where(DocumentVersion.document_id == doc.id)
+        ver_res = await db.execute(ver_stmt)
+        for v in ver_res.scalars().all():
+            await db.delete(v)
+        await db.delete(doc)
+
+    await db.commit()
+
+
+async def ingest_handbook():
+    import chromadb
+
+    handbook_dir = settings.PROJECT_ROOT / "data" / "handbook"
+    if not handbook_dir.exists():
+        logger.error("Handbook directory not found: %s", handbook_dir)
+        return
+
+    embedding_provider = OllamaEmbeddingProvider(
+        base_url=settings.LLM_BASE_URL,
+        model=settings.EMBEDDING_MODEL,
+    )
+    ingestion_service = IngestionService(embedding_provider)
+
+    chroma_client = chromadb.HttpClient(
+        host=settings.CHROMA_HOST,
+        port=settings.CHROMA_PORT,
+    )
+    collection = chroma_client.get_or_create_collection(
+        name=COLLECTION_NAME,
+        metadata={"hnsw:space": "cosine"},
+    )
+
+    async with async_session_factory() as db:
+        await clear_existing_handbook_docs(db, collection)
+
+        for doc_info in HANDBOOK_DOCS:
+            file_path = handbook_dir / doc_info["file"]
+            if not file_path.exists():
+                logger.warning("File not found: %s — skipping", file_path)
+                continue
+
+            content_bytes = file_path.read_bytes()
+            logger.info("Ingesting: %s (%d bytes)", doc_info["title"], len(content_bytes))
+
+            doc = await ingestion_service.ingest_document(
+                db=db,
+                file_bytes=content_bytes,
+                filename=doc_info["file"],
+                title=doc_info["title"],
+                document_type=doc_info["document_type"],
+                department=doc_info["department"],
+                effective_date=doc_info["effective_date"],
+            )
+            logger.info("  [OK] Ingested as document_id=%s (status=%s)", doc.id, doc.status)
+
+    await embedding_provider.close()
+    logger.info("Successfully ingested all SRU Student Handbook sections!")
+
+
+if __name__ == "__main__":
+    asyncio.run(ingest_handbook())

@@ -26,11 +26,14 @@ IntentType = Literal[
 # Fast regex patterns for instantaneous classification without LLM latency
 FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
     (
-        re.compile(r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)\b", re.IGNORECASE),
+        re.compile(
+            r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)(\s+(there|buddy|friend|assistant|bot|sru|all))?[!.,\s]*$",
+            re.IGNORECASE,
+        ),
         "GREETING",
     ),
     (
-        re.compile(r"^\s*(bye|goodbye|see\s+you|farewell|take\s+care|cya)\b", re.IGNORECASE),
+        re.compile(r"\b(bye|goodbye|see\s+you|farewell|take\s+care|cya)\b", re.IGNORECASE),
         "GOODBYE",
     ),
     (
@@ -38,7 +41,7 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
         "THANKS",
     ),
     (
-        re.compile(r"^\s*(how\s+are\s+you|how's\s+it\s+going|how\s+do\s+you\s+do|what's\s+up)\b", re.IGNORECASE),
+        re.compile(r"^\s*(how\s+are\s+you|how's\s+it\s+going|how\s+do\s+you\s+do|what's\s+up)[?!.,\s]*$", re.IGNORECASE),
         "HOW_ARE_YOU",
     ),
     (
@@ -49,7 +52,7 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
         "ACKNOWLEDGMENT",
     ),
     (
-        re.compile(r"^\s*(help|what\s+can\s+you\s+do|how\s+can\s+you\s+help|commands)\b", re.IGNORECASE),
+        re.compile(r"^\s*(help|what\s+can\s+you\s+do|how\s+can\s+you\s+help|commands)[?!.,\s]*$", re.IGNORECASE),
         "HELP",
     ),
 ]
@@ -76,7 +79,26 @@ UNIVERSITY_KEYWORDS = {
     "srix", "club", "clubs", "event", "events", "canteen", "cafeteria", "sports", "gym",
     "accommodation", "program", "programs", "btech", "mtech", "mba", "phd",
     "chancellor", "ranking", "rankings", "nirf", "accreditation",
+    "warangal", "visit", "places", "tourist", "tourism", "temple", "ramappa", "laknavaram", "fort",
 }
+
+
+_QUESTION_STARTERS = {"what", "when", "where", "why", "who", "which", "can", "could", "is", "are", "do", "does", "recommend", "tell"}
+
+
+def _is_greeting_without_question(text: str) -> bool:
+    """Return True if message is a greeting or courtesy, but not a substantive question."""
+    if not re.match(r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)\b", text, re.IGNORECASE):
+        return False
+    # Courtesy check: "how are you" or "how is it going" is part of greeting
+    if re.search(r"\bhow\s+(are\s+you|is\s+it\s+going)\b", text, re.IGNORECASE):
+        return True
+    # If it contains substantive question words, it's an inquiry, not a pure greeting
+    words = [w.lower() for w in re.findall(r"\w+", text)]
+    for w in words:
+        if w in _QUESTION_STARTERS:
+            return False
+    return True
 
 
 def fast_classify(message: str) -> IntentType | None:
@@ -93,9 +115,13 @@ def fast_classify(message: str) -> IntentType | None:
     if words & UNIVERSITY_KEYWORDS:
         return "UNIVERSITY"
 
-    # 3. Conversational patterns (pure greetings, thanks, goodbyes, acknowledgments, help)
+    # 3. Check for greetings that do not contain substantive questions
+    if _is_greeting_without_question(text):
+        return "GREETING"
+
+    # 4. Other conversational patterns (thanks, goodbyes, acknowledgments, help)
     for pattern, intent in FAST_PATTERNS:
-        if pattern.search(text):
+        if intent != "GREETING" and pattern.search(text):
             return intent
 
     return None

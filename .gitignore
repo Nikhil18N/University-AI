@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.bak
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Pytest / Cache
+.pytest_cache/
+
+# Uploads
+uploads/*
+!uploads/.gitkeep

@@ -14,9 +14,10 @@ Classify the user's message in the context of recent conversation into one of th
 
 IMPORTANT:
 - If the user sends a simple greeting ("hi", "hello"), thanks ("thank you"), or acknowledgment ("ok", "got it"), classify it as GREETING, THANKS, or ACKNOWLEDGMENT — NOT UNIVERSITY, even if prior conversation was about the university.
-- Only classify as STUDENT_SPECIFIC when the user is explicitly requesting their OWN personal student records, attendance, grades, dues, or personal timetable (e.g., "my grades", "what is my attendance?", "check my dues").
+- Only classify as STUDENT_SPECIFIC when the user is explicitly ASKING the bot to retrieve, look up, or display their OWN private student records from the database (e.g., "what is my attendance?", "show my grades", "check my fee balance", "download my hall ticket").
+- Do NOT classify statements where the user is merely sharing their own situation, background, marks, attendance percentage, or job offer (e.g., "I am a Mechanical student and got an offer from Cognizant for 4 LPA", "I scored 599 marks in 12th", "I have 71% attendance because of illness") as STUDENT_SPECIFIC! These are conversation context for university policies and rules, and MUST be classified as UNIVERSITY.
 - General informational questions about requirements, required documents, eligibility criteria, certificates needed, fee structures, or application procedures (e.g. "what are the required documents?", "documents needed for admission", "how to apply") MUST ALWAYS be classified as UNIVERSITY, NEVER as STUDENT_SPECIFIC.
-- Only classify as UNIVERSITY if the user is asking a university-specific question or follow-up (e.g. "how much is that?", "what about late registration?", "where is it?").
+- Only classify as UNIVERSITY if the user is asking a university-specific question, policy query, campus inquiry, or follow-up (e.g. "how much is that?", "what about late registration?", "where is it?", "can I sit for placements?").
 
 Recent Conversation:
 {{context}}
