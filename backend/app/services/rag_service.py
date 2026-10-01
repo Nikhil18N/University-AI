@@ -7,6 +7,10 @@ import chromadb
 from app.config import settings
 from app.providers.base import LLMProvider
 from app.providers.embedding_base import EmbeddingProvider
+from app.services.guardrail_service import (
+    verify_numeric_faithfulness,
+    verify_retrieval_confidence,
+)
 from app.services.prompt_service import render_prompt
 
 logger = logging.getLogger(__name__)
@@ -141,6 +145,35 @@ class RAGService:
             {"role": "user", "content": question},
         ]
         answer = await self.llm.generate(messages, temperature=0.3)
+
+        # Runtime Hallucination Guardrail: Verify numeric and percentage claims
+        is_faithful, unsupported = verify_numeric_faithfulness(
+            answer=answer,
+            evidence_text=evidence_text,
+            conversation_context=conversation_context,
+            question=question,
+        )
+        if not is_faithful:
+            logger.warning(
+                "Self-correction triggered: LLM draft contained unverified numbers %s",
+                unsupported,
+            )
+            correction_instruction = (
+                f"CORRECTION: Your previous draft stated number(s) or percentage(s) that are NOT present "
+                f"in the evidence or conversation: {', '.join(unsupported)}. "
+                f"Do NOT invent or assume numbers. Rewrite your response using strictly verified numbers "
+                f"from the evidence, or state that the specific detail is not specified in the documents."
+            )
+            correction_messages = messages + [
+                {"role": "assistant", "content": answer},
+                {"role": "user", "content": correction_instruction},
+            ]
+            corrected_answer = await self.llm.generate(correction_messages, temperature=0.1)
+            second_check, still_unsupported = verify_numeric_faithfulness(
+                corrected_answer, evidence_text, conversation_context, question
+            )
+            if second_check or len(still_unsupported) < len(unsupported):
+                answer = corrected_answer
 
         return answer, sources
 
