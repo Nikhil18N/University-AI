@@ -8,7 +8,9 @@ const API_BASE = "http://localhost:8080";
 export interface SourceReference {
   document_id: string;
   title: string;
+  section?: string;
   page?: number;
+  page_url?: string;
   department?: string;
   effective_date?: string;
 }
@@ -158,6 +160,29 @@ export interface AdminStats {
   negative_feedback: number;
 }
 
+export interface FeedbackPayload {
+  session_id: string;
+  conversation_id: string;
+  message_id: string;
+  rating: number;
+  comment?: string;
+}
+
+export async function submitFeedback(
+  payload: FeedbackPayload
+): Promise<{ id: string; status: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to submit feedback");
+  }
+  return res.json();
+}
+
 export interface FeedbackItem {
   id: string;
   session_id: string;
@@ -165,6 +190,8 @@ export interface FeedbackItem {
   message_id: string;
   rating: number;
   comment: string | null;
+  question?: string | null;
+  answer?: string | null;
   created_at: string;
 }
 

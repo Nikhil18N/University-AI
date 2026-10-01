@@ -6,9 +6,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.deps import get_llm_provider, get_rag_service
+from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service
 from app.db.session import get_db
 from app.providers.base import LLMProvider
+from app.providers.embedding_base import EmbeddingProvider
 from app.schemas.chat import (
     ChatRequest,
     ChatResponse,
@@ -116,6 +117,7 @@ async def delete_conversation(
 async def submit_feedback(
     request: FeedbackRequest,
     db: AsyncSession = Depends(get_db),
+    embeddings: EmbeddingProvider = Depends(get_embedding_provider),
 ) -> FeedbackResponse:
     """Submit user feedback (thumbs up/down and optional comment)."""
-    return await conversation_service.create_feedback(db, request)
+    return await conversation_service.create_feedback(db, request, embeddings)

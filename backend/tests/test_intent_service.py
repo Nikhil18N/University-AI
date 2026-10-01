@@ -75,3 +75,25 @@ async def test_classify_intent_llm_markdown_json():
     )
     assert intent == "GENERAL_CONVERSATION"
     assert conf == 0.88
+
+
+def test_score_replies_classified_as_university_with_context():
+    context = "assistant: What score did you get in your 12th exams?"
+    assert fast_classify("93%", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("93", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("85% in PCM", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("I scored 78%", conversation_context=context) == "UNIVERSITY"
+
+
+@pytest.mark.asyncio
+async def test_student_specific_guardrail_override():
+    # If LLM hallucinates STUDENT_SPECIFIC on a simple number/answer, guardrail should override it
+    mock_llm = MockLLM('{"intent": "STUDENT_SPECIFIC", "confidence": 0.95}')
+    context = "assistant: What score did you achieve?"
+    intent, _ = await classify_intent(
+        "93%",
+        conversation_context=context,
+        llm_provider=mock_llm,
+    )
+    assert intent == "UNIVERSITY"
+

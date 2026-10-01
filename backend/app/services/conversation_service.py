@@ -179,9 +179,11 @@ def _parse_sources(sources_data: dict | list | None) -> list[SourceReference] | 
 
 
 async def create_feedback(
-    db: AsyncSession, request: FeedbackRequest
+    db: AsyncSession,
+    request: FeedbackRequest,
+    embeddings: object | None = None,
 ) -> FeedbackResponse:
-    """Store user feedback for a message."""
+    """Store user feedback for a message and update self-improvement exemplar store."""
     feedback = Feedback(
         session_id=request.session_id,
         conversation_id=request.conversation_id,
@@ -191,4 +193,47 @@ async def create_feedback(
     )
     db.add(feedback)
     await db.flush()
+
+    # Self-improvement loop: Learn from verified positive feedback
+    try:
+        from app.services.exemplar_service import ExemplarService
+        from app.providers.embedding_base import EmbeddingProvider
+
+        emb_provider = embeddings if isinstance(embeddings, EmbeddingProvider) else None
+        exemplar_service = ExemplarService(emb_provider)
+
+        if request.rating == 1 and emb_provider:
+            # Look up assistant message
+            stmt_assistant = select(Message).where(Message.id == request.message_id)
+            result = await db.execute(stmt_assistant)
+            assistant_msg = result.scalar_one_or_none()
+
+            if assistant_msg:
+                # Find the user question that prompted this answer
+                stmt_user = (
+                    select(Message)
+                    .where(
+                        Message.conversation_id == assistant_msg.conversation_id,
+                        Message.role == "user",
+                        Message.created_at <= assistant_msg.created_at,
+                    )
+                    .order_by(Message.created_at.desc())
+                    .limit(1)
+                )
+                res_user = await db.execute(stmt_user)
+                user_msg = res_user.scalar_one_or_none()
+
+                if user_msg and user_msg.content.strip():
+                    await exemplar_service.register_exemplar(
+                        message_id=assistant_msg.id,
+                        question=user_msg.content,
+                        answer=assistant_msg.content,
+                    )
+        elif request.rating == -1:
+            # Prune from exemplar store if it was previously saved
+            await exemplar_service.remove_exemplar(request.message_id)
+    except Exception as e:
+        logger.warning("Feedback exemplar registration encountered an error: %s", e)
+
     return FeedbackResponse(id=feedback.id, status="received")
+

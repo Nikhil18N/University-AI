@@ -65,3 +65,45 @@ def verify_retrieval_confidence(
 
     best_distance = min(distances)
     return best_distance <= confidence_threshold
+
+
+URL_PATTERN = re.compile(
+    r"(?:https?://[^\s)\]]+|portal\.[a-z0-9.-]+|(?:www\.)?[a-z0-9-]+\.(?:edu|edu\.in|com|org)/[^\s)\]]*)",
+    re.I,
+)
+
+
+def verify_url_faithfulness(
+    answer: str,
+    evidence_text: str,
+) -> tuple[bool, list[str]]:
+    """Check if URLs or portal mentions in the answer are grounded in the evidence.
+
+    Returns (is_faithful, list_of_unsupported_urls).
+    """
+    found_urls = [m.group(0).rstrip(".,;!?:") for m in URL_PATTERN.finditer(answer)]
+    if not found_urls:
+        return True, []
+
+    evidence_lower = evidence_text.lower()
+    unsupported = [
+        url for url in found_urls if url.lower() not in evidence_lower
+    ]
+    return len(unsupported) == 0, unsupported
+
+
+def sanitize_hallucinated_urls(answer: str, unsupported_urls: list[str]) -> str:
+    """Replace unsupported portal links and fabricated URLs with offline contact instructions."""
+    sanitized = answer
+    for url in unsupported_urls:
+        sanitized = re.sub(
+            re.escape(url),
+            "the academic coordinator or admissions office",
+            sanitized,
+            flags=re.I,
+        )
+    # Also clean up phrases like "visit portal.university.edu" or "login at..."
+    sanitized = re.sub(r"\blogin (?:at|to) (?:the )?", "contact the ", sanitized, flags=re.I)
+    sanitized = re.sub(r"\bvisit (?:at|to) (?:the )?", "contact the ", sanitized, flags=re.I)
+    return sanitized
+

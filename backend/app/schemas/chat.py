@@ -25,7 +25,9 @@ class SourceReference(BaseModel):
 
     document_id: str
     title: str
+    section: str | None = None
     page: int | None = None
+    page_url: str | None = None
     department: str | None = None
     effective_date: str | None = None
 

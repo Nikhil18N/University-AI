@@ -7,9 +7,12 @@ import chromadb
 from app.config import settings
 from app.providers.base import LLMProvider
 from app.providers.embedding_base import EmbeddingProvider
+from app.services.exemplar_service import ExemplarService
 from app.services.guardrail_service import (
+    sanitize_hallucinated_urls,
     verify_numeric_faithfulness,
     verify_retrieval_confidence,
+    verify_url_faithfulness,
 )
 from app.services.prompt_service import render_prompt
 
@@ -28,6 +31,7 @@ class RAGService:
     ):
         self.llm = llm_provider
         self.embeddings = embedding_provider
+        self.exemplars = ExemplarService(embedding_provider)
         self._chroma_client = chromadb.HttpClient(
             host=settings.CHROMA_HOST,
             port=settings.CHROMA_PORT,
@@ -131,12 +135,25 @@ class RAGService:
 
         evidence_text = "\n\n".join(evidence_parts)
 
+        # Check for a verified exemplar from prior approved feedback (Self-Improvement)
+        matching_exemplar = await self.exemplars.find_matching_exemplar(question)
+        if matching_exemplar:
+            exemplar_block = (
+                "Verified Exemplar (High-Quality Prior Answer for Reference):\n"
+                f"Similar Question: {matching_exemplar['question']}\n"
+                f"Approved Answer: {matching_exemplar['answer']}\n"
+                "Note: Use the verified exemplar above as a structural and factual guide to ensure consistency.\n"
+            )
+        else:
+            exemplar_block = ""
+
         # Build the RAG prompt from the versioned template
         rag_prompt = render_prompt(
             "rag",
             question=question,
             conversation=conversation_context,
             evidence=evidence_text,
+            exemplar=exemplar_block,
         )
 
         # Call the LLM
@@ -146,7 +163,7 @@ class RAGService:
         ]
         answer = await self.llm.generate(messages, temperature=0.3)
 
-        # Runtime Hallucination Guardrail: Verify numeric and percentage claims
+        # Runtime Hallucination Guardrail 1: Verify numeric and percentage claims
         is_faithful, unsupported = verify_numeric_faithfulness(
             answer=answer,
             evidence_text=evidence_text,
@@ -174,6 +191,12 @@ class RAGService:
             )
             if second_check or len(still_unsupported) < len(unsupported):
                 answer = corrected_answer
+
+        # Runtime Hallucination Guardrail 2: Verify URLs & Portal links
+        is_url_faithful, unverified_urls = verify_url_faithfulness(answer, evidence_text)
+        if not is_url_faithful:
+            logger.warning("Sanitizing hallucinated URLs from answer: %s", unverified_urls)
+            answer = sanitize_hallucinated_urls(answer, unverified_urls)
 
         return answer, sources
 

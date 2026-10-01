@@ -197,6 +197,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               role={msg.role}
               content={msg.content}
               sources={msg.sources}
+              messageId={msg.id}
+              conversationId={activeConvId}
+              sessionId={sessionId}
             />
           ))}
 

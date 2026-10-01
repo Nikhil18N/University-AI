@@ -128,7 +128,21 @@ def _is_greeting_without_question(text: str) -> bool:
     return True
 
 
-def fast_classify(message: str) -> IntentType | None:
+# Direct score, percentage, or number answers to bot questions (e.g. "93%", "93", "85% in PCM")
+SCORE_REPLY_PATTERN = re.compile(
+    r"^\s*(?:i\s+(?:got|scored|have|achieved)\s+)?\d{1,3}(?:\.\d+)?\s*%?(?:\s*(?:marks?|out\s+of\s+\d+)?(?:\s*in\s+(?:12th|pcm|intermediate|boards?))?)?\s*$",
+    re.I,
+)
+
+# Explicit personal record lookup expressions
+PERSONAL_RECORD_LOOKUP = re.compile(
+    r"(\b(my\s+(attendance|grades?|gpa|cgpa|marks|results?|timetable|fee\s+dues|dues|schedule)|pay\s+my\s+fee)\b|"
+    r"\b(what\s+is\s+my|what\s+are\s+my|tell\s+me\s+my|show\s+my|check\s+my|view\s+my|get\s+my|fetch\s+my)\b)",
+    re.I,
+)
+
+
+def fast_classify(message: str, conversation_context: str = "") -> IntentType | None:
     """Check fast regex patterns and keyword indicators."""
     text = message.strip()
 
@@ -136,21 +150,27 @@ def fast_classify(message: str) -> IntentType | None:
     if STUDENT_NEGATION_PATTERN.search(text):
         return "GENERAL"
 
-    # 2. Student-specific individual record lookup requests
+    # 2. Direct score or percentage answer to ongoing dialogue (e.g. "93%", "93", "85% in 12th")
+    if SCORE_REPLY_PATTERN.match(text):
+        if conversation_context.strip():
+            return "UNIVERSITY"
+        return "GENERAL_CONVERSATION"
+
+    # 3. Student-specific individual record lookup requests
     if STUDENT_SPECIFIC_PATTERN.search(text):
         return "STUDENT_SPECIFIC"
 
-    # 2. University keyword check — even if query starts with a greeting
+    # 4. University keyword check — even if query starts with a greeting
     #    (e.g., "Hi, how to apply for admission?")
     words = set(re.findall(r"\w+", text.lower()))
     if words & UNIVERSITY_KEYWORDS:
         return "UNIVERSITY"
 
-    # 3. Check for greetings that do not contain substantive questions
+    # 5. Check for greetings that do not contain substantive questions
     if _is_greeting_without_question(text):
         return "GREETING"
 
-    # 4. Other conversational patterns (thanks, goodbyes, acknowledgments, help)
+    # 6. Other conversational patterns (thanks, goodbyes, acknowledgments, help)
     for pattern, intent in FAST_PATTERNS:
         if intent != "GREETING" and pattern.search(text):
             return intent
@@ -168,7 +188,7 @@ async def classify_intent(
     Returns (intent, confidence).
     """
     # 1. Try fast classifier first (0ms latency)
-    fast_result = fast_classify(message)
+    fast_result = fast_classify(message, conversation_context=conversation_context)
     if fast_result is not None:
         logger.debug("Fast classified '%s' as %s", message[:40], fast_result)
         return fast_result, 0.95
@@ -213,6 +233,14 @@ async def classify_intent(
             "UNKNOWN",
         }
         if intent in valid_intents:
+            # Guard against small LLMs falsely classifying short answers as STUDENT_SPECIFIC
+            if intent == "STUDENT_SPECIFIC" and not PERSONAL_RECORD_LOOKUP.search(message):
+                logger.info(
+                    "Guardrail: Overriding false STUDENT_SPECIFIC classification for '%s'",
+                    message[:40],
+                )
+                intent = "UNIVERSITY" if conversation_context.strip() else "GENERAL_CONVERSATION"
+
             return intent, confidence  # type: ignore
 
     except Exception as e:

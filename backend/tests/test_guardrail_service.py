@@ -57,3 +57,29 @@ def test_retrieval_confidence_threshold():
 
     # Empty chunks
     assert verify_retrieval_confidence([], confidence_threshold=0.5) is False
+
+
+def test_url_faithfulness_grounded():
+    from app.services.guardrail_service import verify_url_faithfulness
+    evidence = "You can view the schedule at https://sru.edu.in/exams"
+    answer = "The schedule is available at https://sru.edu.in/exams."
+    is_faithful, unsupported = verify_url_faithfulness(answer, evidence)
+    assert is_faithful is True
+    assert unsupported == []
+
+
+def test_url_faithfulness_catches_unsupported_portal():
+    from app.services.guardrail_service import (
+        sanitize_hallucinated_urls,
+        verify_url_faithfulness,
+    )
+    evidence = "Contact the coordinator for attendance records."
+    answer = "You can view your attendance by logging into portal.university.edu."
+    is_faithful, unsupported = verify_url_faithfulness(answer, evidence)
+    assert is_faithful is False
+    assert any("portal.university.edu" in u for u in unsupported)
+
+    sanitized = sanitize_hallucinated_urls(answer, unsupported)
+    assert "portal.university.edu" not in sanitized
+    assert "coordinator" in sanitized.lower()
+
