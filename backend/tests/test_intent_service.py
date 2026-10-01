@@ -41,6 +41,9 @@ def test_fast_classify():
     assert fast_classify("what are the required documents?") == "UNIVERSITY"
     assert fast_classify("required documents") == "UNIVERSITY"
     assert fast_classify("what documents do i need?") == "UNIVERSITY"
+    # Clarifications and negations should be GENERAL (not STUDENT_SPECIFIC)
+    assert fast_classify("i never mentioned my marks") == "GENERAL"
+    assert fast_classify("i didn't share my marks") == "GENERAL"
 
 
 @pytest.mark.asyncio

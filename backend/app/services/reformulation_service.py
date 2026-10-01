@@ -42,6 +42,14 @@ CHATTER_OR_SLANG_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+# Student profile responses or answers to qualification/discovery questions (e.g. "I got 75%", "my score is 60%", "interested in CSE", "12th PCM with 80%")
+STUDENT_PROFILE_PATTERNS = re.compile(
+    r"\b(i\s+(have|got|scored|did|completed|want|wish|am\s+interested)|"
+    r"my\s+(score|percentage|marks|rank|interest|interests|branch|stream|qualification)|"
+    r"interested\s+in|looking\s+for|pcm|bipc|eamcet|jee|intermediate|12th|10\+2)\b",
+    re.IGNORECASE,
+)
+
 # Distinct university subjects that are self-contained when queried directly
 STANDALONE_TOPICS = {
     "placement", "placements", "hostel", "hostels", "transport", "bus", "buses",
@@ -86,7 +94,13 @@ def needs_reformulation(message: str, context: str) -> bool:
         if not standalone_present:
             return True
 
-    # 5. If query mentions a clear standalone topic without coreference pronouns or slang,
+    # 6. Student profile details responding to a discovery or qualification inquiry
+    if STUDENT_PROFILE_PATTERNS.search(text):
+        words = set(re.findall(r"\w+", text.lower()))
+        if not (words & (STANDALONE_TOPICS - {"admission", "admissions", "eligibility", "qualification", "qualifications"})):
+            return True
+
+    # 7. If query mentions a clear standalone topic without coreference pronouns or slang,
     #    it is self-contained (e.g., "about placements?", "hostel rules", "library timings")
     words = set(re.findall(r"\w+", text.lower()))
     if words & STANDALONE_TOPICS:

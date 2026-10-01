@@ -63,8 +63,17 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
     ),
 ]
 
+# Direct requests for personal student records lookup (e.g. "what is my attendance", "check my GPA")
 STUDENT_SPECIFIC_PATTERN = re.compile(
-    r"\b(my\s+(attendance|grades?|gpa|marks|results?|timetable|schedule|fees?|dues?|application)|pay\s+my\s+fee)\b",
+    r"(\b(what\s+is\s+my|what\s+are\s+my|tell\s+me\s+my|show\s+my|check\s+my|view\s+my|get\s+my|fetch\s+my|can\s+you\s+check\s+my)\s+(attendance|grades?|gpa|cgpa|marks|results?|timetable|schedule|fee\s+dues|dues)\b|"
+    r"^\s*(my\s+(attendance|grades?|gpa|marks|results?|timetable|fee\s+dues|dues))\s*[?!.,]?\s*$|"
+    r"\bpay\s+my\s+fee\b)",
+    re.IGNORECASE,
+)
+
+# Negations, disclaimers, or corrections mentioning attributes (e.g., "i never mentioned my marks", "didn't say my score")
+STUDENT_NEGATION_PATTERN = re.compile(
+    r"\b(never|didn't|did\s+not|not|haven't|don't|why)\s+(mention|mentioned|say|said|give|given|share|shared|tell|told|state|stated|ask|asking)\b",
     re.IGNORECASE,
 )
 
@@ -123,7 +132,11 @@ def fast_classify(message: str) -> IntentType | None:
     """Check fast regex patterns and keyword indicators."""
     text = message.strip()
 
-    # 1. Student-specific auth check takes precedence
+    # 1. Corrections, clarifications, and negations (e.g. "i never mentioned my marks", "didn't say my score")
+    if STUDENT_NEGATION_PATTERN.search(text):
+        return "GENERAL"
+
+    # 2. Student-specific individual record lookup requests
     if STUDENT_SPECIFIC_PATTERN.search(text):
         return "STUDENT_SPECIFIC"
 

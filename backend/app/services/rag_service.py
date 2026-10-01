@@ -149,9 +149,11 @@ class RAGService:
         question: str,
         conversation_context: str = "",
         top_k: int = 6,
+        search_query: str | None = None,
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
-        chunks = await self.retrieve(question, top_k=top_k)
+        retrieval_query = search_query or question
+        chunks = await self.retrieve(retrieval_query, top_k=top_k)
         answer, sources = await self.generate_answer(
             question, conversation_context, chunks
         )

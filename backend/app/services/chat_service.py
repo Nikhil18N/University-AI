@@ -9,6 +9,7 @@ from app.config import settings
 from app.providers.base import LLMProvider
 from app.services import conversation_service, prompt_service
 from app.services.intent_service import classify_intent
+from app.services.profile_service import build_counsellor_guidance, extract_student_profile
 from app.services.reformulation_service import needs_reformulation, reformulate_query
 from app.services.rag_service import RAGService
 from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
@@ -16,10 +17,10 @@ from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
 logger = logging.getLogger(__name__)
 
 STUDENT_AUTH_MESSAGE = (
-    "To access personal student records such as your attendance, grades, GPA, "
-    "individual fee dues, or personal timetable, please log in to the student "
-    "portal at https://portal.university.edu using your student credentials. "
-    "In anonymous public mode, I do not have access to individual student records."
+    "I do not have access to individual student records (such as your personal "
+    "attendance percentage, course grades, CGPA, or specific fee payment status). "
+    "For access to your individual academic records, please reach out to your "
+    "department coordinator, faculty mentor, or the university academic section."
 )
 
 GREETING_RESPONSES_INITIAL: list[str] = [
@@ -179,9 +180,16 @@ async def handle_chat(
         logger.info("Handled via fast conversational response (%s)", intent)
 
     elif intent == "UNIVERSITY" and rag_service:
+        profile = extract_student_profile(recent)
+        guidance = build_counsellor_guidance(profile)
+        rag_context = conversation_context if is_follow_up else ""
+        if guidance:
+            rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
+
         answer, sources = await rag_service.query(
-            question=search_query,
-            conversation_context=conversation_context if is_follow_up else "",
+            question=request.message,
+            search_query=search_query,
+            conversation_context=rag_context,
         )
         logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
 
