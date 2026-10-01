@@ -155,6 +155,7 @@ async def handle_chat(
     #    Skipping reformulation for greetings/chitchat prevents "hi" from
     #    being expanded into the previous topic and misrouted to RAG.
     search_query = request.message
+    is_follow_up = False
     if intent == "UNIVERSITY":
         is_follow_up = needs_reformulation(request.message, conversation_context)
         if is_follow_up:
@@ -180,7 +181,7 @@ async def handle_chat(
     elif intent == "UNIVERSITY" and rag_service:
         answer, sources = await rag_service.query(
             question=search_query,
-            conversation_context=conversation_context,
+            conversation_context=conversation_context if is_follow_up else "",
         )
         logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
 

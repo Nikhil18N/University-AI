@@ -28,6 +28,12 @@ ATTRIBUTE_INQUIRIES = re.compile(
     re.IGNORECASE,
 )
 
+# Comparative/elliptical follow-ups (e.g. "what about for other branches?", "how about ECE?", "and for day scholars?")
+COMPARATIVE_FOLLOWUP_PATTERNS = re.compile(
+    r"^\s*(what\s+about|how\s+about|and\s+for|what\s+of|what\s+for)\b",
+    re.IGNORECASE,
+)
+
 # Conversational chatter prefixes / slang markers that contaminate vector search
 CHATTER_OR_SLANG_PATTERNS = re.compile(
     r"\b(btw|anyway|anyways|lol|lmao|haha|tbh|bro|dude|damnn?|cool\s+cool|"
@@ -67,7 +73,13 @@ def needs_reformulation(message: str, context: str) -> bool:
     if CONTINUATION_PATTERNS.search(text):
         return True
 
-    # 4. Attribute-only follow-ups (e.g., "what about single rooms?", "fees?", "timings?")
+    # 4. Comparative/elliptical follow-ups (e.g., "what about for other branches?", "how about ECE?")
+    if COMPARATIVE_FOLLOWUP_PATTERNS.search(text):
+        words = set(re.findall(r"\w+", text.lower()))
+        if not (words & STANDALONE_TOPICS):
+            return True
+
+    # 5. Attribute-only follow-ups (e.g., "fees?", "timings?")
     if ATTRIBUTE_INQUIRIES.search(text):
         words = set(re.findall(r"\w+", text.lower()))
         standalone_present = bool(words & (STANDALONE_TOPICS - {"fee", "fees"}))

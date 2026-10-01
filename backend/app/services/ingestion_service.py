@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md", ".docx"}
 
 # Chunking configuration
-CHUNK_SIZE = 500        # target words per chunk
-CHUNK_OVERLAP = 50      # overlap words between chunks
+CHUNK_SIZE = 250        # target words per chunk
+CHUNK_OVERLAP = 40      # overlap words between chunks
 
 
 def _compute_checksum(file_bytes: bytes) -> str:
@@ -78,7 +78,7 @@ def _extract_text(file_path: Path) -> list[dict]:
 def _chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
     """Split text into overlapping word-based chunks.
 
-    Tries to break at paragraph boundaries when possible.
+    Tries to break at paragraph and markdown section boundaries when possible.
     """
     if not text.strip():
         return []
@@ -93,16 +93,25 @@ def _chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OV
     for para in paragraphs:
         para_words = para.split()
         para_word_count = len(para_words)
+        is_heading = para.startswith("#") or para.startswith("---")
 
-        # If adding this paragraph exceeds chunk_size, finalize current chunk
-        if current_word_count + para_word_count > chunk_size and current_chunk:
+        # Finalize current chunk if adding this paragraph exceeds chunk_size,
+        # or if reaching a new markdown section and current chunk is already substantial
+        if current_chunk and (
+            current_word_count + para_word_count > chunk_size
+            or (is_heading and current_word_count >= 70)
+        ):
             chunk_text = "\n\n".join(current_chunk)
             chunks.append(chunk_text)
 
-            # Overlap: keep last part of current chunk
-            overlap_text = " ".join(chunk_text.split()[-overlap:])
-            current_chunk = [overlap_text, para]
-            current_word_count = overlap + para_word_count
+            # Overlap: keep last part of current chunk (skip overlap across hard section breaks)
+            if not is_heading:
+                overlap_text = " ".join(chunk_text.split()[-overlap:])
+                current_chunk = [overlap_text, para]
+                current_word_count = min(overlap, len(overlap_text.split())) + para_word_count
+            else:
+                current_chunk = [para]
+                current_word_count = para_word_count
         else:
             current_chunk.append(para)
             current_word_count += para_word_count

@@ -37,7 +37,7 @@ class RAGService:
         )
 
     async def retrieve(
-        self, query: str, top_k: int = 5
+        self, query: str, top_k: int = 6
     ) -> list[dict]:
         """Retrieve the most relevant document chunks for a query.
 
@@ -148,7 +148,7 @@ class RAGService:
         self,
         question: str,
         conversation_context: str = "",
-        top_k: int = 5,
+        top_k: int = 6,
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         chunks = await self.retrieve(question, top_k=top_k)
