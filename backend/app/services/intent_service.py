@@ -33,11 +33,17 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
         "GREETING",
     ),
     (
-        re.compile(r"\b(bye|goodbye|see\s+you|farewell|take\s+care|cya)\b", re.IGNORECASE),
+        re.compile(
+            r"^\s*(bye|goodbye|see\s+you|farewell|take\s+care|cya)(\s+(later|bro|all|buddy|soon))?[.!?\s]*$",
+            re.IGNORECASE,
+        ),
         "GOODBYE",
     ),
     (
-        re.compile(r"\b(thanks|thank\s+you|thx|much\s+appreciated|appreciate\s+it|many\s+thanks)\b", re.IGNORECASE),
+        re.compile(
+            r"^\s*(thanks|thank\s+you|thx|much\s+appreciated|appreciate\s+it|many\s+thanks)(\s+(a\s+lot|so\s+much|bro|sir|buddy|assistant|bot))?[.!?\s]*$",
+            re.IGNORECASE,
+        ),
         "THANKS",
     ),
     (
@@ -80,6 +86,18 @@ UNIVERSITY_KEYWORDS = {
     "accommodation", "program", "programs", "btech", "mtech", "mba", "phd",
     "chancellor", "ranking", "rankings", "nirf", "accreditation",
     "warangal", "visit", "places", "tourist", "tourism", "temple", "ramappa", "laknavaram", "fort",
+    # Common shortcuts, slang, and typo variants
+    "admsn", "admsns", "adm", "admision", "elgblty", "elgible", "eligiblity",
+    "plcmnt", "plcmnts", "placmnt", "placmnts", "pakg", "pkg", "ctc", "lpa",
+    "schlrshp", "schlrshps", "scholrshp", "scholrshps",
+    "attndnc", "atndnc", "attendence",
+    "hostle", "hostles", "intime", "outtime",
+    "sem", "sems",
+    "cgpa", "sgpa",
+    "cse", "ece", "eee", "mech", "civil", "aiml",
+    "prof", "hod", "vc",
+    "mrks",
+    "clg", "collge", "cllg", "univ", "varsity", "sru",
 }
 
 

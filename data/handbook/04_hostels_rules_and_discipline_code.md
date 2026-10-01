@@ -47,10 +47,11 @@
 
 ---
 
-## 4. In-Time, Biometric Roll Call & Out-Pass Regulations
-* **Night In-Time / Curfew**:
-  - Weekdays (Monday to Friday): Students must be inside the hostel premises by **9:00 PM**.
-  - Weekends (Saturday & Sunday): Students must be inside by **9:30 PM**.
+## 4. Hostel In-Time, Curfew & Biometric Roll Call Regulations
+* **Hostel In-Time / Night Curfew Timings**:
+  - Applicable to all hostellers across all years (including 1st year B.Tech students):
+  - **Weekdays (Monday to Friday)**: Students must be inside the hostel premises by **9:00 PM** (in-time).
+  - **Weekends (Saturday & Sunday)**: Students must be inside by **9:30 PM** (in-time).
 * **Biometric Roll Call Hours**:
   - Weekdays: Biometric attendance must be registered before **9:30 PM**.
   - Weekends: Biometric attendance must be registered before **10:00 PM**.

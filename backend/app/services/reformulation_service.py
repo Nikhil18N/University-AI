@@ -28,6 +28,14 @@ ATTRIBUTE_INQUIRIES = re.compile(
     re.IGNORECASE,
 )
 
+# Conversational chatter prefixes / slang markers that contaminate vector search
+CHATTER_OR_SLANG_PATTERNS = re.compile(
+    r"\b(btw|anyway|anyways|lol|lmao|haha|tbh|bro|dude|damnn?|cool\s+cool|"
+    r"wht|abt|elgblty|elgible|admsn|admsns|plcmnt|plcmnts|attndnc|atndnc|"
+    r"schlrshp|schlrshps|mrks|pakg|pkg|hostle|intime|outtime|clg)\b",
+    re.IGNORECASE,
+)
+
 # Distinct university subjects that are self-contained when queried directly
 STANDALONE_TOPICS = {
     "placement", "placements", "hostel", "hostels", "transport", "bus", "buses",
@@ -40,36 +48,41 @@ STANDALONE_TOPICS = {
 
 
 def needs_reformulation(message: str, context: str) -> bool:
-    """Determine if a message requires contextual coreference resolution."""
+    """Determine if a message requires contextual coreference resolution or query cleanup."""
+    text = message.strip()
+
+    # 1. Conversational chatter or slang contaminates vector retrieval: clean it up
+    if CHATTER_OR_SLANG_PATTERNS.search(text):
+        return True
+
+    # Context-dependent rules require existing conversation history
     if not context.strip():
         return False
 
-    text = message.strip()
-
-    # 1. Explicit coreference pronouns (e.g., "when does it close?", "how much is that?")
+    # 2. Explicit coreference pronouns (e.g., "when does it close?", "how much is that?")
     if COREFERENCE_PATTERNS.search(text):
         return True
 
-    # 2. Open-ended continuation (e.g., "tell me more", "more details")
+    # 3. Open-ended continuation (e.g., "tell me more", "more details")
     if CONTINUATION_PATTERNS.search(text):
         return True
 
-    # 3. Attribute-only follow-ups (e.g., "what about single rooms?", "fees?", "timings?")
+    # 4. Attribute-only follow-ups (e.g., "what about single rooms?", "fees?", "timings?")
     if ATTRIBUTE_INQUIRIES.search(text):
         words = set(re.findall(r"\w+", text.lower()))
         standalone_present = bool(words & (STANDALONE_TOPICS - {"fee", "fees"}))
         if not standalone_present:
             return True
 
-    # 4. If query mentions a clear standalone topic without coreference pronouns,
+    # 5. If query mentions a clear standalone topic without coreference pronouns or slang,
     #    it is self-contained (e.g., "about placements?", "hostel rules", "library timings")
     words = set(re.findall(r"\w+", text.lower()))
     if words & STANDALONE_TOPICS:
         return False
 
-    # 5. Very short messages without clear standalone subjects rely on context
+    # 6. Very short messages without clear standalone subjects rely on context
     words_list = text.split()
-    if len(words_list) <= 3:
+    if len(words_list) <= 3 and context.strip():
         return True
 
     return False

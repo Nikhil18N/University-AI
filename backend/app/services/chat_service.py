@@ -180,7 +180,7 @@ async def handle_chat(
     elif intent == "UNIVERSITY" and rag_service:
         answer, sources = await rag_service.query(
             question=search_query,
-            conversation_context=conversation_context if is_follow_up else "",
+            conversation_context=conversation_context,
         )
         logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
 

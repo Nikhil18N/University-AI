@@ -72,28 +72,36 @@ HANDBOOK_DOCS = [
         "department": "Academic Affairs",
         "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
     },
+    {
+        "file": "08_admissions_fees_scholarships_and_eligibility.md",
+        "title": "SRU Student Handbook — Admissions, Fees, Scholarships & Eligibility",
+        "document_type": "handbook",
+        "department": "Admissions & Financial Aid",
+        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
 ]
 
 
 async def clear_existing_handbook_docs(db, collection):
     """Remove previously ingested handbook documents to prevent duplicate chunks."""
     handbook_titles = {d["title"] for d in HANDBOOK_DOCS}
+
+    if collection is not None:
+        for t in handbook_titles:
+            try:
+                existing = collection.get(where={"title": t})
+                if existing and existing.get("ids"):
+                    collection.delete(ids=existing["ids"])
+                    logger.info("  Deleted %d chunks for '%s' from ChromaDB", len(existing["ids"]), t)
+            except Exception as e:
+                logger.warning("  Chroma error: %s", e)
+
     stmt = select(Document).where(Document.title.in_(handbook_titles))
     res = await db.execute(stmt)
     docs = res.scalars().all()
 
     for doc in docs:
         logger.info("Removing old handbook version: %s (id=%s)", doc.title, doc.id)
-        if collection is not None:
-            try:
-                existing = collection.get(where={"document_id": str(doc.id)}, include=["metadatas"])
-                chunk_ids = existing.get("ids", [])
-                if chunk_ids:
-                    collection.delete(ids=chunk_ids)
-                    logger.info("  Deleted %d chunks from ChromaDB", len(chunk_ids))
-            except Exception as e:
-                logger.warning("  Chroma error: %s", e)
-
         ver_stmt = select(DocumentVersion).where(DocumentVersion.document_id == doc.id)
         ver_res = await db.execute(ver_stmt)
         for v in ver_res.scalars().all():
@@ -148,6 +156,8 @@ async def ingest_handbook():
                 effective_date=doc_info["effective_date"],
             )
             logger.info("  [OK] Ingested as document_id=%s (status=%s)", doc.id, doc.status)
+
+        await db.commit()
 
     await embedding_provider.close()
     logger.info("Successfully ingested all SRU Student Handbook sections!")
