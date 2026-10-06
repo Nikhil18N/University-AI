@@ -17,7 +17,7 @@ COREFERENCE_PATTERNS = re.compile(
 
 # Open-ended continuation requests that rely entirely on previous context
 CONTINUATION_PATTERNS = re.compile(
-    r"^\s*(more\s+details|tell\s+me\s+more|what\s+else|elaborate|explain\s+further|"
+    r"^\s*(yes|yeah|yep|sure|definitely|absolutely|yes\s+please|more\s+details|tell\s+me\s+more|what\s+else|elaborate|explain\s+further|"
     r"details\s+please|and\s+then\?|why\s+so|how\s+come)\b",
     re.IGNORECASE,
 )

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { submitFeedback, type SourceReference } from "../services/api";
+import { submitFeedback } from "../services/api";
 import "./MessageBubble.css";
 
 interface Props {
   role: "user" | "assistant";
   content: string;
-  sources?: SourceReference[] | null;
+  sources?: unknown;
   messageId?: string;
   conversationId?: string | null;
   sessionId?: string;
@@ -14,7 +14,6 @@ interface Props {
 export default function MessageBubble({
   role,
   content,
-  sources,
   messageId,
   conversationId,
   sessionId,
@@ -49,19 +48,7 @@ export default function MessageBubble({
       <div className="message-body">
         <div className="message-content">{content}</div>
 
-        {/* Source citation cards */}
-        {role === "assistant" && sources && sources.length > 0 && (
-          <div className="message-sources">
-            <div className="sources-label">Official Sources:</div>
-            {sources.map((s, idx) => (
-              <div key={idx} className="source-card">
-                <span className="source-title">{s.title || "Handbook"}</span>
-                {s.section && <span className="source-dept">{s.section}</span>}
-                {s.page && <span className="source-page">Page {s.page}</span>}
-              </div>
-            ))}
-          </div>
-        )}
+
 
         {/* Feedback actions for assistant responses */}
         {role === "assistant" && messageId && conversationId && sessionId && (

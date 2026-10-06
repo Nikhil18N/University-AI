@@ -1,4 +1,5 @@
 """FastAPI application entry point."""
+# Reload configuration trigger for apodex model
 
 import logging
 from contextlib import asynccontextmanager

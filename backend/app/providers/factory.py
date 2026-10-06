@@ -15,9 +15,34 @@ def create_llm_provider() -> LLMProvider:
             base_url=settings.LLM_BASE_URL,
             model=settings.LLM_MODEL,
         )
+    elif provider == "gemini":
+        from app.providers.gemini import GeminiProvider
+        api_key = settings.GEMINI_API_KEY or settings.LLM_API_KEY
+        if not api_key:
+            raise ValueError(
+                "GEMINI_API_KEY or LLM_API_KEY is required when LLM_PROVIDER='gemini'."
+            )
+        model = settings.LLM_MODEL if "gemini" in settings.LLM_MODEL.lower() else "gemini-2.0-flash"
+        return GeminiProvider(
+            api_key=api_key,
+            model=model,
+        )
+    elif provider in ("openrouter", "openai"):
+        from app.providers.openrouter import OpenRouterProvider
+        api_key = settings.OPENROUTER_API_KEY or settings.LLM_API_KEY
+        if not api_key:
+            raise ValueError(
+                "OPENROUTER_API_KEY or LLM_API_KEY is required when LLM_PROVIDER='openrouter'."
+            )
+        model = settings.LLM_MODEL if settings.LLM_MODEL and not settings.LLM_MODEL.startswith("gemini") and not settings.LLM_MODEL.startswith("llama3") else "meta-llama/llama-3.3-70b-instruct:free"
+        return OpenRouterProvider(
+            api_key=api_key,
+            model=model,
+            base_url=settings.LLM_BASE_URL if "openrouter" not in settings.LLM_BASE_URL and "localhost" not in settings.LLM_BASE_URL else "https://openrouter.ai/api/v1",
+        )
     else:
         raise ValueError(
-            f"Unknown LLM provider: {provider!r}. Supported: ollama"
+            f"Unknown LLM provider: {provider!r}. Supported: ollama, gemini, openrouter"
         )
 
 

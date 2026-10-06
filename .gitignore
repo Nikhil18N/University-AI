@@ -12,6 +12,14 @@ env/
 # Pytest / Cache
 .pytest_cache/
 
+# Environment files & secrets
+.env
+.env.*
+*.env
+!.env.example
+!*.env.example
+
 # Uploads
 uploads/*
 !uploads/.gitkeep
+

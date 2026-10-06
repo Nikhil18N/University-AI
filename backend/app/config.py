@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "ollama"
     LLM_BASE_URL: str = "http://localhost:11434"
     LLM_MODEL: str = "llama3.2"
+    LLM_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
 
     # ---- Embedding ----
     EMBEDDING_PROVIDER: str = "ollama"

@@ -172,22 +172,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 I'm your University AI Companion. Ask me about exams, fees,
                 courses, hostel rules, or just say hello!
               </p>
-              <div className="welcome-suggestions">
-                {[
-                  "When is exam registration?",
-                  "What are the hostel rules?",
-                  "Hi! How are you?",
-                  "Tell me about the fee structure",
-                ].map((s) => (
-                  <button
-                    key={s}
-                    className="suggestion-chip"
-                    onClick={() => handleSendMessage(s)}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
             </div>
           )}
 

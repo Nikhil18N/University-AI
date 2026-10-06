@@ -134,6 +134,12 @@ SCORE_REPLY_PATTERN = re.compile(
     re.I,
 )
 
+# Affirmative responses to assistant offers or questions (e.g. "yes", "yeah", "yep", "sure", "tell me more", "yes please")
+AFFIRMATIVE_FOLLOWUP_PATTERN = re.compile(
+    r"^\s*(yes|yeah|yep|sure|definitely|absolutely|yes\s+please|tell\s+me\s+more|more\s+details|go\s+ahead|please\s+do|please|why\s+not|yup)[.!?\s]*$",
+    re.IGNORECASE,
+)
+
 # Explicit personal record lookup expressions
 PERSONAL_RECORD_LOOKUP = re.compile(
     r"(\b(my\s+(attendance|grades?|gpa|cgpa|marks|results?|timetable|fee\s+dues|dues|schedule)|pay\s+my\s+fee)\b|"
@@ -155,6 +161,13 @@ def fast_classify(message: str, conversation_context: str = "") -> IntentType | 
         if conversation_context.strip():
             return "UNIVERSITY"
         return "GENERAL_CONVERSATION"
+
+    # 2.5 Affirmative confirmation to bot questions/offers (e.g. "yes", "yeah", "sure", "tell me more")
+    if AFFIRMATIVE_FOLLOWUP_PATTERN.match(text):
+        if conversation_context.strip():
+            return "UNIVERSITY"
+        if re.match(r"^\s*(yes|yes\s+please|tell\s+me\s+more|more\s+details)[.!?\s]*$", text, re.I):
+            return "GENERAL_CONVERSATION"
 
     # 3. Student-specific individual record lookup requests
     if STUDENT_SPECIFIC_PATTERN.search(text):

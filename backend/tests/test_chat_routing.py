@@ -42,6 +42,20 @@ def test_acknowledgment_detection():
     assert fast_classify("sure") == "ACKNOWLEDGMENT"
 
 
+def test_affirmative_followup_routing():
+    context = (
+        "User: tell me about AI labs\n"
+        "Assistant: We have modern AI labs. Would you like to know more about the curriculum or the capstone project?"
+    )
+    assert fast_classify("yes", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("yeah", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("sure", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("yep", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("yes please", conversation_context=context) == "UNIVERSITY"
+    assert fast_classify("tell me more", conversation_context=context) == "UNIVERSITY"
+
+
+
 def test_fast_conversational_responses_exist():
     from app.services.chat_service import (
         FAST_CONVERSATIONAL_RESPONSES,
