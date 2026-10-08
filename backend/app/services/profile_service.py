@@ -86,7 +86,15 @@ def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
     return profile
 
 
-def build_counsellor_guidance(profile: dict[str, Any]) -> str:
+ELIGIBILITY_INTENT_PATTERN = re.compile(
+    r"\b(eligible|eligibility|qualify|qualifying|cutoff|cut\s*off|minimum\s+marks|percentage\s+required|"
+    r"can\s+i\s+(get\s+admission|join|apply)|am\s+i\s+eligible|admission\s+criteria|"
+    r"how\s+to\s+get\s+admission|admission\s+procedure|admission\s+process|how\s+can\s+i\s+join)\b",
+    re.IGNORECASE,
+)
+
+
+def build_counsellor_guidance(profile: dict[str, Any], current_query: str = "") -> str:
     """Generate unambiguous contextual directives for the RAG prompt based on known slots."""
     directives = []
 
@@ -119,9 +127,17 @@ def build_counsellor_guidance(profile: dict[str, Any]) -> str:
                 "Politely explain that it falls below the minimum requirement."
             )
     else:
+        is_asking_eligibility = bool(current_query and ELIGIBILITY_INTENT_PATTERN.search(current_query))
         directives.append(
-            "- Stated Score: NOT PROVIDED YET. NEVER invent or assume any percentage (like 75% or 60%). "
-            "State the 60% requirement and ask for their 10+2 PCM percentage."
+            "- Stated Score: NOT PROVIDED YET. NEVER invent or assume any percentage (like 75% or 60%)."
         )
+        if is_asking_eligibility:
+            directives.append(
+                "The student explicitly asked about eligibility/joining: state the 60% requirement and ask for their 10+2 PCM percentage as the single follow-up."
+            )
+        else:
+            directives.append(
+                "Do NOT proactively demand or ask for their board marks/percentage on this turn unless they explicitly ask if they qualify. Focus strictly on answering their question."
+            )
 
     return "\n".join(directives)

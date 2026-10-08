@@ -181,7 +181,7 @@ async def handle_chat(
 
     elif intent == "UNIVERSITY" and rag_service:
         profile = extract_student_profile(recent)
-        guidance = build_counsellor_guidance(profile)
+        guidance = build_counsellor_guidance(profile, current_query=request.message)
         rag_context = conversation_context
         if guidance:
             rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance

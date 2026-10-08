@@ -57,3 +57,20 @@ def test_empty_profile():
     assert profile["branch"] is None
     assert profile["has_score"] is False
     assert build_counsellor_guidance(profile) == ""
+
+
+def test_guidance_eligibility_vs_comparison():
+    messages = [{"role": "user", "content": "I want to do B.Tech CSE"}]
+    profile = extract_student_profile(messages)
+
+    # 1. Comparison query: Should NOT demand marks
+    guidance_comp = build_counsellor_guidance(
+        profile, current_query="compare CSE vs CSE with AIML specialization"
+    )
+    assert "Do NOT proactively demand or ask for their board marks" in guidance_comp
+
+    # 2. Eligibility query: Should ask for marks
+    guidance_elig = build_counsellor_guidance(
+        profile, current_query="Am I eligible for admission in CSE?"
+    )
+    assert "state the 60% requirement and ask for their 10+2 PCM percentage" in guidance_elig
