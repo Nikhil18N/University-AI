@@ -18,7 +18,16 @@ class GeminiProvider(LLMProvider):
         if not api_key:
             raise ValueError("Gemini API key is required.")
         self.api_key = api_key
-        self.model = model
+        # Automatically upgrade deprecated/unavailable models
+        legacy_models = {
+            "gemini-2.0-flash": "gemini-3.5-flash",
+            "gemini-2.0-flash-lite": "gemini-3.5-flash-lite",
+            "gemini-2.5-flash": "gemini-3.5-flash",
+            "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
+            "gemini-1.5-flash": "gemini-3.5-flash",
+            "gemini-1.5-flash-8b": "gemini-3.5-flash-lite",
+        }
+        self.model = legacy_models.get(model, model)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         self._client = httpx.AsyncClient(
             timeout=httpx.Timeout(60.0, connect=10.0),
@@ -87,13 +96,15 @@ class GeminiProvider(LLMProvider):
         url = f"{self.base_url}/models/{self.model}:generateContent"
 
         response = await self._client.post(url, json=payload)
-        if response.status_code in (404, 503) and self.model != "gemini-3.5-flash":
+        if response.status_code in (404, 503):
+            fallback_target = "gemini-3.5-flash-lite" if self.model != "gemini-3.5-flash-lite" else "gemini-3.5-flash"
             logger.warning(
-                "Gemini model '%s' returned status %d. Falling back to 'gemini-3.5-flash'.",
+                "Gemini model '%s' returned status %d. Falling back to '%s'.",
                 self.model,
                 response.status_code,
+                fallback_target,
             )
-            self.model = "gemini-3.5-flash"
+            self.model = fallback_target
             url = f"{self.base_url}/models/{self.model}:generateContent"
             response = await self._client.post(url, json=payload)
 

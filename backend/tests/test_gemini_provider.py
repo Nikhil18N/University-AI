@@ -68,8 +68,14 @@ def test_factory_gemini_missing_key():
 def test_factory_gemini_success():
     with patch("app.config.settings.LLM_PROVIDER", "gemini"):
         with patch("app.config.settings.GEMINI_API_KEY", "test-key-123"):
-            with patch("app.config.settings.LLM_MODEL", "gemini-2.0-flash"):
+            with patch("app.config.settings.LLM_MODEL", "gemini-3.5-flash"):
                 p = create_llm_provider()
                 assert isinstance(p, GeminiProvider)
-                assert p.model == "gemini-2.0-flash"
+                assert p.model == "gemini-3.5-flash"
                 assert p.api_key == "test-key-123"
+
+
+def test_gemini_legacy_model_upgrade():
+    p = GeminiProvider(api_key="test-key-123", model="gemini-2.0-flash")
+    assert p.model == "gemini-3.5-flash"
+
