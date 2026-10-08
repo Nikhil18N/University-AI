@@ -48,9 +48,18 @@ async def send_message(
         return await chat_service.handle_chat(db, request, llm, rag)
     except Exception as e:
         logger.error("Chat error: %s", e, exc_info=True)
+        err_msg = str(e)
+        if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
+            detail = "AI model rate limit reached. Please wait a moment and try again."
+        elif "11434" in err_msg or ("ConnectError" in type(e).__name__ and "embedding" in err_msg.lower()):
+            detail = "Could not connect to Ollama embedding service. Please run 'ollama serve' to enable document retrieval."
+        elif "5433" in err_msg or "ConnectionRefusedError" in type(e).__name__:
+            detail = "Database service unreachable. Please ensure PostgreSQL is running."
+        else:
+            detail = "Something went wrong processing your message. Please try again."
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something went wrong processing your message. Please try again.",
+            detail=detail,
         )
 
 
