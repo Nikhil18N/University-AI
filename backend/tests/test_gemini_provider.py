@@ -57,6 +57,37 @@ async def test_gemini_generate_success():
         mock_post.assert_called_once()
 
 
+@pytest.mark.asyncio
+async def test_gemini_generate_429_fallback():
+    provider = GeminiProvider(api_key="fake-test-key", model="gemini-3.5-flash")
+
+    # First call returns 429, second returns 200
+    resp_429 = MagicMock()
+    resp_429.status_code = 429
+
+    resp_200 = MagicMock()
+    resp_200.status_code = 200
+    resp_200.json.return_value = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [{"text": "Answer from fallback model"}],
+                    "role": "model",
+                }
+            }
+        ]
+    }
+    resp_200.raise_for_status = MagicMock()
+
+    with patch.object(provider._client, "post", new_callable=AsyncMock) as mock_post:
+        mock_post.side_effect = [resp_429, resp_200]
+        result = await provider.generate([{"role": "user", "content": "Hello"}])
+
+        assert result == "Answer from fallback model"
+        assert mock_post.call_count == 2
+        assert provider.model == "gemini-3.5-flash-lite"
+
+
 def test_factory_gemini_missing_key():
     with patch("app.config.settings.LLM_PROVIDER", "gemini"):
         with patch("app.config.settings.GEMINI_API_KEY", ""):

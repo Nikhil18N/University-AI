@@ -91,32 +91,51 @@ class GeminiProvider(LLMProvider):
         temperature: float = 0.7,
         max_tokens: int | None = None,
     ) -> str:
-        """Send messages to Gemini and return the full response."""
+        """Send messages to Gemini and return the full response with automatic quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
-        url = f"{self.base_url}/models/{self.model}:generateContent"
+        models_to_try = [self.model] + [
+            m
+            for m in [
+                "gemini-3.5-flash-lite",
+                "gemini-3.6-flash",
+                "gemini-3.7-flash",
+                "gemini-flash-latest",
+                "gemini-3.1-flash-lite",
+                "gemini-3.5-flash",
+            ]
+            if m != self.model
+        ]
 
-        response = await self._client.post(url, json=payload)
-        if response.status_code in (404, 503):
-            fallback_target = "gemini-3.5-flash-lite" if self.model != "gemini-3.5-flash-lite" else "gemini-3.5-flash"
-            logger.warning(
-                "Gemini model '%s' returned status %d. Falling back to '%s'.",
-                self.model,
-                response.status_code,
-                fallback_target,
-            )
-            self.model = fallback_target
-            url = f"{self.base_url}/models/{self.model}:generateContent"
-            response = await self._client.post(url, json=payload)
+        last_response = None
+        for model_name in models_to_try:
+            url = f"{self.base_url}/models/{model_name}:generateContent"
+            try:
+                response = await self._client.post(url, json=payload)
+                last_response = response
+                if response.status_code == 200:
+                    self.model = model_name
+                    data = response.json()
+                    candidates = data.get("candidates", [])
+                    if not candidates:
+                        return ""
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    return "".join(p.get("text", "") for p in parts)
+                elif response.status_code in (429, 404, 503):
+                    logger.warning(
+                        "Gemini model '%s' returned status %d. Auto-falling back to next available model.",
+                        model_name,
+                        response.status_code,
+                    )
+                    continue
+                else:
+                    response.raise_for_status()
+            except httpx.TimeoutException:
+                logger.warning("Gemini model '%s' timed out. Trying next candidate...", model_name)
+                continue
 
-        response.raise_for_status()
-        data = response.json()
-
-        candidates = data.get("candidates", [])
-        if not candidates:
-            return ""
-
-        parts = candidates[0].get("content", {}).get("parts", [])
-        return "".join(p.get("text", "") for p in parts)
+        if last_response is not None:
+            last_response.raise_for_status()
+        raise RuntimeError("All available Gemini models are currently exhausted or unreachable.")
 
     async def stream(
         self,
@@ -124,28 +143,53 @@ class GeminiProvider(LLMProvider):
         temperature: float = 0.7,
         max_tokens: int | None = None,
     ) -> AsyncIterator[str]:
-        """Stream tokens from Gemini."""
+        """Stream tokens from Gemini with automatic quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
-        url = f"{self.base_url}/models/{self.model}:streamGenerateContent?alt=sse"
+        models_to_try = [self.model] + [
+            m
+            for m in [
+                "gemini-3.5-flash-lite",
+                "gemini-3.6-flash",
+                "gemini-3.7-flash",
+                "gemini-flash-latest",
+                "gemini-3.1-flash-lite",
+                "gemini-3.5-flash",
+            ]
+            if m != self.model
+        ]
 
-        async with self._client.stream("POST", url, json=payload) as response:
-            response.raise_for_status()
-            async for line in response.aiter_lines():
-                line = line.strip()
-                if not line or not line.startswith("data: "):
-                    continue
-                json_str = line[len("data: ") :]
-                try:
-                    data = json.loads(json_str)
-                    candidates = data.get("candidates", [])
-                    if candidates:
-                        parts = candidates[0].get("content", {}).get("parts", [])
-                        for p in parts:
-                            text = p.get("text", "")
-                            if text:
-                                yield text
-                except json.JSONDecodeError:
-                    continue
+        for model_name in models_to_try:
+            url = f"{self.base_url}/models/{model_name}:streamGenerateContent?alt=sse"
+            try:
+                async with self._client.stream("POST", url, json=payload) as response:
+                    if response.status_code in (429, 404, 503):
+                        logger.warning(
+                            "Gemini stream '%s' returned status %d. Auto-falling back to next model.",
+                            model_name,
+                            response.status_code,
+                        )
+                        continue
+                    response.raise_for_status()
+                    self.model = model_name
+                    async for line in response.aiter_lines():
+                        line = line.strip()
+                        if not line or not line.startswith("data: "):
+                            continue
+                        json_str = line[len("data: ") :]
+                        try:
+                            data = json.loads(json_str)
+                            candidates = data.get("candidates", [])
+                            if candidates:
+                                parts = candidates[0].get("content", {}).get("parts", [])
+                                for p in parts:
+                                    text = p.get("text", "")
+                                    if text:
+                                        yield text
+                        except json.JSONDecodeError:
+                            continue
+                    return
+            except httpx.TimeoutException:
+                continue
 
     async def close(self):
         """Close the HTTP client."""
