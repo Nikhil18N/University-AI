@@ -210,7 +210,14 @@ class RAGService:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         retrieval_query = search_query or question
         chunks = await self.retrieve(retrieval_query, top_k=top_k)
+        effective_question = question
+        clean_q = question.lower().strip(" .!?,")
+        if search_query and (
+            clean_q in ("yes", "yeah", "yep", "sure", "ok", "tell me more", "more details", "go ahead", "definitely", "yes please", "why not")
+            or len(clean_q.split()) <= 2
+        ):
+            effective_question = f"{question} ({search_query})"
         answer, sources = await self.generate_answer(
-            question, conversation_context, chunks
+            effective_question, conversation_context, chunks
         )
         return answer, sources
