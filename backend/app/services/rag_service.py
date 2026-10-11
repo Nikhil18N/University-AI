@@ -85,6 +85,71 @@ class RAGService:
         )
         return chunks
 
+    async def prepare_rag_request(
+        self,
+        question: str,
+        conversation_context: str,
+        retrieved_chunks: list[dict],
+    ) -> tuple[list[dict[str, str]], list[dict], str]:
+        """Format evidence and prompt for the LLM. Returns (messages, sources, evidence_text)."""
+        if not retrieved_chunks:
+            return [], [], ""
+
+        evidence_parts = []
+        sources = []
+        seen_docs = set()
+
+        for i, chunk in enumerate(retrieved_chunks, 1):
+            meta = chunk["metadata"]
+            section = meta.get("section", "")
+            page_url = meta.get("page_url", "")
+            label = section or meta.get("title", "Unknown")
+            evidence_parts.append(
+                f"[Source {i}] {label}"
+                + (f" — {page_url}" if page_url else "")
+                + f"\n{chunk['content']}"
+            )
+
+            doc_key = (meta.get("document_id", ""), meta.get("section", meta.get("page", "")))
+            if doc_key not in seen_docs:
+                seen_docs.add(doc_key)
+                sources.append({
+                    "document_id": meta.get("document_id", ""),
+                    "title": meta.get("title", "Unknown"),
+                    "section": meta.get("section", ""),
+                    "page": meta.get("page"),
+                    "page_url": meta.get("page_url", ""),
+                    "department": meta.get("department"),
+                    "effective_date": meta.get("effective_date"),
+                })
+
+        evidence_text = "\n\n".join(evidence_parts)
+
+        matching_exemplar = await self.exemplars.find_matching_exemplar(question)
+        if matching_exemplar:
+            exemplar_block = (
+                "Verified Exemplar (High-Quality Prior Answer for Reference):\n"
+                f"Similar Question: {matching_exemplar['question']}\n"
+                f"Approved Answer: {matching_exemplar['answer']}\n"
+                "Note: Use the verified exemplar above as a structural and factual guide to ensure consistency.\n"
+            )
+        else:
+            exemplar_block = ""
+
+        rag_prompt = render_prompt(
+            "rag",
+            question=question,
+            conversation=conversation_context,
+            evidence=evidence_text,
+            exemplar=exemplar_block,
+        )
+
+        messages = [
+            {"role": "system", "content": rag_prompt},
+            {"role": "user", "content": question},
+        ]
+        return messages, sources, evidence_text
+
     async def generate_answer(
         self,
         question: str,
@@ -103,64 +168,9 @@ class RAGService:
                 [],
             )
 
-        # Format evidence for the prompt
-        evidence_parts = []
-        sources = []
-        seen_docs = set()
-
-        for i, chunk in enumerate(retrieved_chunks, 1):
-            meta = chunk["metadata"]
-            section = meta.get("section", "")
-            page_url = meta.get("page_url", "")
-            label = section or meta.get("title", "Unknown")
-            evidence_parts.append(
-                f"[Source {i}] {label}"
-                + (f" — {page_url}" if page_url else "")
-                + f"\n{chunk['content']}"
-            )
-
-            # Deduplicate source references
-            doc_key = (meta.get("document_id", ""), meta.get("section", meta.get("page", "")))
-            if doc_key not in seen_docs:
-                seen_docs.add(doc_key)
-                sources.append({
-                    "document_id": meta.get("document_id", ""),
-                    "title": meta.get("title", "Unknown"),
-                    "section": meta.get("section", ""),
-                    "page": meta.get("page"),
-                    "page_url": meta.get("page_url", ""),
-                    "department": meta.get("department"),
-                    "effective_date": meta.get("effective_date"),
-                })
-
-        evidence_text = "\n\n".join(evidence_parts)
-
-        # Check for a verified exemplar from prior approved feedback (Self-Improvement)
-        matching_exemplar = await self.exemplars.find_matching_exemplar(question)
-        if matching_exemplar:
-            exemplar_block = (
-                "Verified Exemplar (High-Quality Prior Answer for Reference):\n"
-                f"Similar Question: {matching_exemplar['question']}\n"
-                f"Approved Answer: {matching_exemplar['answer']}\n"
-                "Note: Use the verified exemplar above as a structural and factual guide to ensure consistency.\n"
-            )
-        else:
-            exemplar_block = ""
-
-        # Build the RAG prompt from the versioned template
-        rag_prompt = render_prompt(
-            "rag",
-            question=question,
-            conversation=conversation_context,
-            evidence=evidence_text,
-            exemplar=exemplar_block,
+        messages, sources, evidence_text = await self.prepare_rag_request(
+            question, conversation_context, retrieved_chunks
         )
-
-        # Call the LLM
-        messages = [
-            {"role": "system", "content": rag_prompt},
-            {"role": "user", "content": question},
-        ]
         answer = await self.llm.generate(messages, temperature=0.3)
 
         # Runtime Hallucination Guardrail 1: Verify numeric and percentage claims

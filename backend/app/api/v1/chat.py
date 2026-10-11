@@ -4,6 +4,7 @@ import logging
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service
@@ -61,6 +62,25 @@ async def send_message(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=detail,
         )
+
+
+@router.post("/chat/stream")
+async def send_message_stream(
+    request: ChatRequest,
+    db: AsyncSession = Depends(get_db),
+    llm: LLMProvider = Depends(get_llm_provider),
+    rag: RAGService = Depends(get_rag_service),
+) -> StreamingResponse:
+    """Send a chat message and stream tokens via Server-Sent Events (SSE)."""
+    return StreamingResponse(
+        chat_service.handle_chat_stream(db, request, llm, rag),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get(

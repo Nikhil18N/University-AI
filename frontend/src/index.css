@@ -1,25 +1,30 @@
 /* ======================================
    University AI Companion — Design System
-   Dark theme with premium aesthetics
+   Modern Dual Light & Dark Themes
    ====================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
-  /* Colors — Deep navy dark theme */
-  --bg: #0f1117;
-  --surface-1: #161822;
-  --surface-2: #1e2030;
-  --surface-3: #262940;
-  --border: #2a2d3e;
-  --text: #e4e6f0;
-  --text-muted: #8b8fa7;
+:root,
+[data-theme="light"] {
+  /* Light Theme */
+  --bg: #f8fafc;
+  --surface-1: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-1: #0f172a;
+  --text-2: #475569;
+  --text-muted: #64748b;
 
-  /* Accent — Vibrant indigo-purple */
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.15);
-  --accent-bg: rgba(99, 102, 241, 0.08);
+  /* Accent */
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.15);
+  --accent-bg: rgba(2, 132, 199, 0.08);
+  --primary: #0284c7;
+  --primary-light: #e0f2fe;
 
   /* Status */
   --danger: #ef4444;
@@ -32,11 +37,38 @@
   line-height: 1.5;
   color: var(--text);
 
-  /* Rendering */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --bg: #0b0f19;
+  --surface-1: #111827;
+  --surface-2: #1e293b;
+  --surface-3: #334155;
+  --border: #283548;
+  --text: #f3f4f6;
+  --text-1: #f9fafb;
+  --text-2: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Accent */
+  --accent: #38bdf8;
+  --accent-hover: #0ea5e9;
+  --accent-glow: rgba(56, 189, 248, 0.2);
+  --accent-bg: rgba(56, 189, 248, 0.12);
+  --primary: #38bdf8;
+  --primary-light: rgba(56, 189, 248, 0.18);
+
+  /* Status */
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.15);
+  --success: #4ade80;
 
   color-scheme: dark;
 }
@@ -53,6 +85,8 @@ html, body {
   width: 100%;
   overflow: hidden;
   background: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {

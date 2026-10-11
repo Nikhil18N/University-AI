@@ -1,0 +1,399 @@
+/* Rich Interactive Cards Styling */
+
+.rich-card {
+  margin-top: 14px;
+  background: var(--surface-1, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  animation: cardFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rich-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.card-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--primary-light, #e0f2fe);
+  color: var(--primary, #0284c7);
+}
+
+.card-badge.badge-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.card-badge.badge-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+/* Comparison Card */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.comparison-col {
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.col-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--primary-light, #e0f2fe);
+  color: var(--primary, #0284c7);
+}
+
+.col-name {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+.col-section {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-2, #475569);
+}
+
+.col-section p {
+  margin: 2px 0 0 0;
+}
+
+.section-label {
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+.col-advantage {
+  margin-top: auto;
+  padding: 8px 10px;
+  background: var(--surface-1, #ffffff);
+  border-left: 3px solid var(--primary, #0284c7);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-1, #0f172a);
+}
+
+/* Fee Card */
+.fee-table-wrapper {
+  overflow-x: auto;
+}
+
+.fee-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.fee-table th {
+  background: var(--surface-2, #f8fafc);
+  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--text-2, #475569);
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.fee-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  color: var(--text-1, #0f172a);
+}
+
+.fee-category-cell {
+  font-weight: 500;
+}
+
+.fee-amount-cell {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--primary, #0284c7);
+}
+
+.fee-frequency-cell {
+  color: var(--text-2, #475569);
+  font-size: 0.8rem;
+}
+
+.fee-note-cell {
+  color: var(--text-2, #475569);
+  font-size: 0.82rem;
+}
+
+.card-callout {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.scholarship-callout {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.callout-icon {
+  font-size: 1.2rem;
+}
+
+/* Curriculum Card */
+.curriculum-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.curriculum-tab-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e2e8f0);
+  background: var(--surface-2, #f8fafc);
+  color: var(--text-2, #475569);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.curriculum-tab-btn:hover {
+  background: var(--surface-1, #ffffff);
+  color: var(--text-1, #0f172a);
+}
+
+.curriculum-tab-btn.active {
+  background: var(--primary, #0284c7);
+  color: #ffffff;
+  border-color: var(--primary, #0284c7);
+}
+
+.tab-credits {
+  font-size: 0.7rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.curriculum-tab-btn.active .tab-credits {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.curriculum-courses {
+  padding: 12px;
+  background: var(--surface-2, #f8fafc);
+  border-radius: 8px;
+}
+
+.category-title {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+.category-credits {
+  font-size: 0.8rem;
+  color: var(--primary, #0284c7);
+}
+
+.course-badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.course-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: var(--surface-1, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--text-1, #0f172a);
+}
+
+.course-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary, #0284c7);
+}
+
+/* Campus Tour Card */
+.campus-spots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.campus-spot-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-2, #f8fafc);
+  border-radius: 8px;
+  border: 1px solid var(--border, #e2e8f0);
+  transition: transform 0.15s ease;
+}
+
+.campus-spot-item:hover {
+  transform: translateX(4px);
+}
+
+.spot-icon-wrapper {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spot-name {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+.spot-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-2, #475569);
+  line-height: 1.4;
+}
+
+/* Profile Card */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-2, #475569);
+  font-weight: 600;
+}
+
+.field-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+.status-pill {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.status-success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.status-warning {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.next-steps-box {
+  margin-top: 6px;
+  padding: 10px 12px;
+  background: var(--surface-2, #f8fafc);
+  border-radius: 6px;
+  border: 1px solid var(--border, #e2e8f0);
+}
+
+.next-steps-text {
+  margin: 4px 0 0 0;
+  font-size: 0.84rem;
+  color: var(--text-1, #0f172a);
+  line-height: 1.4;
+}

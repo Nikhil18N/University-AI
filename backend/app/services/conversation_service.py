@@ -73,6 +73,9 @@ async def get_conversation(
                 role=m.role,
                 content=m.content,
                 sources=_parse_sources(m.sources),
+                suggestions=(m.metadata_ or {}).get("suggestions", []),
+                cards=(m.metadata_ or {}).get("cards", []),
+                flow=(m.metadata_ or {}).get("flow"),
                 model=m.model,
                 created_at=m.created_at,
             )
@@ -112,6 +115,7 @@ async def add_message(
     content: str,
     model: str | None = None,
     sources: list[dict] | None = None,
+    metadata: dict | None = None,
 ) -> Message:
     """Add a message to a conversation."""
     msg = Message(
@@ -120,6 +124,7 @@ async def add_message(
         content=content,
         model=model,
         sources=sources,
+        metadata_=metadata,
     )
     db.add(msg)
     await db.flush()

@@ -7,6 +7,7 @@ POST /api/v1/auth/refresh
 
 ## Chat
 POST /api/v1/chat
+POST /api/v1/chat/stream
 GET /api/v1/conversations
 GET /api/v1/conversations/{conversation_id}
 DELETE /api/v1/conversations/{conversation_id}
@@ -26,6 +27,7 @@ GET /api/v1/admin/feedback
 
 ```json
 {
+  "session_id": "browser-session-uuid",
   "conversation_id": "uuid-or-null",
   "message": "When is exam registration?"
 }
@@ -44,9 +46,22 @@ GET /api/v1/admin/feedback
       "title": "Academic Calendar",
       "page": 4
     }
-  ]
+  ],
+  "suggestions": [
+    "📋 How to Apply",
+    "💰 Fee Structure"
+  ],
+  "cards": [],
+  "flow": null,
+  "model": "gemini-3.5-flash-lite"
 }
 ```
+
+## Chat SSE Stream format
+`POST /api/v1/chat/stream` returns `text/event-stream` chunks:
+- `data: {"type": "start", "conversation_id": "uuid"}`
+- `data: {"type": "token", "delta": "word "}`
+- `data: {"type": "done", "conversation_id": "uuid", "message_id": "uuid", "answer": "...", "sources": [...], "suggestions": [...], "cards": [...], "flow": null, "model": "..."}`
 
 ## Feedback request example
 

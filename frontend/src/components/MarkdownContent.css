@@ -1,0 +1,91 @@
+.markdown-content {
+  line-height: 1.65;
+  font-size: 0.95rem;
+  color: inherit;
+  display: inline-block;
+  width: 100%;
+}
+
+.chat-paragraph {
+  margin: 0 0 8px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.chat-line-break {
+  height: 8px;
+}
+
+.chat-inline-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+
+.chat-inline-link:hover {
+  opacity: 0.85;
+}
+
+.inline-code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.chat-bullet-list {
+  margin: 4px 0 10px 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-list-item {
+  line-height: 1.55;
+}
+
+.chat-numbered-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+  line-height: 1.55;
+}
+
+.num-badge {
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Pulsing Real-time Streaming Caret */
+.streaming-caret {
+  display: inline-block;
+  width: 7px;
+  height: 15px;
+  margin-left: 4px;
+  vertical-align: -2px;
+  background-color: var(--accent);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--accent);
+  animation: caretBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes caretBlink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(0.9);
+  }
+}
