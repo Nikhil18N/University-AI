@@ -2,6 +2,7 @@ import { useState } from "react";
 import { submitFeedback, type SourceReference } from "../services/api";
 import { RenderCard } from "./Cards";
 import MarkdownContent from "./MarkdownContent";
+import { copyCleanText } from "../utils/cleanCopy";
 import "./MessageBubble.css";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
   messageId?: string;
   conversationId?: string | null;
   sessionId?: string;
+  createdAt?: string;
   isStreaming?: boolean;
   onSuggestionClick?: (text: string) => void;
 }
@@ -27,6 +29,22 @@ const EMOJI_REACTIONS = [
   { emoji: "🤔", label: "Thinking" },
 ];
 
+/** Format ISO timestamp string to human-friendly local time (e.g. 10:45 AM) */
+function formatMessageTime(isoString?: string): string {
+  if (!isoString) {
+    return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) {
+      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+}
+
 export default function MessageBubble({
   role,
   content,
@@ -37,12 +55,18 @@ export default function MessageBubble({
   messageId,
   conversationId,
   sessionId,
+  createdAt,
   isStreaming,
   onSuggestionClick,
 }: Props) {
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedClean, setCopiedClean] = useState(false);
+  const [copiedRaw, setCopiedRaw] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // If content is very long (> 1600 characters) and not streaming, provide collapsible view
+  const isLongMessage = !isStreaming && role === "assistant" && content.length > 1600;
 
   async function handleReaction(item: { emoji: string; label: string; rating?: number }) {
     if (selectedReaction === item.emoji) return;
@@ -66,11 +90,23 @@ export default function MessageBubble({
     }
   }
 
-  function handleCopy() {
-    navigator.clipboard.writeText(content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // Clean copy strips markdown markers (for WhatsApp, Email, Docs)
+  async function handleCleanCopy() {
+    const success = await copyCleanText(content);
+    if (success) {
+      setCopiedClean(true);
+      setTimeout(() => setCopiedClean(false), 2000);
+    }
   }
+
+  // Raw copy preserves markdown syntax
+  function handleRawCopy() {
+    navigator.clipboard.writeText(content);
+    setCopiedRaw(true);
+    setTimeout(() => setCopiedRaw(false), 2000);
+  }
+
+  const timeLabel = formatMessageTime(createdAt);
 
   return (
     <div className={`message-bubble ${role}`}>
@@ -86,6 +122,18 @@ export default function MessageBubble({
       </div>
 
       <div className="message-body">
+        {/* Message Top Header: Identity & Timestamp */}
+        <div className="message-meta-header">
+          <span className="message-sender-name">
+            {role === "user" ? "You" : "SRU Buddy"}
+          </span>
+          {timeLabel && (
+            <time className="message-timestamp" title={createdAt}>
+              {timeLabel}
+            </time>
+          )}
+        </div>
+
         {/* Guided Flow Step Banner */}
         {role === "assistant" && flow && (
           <div className="flow-step-banner">
@@ -106,13 +154,33 @@ export default function MessageBubble({
         )}
 
         {/* Message Content Bubble with Live Markdown & Streaming Caret */}
-        <div className="message-content">
+        <div
+          className={`message-content ${
+            isLongMessage && !isExpanded ? "message-content-collapsed" : ""
+          }`}
+        >
           <MarkdownContent content={content} isStreaming={isStreaming} />
+
+          {/* Fade-out overlay when long message is collapsed */}
+          {isLongMessage && !isExpanded && (
+            <div className="collapsed-gradient-overlay" aria-hidden="true" />
+          )}
         </div>
+
+        {/* Expand / Collapse Toggle for Long Messages */}
+        {isLongMessage && (
+          <button
+            type="button"
+            className="expand-collapse-btn"
+            onClick={() => setIsExpanded((prev) => !prev)}
+          >
+            {isExpanded ? "▴ Show less" : "▾ Show full answer"}
+          </button>
+        )}
 
         {/* Rich Interactive Cards (Shown once streaming is complete) */}
         {!isStreaming && role === "assistant" && cards && cards.length > 0 && (
-          <div className="message-cards-container">
+          <div className="message-cards-container fade-in-group">
             {cards.map((card, idx) => (
               <RenderCard key={idx} card={card} />
             ))}
@@ -121,7 +189,7 @@ export default function MessageBubble({
 
         {/* Quick Suggestion Chips (Shown once streaming is complete) */}
         {!isStreaming && role === "assistant" && suggestions && suggestions.length > 0 && (
-          <div className="suggestion-chips-wrapper">
+          <div className="suggestion-chips-wrapper fade-in-group">
             <span className="chips-hint">Suggested follow-ups:</span>
             <div className="suggestion-chips-list">
               {suggestions.map((suggestion, idx) => (
@@ -130,6 +198,7 @@ export default function MessageBubble({
                   className="suggestion-chip"
                   onClick={() => onSuggestionClick?.(suggestion)}
                   title={`Ask: ${suggestion}`}
+                  style={{ animationDelay: `${idx * 0.05}s` }}
                 >
                   {suggestion}
                 </button>
@@ -140,7 +209,7 @@ export default function MessageBubble({
 
         {/* Action Row: Emoji Reactions & Copy Button (Shown once streaming is complete) */}
         {!isStreaming && role === "assistant" && (
-          <div className="message-action-bar">
+          <div className="message-action-bar fade-in-group">
             <div className="emoji-reaction-group">
               {EMOJI_REACTIONS.map((item) => (
                 <button
@@ -148,6 +217,7 @@ export default function MessageBubble({
                   className={`emoji-btn ${selectedReaction === item.emoji ? "selected" : ""}`}
                   onClick={() => handleReaction(item)}
                   title={item.label}
+                  type="button"
                 >
                   <span className="emoji-char">{item.emoji}</span>
                 </button>
@@ -163,9 +233,24 @@ export default function MessageBubble({
               )}
             </div>
 
-            <button className="copy-btn" onClick={handleCopy} title="Copy response">
-              {copied ? "✓ Copied" : "📋 Copy"}
-            </button>
+            <div className="copy-action-group">
+              <button
+                className="copy-btn clean-copy-btn"
+                onClick={handleCleanCopy}
+                title="Copy clean plain text without Markdown markers (ideal for sharing)"
+                type="button"
+              >
+                {copiedClean ? "✓ Clean Copied!" : "📋 Clean Copy"}
+              </button>
+              <button
+                className="copy-btn raw-copy-btn"
+                onClick={handleRawCopy}
+                title="Copy raw Markdown"
+                type="button"
+              >
+                {copiedRaw ? "✓ MD" : "MD"}
+              </button>
+            </div>
           </div>
         )}
       </div>

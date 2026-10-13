@@ -7,7 +7,7 @@
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-  animation: cardFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: cardFadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -15,14 +15,14 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
-@keyframes cardFadeIn {
+@keyframes cardFadeInScale {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 

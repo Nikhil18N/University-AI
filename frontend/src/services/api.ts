@@ -145,19 +145,22 @@ export function sendMessageStream(
           const trimmed = line.trim();
           if (!trimmed || !trimmed.startsWith("data: ")) continue;
           const jsonStr = trimmed.slice(6);
+          let parsed: any;
           try {
-            const parsed = JSON.parse(jsonStr);
-            if (parsed.type === "start") {
-              callbacks.onStart?.(parsed.conversation_id);
-            } else if (parsed.type === "token") {
-              callbacks.onToken?.(parsed.delta);
-            } else if (parsed.type === "done") {
-              callbacks.onDone?.(parsed);
-            } else if (parsed.type === "error") {
-              throw new Error(parsed.detail || "Error streaming response");
-            }
+            parsed = JSON.parse(jsonStr);
           } catch {
             // Ignore partial frames
+            continue;
+          }
+
+          if (parsed.type === "start") {
+            callbacks.onStart?.(parsed.conversation_id);
+          } else if (parsed.type === "token") {
+            callbacks.onToken?.(parsed.delta);
+          } else if (parsed.type === "done") {
+            callbacks.onDone?.(parsed);
+          } else if (parsed.type === "error") {
+            throw new Error(parsed.detail || "Error streaming response");
           }
         }
       }

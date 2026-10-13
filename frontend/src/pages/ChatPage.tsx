@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import MessageBubble from "../components/MessageBubble";
 import ChatInput from "../components/ChatInput";
 import ConversationList from "../components/ConversationList";
+import ThinkingIndicator from "../components/ThinkingIndicator";
 import { getSessionId } from "../hooks/useSession";
 import {
   sendMessageStream,
@@ -385,16 +386,12 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   <div className="message-avatar">
                     <div className="sru-buddy-avatar pulse">
                       <span className="buddy-icon">🎓</span>
+                      <span className="buddy-online-indicator"></span>
                     </div>
                   </div>
                   <div className="message-body">
-                    <div className="message-content typing-indicator">
-                      <span className="typing-text">SRU Buddy is thinking</span>
-                      <div className="typing-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                      </div>
+                    <div className="message-content thinking-content-box">
+                      <ThinkingIndicator />
                     </div>
                   </div>
                 </div>
@@ -412,6 +409,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 messageId={msg.id}
                 conversationId={activeConvId}
                 sessionId={sessionId}
+                createdAt={msg.created_at}
                 isStreaming={isMsgStreaming}
                 onSuggestionClick={handleSendMessage}
               />

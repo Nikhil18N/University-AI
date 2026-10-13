@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import logging
 import random
+import re
 
 from sqlalchemy.ext.asyncio import AsyncSession
 

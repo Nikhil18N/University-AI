@@ -14,23 +14,24 @@ logger = logging.getLogger(__name__)
 class GeminiProvider(LLMProvider):
     """LLM provider that communicates with Google Gemini API."""
 
-    def __init__(self, api_key: str, model: str = "gemini-3.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-3.1-flash-lite"):
         if not api_key:
             raise ValueError("Gemini API key is required.")
         self.api_key = api_key
         # Automatically upgrade deprecated/unavailable models
         legacy_models = {
-            "gemini-2.0-flash": "gemini-3.5-flash",
-            "gemini-2.0-flash-lite": "gemini-3.5-flash-lite",
-            "gemini-2.5-flash": "gemini-3.5-flash",
-            "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
-            "gemini-1.5-flash": "gemini-3.5-flash",
-            "gemini-1.5-flash-8b": "gemini-3.5-flash-lite",
+            "gemini-2.0-flash": "gemini-3.1-flash-lite",
+            "gemini-2.0-flash-lite": "gemini-3.1-flash-lite",
+            "gemini-2.5-flash": "gemini-3.1-flash-lite",
+            "gemini-2.5-flash-lite": "gemini-3.1-flash-lite",
+            "gemini-1.5-flash": "gemini-3.1-flash-lite",
+            "gemini-1.5-flash-8b": "gemini-3.1-flash-lite",
+            "gemini-3.5-flash-lite": "gemini-3.1-flash-lite",
         }
         self.model = legacy_models.get(model, model)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         self._client = httpx.AsyncClient(
-            timeout=httpx.Timeout(60.0, connect=10.0),
+            timeout=httpx.Timeout(15.0, connect=5.0),
             headers={"x-goog-api-key": self.api_key},
         )
 
@@ -96,12 +97,12 @@ class GeminiProvider(LLMProvider):
         models_to_try = [self.model] + [
             m
             for m in [
-                "gemini-3.5-flash-lite",
+                "gemini-3.1-flash-lite",
+                "gemini-3.8-flash",
                 "gemini-3.6-flash",
                 "gemini-3.7-flash",
+                "gemini-3.5-flash-lite",
                 "gemini-flash-latest",
-                "gemini-3.1-flash-lite",
-                "gemini-3.5-flash",
             ]
             if m != self.model
         ]
@@ -148,12 +149,12 @@ class GeminiProvider(LLMProvider):
         models_to_try = [self.model] + [
             m
             for m in [
-                "gemini-3.5-flash-lite",
+                "gemini-3.1-flash-lite",
+                "gemini-3.8-flash",
                 "gemini-3.6-flash",
                 "gemini-3.7-flash",
+                "gemini-3.5-flash-lite",
                 "gemini-flash-latest",
-                "gemini-3.1-flash-lite",
-                "gemini-3.5-flash",
             ]
             if m != self.model
         ]

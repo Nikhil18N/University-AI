@@ -78,17 +78,44 @@
   max-width: 80%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
+/* Message Meta Header: Sender Name & Timestamp */
+.message-meta-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.message-bubble.user .message-meta-header {
+  justify-content: flex-end;
+}
+
+.message-sender-name {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-2, #64748b);
+  letter-spacing: 0.02em;
+}
+
+.message-timestamp {
+  font-size: 0.70rem;
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-mono, monospace);
+}
+
+/* Message Content Box */
 .message-content {
+  position: relative;
   padding: 14px 18px;
   border-radius: 18px;
   line-height: 1.6;
   font-size: 0.95rem;
-  white-space: pre-wrap;
   word-break: break-word;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: max-height 0.3s ease;
 }
 
 .message-bubble.user .message-content {
@@ -102,6 +129,41 @@
   color: var(--text-1, #0f172a);
   border-bottom-left-radius: 4px;
   border: 1px solid var(--border);
+}
+
+/* Collapsible Long Message Styling */
+.message-content-collapsed {
+  max-height: 380px;
+  overflow: hidden;
+}
+
+.collapsed-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(to bottom, transparent, var(--surface-2));
+  pointer-events: none;
+}
+
+.expand-collapse-btn {
+  align-self: flex-start;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.expand-collapse-btn:hover {
+  background: var(--surface-3);
+  transform: translateY(-1px);
 }
 
 /* Guided Flow Banner */
@@ -161,63 +223,27 @@
   transition: width 0.4s ease;
 }
 
+/* Fade-In Group Animations */
+.fade-in-group {
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Cards Container */
 .message-cards-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-/* Sources */
-.message-sources {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-left: 2px;
-  margin-top: 4px;
-}
-
-.sources-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted, #64748b);
-}
-
-.source-cards-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.source-card {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  padding: 5px 10px;
-  background: var(--surface-2);
-  border-radius: 6px;
-  border-left: 3px solid var(--accent);
-  font-size: 0.78rem;
-  border: 1px solid var(--border);
-  border-left-width: 3px;
-}
-
-.source-title {
-  font-weight: 600;
-  color: var(--text-1);
-}
-
-.source-section,
-.source-page {
-  color: var(--text-2);
-  font-size: 0.74rem;
-}
-
-.source-section::before,
-.source-page::before {
-  content: "• ";
 }
 
 /* Suggestion Chips */
@@ -256,6 +282,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .suggestion-chip:hover {
@@ -270,7 +297,7 @@
   transform: translateY(0);
 }
 
-/* Action Bar: Reactions & Copy */
+/* Action Bar: Reactions & Clean/MD Copy */
 .message-action-bar {
   display: flex;
   align-items: center;
@@ -319,19 +346,40 @@
   animation: fadeIn 0.2s ease;
 }
 
+.copy-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .copy-btn {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 3px 8px;
+  padding: 4px 9px;
   font-size: 0.74rem;
   color: var(--text-2);
   cursor: pointer;
   transition: all 0.2s ease;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.copy-btn:hover {
-  background: var(--surface-2);
-  color: var(--text-1);
+.clean-copy-btn:hover {
+  background: var(--surface-3);
+  color: var(--accent);
   border-color: var(--accent);
+}
+
+.raw-copy-btn {
+  padding: 4px 7px;
+  font-size: 0.70rem;
+  color: var(--text-muted);
+}
+
+.raw-copy-btn:hover {
+  background: var(--surface-3);
+  color: var(--text-1);
 }
