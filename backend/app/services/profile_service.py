@@ -26,7 +26,24 @@ BRANCH_PATTERNS = [
 ]
 
 SCORE_PERCENT_PATTERN = re.compile(r"\b(\d{1,2}(?:\.\d+)?)\s*%", re.I)
+SCORE_PERCENT_WORD_PATTERN = re.compile(r"\b(\d{1,2}(?:\.\d+)?)\s*(?:percent|percentage|pct)\b", re.I)
 SCORE_FRACTION_PATTERN = re.compile(r"\b(\d{2,4})\s*(?:out\s+of|/)\s*(\d{2,4})\b", re.I)
+SCORE_VERB_KEYWORD_PATTERN = re.compile(
+    r"\b(?:got|scored|have|with|secured|my\s+marks?\s*(?:is|are)?|marks?\s*(?:is|are)?|score\s*(?:is|are)?)\s*[:=]?\s*(\d{2}(?:\.\d+)?)\b",
+    re.I,
+)
+SCORE_SUBJECT_KEYWORD_PATTERN = re.compile(
+    r"\b(?:12th|10\+2|inter|intermediate|pcm|boards?|class\s*12)\s*(?:marks?|score|percentage)?\s*(?:is|are|of|:)?\s*(\d{2}(?:\.\d+)?)\b",
+    re.I,
+)
+SCORE_NUMBER_BEFORE_SUBJECT_PATTERN = re.compile(
+    r"\b(\d{2}(?:\.\d+)?)\s*(?:marks?|%|percent)?\s*(?:in|for|at)\s*(?:12th|10\+2|inter|intermediate|pcm|boards?|class\s*12)\b",
+    re.I,
+)
+SCORE_STANDALONE_ANSWER_PATTERN = re.compile(
+    r"^\s*(\d{2}(?:\.\d+)?)\s*(?:marks?|in\s*(?:12th|inter|pcm))?\s*$",
+    re.I,
+)
 
 
 def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
@@ -58,17 +75,32 @@ def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
 
         # Check Score
         if not profile["has_score"]:
+            # 1. Percent format: e.g. 85%
             pct_match = SCORE_PERCENT_PATTERN.search(text)
             if pct_match:
                 try:
                     val = float(pct_match.group(1))
-                    if 0 < val <= 100:
+                    if 35 <= val <= 100:
                         profile["score_pct"] = val
                         profile["score_raw"] = f"{val}%"
                         profile["has_score"] = True
                 except ValueError:
                     pass
 
+            # 2. Word percent format: e.g. 85 percent, 85 percentage
+            if not profile["has_score"]:
+                word_pct_match = SCORE_PERCENT_WORD_PATTERN.search(text)
+                if word_pct_match:
+                    try:
+                        val = float(word_pct_match.group(1))
+                        if 35 <= val <= 100:
+                            profile["score_pct"] = val
+                            profile["score_raw"] = f"{val}%"
+                            profile["has_score"] = True
+                    except ValueError:
+                        pass
+
+            # 3. Fraction format: e.g. 450/600 or 920 out of 1000
             if not profile["has_score"]:
                 frac_match = SCORE_FRACTION_PATTERN.search(text)
                 if frac_match:
@@ -76,9 +108,61 @@ def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
                         obtained = float(frac_match.group(1))
                         total = float(frac_match.group(2))
                         if total > 0 and obtained <= total:
-                            pct = (obtained / total) * 100
+                            pct = round((obtained / total) * 100, 1)
                             profile["score_pct"] = pct
-                            profile["score_raw"] = f"{obtained}/{total} ({pct:.1f}%)"
+                            profile["score_raw"] = f"{obtained}/{total} ({pct}%)"
+                            profile["has_score"] = True
+                    except ValueError:
+                        pass
+
+            # 4. Contextual verbs: e.g. "i got 85 in 12th", "my marks is 85"
+            if not profile["has_score"]:
+                verb_match = SCORE_VERB_KEYWORD_PATTERN.search(text)
+                if verb_match:
+                    try:
+                        val = float(verb_match.group(1))
+                        if 35 <= val <= 100:
+                            profile["score_pct"] = val
+                            profile["score_raw"] = f"{val}%"
+                            profile["has_score"] = True
+                    except ValueError:
+                        pass
+
+            # 5. Contextual subjects: e.g. "12th marks 85", "inter 78"
+            if not profile["has_score"]:
+                subj_match = SCORE_SUBJECT_KEYWORD_PATTERN.search(text)
+                if subj_match:
+                    try:
+                        val = float(subj_match.group(1))
+                        if 35 <= val <= 100:
+                            profile["score_pct"] = val
+                            profile["score_raw"] = f"{val}%"
+                            profile["has_score"] = True
+                    except ValueError:
+                        pass
+
+            # 5.5 Number before subject: e.g. "78 in pcm", "85 in 12th"
+            if not profile["has_score"]:
+                num_subj_match = SCORE_NUMBER_BEFORE_SUBJECT_PATTERN.search(text)
+                if num_subj_match:
+                    try:
+                        val = float(num_subj_match.group(1))
+                        if 35 <= val <= 100:
+                            profile["score_pct"] = val
+                            profile["score_raw"] = f"{val}%"
+                            profile["has_score"] = True
+                    except ValueError:
+                        pass
+
+            # 6. Standalone answer: e.g. user just types "85" or "85 marks"
+            if not profile["has_score"]:
+                standalone_match = SCORE_STANDALONE_ANSWER_PATTERN.match(text)
+                if standalone_match:
+                    try:
+                        val = float(standalone_match.group(1))
+                        if 35 <= val <= 100:
+                            profile["score_pct"] = val
+                            profile["score_raw"] = f"{val}%"
                             profile["has_score"] = True
                     except ValueError:
                         pass

@@ -147,6 +147,21 @@ async def get_recent_messages(
     return [{"role": m.role, "content": m.content} for m in messages]
 
 
+async def get_all_user_messages(
+    db: AsyncSession, conversation_id: uuid.UUID
+) -> list[dict[str, str]]:
+    """Get all user messages across the conversation to reliably retain student profile slots."""
+    stmt = (
+        select(Message)
+        .where(Message.conversation_id == conversation_id, Message.role == "user")
+        .order_by(Message.created_at.asc())
+    )
+    result = await db.execute(stmt)
+    messages = result.scalars().all()
+
+    return [{"role": m.role, "content": m.content} for m in messages]
+
+
 async def update_conversation_title(
     db: AsyncSession, conversation_id: uuid.UUID, title: str
 ) -> None:

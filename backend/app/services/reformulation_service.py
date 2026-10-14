@@ -42,11 +42,75 @@ CHATTER_OR_SLANG_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+# Common university domain synonyms and colloquialisms mapped to official handbook terms
+DOMAIN_SYNONYMS: dict[str, str] = {
+    "discount": "scholarship",
+    "discounts": "scholarships",
+    "fee concession": "scholarship fee concession",
+    "fee waiver": "scholarship tuition fee waiver",
+    "concession": "scholarship",
+    "concessions": "scholarships",
+    "financial aid": "scholarship",
+    "dorm": "hostel",
+    "dorms": "hostels",
+    "dormitory": "hostel accommodation",
+    "salary": "placement package CTC",
+    "salaries": "placement packages CTC",
+    "highest salary": "highest placement package CTC",
+    "avg salary": "average placement package CTC",
+    "average salary": "average placement package CTC",
+    "seat": "admission seat intake",
+    "seats": "admission intake capacity",
+}
+
+# Rapid campus typo normalizations
+TYPO_CORRECTIONS: dict[str, str] = {
+    "elgblty": "eligibility",
+    "elgible": "eligible",
+    "admsn": "admission",
+    "admsns": "admissions",
+    "plcmnt": "placement",
+    "plcmnts": "placements",
+    "hostle": "hostel",
+    "hostles": "hostels",
+    "attndnc": "attendance",
+    "atndnc": "attendance",
+    "schlrshp": "scholarship",
+    "schlrshps": "scholarships",
+    "mrks": "marks",
+    "clg": "college",
+    "bteck": "B.Tech",
+    "syllubus": "syllabus",
+}
+
+SYNONYM_OR_TYPO_PATTERN = re.compile(
+    r"\b(" + "|".join(re.escape(k) for k in list(DOMAIN_SYNONYMS.keys()) + list(TYPO_CORRECTIONS.keys())) + r")\b",
+    re.IGNORECASE,
+)
+
+
+def canonicalize_query(query: str) -> str:
+    """Pre-retrieval normalization: correct campus typos and expand informal domain synonyms."""
+    text = query
+
+    # 1. Correct spelling typos
+    for typo, correction in TYPO_CORRECTIONS.items():
+        pattern = re.compile(r"\b" + re.escape(typo) + r"\b", re.IGNORECASE)
+        text = pattern.sub(correction, text)
+
+    # 2. Map domain synonyms (e.g. discount -> scholarship)
+    for term, canonical in DOMAIN_SYNONYMS.items():
+        pattern = re.compile(r"\b" + re.escape(term) + r"\b", re.IGNORECASE)
+        text = pattern.sub(canonical, text)
+
+    return text
+
+
 # Student profile responses or answers to qualification/discovery questions (e.g. "I got 75%", "my score is 60%", "interested in CSE", "12th PCM with 80%")
 STUDENT_PROFILE_PATTERNS = re.compile(
     r"\b(i\s+(have|got|scored|did|completed|want|wish|am\s+interested)|"
     r"my\s+(score|percentage|marks|rank|interest|interests|branch|stream|qualification)|"
-    r"interested\s+in|looking\s+for|pcm|bipc|eamcet|jee|intermediate|12th|10\+2)\b",
+    r"interested\s+in|looking\s+for|pcm|bipc|eamcet|jee|intermediate|inter|12th|10\+2)\b",
     re.IGNORECASE,
 )
 
@@ -62,11 +126,11 @@ STANDALONE_TOPICS = {
 
 
 def needs_reformulation(message: str, context: str) -> bool:
-    """Determine if a message requires contextual coreference resolution or query cleanup."""
+    """Determine if a message requires contextual coreference resolution, synonym expansion, or query cleanup."""
     text = message.strip()
 
-    # 1. Conversational chatter or slang contaminates vector retrieval: clean it up
-    if CHATTER_OR_SLANG_PATTERNS.search(text):
+    # 1. Conversational chatter, typos, or domain synonyms (e.g. "discount", "dorm"): clean it up
+    if CHATTER_OR_SLANG_PATTERNS.search(text) or SYNONYM_OR_TYPO_PATTERN.search(text):
         return True
 
     # Context-dependent rules require existing conversation history
@@ -121,16 +185,17 @@ async def reformulate_query(
 ) -> str:
     """Reformulate a follow-up query into a standalone search query.
 
-    If reformulation is not needed or fails, returns the original query.
+    If reformulation is not needed or fails, returns the canonicalized query.
     """
+    canonical_message = canonicalize_query(message)
     if not needs_reformulation(message, conversation_context):
-        return message
+        return canonical_message
 
     try:
         prompt = render_prompt(
             "reformulation",
             conversation=conversation_context,
-            message=message,
+            message=canonical_message,
         )
         reformulated = await llm_provider.generate(
             messages=[{"role": "user", "content": prompt}],
@@ -144,9 +209,9 @@ async def reformulate_query(
                 message[:50],
                 cleaned[:60],
             )
-            return cleaned
+            return canonicalize_query(cleaned)
 
     except Exception as e:
         logger.warning("Query reformulation failed for '%s': %s", message[:50], e)
 
-    return message
+    return canonical_message

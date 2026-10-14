@@ -302,6 +302,7 @@ async def handle_chat_stream(
 
         # 3. Build context
         recent = await conversation_service.get_recent_messages(db, conversation.id)
+        all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
         conversation_context = "\n".join(
             f"{m['role']}: {m['content']}" for m in recent[:-1]
         )
@@ -326,7 +327,7 @@ async def handle_chat_stream(
                 }
             answer, flow_info = execute_wizard_step(wizard_step)
             intent = "ADMISSION_FLOW"
-            profile = extract_student_profile(recent)
+            profile = extract_student_profile(all_user_messages)
 
             # Stream words smoothly preserving all formatting
             for chunk in chunk_text_stream(answer):
@@ -340,7 +341,7 @@ async def handle_chat_stream(
                 conversation_context=conversation_context,
                 llm_provider=llm_provider,
             )
-            profile = extract_student_profile(recent)
+            profile = extract_student_profile(all_user_messages)
 
             if intent == "STUDENT_SPECIFIC":
                 answer = STUDENT_AUTH_MESSAGE
@@ -429,6 +430,9 @@ async def handle_chat_stream(
 
             else:
                 system_prompt = prompt_service.load_prompt("system")
+                guidance = build_counsellor_guidance(profile, current_query=request.message)
+                if guidance:
+                    system_prompt = f"{system_prompt}\n\n{guidance}".strip()
                 messages = [{"role": "system", "content": system_prompt}] + recent
                 streamed_tokens = []
                 async for token in llm_provider.stream(messages):

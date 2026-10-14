@@ -107,6 +107,10 @@ UNIVERSITY_KEYWORDS = {
     "prof", "hod", "vc",
     "mrks",
     "clg", "collge", "cllg", "univ", "varsity", "sru",
+    # Synonyms, colloquialisms, and qualifications
+    "discount", "discounts", "concession", "concessions", "waiver", "waivers",
+    "dorm", "dorms", "dormitory", "inter", "intermediate", "12th", "pcm", "boards",
+    "salary", "salaries", "package", "packages",
 }
 
 
@@ -129,8 +133,14 @@ def _is_greeting_without_question(text: str) -> bool:
 
 
 # Direct score, percentage, or number answers to bot questions (e.g. "93%", "93", "85% in PCM")
+# Direct score, percentage, or qualification statements (e.g. "93%", "93", "85% in PCM", "i got 85 in 12th", "my marks are 85")
 SCORE_REPLY_PATTERN = re.compile(
-    r"^\s*(?:i\s+(?:got|scored|have|achieved)\s+)?\d{1,3}(?:\.\d+)?\s*%?(?:\s*(?:marks?|out\s+of\s+\d+)?(?:\s*in\s+(?:12th|pcm|intermediate|boards?))?)?\s*$",
+    r"^\s*(?:i\s+(?:got|scored|have|achieved|secured)|my\s+marks?\s*(?:is|are)?|my\s+12th\s*marks?\s*(?:is|are)?)\s*[:=]?\s*\d{1,3}(?:\.\d+)?\s*%?(?:\s*(?:marks?|out\s+of\s+\d+)?(?:\s*(?:in|for)\s+(?:12th|pcm|intermediate|inter|boards?|class\s*12))?)?\s*$",
+    re.I,
+)
+
+STUDENT_SCORE_STATEMENT_PATTERN = re.compile(
+    r"\b(?:got|scored|have|marks?\s*(?:is|are)?)\s*[:=]?\s*(\d{2}(?:\.\d+)?)\s*(?:%|percent)?\s*(?:in|for)?\s*(?:12th|inter|intermediate|pcm|boards?)\b",
     re.I,
 )
 
@@ -156,11 +166,9 @@ def fast_classify(message: str, conversation_context: str = "") -> IntentType | 
     if STUDENT_NEGATION_PATTERN.search(text):
         return "GENERAL"
 
-    # 2. Direct score or percentage answer to ongoing dialogue (e.g. "93%", "93", "85% in 12th")
-    if SCORE_REPLY_PATTERN.match(text):
-        if conversation_context.strip():
-            return "UNIVERSITY"
-        return "GENERAL_CONVERSATION"
+    # 2. Direct score or percentage statement (e.g. "93%", "85% in 12th", "i got 85 in 12th")
+    if SCORE_REPLY_PATTERN.match(text) or STUDENT_SCORE_STATEMENT_PATTERN.search(text):
+        return "UNIVERSITY"
 
     # 2.5 Affirmative confirmation to bot questions/offers (e.g. "yes", "yeah", "sure", "tell me more")
     if AFFIRMATIVE_FOLLOWUP_PATTERN.match(text):
