@@ -1,0 +1,71 @@
+{
+  "grounded_evaluation": {
+    "total_policies": 7,
+    "faithful_answers": 7,
+    "faithfulness_rate": 100.0,
+    "mean_score": 1.0,
+    "policy_evaluations": {
+      "btech_eligibility_cutoff": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      },
+      "direct_admission_entrance_exam": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      },
+      "attendance_minimum_requirement": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      },
+      "attendance_condonation_policy": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      },
+      "btech_cse_tuition_fee": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      },
+      "merit_scholarships_slabs": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      },
+      "highest_placement_package": {
+        "score": 1.0,
+        "is_faithful": true,
+        "detected_hallucinations": [],
+        "missing_required_facts": [],
+        "unsupported_numbers": [],
+        "explanation": "Answer is 100% faithful and grounded in official handbook documentation."
+      }
+    }
+  },
+  "hallucination_stress_test": {
+    "total_synthetic_attacks": 7,
+    "hallucinations_caught": 7,
+    "catch_rate_percent": 100.0
+  }
+}
