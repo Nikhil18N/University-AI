@@ -76,29 +76,23 @@ DOMAIN_SYNONYMS: dict[str, str] = {
     "free seat": "scholarship full fee waiver",
     "free admission": "scholarship merit admission",
 
-    # Accommodation
+    # Accommodation — only expand standalone 'dorm', not 'room' (too generic mid-sentence)
     "dorm": "hostel",
     "dorms": "hostels",
     "dormitory": "hostel accommodation",
-    "room": "hostel room",
-    "rooms": "hostel rooms",
-    "stay": "hostel accommodation",
-    "quarters": "hostel accommodation",
-    "pg": "hostel accommodation",
-    "paying guest": "hostel accommodation",
+    # 'room'/'rooms'/'stay'/'quarters'/'pg'/'paying guest' removed — too noisy mid-sentence
 
     # Placements / salaries
     "salary": "placement package CTC",
     "salaries": "placement packages CTC",
     "highest salary": "highest placement package CTC",
-    "avg salary": "average placement package CTC",
-    "average salary": "average placement package CTC",
+    # 'avg salary' and 'average salary' removed — 'avg' is caught by typo dict, not compound
     "job package": "placement package CTC",
     "job offer": "placement offer",
     "jobs": "placement",
-    "company": "placement recruiter",
+    "company": "placement recruiter company",
     "companies": "placement recruiters",
-    "mnc": "placement MNC recruiter",
+    "mnc": "MNC placement recruiter",
     "hire": "placement recruitment",
     "hiring": "placement recruitment",
     "campus drive": "campus placement drive",
@@ -107,8 +101,7 @@ DOMAIN_SYNONYMS: dict[str, str] = {
     # Admissions / seats
     "seat": "admission seat intake",
     "seats": "admission intake capacity",
-    "join": "admission enrollment",
-    "joining": "admission enrollment procedure",
+    # 'join'/'joining' removed — too generic in mid-sentence (e.g. 'how to join'→'how to admission enrollment')
     "enroll": "admission enrollment",
     "enrollment": "admission enrollment procedure",
     "take admission": "admission procedure",
@@ -132,16 +125,12 @@ DOMAIN_SYNONYMS: dict[str, str] = {
     "inter marks": "intermediate marks",
     "pcm score": "PCM 12th percentage",
 
-    # Hinglish terms (common in Telugu/Hindi speaking student population)
-    "chahiye": "required",
-    "kitna": "how much",
-    "kab": "when",
-    "kahan": "where",
-    "kaisa": "how",
-    "kitne": "how many",
-    "kaise": "how to",
+    # Hinglish meaning mappings — ONLY expand standalone words that are clearly domain terms
+    # NOTE: Generic Hinglish particles (kab, kahan, kaise, chahiye, kitna) removed — they
+    #       corrupt mid-sentence context when replaced word-for-word. The LLM reformulation
+    #       step handles these naturally.
 
-    # Common informal phrases
+    # Common informal phrases (multi-word → clear search term)
     "when to apply": "admission application deadline",
     "how to join": "admission enrollment procedure",
     "how to get in": "admission eligibility and procedure",

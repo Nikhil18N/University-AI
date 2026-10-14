@@ -40,6 +40,13 @@ STUDENT_AUTH_MESSAGE = (
     "department coordinator, faculty mentor, or the university academic section."
 )
 
+OUT_OF_SCOPE_MESSAGE = (
+    "I'm SRU Buddy, the dedicated AI assistant for SR University. "
+    "I can only help with university-related topics such as admissions, eligibility, "
+    "course curriculum, fees, scholarships, hostel accommodation, and placements. "
+    "Please ask me anything about SR University!"
+)
+
 
 def get_time_aware_greeting() -> str:
     """Return a time-appropriate greeting salutation."""
@@ -193,6 +200,10 @@ async def handle_chat(
             answer = STUDENT_AUTH_MESSAGE
             logger.info("Handled via STUDENT_SPECIFIC auth guardrail")
 
+        elif intent == "OUT_OF_SCOPE":
+            answer = OUT_OF_SCOPE_MESSAGE
+            logger.info("Handled via OUT_OF_SCOPE guardrail")
+
         elif intent in FAST_CONVERSATIONAL_RESPONSES:
             has_context = bool(conversation_context.strip())
             answer = get_conversational_response(intent, has_context=has_context)
@@ -345,6 +356,12 @@ async def handle_chat_stream(
 
             if intent == "STUDENT_SPECIFIC":
                 answer = STUDENT_AUTH_MESSAGE
+                for chunk in chunk_text_stream(answer):
+                    yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                    await asyncio.sleep(0.012)
+
+            elif intent == "OUT_OF_SCOPE":
+                answer = OUT_OF_SCOPE_MESSAGE
                 for chunk in chunk_text_stream(answer):
                     yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                     await asyncio.sleep(0.012)

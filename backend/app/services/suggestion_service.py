@@ -91,6 +91,15 @@ def generate_suggestions(
             "📋 Admission Inquiries",
         ]
 
+    # 2b. Out of scope guardrail
+    if intent == "OUT_OF_SCOPE":
+        return [
+            "🎓 B.Tech Programs & Admissions",
+            "💰 Fee Structure & Scholarships",
+            "🏢 Campus & Hostel Facilities",
+            "💼 Placement Records & CTC",
+        ]
+
     # 3. Eligibility & Cutoff
     if any(k in msg_lower for k in ("eligible", "eligibility", "cutoff", "percentage", "marks", "percent", "criteria")):
         if any(w in ans_lower for w in ("fully eligible", "you are eligible", "meets the", "exceeds the", "congratulations", "welcome")):

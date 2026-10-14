@@ -20,6 +20,7 @@ IntentType = Literal[
     "STUDENT_SPECIFIC",
     "UNIVERSITY",
     "GENERAL_CONVERSATION",
+    "OUT_OF_SCOPE",
     "UNKNOWN",
 ]
 
@@ -74,6 +75,29 @@ STUDENT_SPECIFIC_PATTERN = re.compile(
 # Negations, disclaimers, or corrections mentioning attributes (e.g., "i never mentioned my marks", "didn't say my score")
 STUDENT_NEGATION_PATTERN = re.compile(
     r"\b(never|didn't|did\s+not|not|haven't|don't|why)\s+(mention|mentioned|say|said|give|given|share|shared|tell|told|state|stated|ask|asking)\b",
+    re.IGNORECASE,
+)
+
+# Out-of-scope / prompt-injection / jailbreak guardrail
+# These queries should NEVER be routed through the RAG or LLM fallback as a university query.
+OUT_OF_SCOPE_PATTERN = re.compile(
+    r"\b("
+    # Prompt injection / jailbreak attempts
+    r"ignore\s+(all\s+)?(previous|above|prior)\s+instructions|"
+    r"you\s+are\s+now\s+(DAN|GPT|a\s+different|an\s+unrestricted)|"
+    r"act\s+as\s+(DAN|an\s+AI\s+without|an\s+unrestricted|a\s+different)|"
+    r"(reveal|tell\s+me|show\s+me|print|output|repeat|say)\s+(your|the)\s+(system\s+prompt|instructions|context|internal\s+prompt|prompt)|"
+    r"(bypass|override|disable|remove)\s+(your\s+)?(filter|restriction|safety|guardrail|training)|"
+    r"pretend\s+(you\s+are|to\s+be)|jailbreak|"
+    # Completely off-topic requests
+    r"book\s+(me\s+a?\s+)?(flight|train|bus|hotel|ticket|cab|taxi|uber|ola)|"
+    r"(order|buy|purchase|deliver)\s+(food|pizza|groceries|medicine)|"
+    r"(prime\s+minister|president|chief\s+minister|minister)\s+of\s+(india|andhra|telangana|ap|ts)|"
+    r"write\s+(me\s+a?\s+)?.*?(code|script|program|essay|article|tool)\s+(to|that|for)\s+(hack|crack|break|exploit|bypass|steal)|"
+    r"\b(hack|crack|break\s+into|exploit|bypass|steal|ddos|phish)\b.*?\b(website|account|password|database|wifi|server|system)\b|"
+    r"(hacking|phishing|ddos|malware|ransomware|keylogger|exploit)\b.*\b(tutorial|guide|how\s+to|script|code)|"
+    r"what\s+is\s+(\d+\s*[+\-*/]\s*\d+|the\s+capital\s+of|the\s+population\s+of)"
+    r")\b",
     re.IGNORECASE,
 )
 
@@ -162,9 +186,13 @@ def fast_classify(message: str, conversation_context: str = "") -> IntentType | 
     """Check fast regex patterns and keyword indicators."""
     text = message.strip()
 
+    # 0. Out-of-scope / prompt-injection / jailbreak guardrail (checked FIRST)
+    if OUT_OF_SCOPE_PATTERN.search(text):
+        return "OUT_OF_SCOPE"
+
     # 1. Corrections, clarifications, and negations (e.g. "i never mentioned my marks", "didn't say my score")
     if STUDENT_NEGATION_PATTERN.search(text):
-        return "GENERAL"
+        return "GENERAL_CONVERSATION"
 
     # 2. Direct score or percentage statement (e.g. "93%", "85% in 12th", "i got 85 in 12th")
     if SCORE_REPLY_PATTERN.match(text) or STUDENT_SCORE_STATEMENT_PATTERN.search(text):
