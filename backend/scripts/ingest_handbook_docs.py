@@ -15,7 +15,7 @@ from sqlalchemy import select
 from app.config import settings
 from app.db.session import async_session_factory
 from app.models.document import Document, DocumentVersion
-from app.providers.embedding_ollama import OllamaEmbeddingProvider
+from app.providers.factory import create_embedding_provider
 from app.services.ingestion_service import IngestionService
 from app.services.rag_service import COLLECTION_NAME
 
@@ -119,10 +119,7 @@ async def ingest_handbook():
         logger.error("Handbook directory not found: %s", handbook_dir)
         return
 
-    embedding_provider = OllamaEmbeddingProvider(
-        base_url=settings.LLM_BASE_URL,
-        model=settings.EMBEDDING_MODEL,
-    )
+    embedding_provider = create_embedding_provider()
     ingestion_service = IngestionService(embedding_provider)
 
     chroma_client = chromadb.HttpClient(

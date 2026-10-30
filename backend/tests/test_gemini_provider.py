@@ -85,7 +85,7 @@ async def test_gemini_generate_429_fallback():
 
         assert result == "Answer from fallback model"
         assert mock_post.call_count == 2
-        assert provider.model == "gemini-3.5-flash-lite"
+        assert provider.model == "gemini-3.1-flash-lite"
 
 
 def test_factory_gemini_missing_key():
@@ -108,5 +108,46 @@ def test_factory_gemini_success():
 
 def test_gemini_legacy_model_upgrade():
     p = GeminiProvider(api_key="test-key-123", model="gemini-2.0-flash")
-    assert p.model == "gemini-3.5-flash"
+    assert p.model == "gemini-3.1-flash-lite"
+
+
+@pytest.mark.asyncio
+async def test_gemini_embedding_provider():
+    from app.providers.embedding_gemini import GeminiEmbeddingProvider
+
+    provider = GeminiEmbeddingProvider(api_key="fake-test-key")
+    resp_batch = MagicMock()
+    resp_batch.status_code = 200
+    resp_batch.json.return_value = {
+        "embeddings": [{"values": [0.1, 0.2, 0.3]}, {"values": [0.4, 0.5, 0.6]}]
+    }
+    resp_batch.raise_for_status = MagicMock()
+
+    with patch.object(provider._client, "post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = resp_batch
+        res = await provider.embed(["doc1", "doc2"])
+        assert len(res) == 2
+        assert res[0] == [0.1, 0.2, 0.3]
+
+    resp_single = MagicMock()
+    resp_single.status_code = 200
+    resp_single.json.return_value = {
+        "embedding": {"values": [0.7, 0.8, 0.9]}
+    }
+    resp_single.raise_for_status = MagicMock()
+
+    with patch.object(provider._client, "post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = resp_single
+        res_single = await provider.embed_single("query")
+        assert res_single == [0.7, 0.8, 0.9]
+
+
+def test_factory_gemini_embedding_provider():
+    from app.providers.factory import create_embedding_provider
+    from app.providers.embedding_gemini import GeminiEmbeddingProvider
+
+    with patch("app.config.settings.EMBEDDING_PROVIDER", "gemini"):
+        with patch("app.config.settings.GEMINI_API_KEY", "test-key-123"):
+            emb = create_embedding_provider()
+            assert isinstance(emb, GeminiEmbeddingProvider)
 

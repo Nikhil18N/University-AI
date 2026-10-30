@@ -56,7 +56,18 @@ def create_embedding_provider() -> EmbeddingProvider:
             base_url=settings.LLM_BASE_URL,
             model=settings.EMBEDDING_MODEL,
         )
+    elif provider == "gemini":
+        from app.providers.embedding_gemini import GeminiEmbeddingProvider
+        api_key = settings.GEMINI_API_KEY or settings.LLM_API_KEY
+        if not api_key:
+            raise ValueError(
+                "GEMINI_API_KEY is required when EMBEDDING_PROVIDER='gemini'."
+            )
+        return GeminiEmbeddingProvider(
+            api_key=api_key,
+            model=settings.EMBEDDING_MODEL,
+        )
     else:
         raise ValueError(
-            f"Unknown embedding provider: {provider!r}. Supported: ollama"
+            f"Unknown embedding provider: {provider!r}. Supported: ollama, gemini"
         )
