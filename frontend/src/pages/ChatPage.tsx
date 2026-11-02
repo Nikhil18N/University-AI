@@ -76,6 +76,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelStreamRef = useRef<(() => void) | null>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
+  const isAtBottomRef = useRef(true);
 
   // Apply theme to document
   useEffect(() => {
@@ -106,25 +107,40 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     };
   }, [showExportMenu]);
 
-  // Track scroll position to toggle scroll-to-bottom button
+  // Track user's manual scroll position
   const handleScroll = () => {
     if (!messagesAreaRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = messagesAreaRef.current;
-    const isScrolledUp = scrollHeight - scrollTop - clientHeight > 160;
-    setShowScrollBottom(isScrolledUp);
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+    // If within 80px from bottom, consider user "at bottom"
+    const atBottom = distanceFromBottom <= 80;
+    isAtBottomRef.current = atBottom;
+    setShowScrollBottom(!atBottom);
   };
 
-  const scrollToBottom = (instant: boolean = false) => {
-    if (instant && messagesAreaRef.current) {
-      messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-    } else {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (smooth: boolean = true) => {
+    isAtBottomRef.current = true;
+    setShowScrollBottom(false);
+    if (messagesAreaRef.current) {
+      if (smooth) {
+        messagesAreaRef.current.scrollTo({
+          top: messagesAreaRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      } else {
+        messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+      }
     }
   };
 
+  // Only auto-scroll on new stream tokens if user is already at the bottom
+  // If the user scrolled up to read earlier text, DO NOT hijack their scroll!
   useEffect(() => {
-    if (!showScrollBottom) {
-      scrollToBottom(Boolean(streamingMsgId));
+    if (!isAtBottomRef.current) return;
+
+    if (messagesAreaRef.current) {
+      messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
     }
   }, [messages, streamingMsgId]);
 
@@ -145,9 +161,16 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setStreamingMsgId(null);
     setActiveConvId(convId);
     setError(null);
+    isAtBottomRef.current = true;
+    setShowScrollBottom(false);
     try {
       const detail = await getConversation(convId, sessionId);
       setMessages(detail.messages);
+      setTimeout(() => {
+        if (messagesAreaRef.current) {
+          messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+        }
+      }, 50);
     } catch {
       setError("Failed to load conversation.");
     }
@@ -162,6 +185,17 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setActiveConvId(null);
     setMessages([]);
     setError(null);
+    isAtBottomRef.current = true;
+    setShowScrollBottom(false);
+  }
+
+  function handleStopStreaming() {
+    if (cancelStreamRef.current) {
+      cancelStreamRef.current();
+      cancelStreamRef.current = null;
+    }
+    setIsLoading(false);
+    setStreamingMsgId(null);
   }
 
   async function handleDeleteConversation(convId: string) {
@@ -210,10 +244,25 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   };
 
   async function handleSendMessage(text: string) {
-    if (isLoading) return;
+    if (isLoading && cancelStreamRef.current) {
+      cancelStreamRef.current();
+      cancelStreamRef.current = null;
+    }
 
     setIsLoading(true);
     setError(null);
+
+    // CRITICAL: When user sends a message, immediately scroll to bottom
+    isAtBottomRef.current = true;
+    setShowScrollBottom(false);
+    if (messagesAreaRef.current) {
+      messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+    }
+    setTimeout(() => {
+      if (messagesAreaRef.current) {
+        messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+      }
+    }, 40);
 
     const userMsgId = crypto.randomUUID();
     const assistantMsgId = crypto.randomUUID();
@@ -562,17 +611,23 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           {/* Scroll-to-bottom FAB */}
           {showScrollBottom && (
             <button
-              className="scroll-bottom-fab"
-              onClick={() => scrollToBottom()}
+              className={`scroll-bottom-fab ${streamingMsgId ? "is-streaming" : ""}`}
+              onClick={() => scrollToBottom(true)}
               title="Scroll to latest message"
               aria-label="Scroll to bottom"
             >
               ↓
+              {streamingMsgId && <span className="fab-unread-dot" />}
             </button>
           )}
 
-          {/* Bottom Chat Input */}
-          <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+          {/* Bottom Chat Input (ChatGPT/Gemini style with Stop generating & free typing) */}
+          <ChatInput
+            onSend={handleSendMessage}
+            isLoading={isLoading}
+            onStop={handleStopStreaming}
+            disabled={false}
+          />
         </main>
       </div>
 

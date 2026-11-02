@@ -3,10 +3,12 @@ import "./ChatInput.css";
 
 interface Props {
   onSend: (message: string) => void;
+  isLoading?: boolean;
+  onStop?: () => void;
   disabled?: boolean;
 }
 
-export default function ChatInput({ onSend, disabled }: Props) {
+export default function ChatInput({ onSend, isLoading, onStop, disabled }: Props) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -24,19 +26,12 @@ export default function ChatInput({ onSend, disabled }: Props) {
     }
   }, []);
 
-  // Refocus when assistant finishes
-  useEffect(() => {
-    if (!disabled && window.innerWidth > 768) {
-      const timer = setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [disabled]);
-
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
+    if (isLoading && onStop) {
+      onStop();
+    }
     onSend(trimmed);
     setText("");
     if (textareaRef.current) {
@@ -61,30 +56,43 @@ export default function ChatInput({ onSend, disabled }: Props) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Message SRU Buddy..."
-          disabled={disabled}
           rows={1}
           aria-label="Message SRU Buddy"
         />
-        <button
-          className={`send-btn ${text.trim() && !disabled ? "active" : ""}`}
-          onClick={handleSubmit}
-          disabled={!text.trim() || disabled}
-          aria-label="Send message"
-          title="Send (Enter)"
-        >
-          <svg
-            width="17"
-            height="17"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+
+        {isLoading ? (
+          <button
+            className="send-btn stop-btn active"
+            onClick={onStop}
+            aria-label="Stop generating"
+            title="Stop generating"
+            type="button"
           >
-            <path d="M12 19V5M5 12l7-7 7 7" />
-          </svg>
-        </button>
+            <span className="stop-square" />
+          </button>
+        ) : (
+          <button
+            className={`send-btn ${text.trim() && !disabled ? "active" : ""}`}
+            onClick={handleSubmit}
+            disabled={!text.trim() || disabled}
+            aria-label="Send message"
+            title="Send (Enter)"
+            type="button"
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </button>
+        )}
       </div>
 
       <div className="chat-input-disclaimer">
