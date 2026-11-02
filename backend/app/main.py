@@ -24,6 +24,9 @@ async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
     logger.info("Starting University AI Companion")
     logger.info("LLM Provider: %s (%s)", settings.LLM_PROVIDER, settings.LLM_MODEL)
+    if settings.LLM_PROVIDER.lower() == "gemini":
+        gemini_keys = settings.get_gemini_api_keys()
+        logger.info("Gemini API Key Pool: %d key(s) active with auto-failover", len(gemini_keys))
     logger.info("Embedding Model: %s", settings.EMBEDDING_MODEL)
 
     # Ensure upload directory exists

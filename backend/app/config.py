@@ -49,18 +49,17 @@ class Settings(BaseSettings):
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
     def get_gemini_api_keys(self) -> list[str]:
-        """Return a list of Gemini API keys configured from GEMINI_API_KEYS or GEMINI_API_KEY."""
+        """Return a deduplicated list of Gemini API keys configured from GEMINI_API_KEYS, GEMINI_API_KEY, or GOOGLE_API_KEY."""
+        all_keys: list[str] = []
         if self.GEMINI_API_KEYS:
-            keys = [k.strip() for k in self.GEMINI_API_KEYS.split(",") if k.strip()]
-            if keys:
-                return keys
-        if self.GEMINI_API_KEY:
-            return [self.GEMINI_API_KEY.strip()]
-        if self.GOOGLE_API_KEY:
-            return [self.GOOGLE_API_KEY.strip()]
-        if self.LLM_API_KEY:
-            return [self.LLM_API_KEY.strip()]
-        return []
+            all_keys.extend(k.strip() for k in self.GEMINI_API_KEYS.split(",") if k.strip())
+        if self.GEMINI_API_KEY and self.GEMINI_API_KEY.strip():
+            all_keys.append(self.GEMINI_API_KEY.strip())
+        if self.GOOGLE_API_KEY and self.GOOGLE_API_KEY.strip():
+            all_keys.append(self.GOOGLE_API_KEY.strip())
+        if self.LLM_API_KEY and self.LLM_PROVIDER.lower() == "gemini" and self.LLM_API_KEY.strip():
+            all_keys.append(self.LLM_API_KEY.strip())
+        return list(dict.fromkeys(all_keys))
 
 
 settings = Settings()
