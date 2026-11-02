@@ -3,6 +3,8 @@ import MessageBubble from "../components/MessageBubble";
 import ChatInput from "../components/ChatInput";
 import ConversationList from "../components/ConversationList";
 import ThinkingIndicator from "../components/ThinkingIndicator";
+import ShareModal from "../components/ShareModal";
+import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
 import {
   sendMessageStream,
@@ -20,58 +22,27 @@ interface Props {
   onOpenAdmin?: () => void;
 }
 
-const QUICK_STARTERS = [
+const MINIMAL_STARTERS = [
   {
-    category: "admissions",
-    icon: "🧭",
-    title: "Admission 2026 Wizard",
-    desc: "Step-by-step guided eligibility & registration checklist",
-    prompt: "I want admission - start the admission wizard",
+    title: "Admissions 2026",
+    desc: "Eligibility criteria, cutoff ranks & application procedure",
+    prompt: "What is the eligibility criteria and admission process for B.Tech 2026?",
   },
   {
-    category: "academics",
-    icon: "🆚",
-    title: "CSE vs CSE (AI/ML)",
-    desc: "Side-by-side branch curriculum & career scope comparison",
-    prompt: "Compare CSE vs CSE with AI/ML specialization",
+    title: "Fees & Scholarships",
+    desc: "Tuition breakdown, hostel fee tiers & merit scholarships",
+    prompt: "What is the complete fee structure and merit scholarship details for B.Tech?",
   },
   {
-    category: "fees",
-    icon: "💰",
-    title: "Fee & Scholarships",
-    desc: "Tuition, hostel, mess fees & merit scholarship tiers",
-    prompt: "What is the complete annual fee structure and scholarship for B.Tech?",
+    title: "Hostel Living & Rules",
+    desc: "Room types, mess schedule, night curfew & out-pass policies",
+    prompt: "What are the hostel room options, mess food, and curfew rules?",
   },
   {
-    category: "campus",
-    icon: "🏠",
-    title: "Hostel Rules & Curfew",
-    desc: "Room types, mess schedule, night curfew & out-pass rules",
-    prompt: "What are the hostel rules, mess food details, and curfew timings?",
-  },
-  {
-    category: "tours",
-    icon: "🎥",
-    title: "Virtual Campus Tour",
-    desc: "Watch official campus walkthrough, hostels & SRiX incubator",
-    prompt: "Show me official video tours of SR University campus, hostels, and facilities",
-  },
-  {
-    category: "academics",
-    icon: "📊",
-    title: "Placement Records",
-    desc: "Highest packages, top recruiters, and placement statistics",
+    title: "Placements & Recruiters",
+    desc: "Highest packages, placement rate & top campus hiring companies",
     prompt: "Tell me about SR University placement records, top recruiters, and highest package",
   },
-];
-
-const CATEGORY_TABS = [
-  { id: "all", label: "🌟 All Topics" },
-  { id: "admissions", label: "📝 Admissions" },
-  { id: "fees", label: "💰 Fees" },
-  { id: "academics", label: "🎓 Academics" },
-  { id: "campus", label: "🏨 Hostels" },
-  { id: "tours", label: "🎥 Video Tours" },
 ];
 
 export default function ChatPage({ onOpenAdmin }: Props) {
@@ -85,7 +56,10 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
   // Responsive sidebar: closed by default on mobile (< 768px), open on desktop
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Modals & Popovers
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Theme & Sound states
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -101,6 +75,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelStreamRef = useRef<(() => void) | null>(null);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
 
   // Apply theme to document
   useEffect(() => {
@@ -113,7 +88,25 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     loadConversations();
   }, []);
 
-  // Track scroll position to toggle the scroll-to-bottom FAB
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        exportMenuRef.current &&
+        !exportMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowExportMenu(false);
+      }
+    }
+    if (showExportMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showExportMenu]);
+
+  // Track scroll position to toggle scroll-to-bottom button
   const handleScroll = () => {
     if (!messagesAreaRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = messagesAreaRef.current;
@@ -121,7 +114,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setShowScrollBottom(isScrolledUp);
   };
 
-  // Scroll smoothly or instantly to bottom
   const scrollToBottom = (instant: boolean = false) => {
     if (instant && messagesAreaRef.current) {
       messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
@@ -195,6 +187,27 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       return next;
     });
   }
+
+  // Active chat title for share & export
+  const activeChatTitle =
+    conversations.find((c) => c.id === activeConvId)?.title ||
+    messages.find((m) => m.role === "user")?.content.slice(0, 40) ||
+    "SRU Buddy Chat";
+
+  const handleExportPDF = () => {
+    setShowExportMenu(false);
+    exportToPDF(activeChatTitle, messages);
+  };
+
+  const handleExportMD = () => {
+    setShowExportMenu(false);
+    exportToMarkdown(activeChatTitle, messages);
+  };
+
+  const handleExportTXT = () => {
+    setShowExportMenu(false);
+    exportToText(activeChatTitle, messages);
+  };
 
   async function handleSendMessage(text: string) {
     if (isLoading) return;
@@ -293,30 +306,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     cancelStreamRef.current = cancelFn;
   }
 
-  const filteredStarters =
-    selectedCategory === "all"
-      ? QUICK_STARTERS
-      : QUICK_STARTERS.filter((s) => s.category === selectedCategory);
-
   return (
     <div className={`chat-page theme-${theme}`}>
-      {/* Official Top Notice Bar */}
-      <div className="official-top-banner" role="banner">
-        <span className="banner-badge">🏛️ SR UNIVERSITY</span>
-        <span className="banner-text">
-          NIRF Ranked • Admissions 2026 Open • Official AI Campus Companion
-        </span>
-        <a
-          href="https://sru.edu.in"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="banner-link"
-        >
-          sru.edu.in ↗
-        </a>
-      </div>
-
-      {/* Mobile Drawer Backdrop Overlay */}
+      {/* Mobile Drawer Backdrop */}
       {sidebarOpen && (
         <div
           className="sidebar-backdrop"
@@ -325,7 +317,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         />
       )}
 
-      {/* Main Wrapper: Sidebar + Chat Area */}
+      {/* Main Layout: Sidebar + Canvas */}
       <div className="chat-layout-wrapper">
         {/* Sliding Sidebar */}
         <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
@@ -339,83 +331,152 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           />
         </aside>
 
-        {/* Main Chat Canvas */}
+        {/* Main Canvas */}
         <main className="chat-main">
           {/* Header */}
           <header className="chat-header">
-            <button
-              className="header-icon-btn toggle-sidebar-btn"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label="Toggle sidebar"
-              title="Toggle sidebar"
-            >
-              <span className="hamburger-icon">☰</span>
-            </button>
+            <div className="header-left">
+              <button
+                className="header-icon-btn toggle-sidebar-btn"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle sidebar"
+                title="Toggle sidebar"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
 
-            {/* Official Logo & Portal Title */}
-            <div className="header-brand-group">
-              <img
-                src="/sru-logo.png"
-                alt="SR University Logo"
-                className="header-sru-logo"
-              />
-              <div className="header-title-column">
-                <div className="header-title-row">
-                  <h1 className="header-title">SR University</h1>
-                  <span className="header-status-badge">
-                    <span className="status-dot"></span> Online
-                  </span>
+              <button
+                className="header-icon-btn new-chat-header-btn"
+                onClick={handleNewChat}
+                aria-label="New chat"
+                title="New chat"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+
+              {/* Brand Branding */}
+              <div className="header-brand-group">
+                <img
+                  src="/sru-logo.png"
+                  alt="SRU Logo"
+                  className="header-sru-logo"
+                />
+                <div className="header-brand-text">
+                  <span className="header-title">SRU Buddy</span>
+                  <span className="header-tagline">Your AI agent</span>
                 </div>
-                <p className="header-subtitle">
-                  AI Companion & Official Knowledge Portal
-                </p>
               </div>
             </div>
 
             {/* Header Right Actions */}
             <div className="header-actions">
-              <a
-                href="https://sru.edu.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="header-web-link-btn"
-                title="Visit Official Website"
-              >
-                <span className="web-link-icon">🌐</span>
-                <span className="web-link-text">sru.edu.in</span>
-              </a>
+              {/* Share Chat (ChatGPT style) */}
+              {messages.length > 0 && (
+                <button
+                  className="header-action-pill-btn share-btn"
+                  onClick={() => setShowShareModal(true)}
+                  title="Share chat link"
+                  aria-label="Share chat"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                  <span className="btn-label">Share</span>
+                </button>
+              )}
 
-              <button
-                className="header-icon-btn"
-                onClick={toggleSound}
-                title={soundEnabled ? "Mute audio chimes" : "Enable audio chimes"}
-                aria-label="Toggle sound"
-              >
-                {soundEnabled ? "🔊" : "🔇"}
-              </button>
+              {/* Export Chat Dropdown */}
+              {messages.length > 0 && (
+                <div className="export-menu-container" ref={exportMenuRef}>
+                  <button
+                    className="header-action-pill-btn export-btn"
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    title="Export chat"
+                    aria-label="Export chat"
+                    aria-expanded={showExportMenu}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span className="btn-label">Export</span>
+                  </button>
 
+                  {showExportMenu && (
+                    <div className="export-dropdown-card">
+                      <div className="export-dropdown-header">Export Options</div>
+                      <button className="export-option-item" onClick={handleExportPDF}>
+                        <span className="export-opt-icon">📄</span>
+                        <div className="export-opt-text">
+                          <span className="export-opt-title">PDF / Print</span>
+                          <span className="export-opt-desc">Official university transcript layout</span>
+                        </div>
+                      </button>
+                      <button className="export-option-item" onClick={handleExportMD}>
+                        <span className="export-opt-icon">📝</span>
+                        <div className="export-opt-text">
+                          <span className="export-opt-title">Markdown (.md)</span>
+                          <span className="export-opt-desc">Formatted for Notion, Obsidian & notes</span>
+                        </div>
+                      </button>
+                      <button className="export-option-item" onClick={handleExportTXT}>
+                        <span className="export-opt-icon">📋</span>
+                        <div className="export-opt-text">
+                          <span className="export-opt-title">Plain Text (.txt)</span>
+                          <span className="export-opt-desc">Clean unformatted text transcript</span>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Theme Toggle */}
               <button
                 className="header-icon-btn"
                 onClick={toggleTheme}
-                title={theme === "light" ? "Switch to Midnight Navy mode" : "Switch to Light mode"}
+                title={theme === "light" ? "Switch to Dark mode" : "Switch to Light mode"}
                 aria-label="Toggle theme"
               >
                 {theme === "light" ? "🌙" : "☀️"}
               </button>
 
+              {/* Sound Toggle */}
+              <button
+                className="header-icon-btn sound-toggle-btn"
+                onClick={toggleSound}
+                title={soundEnabled ? "Mute chimes" : "Enable chimes"}
+                aria-label="Toggle audio"
+              >
+                {soundEnabled ? "🔊" : "🔇"}
+              </button>
+
+              {/* Admin console */}
               {onOpenAdmin && (
                 <button
-                  className="header-admin-btn"
+                  className="header-icon-btn"
                   onClick={onOpenAdmin}
-                  title="Open Knowledge & Admin Console"
+                  title="Admin console"
+                  aria-label="Admin console"
                 >
-                  ⚙️ Admin
+                  ⚙️
                 </button>
               )}
             </div>
           </header>
 
-          {/* Messages Scroll Area */}
+          {/* Messages Canvas */}
           <div
             className="messages-area"
             ref={messagesAreaRef}
@@ -423,76 +484,30 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           >
             {messages.length === 0 && (
               <div className="welcome-screen">
-                {/* Official Crest Hero */}
-                <div className="welcome-crest-hero">
-                  <div className="welcome-logo-badge">
+                {/* Minimalist Centered Brand Hero */}
+                <div className="welcome-hero-brand">
+                  <div className="welcome-hero-logo-box">
                     <img
                       src="/sru-logo.png"
                       alt="SR University"
-                      className="welcome-main-logo"
+                      className="welcome-hero-logo"
                     />
                   </div>
-                  <div className="welcome-verify-pill">
-                    <span className="verify-shield">🛡️</span>
-                    <span>Official University Knowledge System</span>
-                  </div>
+                  <h1 className="welcome-hero-title">SRU Buddy</h1>
+                  <p className="welcome-hero-tagline">Your AI agent</p>
                 </div>
 
-                <h2 className="welcome-title">SR University AI Companion</h2>
-                <p className="welcome-text">
-                  Your 24/7 intelligent guide for admissions, academic regulations,
-                  scholarships, hostel living, and campus life at SR University, Warangal.
-                </p>
-
-                {/* Accreditation & Stats Bar */}
-                <div className="welcome-stats-bar">
-                  <div className="stat-pill">
-                    <span className="stat-icon">🏆</span>
-                    <span className="stat-label">NAAC 'A+' Grade</span>
-                  </div>
-                  <div className="stat-pill">
-                    <span className="stat-icon">📈</span>
-                    <span className="stat-label">NIRF Ranked</span>
-                  </div>
-                  <div className="stat-pill">
-                    <span className="stat-icon">💡</span>
-                    <span className="stat-label">SRiX Technology Hub</span>
-                  </div>
-                  <div className="stat-pill">
-                    <span className="stat-icon">🎓</span>
-                    <span className="stat-label">UGC / AICTE Approved</span>
-                  </div>
-                </div>
-
-                {/* Category Filter Chips */}
-                <div className="welcome-category-tabs" role="tablist">
-                  {CATEGORY_TABS.map((tab) => (
-                    <button
-                      key={tab.id}
-                      className={`cat-tab-btn ${selectedCategory === tab.id ? "active" : ""}`}
-                      onClick={() => setSelectedCategory(tab.id)}
-                      type="button"
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Interactive Quick Starters Grid */}
-                <div className="quick-starters-grid">
-                  {filteredStarters.map((item, idx) => (
+                {/* 4 Clean Suggestion Cards */}
+                <div className="minimal-starters-grid">
+                  {MINIMAL_STARTERS.map((item, idx) => (
                     <button
                       key={idx}
-                      className="starter-card"
+                      className="starter-tile"
                       onClick={() => handleSendMessage(item.prompt)}
                       type="button"
                     >
-                      <div className="starter-icon">{item.icon}</div>
-                      <div className="starter-content">
-                        <div className="starter-title">{item.title}</div>
-                        <div className="starter-desc">{item.desc}</div>
-                      </div>
-                      <span className="starter-arrow">→</span>
+                      <span className="starter-tile-title">{item.title}</span>
+                      <span className="starter-tile-desc">{item.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -509,7 +524,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                     <div className="message-avatar">
                       <div className="sru-buddy-avatar pulse">
                         <img src="/sru-logo.png" alt="SRU" className="buddy-logo-img" />
-                        <span className="buddy-online-indicator"></span>
                       </div>
                     </div>
                     <div className="message-body">
@@ -545,7 +559,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Scroll-to-bottom Floating Action Button */}
+          {/* Scroll-to-bottom FAB */}
           {showScrollBottom && (
             <button
               className="scroll-bottom-fab"
@@ -561,6 +575,18 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           <ChatInput onSend={handleSendMessage} disabled={isLoading} />
         </main>
       </div>
+
+      {/* ChatGPT-style Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          conversationId={activeConvId}
+          title={activeChatTitle}
+          messages={messages}
+          onClose={() => setShowShareModal(false)}
+          onExportPDF={handleExportPDF}
+          onExportMD={handleExportMD}
+        />
+      )}
     </div>
   );
 }

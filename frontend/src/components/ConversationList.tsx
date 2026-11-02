@@ -29,8 +29,8 @@ export default function ConversationList({
             className="sidebar-sru-logo"
           />
           <div className="sidebar-brand-text">
-            <span className="sidebar-brand-title">SR University</span>
-            <span className="sidebar-brand-sub">Companion Portal</span>
+            <span className="sidebar-brand-title">SRU Buddy</span>
+            <span className="sidebar-brand-sub">Your AI agent</span>
           </div>
         </div>
         {onCloseMobile && (

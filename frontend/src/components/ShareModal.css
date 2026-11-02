@@ -1,0 +1,312 @@
+/* ==========================================================================
+   ShareModal.css — ChatGPT-style Share Link Dialog
+   ========================================================================== */
+
+.share-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: shareFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes shareFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.share-modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 18px;
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: shareSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes shareSlideUp {
+  from {
+    transform: translateY(14px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.share-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.share-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.share-header-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.share-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  letter-spacing: -0.015em;
+}
+
+.share-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-tertiary, #94a3b8);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.share-close-btn:hover {
+  background: var(--bg-surface-hover, #f1f5f9);
+  color: var(--text-primary, #0f172a);
+}
+
+.share-modal-subtitle {
+  margin: -6px 0 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #64748b);
+}
+
+/* Conversation Snapshot Preview */
+.share-preview-box {
+  background: var(--bg-main, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preview-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  padding-bottom: 8px;
+}
+
+.preview-chat-title {
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  max-width: 75%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preview-msg-count {
+  color: var(--text-tertiary, #94a3b8);
+  font-size: 0.75rem;
+}
+
+.preview-snippet {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.preview-user-bubble,
+.preview-assistant-bubble {
+  display: flex;
+  gap: 6px;
+}
+
+.preview-role-label {
+  font-weight: 700;
+  color: var(--color-sru-blue, #0055a4);
+  flex-shrink: 0;
+}
+
+.preview-text {
+  color: var(--text-secondary, #475569);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Share URL Group */
+.share-url-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-url-input {
+  flex: 1;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--text-primary, #0f172a);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.share-url-input:focus {
+  border-color: var(--color-sru-blue, #0055a4);
+  box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.12);
+}
+
+.share-copy-btn {
+  background: var(--color-sru-blue, #0055a4);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.share-copy-btn:hover {
+  background: var(--color-sru-dark, #003e7e);
+  transform: translateY(-1px);
+}
+
+.share-copy-btn.copied {
+  background: #10b981;
+}
+
+/* Channels row */
+.share-channels-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.share-channel-btn {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  padding: 10px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.share-channel-btn .channel-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.share-channel-btn:hover {
+  background: var(--bg-surface-hover, #f8fafc);
+  border-color: var(--color-sru-blue, #0055a4);
+  transform: translateY(-1px);
+}
+
+/* Footer */
+.share-modal-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #94a3b8);
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color, #f1f5f9);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .share-modal-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .share-preview-box {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .share-url-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .share-channel-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .share-channel-btn:hover {
+  background: #1e293b;
+  border-color: #38bdf8;
+}
+
+[data-theme="dark"] .share-modal-footer {
+  border-color: #334155;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 600px) {
+  .share-modal-card {
+    padding: 20px 18px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+  .share-channels-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .share-url-group {
+    flex-direction: column;
+  }
+  .share-copy-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

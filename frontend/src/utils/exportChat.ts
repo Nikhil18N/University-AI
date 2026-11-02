@@ -1,0 +1,323 @@
+import type { MessageData } from "../services/api";
+import { stripMarkdown } from "./cleanCopy";
+
+/**
+ * Export conversation to a clean Markdown (.md) file
+ */
+export function exportToMarkdown(title: string, messages: MessageData[]) {
+  const timestamp = new Date().toLocaleString();
+  let md = `# ${title || "SRU Buddy Conversation"}\n`;
+  md += `*Exported from SRU Buddy • Your AI Agent • ${timestamp}*\n\n`;
+  md += `---\n\n`;
+
+  for (const msg of messages) {
+    const sender = msg.role === "user" ? "You" : "SRU Buddy";
+    const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+    md += `### ${sender} ${time ? `(${time})` : ""}\n\n`;
+    md += `${msg.content}\n\n`;
+
+    if (msg.sources && msg.sources.length > 0) {
+      md += `**Sources Cited:**\n`;
+      for (const s of msg.sources) {
+        md += `- ${s.title}${s.section ? ` (§ ${s.section})` : ""}${s.page ? ` (p. ${s.page})` : ""}\n`;
+      }
+      md += `\n`;
+    }
+    md += `---\n\n`;
+  }
+
+  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+  downloadBlob(blob, `${slugify(title || "sru-buddy-chat")}-${dateStamp()}.md`);
+}
+
+/**
+ * Export conversation to a clean Plain Text (.txt) file
+ */
+export function exportToText(title: string, messages: MessageData[]) {
+  const timestamp = new Date().toLocaleString();
+  let txt = `=================================================================\n`;
+  txt += `SRU Buddy • Your AI Agent\n`;
+  txt += `Topic: ${title || "Conversation"}\n`;
+  txt += `Date: ${timestamp}\n`;
+  txt += `=================================================================\n\n`;
+
+  for (const msg of messages) {
+    const sender = msg.role === "user" ? "You" : "SRU Buddy";
+    const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+    txt += `[${sender}] ${time ? `(${time})` : ""}\n`;
+    txt += `${stripMarkdown(msg.content)}\n`;
+
+    if (msg.sources && msg.sources.length > 0) {
+      txt += `\nSources Cited:\n`;
+      for (const s of msg.sources) {
+        txt += `• ${s.title}${s.section ? ` - ${s.section}` : ""}\n`;
+      }
+    }
+    txt += `\n-----------------------------------------------------------------\n\n`;
+  }
+
+  const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+  downloadBlob(blob, `${slugify(title || "sru-buddy-chat")}-${dateStamp()}.txt`);
+}
+
+/**
+ * Export conversation to a beautifully styled Print / PDF document
+ */
+export function exportToPDF(title: string, messages: MessageData[]) {
+  const timestamp = new Date().toLocaleString([], {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Please allow pop-ups to export as PDF / Print.");
+    return;
+  }
+
+  let messagesHtml = "";
+  for (const msg of messages) {
+    const isUser = msg.role === "user";
+    const senderName = isUser ? "You" : "SRU Buddy";
+    const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+    const cleanBody = msg.content
+      .replace(/\n\n/g, "</p><p>")
+      .replace(/\n/g, "<br/>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+    let sourcesHtml = "";
+    if (!isUser && msg.sources && msg.sources.length > 0) {
+      sourcesHtml = `
+        <div class="sources-box">
+          <div class="sources-title">Verified University Sources Cited:</div>
+          <ul>
+            ${msg.sources.map(s => `<li><strong>${escapeHtml(s.title)}</strong> ${s.section ? `— § ${escapeHtml(s.section)}` : ""} ${s.page ? `(p. ${s.page})` : ""}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+    }
+
+    messagesHtml += `
+      <div class="message ${isUser ? "user" : "assistant"}">
+        <div class="msg-header">
+          <span class="sender">${senderName}</span>
+          <span class="time">${time}</span>
+        </div>
+        <div class="msg-body">
+          <p>${cleanBody}</p>
+          ${sourcesHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>${escapeHtml(title || "SRU Buddy Conversation")}</title>
+      <style>
+        @page {
+          margin: 18mm 16mm;
+          size: auto;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          color: #0f172a;
+          background: #ffffff;
+          line-height: 1.55;
+          font-size: 13.5px;
+          margin: 0;
+          padding: 24px;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-bottom: 14px;
+          border-bottom: 2px solid #0055a4;
+          margin-bottom: 20px;
+        }
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .brand img {
+          height: 32px;
+          width: auto;
+        }
+        .brand-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #0055a4;
+          line-height: 1.1;
+        }
+        .brand-tag {
+          font-size: 11px;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+        .meta-info {
+          text-align: right;
+          font-size: 11px;
+          color: #64748b;
+        }
+        .chat-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 16px;
+        }
+        .messages-container {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .message {
+          page-break-inside: avoid;
+          border-radius: 10px;
+          padding: 12px 14px;
+        }
+        .message.user {
+          background: #f1f5f9;
+          border-left: 3px solid #0055a4;
+        }
+        .message.assistant {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-left: 3px solid #10b981;
+        }
+        .msg-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 6px;
+          font-size: 11.5px;
+        }
+        .sender {
+          font-weight: 700;
+          color: #0055a4;
+        }
+        .message.user .sender {
+          color: #334155;
+        }
+        .time {
+          color: #94a3b8;
+        }
+        .msg-body p {
+          margin: 0 0 8px 0;
+        }
+        .msg-body p:last-child {
+          margin-bottom: 0;
+        }
+        .sources-box {
+          margin-top: 10px;
+          padding: 8px 10px;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          font-size: 11px;
+        }
+        .sources-title {
+          font-weight: 700;
+          color: #475569;
+          margin-bottom: 4px;
+        }
+        .sources-box ul {
+          margin: 0;
+          padding-left: 18px;
+        }
+        .sources-box li {
+          margin-bottom: 2px;
+          color: #334155;
+        }
+        .footer {
+          margin-top: 30px;
+          padding-top: 12px;
+          border-top: 1px solid #e2e8f0;
+          text-align: center;
+          font-size: 11px;
+          color: #94a3b8;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="brand">
+          <img src="/sru-logo.png" alt="SRU Logo" />
+          <div>
+            <div class="brand-title">SRU Buddy</div>
+            <div class="brand-tag">SR University • Your AI Agent</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <div><strong>Date:</strong> ${timestamp}</div>
+          <div>Official Transcript</div>
+        </div>
+      </div>
+
+      <div class="chat-title">${escapeHtml(title || "Conversation Transcript")}</div>
+
+      <div class="messages-container">
+        ${messagesHtml}
+      </div>
+
+      <div class="footer">
+        Generated by SRU Buddy • SR University Official AI Companion • Grounded in Academic Regulations
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+          }, 350);
+        };
+      </script>
+    </body>
+    </html>
+  `;
+
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .substring(0, 40);
+}
+
+function dateStamp(): string {
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
