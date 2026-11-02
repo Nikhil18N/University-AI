@@ -710,7 +710,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               <div className="shared-chat-banner">
                 <div className="shared-chat-info">
                   <span className="shared-chat-pill">Loading</span>
-                  <span className="shared-chat-title">Retrieving shared conversation snapshot...</span>
+                  <span className="shared-chat-hint">Retrieving shared conversation snapshot...</span>
                 </div>
               </div>
             )}
@@ -718,14 +718,14 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             {isSharedView && (
               <div className="shared-chat-banner">
                 <div className="shared-chat-info">
-                  <span className="shared-chat-pill">🔗 Shared Chat Snapshot</span>
-                  <span className="shared-chat-title">{sharedTitle || "Conversation with SRU Buddy"}</span>
+                  <span className="shared-chat-pill">Shared conversation</span>
+                  <span className="shared-chat-hint">{sharedTitle || "Read-only preview"}</span>
                 </div>
                 <button
                   className="shared-continue-btn"
                   onClick={() => setIsSharedView(false)}
                 >
-                  Continue this chat →
+                  Continue chat →
                 </button>
               </div>
             )}
@@ -805,38 +805,57 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               );
             })}
 
-            {error && (
-              <div className="error-toast-card">
-                <div className="error-toast-content">
-                  <span className="error-toast-icon">⚡</span>
-                  <div className="error-toast-text">
-                    <span className="error-toast-title">
-                      {error.includes("Failed to fetch")
-                        ? "Server is waking up (Render free tier)"
-                        : "Connection issue"}
-                    </span>
-                    <span className="error-toast-desc">
-                      {error.includes("Failed to fetch")
-                        ? "Backend takes ~30s to start from sleep. Please tap retry."
-                        : error}
-                    </span>
+            {error && (() => {
+              const getErrorDetails = (err: string) => {
+                if (err.includes("Failed to fetch") || err.includes("NetworkError")) {
+                  return {
+                    title: "Server is connecting",
+                    desc: "Backend service is spinning up. Please tap retry in a few seconds.",
+                  };
+                }
+                if (err.includes("401") || err.includes("Unauthorized") || err.includes("Forbidden") || err.includes("generativelanguage")) {
+                  return {
+                    title: "AI service temporarily busy",
+                    desc: "Unable to reach the AI service. Please tap retry to switch to an active key.",
+                  };
+                }
+                if (err.includes("429") || err.includes("quota") || err.includes("rate limit")) {
+                  return {
+                    title: "High traffic",
+                    desc: "The AI agent is receiving many requests. Please wait a moment and tap retry.",
+                  };
+                }
+                return {
+                  title: "Connection issue",
+                  desc: "Something went wrong processing your request. Please tap retry.",
+                };
+              };
+              const { title, desc } = getErrorDetails(error);
+              return (
+                <div className="error-toast-card">
+                  <div className="error-toast-content">
+                    <span className="error-toast-icon">⚡</span>
+                    <div className="error-toast-text">
+                      <span className="error-toast-title">{title}</span>
+                      <span className="error-toast-desc">{desc}</span>
+                    </div>
                   </div>
+                  <button
+                    className="error-retry-action-btn"
+                    onClick={() => {
+                      const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+                      if (lastUserMsg) {
+                        setError(null);
+                        handleSendMessage(lastUserMsg.content);
+                      }
+                    }}
+                    type="button"
+                  >
+                    Retry ↻
+                  </button>
                 </div>
-                <button
-                  className="error-retry-action-btn"
-                  onClick={() => {
-                    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
-                    if (lastUserMsg) {
-                      setError(null);
-                      handleSendMessage(lastUserMsg.content);
-                    }
-                  }}
-                  type="button"
-                >
-                  Retry ↺
-                </button>
-              </div>
-            )}
+              );
+            })()}
 
             <div ref={messagesEndRef} />
           </div>

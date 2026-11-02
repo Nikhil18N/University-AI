@@ -218,7 +218,11 @@ class RAGService:
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         retrieval_query = search_query or question
-        chunks = await self.retrieve(retrieval_query, top_k=top_k)
+        try:
+            chunks = await self.retrieve(retrieval_query, top_k=top_k)
+        except Exception as e:
+            logger.error("RAG retrieval failed: %s. Proceeding with fallback.", e)
+            chunks = []
         effective_question = question
         clean_q = question.lower().strip(" .!?,")
         if search_query and (

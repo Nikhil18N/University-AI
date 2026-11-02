@@ -146,7 +146,7 @@ class GeminiProvider(LLMProvider):
                             return ""
                         parts = candidates[0].get("content", {}).get("parts", [])
                         return "".join(p.get("text", "") for p in parts)
-                    elif response.status_code in (429, 403):
+                    elif response.status_code in (401, 403, 429, 500, 502):
                         logger.warning(
                             "Gemini key '%s...' hit HTTP %d on model '%s'. Rotating key.",
                             active_key[:8],
@@ -217,7 +217,7 @@ class GeminiProvider(LLMProvider):
                         json=payload,
                         headers={"x-goog-api-key": active_key},
                     ) as response:
-                        if response.status_code in (429, 403):
+                        if response.status_code in (401, 403, 429, 500, 502):
                             logger.warning(
                                 "Gemini stream key '%s...' hit status %d on model '%s'. Rotating key.",
                                 active_key[:8],

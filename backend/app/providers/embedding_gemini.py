@@ -68,14 +68,14 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
                     self.key_pool.mark_success(active_key)
                     data = response.json()
                     return [item["values"] for item in data.get("embeddings", [])]
-                elif response.status_code in (429, 403, 503):
+                elif response.status_code in (401, 403, 429, 500, 502, 503):
                     logger.warning(
                         "Gemini embedding key '%s...' hit HTTP %d. Rotating key.",
                         active_key[:8],
                         response.status_code,
                     )
                     self.key_pool.mark_rate_limited(active_key)
-                    await asyncio.sleep(1.0)
+                    await asyncio.sleep(0.5)
                     continue
                 else:
                     response.raise_for_status()
@@ -112,14 +112,14 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
                     self.key_pool.mark_success(active_key)
                     data = response.json()
                     return data["embedding"]["values"]
-                elif response.status_code in (429, 403, 503):
+                elif response.status_code in (401, 403, 429, 500, 502, 503):
                     logger.warning(
                         "Gemini query embedding key '%s...' hit HTTP %d. Rotating key.",
                         active_key[:8],
                         response.status_code,
                     )
                     self.key_pool.mark_rate_limited(active_key)
-                    await asyncio.sleep(1.0)
+                    await asyncio.sleep(0.5)
                     continue
                 else:
                     response.raise_for_status()
