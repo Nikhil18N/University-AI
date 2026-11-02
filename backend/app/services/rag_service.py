@@ -22,12 +22,11 @@ class RAGService:
         llm_provider: LLMProvider,
         embedding_provider: EmbeddingProvider,
     ):
+        from app.db.chroma import get_chroma_client
+
         self.llm = llm_provider
         self.embeddings = embedding_provider
-        self._chroma_client = chromadb.HttpClient(
-            host=settings.CHROMA_HOST,
-            port=settings.CHROMA_PORT,
-        )
+        self._chroma_client = get_chroma_client()
 
     def _get_collection(self) -> chromadb.Collection:
         """Get or create the university documents collection."""
@@ -37,7 +36,7 @@ class RAGService:
         )
 
     async def retrieve(
-        self, query: str, top_k: int = 5
+        self, query: str, top_k: int = 3
     ) -> list[dict]:
         """Retrieve the most relevant document chunks for a query.
 
@@ -140,7 +139,9 @@ class RAGService:
             {"role": "system", "content": rag_prompt},
             {"role": "user", "content": question},
         ]
-        answer = await self.llm.generate(messages, temperature=0.3)
+        answer = await self.llm.generate(
+            messages, temperature=0.0, max_tokens=150
+        )
 
         return answer, sources
 
@@ -148,7 +149,7 @@ class RAGService:
         self,
         question: str,
         conversation_context: str = "",
-        top_k: int = 5,
+        top_k: int = 3,
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         chunks = await self.retrieve(question, top_k=top_k)

@@ -46,7 +46,21 @@ def _extract_text_from_pdf(file_path: Path) -> list[dict]:
 def _extract_text_from_txt(file_path: Path) -> list[dict]:
     """Extract text from a plain text or markdown file."""
     text = file_path.read_text(encoding="utf-8", errors="replace")
-    return [{"page": 1, "text": text.strip()}]
+    
+    metadata = {}
+    if file_path.suffix.lower() == ".md" and text.startswith("---"):
+        try:
+            import yaml
+            parts = text.split("---", 2)
+            if len(parts) >= 3:
+                frontmatter = yaml.safe_load(parts[1])
+                if isinstance(frontmatter, dict):
+                    metadata = frontmatter
+                text = parts[2].strip()
+        except Exception as e:
+            logger.warning("Failed to parse YAML frontmatter: %s", e)
+            
+    return [{"page": 1, "text": text.strip(), "okf_metadata": metadata}]
 
 
 def _extract_text_from_docx(file_path: Path) -> list[dict]:
@@ -188,10 +202,22 @@ class IngestionService:
             all_chunks = []
             for page_info in pages:
                 page_chunks = _chunk_text(page_info["text"])
+                okf = page_info.get("okf_metadata", {})
+                
                 for chunk in page_chunks:
+                    chunk_prefix = ""
+                    if okf:
+                        parts = []
+                        if "title" in okf: parts.append(f"Title: {okf['title']}")
+                        if "type" in okf: parts.append(f"Type: {okf['type']}")
+                        if "description" in okf: parts.append(f"Description: {okf['description']}")
+                        if parts:
+                            chunk_prefix = " | ".join(parts) + "\n\n"
+                            
                     all_chunks.append({
-                        "text": chunk,
+                        "text": chunk_prefix + chunk,
                         "page": page_info["page"],
+                        "okf_metadata": okf,
                     })
 
             if not all_chunks:
@@ -207,10 +233,9 @@ class IngestionService:
             embeddings = await self.embeddings.embed(chunk_texts)
 
             # 7. Store in ChromaDB
-            chroma_client = chromadb.HttpClient(
-                host=settings.CHROMA_HOST,
-                port=settings.CHROMA_PORT,
-            )
+            from app.db.chroma import get_chroma_client
+
+            chroma_client = get_chroma_client()
             collection = chroma_client.get_or_create_collection(
                 name=COLLECTION_NAME,
                 metadata={"hnsw:space": "cosine"},
@@ -221,15 +246,16 @@ class IngestionService:
                 {
                     "document_id": str(doc.id),
                     "version_id": str(doc_version.id),
-                    "title": title,
-                    "document_type": document_type,
+                    "title": str(chunk["okf_metadata"].get("title", title))[:100],
+                    "document_type": str(chunk["okf_metadata"].get("type", document_type))[:100],
                     "department": department or "",
                     "page": chunk["page"],
                     "effective_date": (
                         effective_date.isoformat() if effective_date else ""
                     ),
                     "publication_date": (
-                        publication_date.isoformat() if publication_date else ""
+                        str(chunk["okf_metadata"].get("timestamp", "")) if chunk["okf_metadata"].get("timestamp")
+                        else (publication_date.isoformat() if publication_date else "")
                     ),
                 }
                 for chunk in all_chunks

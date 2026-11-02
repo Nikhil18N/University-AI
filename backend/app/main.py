@@ -50,11 +50,11 @@ app = FastAPI(
 )
 
 # CORS
-origins = [o.strip() for o in settings.CORS_ORIGINS.split(",")]
+origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origins=origins if "*" not in origins else ["*"],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -121,11 +121,9 @@ async def health_check() -> HealthResponse:
 
     # Check ChromaDB
     try:
-        import chromadb
+        from app.db.chroma import get_chroma_client
 
-        client = chromadb.HttpClient(
-            host=settings.CHROMA_HOST, port=settings.CHROMA_PORT
-        )
+        client = get_chroma_client()
         client.heartbeat()
         services["chromadb"] = "healthy"
     except Exception:

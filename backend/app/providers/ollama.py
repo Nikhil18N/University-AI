@@ -19,7 +19,7 @@ class OllamaProvider(LLMProvider):
         self.model = model
         self._client = httpx.AsyncClient(
             base_url=self.base_url,
-            timeout=httpx.Timeout(120.0, connect=10.0),
+            timeout=httpx.Timeout(300.0, connect=10.0),
         )
 
     async def generate(

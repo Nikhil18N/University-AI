@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # ---- LLM ----
     LLM_PROVIDER: str = "ollama"
     LLM_BASE_URL: str = "http://localhost:11434"
-    LLM_MODEL: str = "llama3.2"
+    LLM_MODEL: str = "llama3.2:1b"
 
     # ---- Embedding ----
     EMBEDDING_PROVIDER: str = "ollama"
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # ---- ChromaDB ----
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8000
+    CHROMA_PERSIST_DIR: str | None = None
     RAG_MAX_DISTANCE: float = 0.5
 
     # ---- Admin ----

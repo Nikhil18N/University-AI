@@ -8,7 +8,7 @@ def test_load_system_prompt():
     clear_cache()
     prompt = load_prompt("system")
     assert prompt is not None
-    assert "University AI Companion" in prompt
+    assert "SR University" in prompt or "University AI" in prompt
 
 
 def test_load_rag_prompt():

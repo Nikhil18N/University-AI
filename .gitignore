@@ -15,3 +15,13 @@ env/
 # Uploads
 uploads/*
 !uploads/.gitkeep
+.neon
+node_modules/
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Database and vector storage
+chroma_data/
+*.rdb

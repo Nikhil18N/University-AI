@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
 
 /**
  * API client for the University AI Companion backend.
@@ -57,7 +57,7 @@ async function handleResponse<T>(res: Response, fallbackError: string): Promise<
 
 function handleNetworkError(err: unknown, fallback: string): never {
   if (err instanceof TypeError && err.message.toLowerCase().includes("fetch")) {
-    throw new Error("Cannot connect to backend server at http://localhost:8080. Make sure the backend is running.");
+    throw new Error(`Cannot connect to backend server at ${API_BASE}. Make sure the backend is running.`);
   }
   throw err instanceof Error ? err : new Error(fallback);
 }
