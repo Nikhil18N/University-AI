@@ -1,4 +1,18 @@
-# Deployment
+# Deployment & Branching Strategy
+
+## GitHub Branch Separation
+To separate production and development safely:
+
+| Branch | Environment | Purpose | Deployment Trigger |
+| :--- | :--- | :--- | :--- |
+| **`main`** | **Production** | Stable, thoroughly tested code deployed to students. | Auto-deploys to Render & Vercel Production. |
+| **`develop`** | **Development** | Active day-to-day integration branch for new features, experiments, and PRs. | Local dev or Render/Vercel Staging/Preview. |
+
+### Development Workflow:
+1. Create feature branches off `develop` (e.g. `feat/attendance-calculator`, `fix/chat-scroll`).
+2. Test locally against `develop`.
+3. Open a Pull Request into `develop` and merge after review.
+4. When ready for a production release, merge `develop` into `main`.
 
 ## Environments
 Development -> Staging -> Production
