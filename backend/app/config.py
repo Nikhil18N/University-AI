@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     LLM_MODEL: str = "gemini-3.5-flash-lite"
     LLM_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    GEMINI_API_KEYS: str = ""  # Comma-separated list of Gemini API keys for pooling/rotation
     GOOGLE_API_KEY: str | None = None
     OPENROUTER_API_KEY: str = ""
 
@@ -46,6 +47,20 @@ class Settings(BaseSettings):
     UPLOAD_DIR: Path = PROJECT_ROOT / "uploads"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+
+    def get_gemini_api_keys(self) -> list[str]:
+        """Return a list of Gemini API keys configured from GEMINI_API_KEYS or GEMINI_API_KEY."""
+        if self.GEMINI_API_KEYS:
+            keys = [k.strip() for k in self.GEMINI_API_KEYS.split(",") if k.strip()]
+            if keys:
+                return keys
+        if self.GEMINI_API_KEY:
+            return [self.GEMINI_API_KEY.strip()]
+        if self.GOOGLE_API_KEY:
+            return [self.GOOGLE_API_KEY.strip()]
+        if self.LLM_API_KEY:
+            return [self.LLM_API_KEY.strip()]
+        return []
 
 
 settings = Settings()

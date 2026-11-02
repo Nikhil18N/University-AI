@@ -154,8 +154,10 @@ async def health_check() -> HealthResponse:
             services["ollama"] = "unhealthy"
     else:
         # Provider is Gemini or OpenRouter
-        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY or settings.OPENROUTER_API_KEY
-        services[settings.LLM_PROVIDER.lower()] = "healthy" if api_key else "unconfigured (missing API key)"
+        has_gemini = bool(settings.get_gemini_api_keys())
+        has_openrouter = bool(settings.OPENROUTER_API_KEY)
+        is_healthy = has_gemini if settings.LLM_PROVIDER.lower() == "gemini" else has_openrouter
+        services[settings.LLM_PROVIDER.lower()] = "healthy" if is_healthy else "unconfigured (missing API key)"
 
     overall = "healthy" if all(v == "healthy" for v in services.values()) else "degraded"
     return HealthResponse(status=overall, services=services)

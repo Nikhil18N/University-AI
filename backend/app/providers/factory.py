@@ -17,14 +17,14 @@ def create_llm_provider() -> LLMProvider:
         )
     elif provider == "gemini":
         from app.providers.gemini import GeminiProvider
-        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY or settings.LLM_API_KEY
-        if not api_key:
+        keys = settings.get_gemini_api_keys()
+        if not keys:
             raise ValueError(
-                "GEMINI_API_KEY or LLM_API_KEY is required when LLM_PROVIDER='gemini'."
+                "GEMINI_API_KEYS, GEMINI_API_KEY, or LLM_API_KEY is required when LLM_PROVIDER='gemini'."
             )
         model = settings.LLM_MODEL if "gemini" in settings.LLM_MODEL.lower() else "gemini-3.5-flash-lite"
         return GeminiProvider(
-            api_key=api_key,
+            api_keys=keys,
             model=model,
         )
     elif provider in ("openrouter", "openai"):
@@ -58,13 +58,13 @@ def create_embedding_provider() -> EmbeddingProvider:
         )
     elif provider == "gemini":
         from app.providers.embedding_gemini import GeminiEmbeddingProvider
-        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY or settings.LLM_API_KEY
-        if not api_key:
+        keys = settings.get_gemini_api_keys()
+        if not keys:
             raise ValueError(
-                "GEMINI_API_KEY is required when EMBEDDING_PROVIDER='gemini'."
+                "GEMINI_API_KEYS, GEMINI_API_KEY, or LLM_API_KEY is required when EMBEDDING_PROVIDER='gemini'."
             )
         return GeminiEmbeddingProvider(
-            api_key=api_key,
+            api_keys=keys,
             model=settings.EMBEDDING_MODEL,
         )
     else:

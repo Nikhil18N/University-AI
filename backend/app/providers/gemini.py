@@ -7,17 +7,24 @@ from collections.abc import AsyncIterator
 import httpx
 
 from app.providers.base import LLMProvider
+from app.providers.key_pool import APIKeyPool
 
 logger = logging.getLogger(__name__)
 
 
 class GeminiProvider(LLMProvider):
-    """LLM provider that communicates with Google Gemini API."""
+    """LLM provider that communicates with Google Gemini API with multi-key pool failover."""
 
-    def __init__(self, api_key: str, model: str = "gemini-3.1-flash-lite"):
-        if not api_key:
+    def __init__(
+        self,
+        api_key: str | list[str] = "",
+        model: str = "gemini-3.1-flash-lite",
+        api_keys: list[str] | str | None = None,
+    ):
+        raw_keys = api_keys if api_keys is not None else api_key
+        if not raw_keys:
             raise ValueError("Gemini API key is required.")
-        self.api_key = api_key
+        self.key_pool = APIKeyPool(raw_keys)
         # Automatically upgrade deprecated/unavailable models
         legacy_models = {
             "gemini-2.0-flash": "gemini-3.1-flash-lite",
@@ -32,8 +39,12 @@ class GeminiProvider(LLMProvider):
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         self._client = httpx.AsyncClient(
             timeout=httpx.Timeout(15.0, connect=5.0),
-            headers={"x-goog-api-key": self.api_key},
         )
+
+    @property
+    def api_key(self) -> str:
+        """Current active key for backwards compatibility."""
+        return self.key_pool.get_current_key()
 
     def _format_payload(
         self,
@@ -92,7 +103,7 @@ class GeminiProvider(LLMProvider):
         temperature: float = 0.7,
         max_tokens: int | None = None,
     ) -> str:
-        """Send messages to Gemini and return the full response with automatic quota fallback."""
+        """Send messages to Gemini and return the full response with automatic multi-key and quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
         models_to_try = [self.model] + [
             m
@@ -107,36 +118,66 @@ class GeminiProvider(LLMProvider):
             if m != self.model
         ]
 
+        total_keys = len(self.key_pool)
         last_response = None
+
         for model_name in models_to_try:
             url = f"{self.base_url}/models/{model_name}:generateContent"
-            try:
-                response = await self._client.post(url, json=payload)
-                last_response = response
-                if response.status_code == 200:
-                    self.model = model_name
-                    data = response.json()
-                    candidates = data.get("candidates", [])
-                    if not candidates:
-                        return ""
-                    parts = candidates[0].get("content", {}).get("parts", [])
-                    return "".join(p.get("text", "") for p in parts)
-                elif response.status_code in (429, 404, 503):
+            keys_tried_for_model = 0
+
+            while keys_tried_for_model < total_keys:
+                active_key = self.key_pool.get_next_key(advance=True)
+                keys_tried_for_model += 1
+
+                try:
+                    response = await self._client.post(
+                        url,
+                        json=payload,
+                        headers={"x-goog-api-key": active_key},
+                    )
+                    last_response = response
+
+                    if response.status_code == 200:
+                        self.key_pool.mark_success(active_key)
+                        self.model = model_name
+                        data = response.json()
+                        candidates = data.get("candidates", [])
+                        if not candidates:
+                            return ""
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        return "".join(p.get("text", "") for p in parts)
+                    elif response.status_code in (429, 403):
+                        logger.warning(
+                            "Gemini key '%s...' hit HTTP %d on model '%s'. Rotating key.",
+                            active_key[:8],
+                            response.status_code,
+                            model_name,
+                        )
+                        self.key_pool.mark_rate_limited(active_key)
+                        if keys_tried_for_model < total_keys:
+                            continue
+                        else:
+                            break
+                    elif response.status_code in (404, 503):
+                        logger.warning(
+                            "Gemini model '%s' returned status %d. Auto-falling back to next available model.",
+                            model_name,
+                            response.status_code,
+                        )
+                        break
+                    else:
+                        response.raise_for_status()
+                except httpx.TimeoutException:
                     logger.warning(
-                        "Gemini model '%s' returned status %d. Auto-falling back to next available model.",
+                        "Gemini model '%s' with key '%s...' timed out. Trying next candidate...",
                         model_name,
-                        response.status_code,
+                        active_key[:8],
                     )
                     continue
-                else:
-                    response.raise_for_status()
-            except httpx.TimeoutException:
-                logger.warning("Gemini model '%s' timed out. Trying next candidate...", model_name)
-                continue
 
         if last_response is not None:
             last_response.raise_for_status()
-        raise RuntimeError("All available Gemini models are currently exhausted or unreachable.")
+        raise RuntimeError("All available Gemini models and API keys are currently exhausted or unreachable.")
 
     async def stream(
         self,
@@ -144,7 +185,7 @@ class GeminiProvider(LLMProvider):
         temperature: float = 0.7,
         max_tokens: int | None = None,
     ) -> AsyncIterator[str]:
-        """Stream tokens from Gemini with automatic quota fallback."""
+        """Stream tokens from Gemini with automatic multi-key and quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
         models_to_try = [self.model] + [
             m
@@ -159,38 +200,64 @@ class GeminiProvider(LLMProvider):
             if m != self.model
         ]
 
+        total_keys = len(self.key_pool)
+
         for model_name in models_to_try:
             url = f"{self.base_url}/models/{model_name}:streamGenerateContent?alt=sse"
-            try:
-                async with self._client.stream("POST", url, json=payload) as response:
-                    if response.status_code in (429, 404, 503):
-                        logger.warning(
-                            "Gemini stream '%s' returned status %d. Auto-falling back to next model.",
-                            model_name,
-                            response.status_code,
-                        )
-                        continue
-                    response.raise_for_status()
-                    self.model = model_name
-                    async for line in response.aiter_lines():
-                        line = line.strip()
-                        if not line or not line.startswith("data: "):
-                            continue
-                        json_str = line[len("data: ") :]
-                        try:
-                            data = json.loads(json_str)
-                            candidates = data.get("candidates", [])
-                            if candidates:
-                                parts = candidates[0].get("content", {}).get("parts", [])
-                                for p in parts:
-                                    text = p.get("text", "")
-                                    if text:
-                                        yield text
-                        except json.JSONDecodeError:
-                            continue
-                    return
-            except httpx.TimeoutException:
-                continue
+            keys_tried_for_model = 0
+
+            while keys_tried_for_model < total_keys:
+                active_key = self.key_pool.get_next_key(advance=True)
+                keys_tried_for_model += 1
+
+                try:
+                    async with self._client.stream(
+                        "POST",
+                        url,
+                        json=payload,
+                        headers={"x-goog-api-key": active_key},
+                    ) as response:
+                        if response.status_code in (429, 403):
+                            logger.warning(
+                                "Gemini stream key '%s...' hit status %d on model '%s'. Rotating key.",
+                                active_key[:8],
+                                response.status_code,
+                                model_name,
+                            )
+                            self.key_pool.mark_rate_limited(active_key)
+                            if keys_tried_for_model < total_keys:
+                                continue
+                            else:
+                                break
+                        elif response.status_code in (404, 503):
+                            logger.warning(
+                                "Gemini stream '%s' returned status %d. Auto-falling back to next model.",
+                                model_name,
+                                response.status_code,
+                            )
+                            break
+                        response.raise_for_status()
+                        self.key_pool.mark_success(active_key)
+                        self.model = model_name
+                        async for line in response.aiter_lines():
+                            line = line.strip()
+                            if not line or not line.startswith("data: "):
+                                continue
+                            json_str = line[len("data: ") :]
+                            try:
+                                data = json.loads(json_str)
+                                candidates = data.get("candidates", [])
+                                if candidates:
+                                    parts = candidates[0].get("content", {}).get("parts", [])
+                                    for p in parts:
+                                        text = p.get("text", "")
+                                        if text:
+                                            yield text
+                            except json.JSONDecodeError:
+                                continue
+                        return
+                except httpx.TimeoutException:
+                    continue
 
     async def close(self):
         """Close the HTTP client."""
