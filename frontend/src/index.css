@@ -61,44 +61,44 @@
 }
 
 [data-theme="dark"] {
-  /* SR University Executive Midnight Navy */
+  /* SR University Executive Royal Blue Accent */
   --sru-blue: #2563eb;
   --sru-blue-dark: #1d4ed8;
-  --sru-blue-light: rgba(37, 99, 235, 0.18);
+  --sru-blue-light: rgba(37, 99, 235, 0.2);
   --sru-sky: #38bdf8;
   --sru-gold: #fbbf24;
   --sru-gold-light: rgba(251, 191, 36, 0.15);
   --sru-green: #34d399;
   --sru-green-light: rgba(52, 211, 153, 0.15);
 
-  /* Surfaces & Canvas */
-  --bg: #070e1c;
-  --surface-1: #0d182e;
-  --surface-2: #142343;
-  --surface-3: #1d315b;
-  --surface-elevated: #101e3b;
-  --border: #1e3358;
-  --border-subtle: #172744;
-  --border-focus: #38bdf8;
+  /* ChatGPT Pitch Black OLED Palette (Matching Screenshots) */
+  --bg: #000000;
+  --surface-1: #121212;
+  --surface-2: #212121;
+  --surface-3: #2a2a2a;
+  --surface-elevated: #1e1e1e;
+  --border: #262626;
+  --border-subtle: #1c1c1c;
+  --border-focus: #2563eb;
 
   /* Typography */
-  --text: #f1f5f9;
+  --text: #f4f4f5;
   --text-1: #ffffff;
-  --text-2: #cbd5e1;
-  --text-muted: #8899b5;
-  --text-inverse: #070e1c;
+  --text-2: #d4d4d8;
+  --text-muted: #8e8e93;
+  --text-inverse: #000000;
 
   /* Semantic */
-  --primary: #38bdf8;
-  --primary-hover: #0284c7;
-  --primary-light: rgba(56, 189, 248, 0.15);
-  --primary-glow: rgba(56, 189, 248, 0.25);
+  --primary: #2563eb;
+  --primary-hover: #3b82f6;
+  --primary-light: rgba(37, 99, 235, 0.18);
+  --primary-glow: rgba(37, 99, 235, 0.35);
 
-  --accent: #38bdf8;
-  --accent-hover: #7dd3fc;
-  --accent-light: rgba(56, 189, 248, 0.15);
-  --accent-glow: rgba(56, 189, 248, 0.3);
-  --accent-bg: rgba(56, 189, 248, 0.12);
+  --accent: #2563eb;
+  --accent-hover: #3b82f6;
+  --accent-light: rgba(37, 99, 235, 0.15);
+  --accent-glow: rgba(37, 99, 235, 0.25);
+  --accent-bg: rgba(37, 99, 235, 0.1);
 
   --danger: #f87171;
   --danger-bg: rgba(248, 113, 113, 0.14);
@@ -106,10 +106,10 @@
   --success-bg: rgba(52, 211, 153, 0.12);
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.5);
 
   color-scheme: dark;
 }
