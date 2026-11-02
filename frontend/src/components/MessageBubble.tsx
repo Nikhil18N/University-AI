@@ -109,6 +109,13 @@ export default function MessageBubble({
           </div>
         )}
 
+        {/* AI Disclaimer Tagline */}
+        {role === "assistant" && content.length > 0 && (
+          <div className="ai-response-disclaimer">
+            <span>May contain inaccuracies. Verify with official university sources.</span>
+          </div>
+        )}
+
         {/* Clean Suggestion Chips */}
         {!isStreaming && role === "assistant" && suggestions && suggestions.length > 0 && (
           <div className="suggestion-chips-wrapper">
