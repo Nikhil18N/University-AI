@@ -32,6 +32,21 @@ async def lifespan(app: FastAPI):
     # Ensure upload directory exists
     settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Auto-initialize database tables if using fresh database (e.g. Supabase)
+    try:
+        from app.db.session import engine
+        from app.db.base import Base
+        import app.models.conversation
+        import app.models.message
+        import app.models.feedback
+        import app.models.document
+
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database schema verified/created in PostgreSQL.")
+    except Exception as e:
+        logger.warning("Database schema check skipped or deferred: %s", e)
+
     # Verify or auto-seed ChromaDB documents in background
     import asyncio
     from app.services.auto_seed import ensure_documents_seeded
