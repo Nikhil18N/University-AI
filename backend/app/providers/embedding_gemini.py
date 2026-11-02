@@ -13,7 +13,7 @@ GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 class GeminiEmbeddingProvider(EmbeddingProvider):
     """Embedding provider using Google Gemini's text-embedding-004."""
 
-    def __init__(self, api_key: str, model: str = "text-embedding-004"):
+    def __init__(self, api_key: str, model: str = "gemini-embedding-001"):
         if not api_key:
             raise ValueError("GEMINI_API_KEY (or GOOGLE_API_KEY) is required.")
         self.api_key = api_key

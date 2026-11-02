@@ -10,13 +10,13 @@ class Settings(BaseSettings):
     # ---- LLM ----
     LLM_PROVIDER: str = "gemini"
     LLM_BASE_URL: str = "http://localhost:11434"
-    LLM_MODEL: str = "gemini-1.5-flash"
+    LLM_MODEL: str = "gemini-3.5-flash-lite"
     GEMINI_API_KEY: str | None = None
     GOOGLE_API_KEY: str | None = None
 
     # ---- Embedding ----
     EMBEDDING_PROVIDER: str = "gemini"
-    EMBEDDING_MODEL: str = "text-embedding-004"
+    EMBEDDING_MODEL: str = "gemini-embedding-001"
 
     # ---- Database ----
     DATABASE_URL: str = "postgresql+asyncpg://university_ai:university_ai_dev@localhost:5433/university_ai"

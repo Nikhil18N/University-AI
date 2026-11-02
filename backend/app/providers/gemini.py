@@ -16,7 +16,7 @@ GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 class GeminiProvider(LLMProvider):
     """LLM provider that communicates with the Google Gemini API."""
 
-    def __init__(self, api_key: str, model: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-3.5-flash-lite"):
         if not api_key:
             raise ValueError("GEMINI_API_KEY (or GOOGLE_API_KEY) is required.")
         self.api_key = api_key
