@@ -94,3 +94,4 @@ class APIKeyPool:
         """Number of keys currently not in cooldown."""
         now = time.time()
         return sum(1 for k in self.keys if now >= self._cooldowns.get(k, 0.0))
+
