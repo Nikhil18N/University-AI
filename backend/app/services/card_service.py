@@ -1,6 +1,7 @@
 """Card service — detects and generates structured interactive cards for rich UI rendering."""
 
 import re
+from app.services.video_service import get_relevant_videos, create_video_card
 
 COMPARISON_CSE_AIML = {
     "type": "comparison",
@@ -150,6 +151,7 @@ def generate_cards(
     user_message: str,
     answer: str,
     profile: dict | None = None,
+    sources: list[dict] | None = None,
 ) -> list[dict]:
     """Generate structured interactive cards based on message context and student profile."""
     cards = []
@@ -172,10 +174,17 @@ def generate_cards(
     ):
         cards.append(CURRICULUM_CARD)
 
-    # 4. Campus tour card
-    if any(k in msg_lower for k in ("campus", "tour", "facilities", "campus life", "hostels and campus")):
+    # 4. Campus tour card (render static spot highlights if not explicitly asking for video)
+    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip"))
+    if not is_video_query and any(k in msg_lower for k in ("campus", "tour", "facilities", "campus life", "hostels and campus")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
+
+    # 5. University YouTube Video Recommendations (Contextual & Discoverable)
+    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "tour", "walkthrough", "drone"))
+    relevant_videos = get_relevant_videos(user_message, answer, sources)
+    if relevant_videos:
+        cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_video))
 
     # 5. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):

@@ -39,10 +39,10 @@ FEE_SUGGESTIONS = [
 ]
 
 HOSTEL_SUGGESTIONS = [
+    "🎥 Watch Hostel Tour",
     "🍽️ Mess & Food Quality",
     "🕒 Hostel Timings & Rules",
     "🚌 Campus Transport",
-    "⚽ Sports & Clubs",
 ]
 
 CURRICULUM_SUGGESTIONS = [
@@ -54,9 +54,16 @@ CURRICULUM_SUGGESTIONS = [
 
 DEFAULT_GREETING_SUGGESTIONS = [
     "🎯 B.Tech Admissions",
+    "🎥 Virtual Campus Tour",
     "💰 Fee Structure",
     "📊 Placement Highlights",
-    "🧭 Start Admission Wizard",
+]
+
+VIDEO_TOUR_SUGGESTIONS = [
+    "🎥 Watch Campus Tour",
+    "🎥 Watch Hostel Walkthrough",
+    "🚀 SRiX Startup Incubator",
+    "💼 Placements & Packages",
 ]
 
 DEFAULT_UNIVERSITY_SUGGESTIONS = [
@@ -99,6 +106,10 @@ def generate_suggestions(
             "🏢 Campus & Hostel Facilities",
             "💼 Placement Records & CTC",
         ]
+
+    # 2c. Video or Tour explicit query
+    if any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like")):
+        return VIDEO_TOUR_SUGGESTIONS
 
     # 3. Eligibility & Cutoff
     if any(k in msg_lower for k in ("eligible", "eligibility", "cutoff", "percentage", "marks", "percent", "criteria")):

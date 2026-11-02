@@ -186,6 +186,102 @@ export function ProfileCard({ card }: CardProps) {
   );
 }
 
+export function VideoRecommendationsCard({ card }: { card: any }) {
+  const videos = card.videos || [];
+  const channelUrl = card.channel_url || "https://www.youtube.com/@SRUniversity/videos";
+  const channelName = card.channel_name || "SR University Official";
+
+  if (!videos.length) return null;
+
+  return (
+    <div className="rich-card video-recommendations-card">
+      <div className="video-card-header">
+        <div className="video-card-header-left">
+          <span className="video-header-icon">🎥</span>
+          <div>
+            <h4 className="video-card-title">{card.title || "Related University Videos"}</h4>
+            <span className="video-card-subtitle">Official videos from {channelName}</span>
+          </div>
+        </div>
+        <a
+          href={channelUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="channel-link-btn"
+          title="Visit official YouTube channel"
+        >
+          <svg className="yt-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+          Channel
+        </a>
+      </div>
+
+      <div className="yt-carousel-row">
+        {videos.map((vid: any, idx: number) => (
+          <a
+            key={vid.id || idx}
+            href={vid.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="yt-card-item"
+            title={`Watch: ${vid.title}`}
+          >
+            <div className="yt-thumb-wrapper">
+              <img
+                src={vid.thumbnail_url || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`}
+                alt={vid.title}
+                className="yt-thumb-img"
+                loading="eager"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  if (!img.src.includes("mqdefault")) {
+                    img.src = `https://i.ytimg.com/vi/${vid.id}/mqdefault.jpg`;
+                  }
+                }}
+              />
+              {vid.duration && <span className="yt-duration-badge">{vid.duration}</span>}
+            </div>
+
+            <div className="yt-card-details">
+              <div className="yt-channel-avatar" title={vid.channel_name || "SR University Official"}>
+                <span>SRU</span>
+              </div>
+
+              <div className="yt-text-meta">
+                <h5 className="yt-video-title">{vid.title}</h5>
+                <div className="yt-submeta">
+                  <span className="yt-channel-name">{vid.channel_name || "SR University"}</span>
+                  {vid.category && <span className="yt-category-bullet"> • {vid.category}</span>}
+                </div>
+              </div>
+
+              <div className="yt-card-action" title="More options" onClick={(e) => e.preventDefault()}>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                  <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div className="video-card-footer">
+        <a
+          href={channelUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="more-videos-link"
+        >
+          Explore more videos on @SRUniversity YouTube ↗
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export function RenderCard({ card }: { card: any }) {
   if (!card || !card.type) return null;
 
@@ -200,6 +296,8 @@ export function RenderCard({ card }: { card: any }) {
       return <CampusTourCard card={card} />;
     case "profile":
       return <ProfileCard card={card} />;
+    case "video_recommendations":
+      return <VideoRecommendationsCard card={card} />;
     default:
       return null;
   }

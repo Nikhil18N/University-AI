@@ -51,7 +51,24 @@ GET /api/v1/admin/feedback
     "📋 How to Apply",
     "💰 Fee Structure"
   ],
-  "cards": [],
+  "cards": [
+    {
+      "type": "video_recommendations",
+      "title": "Official SR University Video Tours",
+      "channel_name": "SR University Official",
+      "channel_url": "https://www.youtube.com/@SRUniversity/videos",
+      "videos": [
+        {
+          "id": "9kYIkkadZkU",
+          "title": "SR University Campus Tour",
+          "url": "https://www.youtube.com/watch?v=9kYIkkadZkU",
+          "thumbnail_url": "https://img.youtube.com/vi/9kYIkkadZkU/hqdefault.jpg",
+          "category": "Campus Tour",
+          "duration": "3:45"
+        }
+      ]
+    }
+  ],
   "flow": null,
   "model": "gemini-3.5-flash-lite"
 }

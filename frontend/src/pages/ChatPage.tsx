@@ -45,6 +45,12 @@ const QUICK_STARTERS = [
     desc: "Living facilities, mess food, timings & student clubs",
     prompt: "Tell me about hostel rooms, mess food, and campus life",
   },
+  {
+    icon: "🎥",
+    title: "Virtual Campus Tour",
+    desc: "Watch official video tours of campus, hostels & SRiX",
+    prompt: "Show me official video tours of SR University campus, hostels, and facilities",
+  },
 ];
 
 export default function ChatPage({ onOpenAdmin }: Props) {

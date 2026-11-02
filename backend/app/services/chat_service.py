@@ -249,6 +249,7 @@ async def handle_chat(
         user_message=request.message,
         answer=answer,
         profile=profile,
+        sources=sources,
     )
 
     # 7. Save assistant message with metadata
@@ -470,6 +471,7 @@ async def handle_chat_stream(
             user_message=request.message,
             answer=answer,
             profile=profile,
+            sources=sources,
         )
 
         # Save to database

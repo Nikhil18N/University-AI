@@ -156,10 +156,9 @@ def _is_greeting_without_question(text: str) -> bool:
     return True
 
 
-# Direct score, percentage, or number answers to bot questions (e.g. "93%", "93", "85% in PCM")
 # Direct score, percentage, or qualification statements (e.g. "93%", "93", "85% in PCM", "i got 85 in 12th", "my marks are 85")
 SCORE_REPLY_PATTERN = re.compile(
-    r"^\s*(?:i\s+(?:got|scored|have|achieved|secured)|my\s+marks?\s*(?:is|are)?|my\s+12th\s*marks?\s*(?:is|are)?)\s*[:=]?\s*\d{1,3}(?:\.\d+)?\s*%?(?:\s*(?:marks?|out\s+of\s+\d+)?(?:\s*(?:in|for)\s+(?:12th|pcm|intermediate|inter|boards?|class\s*12))?)?\s*$",
+    r"^\s*(?:(?:i\s+(?:got|scored|have|achieved|secured)|my\s+marks?\s*(?:is|are)?|my\s+12th\s*marks?\s*(?:is|are)?)\s*[:=]?\s*)?\d{1,3}(?:\.\d+)?\s*%?(?:\s*(?:marks?|out\s+of\s+\d+)?(?:\s*(?:in|for)\s+(?:12th|pcm|intermediate|inter|boards?|class\s*12))?)?\s*$",
     re.I,
 )
 
