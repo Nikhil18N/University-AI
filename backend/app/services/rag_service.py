@@ -44,11 +44,7 @@ class RAGService:
         )
 
     async def retrieve(
-<<<<<<< HEAD
-        self, query: str, top_k: int = 3
-=======
         self, query: str, top_k: int = 4
->>>>>>> origin/main
     ) -> list[dict]:
         """Retrieve the most relevant document chunks for a query.
 
@@ -174,19 +170,7 @@ class RAGService:
         messages, sources, evidence_text = await self.prepare_rag_request(
             question, conversation_context, retrieved_chunks
         )
-<<<<<<< HEAD
-
-        # Call the LLM
-        messages = [
-            {"role": "system", "content": rag_prompt},
-            {"role": "user", "content": question},
-        ]
-        answer = await self.llm.generate(
-            messages, temperature=0.0, max_tokens=150
-        )
-=======
         answer = await self.llm.generate(messages, temperature=0.3)
->>>>>>> origin/main
 
         # Runtime Hallucination Guardrail 1: Verify numeric and percentage claims
         is_faithful, unsupported = verify_numeric_faithfulness(
@@ -229,12 +213,8 @@ class RAGService:
         self,
         question: str,
         conversation_context: str = "",
-<<<<<<< HEAD
-        top_k: int = 3,
-=======
         top_k: int = 4,
         search_query: str | None = None,
->>>>>>> origin/main
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         retrieval_query = search_query or question
