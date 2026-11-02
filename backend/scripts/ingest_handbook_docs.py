@@ -122,10 +122,8 @@ async def ingest_handbook():
     embedding_provider = create_embedding_provider()
     ingestion_service = IngestionService(embedding_provider)
 
-    chroma_client = chromadb.HttpClient(
-        host=settings.CHROMA_HOST,
-        port=settings.CHROMA_PORT,
-    )
+    from app.db.chroma import get_chroma_client
+    chroma_client = get_chroma_client()
     collection = chroma_client.get_or_create_collection(
         name=COLLECTION_NAME,
         metadata={"hnsw:space": "cosine"},

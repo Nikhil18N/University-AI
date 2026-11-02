@@ -48,10 +48,8 @@ async def remove_sample_docs() -> None:
     from app.models.document import Document, DocumentVersion
     from app.services.rag_service import COLLECTION_NAME
 
-    chroma_client = chromadb.HttpClient(
-        host=settings.CHROMA_HOST,
-        port=settings.CHROMA_PORT,
-    )
+    from app.db.chroma import get_chroma_client
+    chroma_client = get_chroma_client()
 
     try:
         collection = chroma_client.get_collection(name=COLLECTION_NAME)

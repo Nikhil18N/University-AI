@@ -87,15 +87,13 @@ async def _ingest_entries(
     from app.config import settings
     from app.db.session import async_session_factory
     from app.models.document import Document, DocumentVersion
+    from app.db.chroma import get_chroma_client
     from app.providers.factory import create_embedding_provider
     from app.services.rag_service import COLLECTION_NAME
 
     embedding_provider = create_embedding_provider()
 
-    chroma_client = chromadb.HttpClient(
-        host=settings.CHROMA_HOST,
-        port=settings.CHROMA_PORT,
-    )
+    chroma_client = get_chroma_client()
     collection = chroma_client.get_or_create_collection(
         name=COLLECTION_NAME,
         metadata={"hnsw:space": "cosine"},
@@ -234,8 +232,10 @@ def main() -> None:
     args = parser.parse_args()
 
     file_path = Path(args.file)
-    if not file_path.is_absolute():
-        file_path = (_BACKEND_DIR.parent / file_path).resolve()
+    if not file_path.exists():
+        file_path = (Path.cwd() / args.file).resolve()
+    if not file_path.exists():
+        file_path = (_BACKEND_DIR.parent / args.file).resolve()
 
     if not file_path.exists():
         print(f"Error: file not found: {file_path}")

@@ -18,10 +18,8 @@ class ExemplarService:
     def __init__(self, embedding_provider: EmbeddingProvider | None = None):
         self.embeddings = embedding_provider
         try:
-            self._chroma_client = chromadb.HttpClient(
-                host=settings.CHROMA_HOST,
-                port=settings.CHROMA_PORT,
-            )
+            from app.db.chroma import get_chroma_client
+            self._chroma_client = get_chroma_client()
         except Exception as e:
             logger.warning("Could not connect to ChromaDB for exemplars: %s", e)
             self._chroma_client = None

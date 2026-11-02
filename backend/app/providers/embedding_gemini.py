@@ -1,5 +1,6 @@
 """Google Gemini embedding provider implementation."""
 
+import asyncio
 import logging
 import httpx
 
@@ -40,10 +41,22 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
         ]
 
         url = f"{self.base_url}/models/{self.model}:batchEmbedContents"
-        response = await self._client.post(url, json={"requests": requests})
-        response.raise_for_status()
-        data = response.json()
-        return [item["values"] for item in data.get("embeddings", [])]
+        for attempt in range(5):
+            response = await self._client.post(url, json={"requests": requests})
+            if response.status_code in (429, 503) and attempt < 4:
+                wait_time = 2.0 * (attempt + 1)
+                logger.warning(
+                    "Gemini batchEmbedContents returned %d. Retrying in %.1fs (attempt %d/5)...",
+                    response.status_code,
+                    wait_time,
+                    attempt + 1,
+                )
+                await asyncio.sleep(wait_time)
+                continue
+            response.raise_for_status()
+            data = response.json()
+            return [item["values"] for item in data.get("embeddings", [])]
+        return []
 
     async def embed_single(self, text: str) -> list[float]:
         """Embed a single query text using Gemini embedContent."""
@@ -53,10 +66,22 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
             "content": {"parts": [{"text": text}]},
             "taskType": "RETRIEVAL_QUERY",
         }
-        response = await self._client.post(url, json=payload)
-        response.raise_for_status()
-        data = response.json()
-        return data["embedding"]["values"]
+        for attempt in range(5):
+            response = await self._client.post(url, json=payload)
+            if response.status_code in (429, 503) and attempt < 4:
+                wait_time = 2.0 * (attempt + 1)
+                logger.warning(
+                    "Gemini embedContent returned %d. Retrying in %.1fs (attempt %d/5)...",
+                    response.status_code,
+                    wait_time,
+                    attempt + 1,
+                )
+                await asyncio.sleep(wait_time)
+                continue
+            response.raise_for_status()
+            data = response.json()
+            return data["embedding"]["values"]
+        return []
 
     async def close(self):
         """Close the HTTP client."""

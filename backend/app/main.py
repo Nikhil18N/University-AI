@@ -29,6 +29,12 @@ async def lifespan(app: FastAPI):
     # Ensure upload directory exists
     settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Verify or auto-seed ChromaDB documents in background
+    import asyncio
+    from app.services.auto_seed import ensure_documents_seeded
+
+    asyncio.create_task(ensure_documents_seeded())
+
     yield
 
     # Cleanup
