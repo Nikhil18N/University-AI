@@ -4,10 +4,26 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.config import settings
 
+def get_database_url() -> str:
+    url = settings.DATABASE_URL
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+    return url
+
+
+_db_url = get_database_url()
+_connect_args = {}
+if ":6543" in _db_url:
+    _connect_args["prepared_statement_cache_size"] = 0
+
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _db_url,
     echo=settings.APP_DEBUG,
     pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args=_connect_args,
 )
 
 async_session_factory = async_sessionmaker(
