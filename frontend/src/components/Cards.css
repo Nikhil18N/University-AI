@@ -692,6 +692,54 @@
   color: #60a5fa;
 }
 
+[data-theme="dark"] .card-badge.badge-success {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
+[data-theme="dark"] .card-badge.badge-warning {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .scholarship-callout {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.28);
+  color: #34d399;
+}
+
+[data-theme="dark"] .status-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .status-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .curriculum-tab-btn {
+  background: #212631;
+  border-color: #2d3340;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .curriculum-tab-btn:hover {
+  background: #2d3340;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .next-steps-box {
+  background: #212631;
+  border-color: #2d3340;
+}
+
+[data-theme="dark"] .next-steps-text {
+  color: #e2e8f0;
+}
+
 /* Mobile Optimizations */
 @media (max-width: 600px) {
   .rich-card {

@@ -262,35 +262,44 @@
 
 /* Dark mode overrides */
 [data-theme="dark"] .share-modal-card {
-  background: #1e293b;
-  border-color: #334155;
-  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  background: #181b22;
+  border-color: #2d3340;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+  color: #f8fafc;
 }
 
 [data-theme="dark"] .share-preview-box {
-  background: #0f172a;
-  border-color: #334155;
+  background: #131519;
+  border-color: #2d3340;
+}
+
+[data-theme="dark"] .share-preview-title {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .share-preview-snippet {
+  color: #cbd5e1;
 }
 
 [data-theme="dark"] .share-url-input {
-  background: #0f172a;
-  border-color: #334155;
+  background: #131519;
+  border-color: #2d3340;
   color: #f1f5f9;
 }
 
 [data-theme="dark"] .share-channel-btn {
-  background: #0f172a;
-  border-color: #334155;
+  background: #131519;
+  border-color: #2d3340;
   color: #f1f5f9;
 }
 
 [data-theme="dark"] .share-channel-btn:hover {
-  background: #1e293b;
-  border-color: #38bdf8;
+  background: #212631;
+  border-color: #3b82f6;
 }
 
 [data-theme="dark"] .share-modal-footer {
-  border-color: #334155;
+  border-color: #2d3340;
 }
 
 /* Mobile responsive adjustments */

@@ -62,48 +62,48 @@
 
 [data-theme="dark"] {
   /* SR University Executive Royal Blue Accent */
-  --sru-blue: #2563eb;
-  --sru-blue-dark: #1d4ed8;
-  --sru-blue-light: rgba(37, 99, 235, 0.2);
-  --sru-sky: #38bdf8;
+  --sru-blue: #3b82f6;
+  --sru-blue-dark: #2563eb;
+  --sru-blue-light: rgba(59, 130, 246, 0.22);
+  --sru-sky: #60a5fa;
   --sru-gold: #fbbf24;
-  --sru-gold-light: rgba(251, 191, 36, 0.15);
+  --sru-gold-light: rgba(251, 191, 36, 0.18);
   --sru-green: #34d399;
-  --sru-green-light: rgba(52, 211, 153, 0.15);
+  --sru-green-light: rgba(52, 211, 153, 0.18);
 
-  /* ChatGPT Pitch Black OLED Palette (Matching Screenshots) */
-  --bg: #000000;
-  --surface-1: #121212;
-  --surface-2: #212121;
-  --surface-3: #2a2a2a;
-  --surface-elevated: #1e1e1e;
-  --border: #262626;
-  --border-subtle: #1c1c1c;
-  --border-focus: #2563eb;
+  /* Deep High-Contrast Dark Canvas */
+  --bg: #0f1117;
+  --surface-1: #181b22;
+  --surface-2: #212631;
+  --surface-3: #2d3340;
+  --surface-elevated: #242934;
+  --border: #2d3340;
+  --border-subtle: #222631;
+  --border-focus: #3b82f6;
 
-  /* Typography */
-  --text: #f4f4f5;
+  /* High Visibility Typography (100% readable) */
+  --text: #f8fafc;
   --text-1: #ffffff;
-  --text-2: #d4d4d8;
-  --text-muted: #8e8e93;
-  --text-inverse: #000000;
+  --text-2: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
 
   /* Semantic */
-  --primary: #2563eb;
-  --primary-hover: #3b82f6;
-  --primary-light: rgba(37, 99, 235, 0.18);
-  --primary-glow: rgba(37, 99, 235, 0.35);
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-light: rgba(59, 130, 246, 0.2);
+  --primary-glow: rgba(59, 130, 246, 0.4);
 
-  --accent: #2563eb;
-  --accent-hover: #3b82f6;
-  --accent-light: rgba(37, 99, 235, 0.15);
-  --accent-glow: rgba(37, 99, 235, 0.25);
-  --accent-bg: rgba(37, 99, 235, 0.1);
+  --accent: #38bdf8;
+  --accent-hover: #60a5fa;
+  --accent-light: rgba(56, 189, 248, 0.18);
+  --accent-glow: rgba(56, 189, 248, 0.3);
+  --accent-bg: rgba(56, 189, 248, 0.12);
 
   --danger: #f87171;
-  --danger-bg: rgba(248, 113, 113, 0.14);
+  --danger-bg: rgba(248, 113, 113, 0.16);
   --success: #34d399;
-  --success-bg: rgba(52, 211, 153, 0.12);
+  --success-bg: rgba(52, 211, 153, 0.16);
 
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);

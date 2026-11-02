@@ -63,9 +63,13 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  // Theme & Sound states (default to dark OLED mode matching ChatGPT mobile reference)
+  // Theme & Sound states (default to white / light mode)
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    return (localStorage.getItem("sru_theme") as "light" | "dark") || "dark";
+    const saved = localStorage.getItem("sru_theme_v2");
+    if (saved === "light" || saved === "dark") {
+      return saved;
+    }
+    return "light";
   });
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
     return localStorage.getItem("sru_sound") !== "false";
@@ -89,6 +93,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   // Apply theme to document
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("sru_theme_v2", theme);
     localStorage.setItem("sru_theme", theme);
   }, [theme]);
 
