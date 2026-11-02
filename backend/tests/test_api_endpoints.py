@@ -43,9 +43,11 @@ async def test_health_endpoint():
 
 @pytest.mark.asyncio
 async def test_list_conversations_empty():
+    import uuid
+    unique_session = f"empty-session-{uuid.uuid4()}"
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/api/v1/conversations?session_id=test-session-123")
+        response = await client.get(f"/api/v1/conversations?session_id={unique_session}")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)

@@ -30,6 +30,14 @@ def _find_data_path(rel_path: str) -> Path | None:
 async def ensure_documents_seeded() -> int:
     """Check if ChromaDB collection has documents; if empty, ingest automatically."""
     try:
+        import sys
+        backend_dir = Path(__file__).resolve().parent.parent.parent
+        if str(backend_dir) not in sys.path:
+            sys.path.insert(0, str(backend_dir))
+        scripts_dir = backend_dir / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+
         client = get_chroma_client()
         collection = client.get_or_create_collection(
             name=COLLECTION_NAME,

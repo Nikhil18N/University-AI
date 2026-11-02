@@ -129,12 +129,18 @@ async def health_check() -> HealthResponse:
     # Check ChromaDB
     try:
         from app.db.chroma import get_chroma_client
+        from app.services.rag_service import COLLECTION_NAME
 
         client = get_chroma_client()
         client.heartbeat()
-        services["chromadb"] = "healthy"
-    except Exception:
-        services["chromadb"] = "unhealthy"
+        collection = client.get_or_create_collection(
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"},
+        )
+        count = collection.count()
+        services["chromadb"] = f"healthy ({count} docs)"
+    except Exception as e:
+        services["chromadb"] = f"unhealthy ({e})"
 
     # Check LLM / Embedding Provider
     if settings.LLM_PROVIDER.lower() == "ollama" or settings.EMBEDDING_PROVIDER.lower() == "ollama":

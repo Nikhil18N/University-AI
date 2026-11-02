@@ -28,6 +28,4 @@ uploads/*
 node_modules/
 
 # Database and vector storage
-/chroma_data/
-!backend/chroma_data/
 *.rdb
