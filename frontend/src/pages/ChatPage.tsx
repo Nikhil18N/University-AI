@@ -10,6 +10,7 @@ import {
   sendMessageStream,
   listConversations,
   getConversation,
+  getSharedConversation,
   deleteConversation,
   type ConversationSummary,
   type MessageData,
@@ -73,6 +74,11 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [streamingMsgId, setStreamingMsgId] = useState<string | null>(null);
 
+  // Shared chat states
+  const [isSharedView, setIsSharedView] = useState(false);
+  const [sharedTitle, setSharedTitle] = useState<string | null>(null);
+  const [isLoadingShared, setIsLoadingShared] = useState(false);
+
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelStreamRef = useRef<(() => void) | null>(null);
@@ -86,9 +92,73 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     localStorage.setItem("sru_theme", theme);
   }, [theme]);
 
-  // Load conversations on mount
+  // Load conversations on mount & check for shared link (?chat=... or #s=...)
   useEffect(() => {
     loadConversations();
+
+    async function checkSharedLink() {
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const chatId = searchParams.get("chat") || searchParams.get("share");
+        let hashData = "";
+        if (window.location.hash.startsWith("#s=")) {
+          hashData = window.location.hash.slice(3);
+        }
+
+        // 1. Instant recovery from hash snapshot if available (0ms offline/sleep fallback)
+        if (hashData) {
+          try {
+            const jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(hashData))));
+            const parsed = JSON.parse(jsonStr);
+            if (parsed && Array.isArray(parsed.m) && parsed.m.length > 0) {
+              const restoredMsgs: MessageData[] = parsed.m.map((item: any, i: number) => ({
+                id: `shared-${i}`,
+                role: item.r,
+                content: item.c,
+                created_at: new Date().toISOString(),
+              }));
+              setMessages(restoredMsgs);
+              setIsSharedView(true);
+              setSharedTitle(parsed.t || "Shared Conversation");
+              setTimeout(() => {
+                if (messagesAreaRef.current) {
+                  messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+                }
+              }, 60);
+              return;
+            }
+          } catch (e) {
+            console.warn("Could not decode hash snapshot:", e);
+          }
+        }
+
+        // 2. Fetch from backend public shared endpoint if chatId is present
+        if (chatId && chatId !== "share" && chatId !== "1") {
+          setIsLoadingShared(true);
+          try {
+            const detail = await getSharedConversation(chatId);
+            if (detail && detail.messages && detail.messages.length > 0) {
+              setMessages(detail.messages);
+              setIsSharedView(true);
+              setSharedTitle(detail.title || "Shared Conversation");
+              setTimeout(() => {
+                if (messagesAreaRef.current) {
+                  messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+                }
+              }, 60);
+            }
+          } catch (err) {
+            console.warn("Failed to load shared chat from backend:", err);
+          } finally {
+            setIsLoadingShared(false);
+          }
+        }
+      } catch (err) {
+        console.error("Shared link check error:", err);
+      }
+    }
+
+    checkSharedLink();
   }, []);
 
   // Close export & mobile menus when clicking outside
@@ -192,9 +262,14 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setStreamingMsgId(null);
     setActiveConvId(null);
     setMessages([]);
+    setIsSharedView(false);
+    setSharedTitle(null);
     setError(null);
     isAtBottomRef.current = true;
     setShowScrollBottom(false);
+    if (window.location.search || window.location.hash) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }
 
   function handleStopStreaming() {
@@ -259,6 +334,15 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
     setIsLoading(true);
     setError(null);
+
+    // If replying from a shared chat view, seamlessly fork into own conversation
+    if (isSharedView) {
+      setIsSharedView(false);
+      setActiveConvId(null);
+      if (window.location.search || window.location.hash) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
 
     // CRITICAL: When user sends a message, immediately scroll to bottom
     isAtBottomRef.current = true;
@@ -418,6 +502,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 tabIndex={0}
               >
                 <span className="pill-brand-name">SRU Buddy</span>
+                <span className="brand-beta-pill">Beta</span>
                 <span className="pill-down-arrow">▾</span>
               </div>
 
@@ -620,6 +705,31 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             ref={messagesAreaRef}
             onScroll={handleScroll}
           >
+            {/* Shared Chat Snapshot Banner */}
+            {isLoadingShared && (
+              <div className="shared-chat-banner">
+                <div className="shared-chat-info">
+                  <span className="shared-chat-pill">Loading</span>
+                  <span className="shared-chat-title">Retrieving shared conversation snapshot...</span>
+                </div>
+              </div>
+            )}
+
+            {isSharedView && (
+              <div className="shared-chat-banner">
+                <div className="shared-chat-info">
+                  <span className="shared-chat-pill">🔗 Shared Chat Snapshot</span>
+                  <span className="shared-chat-title">{sharedTitle || "Conversation with SRU Buddy"}</span>
+                </div>
+                <button
+                  className="shared-continue-btn"
+                  onClick={() => setIsSharedView(false)}
+                >
+                  Continue this chat →
+                </button>
+              </div>
+            )}
+
             {messages.length === 0 && (
               <div className="welcome-screen">
                 {/* Minimalist Centered Brand Hero */}
@@ -631,7 +741,10 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                       className="welcome-hero-logo"
                     />
                   </div>
-                  <h1 className="welcome-hero-title">SRU Buddy</h1>
+                  <div className="welcome-hero-title-row">
+                    <h1 className="welcome-hero-title">SRU Buddy</h1>
+                    <span className="hero-beta-pill">Beta</span>
+                  </div>
                   <p className="welcome-hero-tagline">Your AI agent</p>
                 </div>
 

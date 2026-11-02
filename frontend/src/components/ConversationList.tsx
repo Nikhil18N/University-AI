@@ -79,6 +79,7 @@ export default function ConversationList({
       <div className="sidebar-top-bar">
         <div className="sidebar-brand-title-box">
           <span className="sidebar-brand-title">SRU Buddy</span>
+          <span className="brand-beta-pill">Beta</span>
         </div>
 
         <button

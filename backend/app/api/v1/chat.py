@@ -117,6 +117,25 @@ async def get_conversation(
     return detail
 
 
+@router.get(
+    "/shared/{conversation_id}",
+    response_model=ConversationDetail,
+    responses={404: {"model": ErrorResponse}},
+)
+async def get_shared_conversation(
+    conversation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> ConversationDetail:
+    """Get a shared conversation with all messages for public view without requiring owner session_id."""
+    detail = await conversation_service.get_shared_conversation(db, conversation_id)
+    if detail is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Shared conversation not found",
+        )
+    return detail
+
+
 @router.delete(
     "/conversations/{conversation_id}",
     status_code=status.HTTP_204_NO_CONTENT,

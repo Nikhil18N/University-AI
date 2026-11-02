@@ -12,6 +12,19 @@ interface Props {
   onExportMD: () => void;
 }
 
+function encodeSnapshot(title: string, msgs: MessageData[]): string {
+  try {
+    const compact = {
+      t: title || "SRU Buddy Conversation",
+      m: msgs.map((m) => ({ r: m.role, c: m.content })),
+    };
+    const jsonStr = JSON.stringify(compact);
+    return encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+  } catch {
+    return "";
+  }
+}
+
 export default function ShareModal({
   conversationId,
   title,
@@ -22,8 +35,10 @@ export default function ShareModal({
 }: Props) {
   const [copied, setCopied] = useState(false);
 
-  // Generate share link with conversation identifier
-  const shareUrl = `${window.location.origin}${window.location.pathname}?chat=${conversationId || "share"}`;
+  // Generate share link with conversation identifier + instant snapshot hash fallback
+  const snapshotHash = encodeSnapshot(title, messages);
+  const shareParam = conversationId && conversationId !== "share" ? `?chat=${encodeURIComponent(conversationId)}` : `?share=1`;
+  const shareUrl = `${window.location.origin}${window.location.pathname}${shareParam}${snapshotHash ? `#s=${snapshotHash}` : ""}`;
 
   const firstUserMsg = messages.find((m) => m.role === "user")?.content || "Conversation with SRU Buddy";
   const firstAssistantMsg = messages.find((m) => m.role === "assistant")?.content || "";

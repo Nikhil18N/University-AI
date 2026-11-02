@@ -85,6 +85,42 @@ async def get_conversation(
     )
 
 
+async def get_shared_conversation(
+    db: AsyncSession, conversation_id: uuid.UUID
+) -> ConversationDetail | None:
+    """Get a conversation with all messages for public shared viewing (read-only snapshot)."""
+    stmt = (
+        select(Conversation)
+        .options(selectinload(Conversation.messages))
+        .where(Conversation.id == conversation_id)
+    )
+    result = await db.execute(stmt)
+    conv = result.scalar_one_or_none()
+
+    if conv is None:
+        return None
+
+    return ConversationDetail(
+        id=conv.id,
+        title=conv.title,
+        messages=[
+            MessageResponse(
+                id=m.id,
+                role=m.role,
+                content=m.content,
+                sources=_parse_sources(m.sources),
+                suggestions=(m.metadata_ or {}).get("suggestions", []),
+                cards=(m.metadata_ or {}).get("cards", []),
+                flow=(m.metadata_ or {}).get("flow"),
+                model=m.model,
+                created_at=m.created_at,
+            )
+            for m in conv.messages
+        ],
+        created_at=conv.created_at,
+    )
+
+
 async def get_or_create_conversation(
     db: AsyncSession,
     session_id: str,

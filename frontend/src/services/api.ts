@@ -211,6 +211,20 @@ export async function getConversation(
 }
 
 /**
+ * Load a public shared conversation snapshot without requiring session_id.
+ */
+export async function getSharedConversation(
+  conversationId: string
+): Promise<ConversationDetail> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/shared/${conversationId}`);
+    return await handleResponse<ConversationDetail>(res, "Failed to load shared conversation");
+  } catch (err) {
+    handleNetworkError(err, "Failed to load shared conversation");
+  }
+}
+
+/**
  * Delete a conversation.
  */
 export async function deleteConversation(
