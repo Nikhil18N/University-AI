@@ -6,6 +6,15 @@ interface Props {
   disabled?: boolean;
 }
 
+const QUICK_PROMPT_PILLS = [
+  "Are admissions open?",
+  "B.Tech fee structure",
+  "Hostel rules & curfew",
+  "CSE vs AI/ML",
+  "Placement statistics",
+  "Scholarship criteria",
+];
+
 export default function ChatInput({ onSend, disabled }: Props) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -14,18 +23,20 @@ export default function ChatInput({ onSend, disabled }: Props) {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height =
-        Math.min(textareaRef.current.scrollHeight, 150) + "px";
+        Math.min(textareaRef.current.scrollHeight, 140) + "px";
     }
   }, [text]);
 
-  // Always keep input focused on mount
+  // Always keep input focused on mount (desktop only, avoid auto-popping keyboard on mobile on fresh load)
   useEffect(() => {
-    textareaRef.current?.focus();
+    if (window.innerWidth > 768) {
+      textareaRef.current?.focus();
+    }
   }, []);
 
-  // Automatically refocus when assistant finishes responding
+  // Automatically refocus on desktop when assistant finishes responding
   useEffect(() => {
-    if (!disabled) {
+    if (!disabled && window.innerWidth > 768) {
       const timer = setTimeout(() => {
         textareaRef.current?.focus();
       }, 50);
@@ -33,35 +44,14 @@ export default function ChatInput({ onSend, disabled }: Props) {
     }
   }, [disabled]);
 
-  // If user starts typing anywhere on the page, automatically direct focus to the chat input
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.metaKey ||
-        e.ctrlKey ||
-        e.altKey
-      ) {
-        return;
-      }
-      if (e.key.length === 1 && !disabled) {
-        textareaRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, [disabled]);
-
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setText("");
-    // Keep focus ready for next prompt
-    requestAnimationFrame(() => {
-      textareaRef.current?.focus();
-    });
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -71,8 +61,28 @@ export default function ChatInput({ onSend, disabled }: Props) {
     }
   };
 
+  const handlePillClick = (prompt: string) => {
+    if (disabled) return;
+    onSend(prompt);
+  };
+
   return (
     <div className="chat-input-container">
+      {/* Quick Prompt Carousel Pills */}
+      <div className="quick-pills-row" aria-label="Suggested questions">
+        {QUICK_PROMPT_PILLS.map((pill, idx) => (
+          <button
+            key={idx}
+            className="quick-pill-btn"
+            onClick={() => handlePillClick(pill)}
+            disabled={disabled}
+            type="button"
+          >
+            {pill}
+          </button>
+        ))}
+      </div>
+
       <div className="chat-input-wrapper">
         <textarea
           ref={textareaRef}
@@ -80,25 +90,39 @@ export default function ChatInput({ onSend, disabled }: Props) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask me anything about the university..."
+          placeholder="Ask SRU Buddy about admissions, courses, hostels, fees..."
           disabled={disabled}
           rows={1}
+          aria-label="Ask SR University Assistant"
         />
         <button
           className="send-btn"
           onClick={handleSubmit}
           disabled={!text.trim() || disabled}
           aria-label="Send message"
+          title="Send (Enter)"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="22" y1="2" x2="11" y2="13" />
             <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
         </button>
       </div>
-      <p className="chat-input-hint">
-        Press Enter to send, Shift+Enter for new line
-      </p>
+
+      <div className="chat-input-footer">
+        <span className="official-verify-tag">
+          🔒 Official SR University AI • Grounded in Student Handbook & Regulations
+        </span>
+      </div>
     </div>
   );
 }

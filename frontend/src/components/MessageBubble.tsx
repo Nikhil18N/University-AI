@@ -48,7 +48,7 @@ function formatMessageTime(isoString?: string): string {
 export default function MessageBubble({
   role,
   content,
-  sources: _sources,
+  sources,
   suggestions,
   cards,
   flow,
@@ -112,10 +112,12 @@ export default function MessageBubble({
     <div className={`message-bubble ${role}`}>
       <div className="message-avatar">
         {role === "user" ? (
-          "👤"
+          <div className="user-avatar-badge" title="You">
+            <span>👤</span>
+          </div>
         ) : (
-          <div className="sru-buddy-avatar" title="SRU Buddy — AI Senior">
-            <span className="buddy-icon">🎓</span>
+          <div className="sru-buddy-avatar" title="SRU Buddy — Official AI">
+            <img src="/sru-logo.png" alt="SRU" className="buddy-logo-img" />
             <span className="buddy-online-indicator"></span>
           </div>
         )}
@@ -127,6 +129,11 @@ export default function MessageBubble({
           <span className="message-sender-name">
             {role === "user" ? "You" : "SRU Buddy"}
           </span>
+          {role === "assistant" && (
+            <span className="official-verified-badge" title="Verified against official university handbook">
+              ✓ Verified
+            </span>
+          )}
           {timeLabel && (
             <time className="message-timestamp" title={createdAt}>
               {timeLabel}
@@ -202,6 +209,25 @@ export default function MessageBubble({
                 >
                   {suggestion}
                 </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Official Source References Citations */}
+        {!isStreaming && role === "assistant" && sources && sources.length > 0 && (
+          <div className="message-sources-wrapper fade-in-group">
+            <div className="sources-header">
+              <span className="sources-icon">🏛️</span>
+              <span className="sources-title">Verified University Documents Cited:</span>
+            </div>
+            <div className="sources-chips-list">
+              {sources.map((src, idx) => (
+                <div key={idx} className="source-citation-badge" title={src.department ? `Department: ${src.department}` : undefined}>
+                  <span className="source-badge-icon">📄</span>
+                  <span className="source-doc-name">{src.title}</span>
+                  {src.section && <span className="source-sec-tag">{src.section}</span>}
+                </div>
               ))}
             </div>
           </div>

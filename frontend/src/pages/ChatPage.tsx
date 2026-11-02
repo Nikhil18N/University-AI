@@ -22,35 +22,56 @@ interface Props {
 
 const QUICK_STARTERS = [
   {
+    category: "admissions",
     icon: "🧭",
-    title: "Admission Wizard",
-    desc: "Step-by-step guided admission & eligibility check",
+    title: "Admission 2026 Wizard",
+    desc: "Step-by-step guided eligibility & registration checklist",
     prompt: "I want admission - start the admission wizard",
   },
   {
+    category: "academics",
     icon: "🆚",
     title: "CSE vs CSE (AI/ML)",
-    desc: "Side-by-side branch curriculum & career comparison",
+    desc: "Side-by-side branch curriculum & career scope comparison",
     prompt: "Compare CSE vs CSE with AI/ML specialization",
   },
   {
+    category: "fees",
     icon: "💰",
-    title: "Fee Structure",
-    desc: "Detailed tuition, hostel, mess & scholarship breakdown",
-    prompt: "What is the complete annual fee structure for B.Tech?",
+    title: "Fee & Scholarships",
+    desc: "Tuition, hostel, mess fees & merit scholarship tiers",
+    prompt: "What is the complete annual fee structure and scholarship for B.Tech?",
   },
   {
+    category: "campus",
     icon: "🏠",
-    title: "Hostels & Campus",
-    desc: "Living facilities, mess food, timings & student clubs",
-    prompt: "Tell me about hostel rooms, mess food, and campus life",
+    title: "Hostel Rules & Curfew",
+    desc: "Room types, mess schedule, night curfew & out-pass rules",
+    prompt: "What are the hostel rules, mess food details, and curfew timings?",
   },
   {
+    category: "tours",
     icon: "🎥",
     title: "Virtual Campus Tour",
-    desc: "Watch official video tours of campus, hostels & SRiX",
+    desc: "Watch official campus walkthrough, hostels & SRiX incubator",
     prompt: "Show me official video tours of SR University campus, hostels, and facilities",
   },
+  {
+    category: "academics",
+    icon: "📊",
+    title: "Placement Records",
+    desc: "Highest packages, top recruiters, and placement statistics",
+    prompt: "Tell me about SR University placement records, top recruiters, and highest package",
+  },
+];
+
+const CATEGORY_TABS = [
+  { id: "all", label: "🌟 All Topics" },
+  { id: "admissions", label: "📝 Admissions" },
+  { id: "fees", label: "💰 Fees" },
+  { id: "academics", label: "🎓 Academics" },
+  { id: "campus", label: "🏨 Hostels" },
+  { id: "tours", label: "🎥 Video Tours" },
 ];
 
 export default function ChatPage({ onOpenAdmin }: Props) {
@@ -61,7 +82,10 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Responsive sidebar: closed by default on mobile (< 768px), open on desktop
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Theme & Sound states
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -108,7 +132,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
   useEffect(() => {
     if (!showScrollBottom) {
-      // During active token streaming, stick instantly to bottom without animation jitter
       scrollToBottom(Boolean(streamingMsgId));
     }
   }, [messages, streamingMsgId]);
@@ -214,9 +237,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         accumulatedContent += delta;
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === assistantMsgId
-              ? { ...m, content: accumulatedContent }
-              : m
+            m.id === assistantMsgId ? { ...m, content: accumulatedContent } : m
           )
         );
       },
@@ -225,12 +246,10 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         setStreamingMsgId(null);
         cancelStreamRef.current = null;
 
-        // Sound chime if enabled
         if (soundEnabled) {
           playChime();
         }
 
-        // Trigger celebration confetti if eligible or celebratory
         const ansLower = (data.answer || "").toLowerCase();
         if (
           ansLower.includes("fully eligible") ||
@@ -241,7 +260,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           triggerConfetti();
         }
 
-        // Finalize assistant message with full metadata
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsgId
@@ -266,7 +284,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         setStreamingMsgId(null);
         cancelStreamRef.current = null;
         setError(err.message || "Failed to get response.");
-        // Remove empty placeholder if nothing was streamed
         setMessages((prev) =>
           prev.filter((m) => m.id !== assistantMsgId || accumulatedContent.length > 0)
         );
@@ -276,172 +293,274 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     cancelStreamRef.current = cancelFn;
   }
 
+  const filteredStarters =
+    selectedCategory === "all"
+      ? QUICK_STARTERS
+      : QUICK_STARTERS.filter((s) => s.category === selectedCategory);
+
   return (
     <div className={`chat-page theme-${theme}`}>
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-        <ConversationList
-          conversations={conversations}
-          activeId={activeConvId}
-          onSelect={handleSelectConversation}
-          onNew={handleNewChat}
-          onDelete={handleDeleteConversation}
-        />
-      </aside>
-
-      {/* Main chat area */}
-      <main className="chat-main">
-        {/* Glassmorphism Header */}
-        <header className="chat-header">
-          <button
-            className="header-icon-btn toggle-sidebar-btn"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            aria-label="Toggle sidebar"
-            title="Toggle sidebar"
-          >
-            ☰
-          </button>
-
-          <div className="header-info">
-            <div className="header-title-row">
-              <span className="header-mascot">🎓</span>
-              <h1 className="header-title">SRU Buddy</h1>
-              <span className="header-status-badge">
-                <span className="status-dot"></span> Online
-              </span>
-            </div>
-            <p className="header-subtitle">
-              SR University Official AI Companion & Senior Guide
-            </p>
-          </div>
-
-          <div className="header-actions">
-            <button
-              className="header-icon-btn"
-              onClick={toggleSound}
-              title={soundEnabled ? "Sound enabled (Click to mute)" : "Sound muted (Click to enable)"}
-            >
-              {soundEnabled ? "🔊" : "🔇"}
-            </button>
-
-            <button
-              className="header-icon-btn"
-              onClick={toggleTheme}
-              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-            >
-              {theme === "light" ? "🌙" : "☀️"}
-            </button>
-
-            {onOpenAdmin && (
-              <button
-                className="header-admin-btn"
-                onClick={onOpenAdmin}
-                title="Open Admin Console"
-              >
-                ⚙️ Admin
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* Messages scroll area */}
-        <div
-          className="messages-area"
-          ref={messagesAreaRef}
-          onScroll={handleScroll}
+      {/* Official Top Notice Bar */}
+      <div className="official-top-banner" role="banner">
+        <span className="banner-badge">🏛️ SR UNIVERSITY</span>
+        <span className="banner-text">
+          NIRF Ranked • Admissions 2026 Open • Official AI Campus Companion
+        </span>
+        <a
+          href="https://sru.edu.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="banner-link"
         >
-          {messages.length === 0 && (
-            <div className="welcome-screen">
-              <div className="welcome-mascot-container">
-                <div className="welcome-mascot-ring">
-                  <span className="welcome-mascot-emoji">🎓</span>
+          sru.edu.in ↗
+        </a>
+      </div>
+
+      {/* Mobile Drawer Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Main Wrapper: Sidebar + Chat Area */}
+      <div className="chat-layout-wrapper">
+        {/* Sliding Sidebar */}
+        <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+          <ConversationList
+            conversations={conversations}
+            activeId={activeConvId}
+            onSelect={handleSelectConversation}
+            onNew={handleNewChat}
+            onDelete={handleDeleteConversation}
+            onCloseMobile={() => setSidebarOpen(false)}
+          />
+        </aside>
+
+        {/* Main Chat Canvas */}
+        <main className="chat-main">
+          {/* Header */}
+          <header className="chat-header">
+            <button
+              className="header-icon-btn toggle-sidebar-btn"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Toggle sidebar"
+              title="Toggle sidebar"
+            >
+              <span className="hamburger-icon">☰</span>
+            </button>
+
+            {/* Official Logo & Portal Title */}
+            <div className="header-brand-group">
+              <img
+                src="/sru-logo.png"
+                alt="SR University Logo"
+                className="header-sru-logo"
+              />
+              <div className="header-title-column">
+                <div className="header-title-row">
+                  <h1 className="header-title">SR University</h1>
+                  <span className="header-status-badge">
+                    <span className="status-dot"></span> Online
+                  </span>
+                </div>
+                <p className="header-subtitle">
+                  AI Companion & Official Knowledge Portal
+                </p>
+              </div>
+            </div>
+
+            {/* Header Right Actions */}
+            <div className="header-actions">
+              <a
+                href="https://sru.edu.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="header-web-link-btn"
+                title="Visit Official Website"
+              >
+                <span className="web-link-icon">🌐</span>
+                <span className="web-link-text">sru.edu.in</span>
+              </a>
+
+              <button
+                className="header-icon-btn"
+                onClick={toggleSound}
+                title={soundEnabled ? "Mute audio chimes" : "Enable audio chimes"}
+                aria-label="Toggle sound"
+              >
+                {soundEnabled ? "🔊" : "🔇"}
+              </button>
+
+              <button
+                className="header-icon-btn"
+                onClick={toggleTheme}
+                title={theme === "light" ? "Switch to Midnight Navy mode" : "Switch to Light mode"}
+                aria-label="Toggle theme"
+              >
+                {theme === "light" ? "🌙" : "☀️"}
+              </button>
+
+              {onOpenAdmin && (
+                <button
+                  className="header-admin-btn"
+                  onClick={onOpenAdmin}
+                  title="Open Knowledge & Admin Console"
+                >
+                  ⚙️ Admin
+                </button>
+              )}
+            </div>
+          </header>
+
+          {/* Messages Scroll Area */}
+          <div
+            className="messages-area"
+            ref={messagesAreaRef}
+            onScroll={handleScroll}
+          >
+            {messages.length === 0 && (
+              <div className="welcome-screen">
+                {/* Official Crest Hero */}
+                <div className="welcome-crest-hero">
+                  <div className="welcome-logo-badge">
+                    <img
+                      src="/sru-logo.png"
+                      alt="SR University"
+                      className="welcome-main-logo"
+                    />
+                  </div>
+                  <div className="welcome-verify-pill">
+                    <span className="verify-shield">🛡️</span>
+                    <span>Official University Knowledge System</span>
+                  </div>
+                </div>
+
+                <h2 className="welcome-title">SR University AI Companion</h2>
+                <p className="welcome-text">
+                  Your 24/7 intelligent guide for admissions, academic regulations,
+                  scholarships, hostel living, and campus life at SR University, Warangal.
+                </p>
+
+                {/* Accreditation & Stats Bar */}
+                <div className="welcome-stats-bar">
+                  <div className="stat-pill">
+                    <span className="stat-icon">🏆</span>
+                    <span className="stat-label">NAAC 'A+' Grade</span>
+                  </div>
+                  <div className="stat-pill">
+                    <span className="stat-icon">📈</span>
+                    <span className="stat-label">NIRF Ranked</span>
+                  </div>
+                  <div className="stat-pill">
+                    <span className="stat-icon">💡</span>
+                    <span className="stat-label">SRiX Technology Hub</span>
+                  </div>
+                  <div className="stat-pill">
+                    <span className="stat-icon">🎓</span>
+                    <span className="stat-label">UGC / AICTE Approved</span>
+                  </div>
+                </div>
+
+                {/* Category Filter Chips */}
+                <div className="welcome-category-tabs" role="tablist">
+                  {CATEGORY_TABS.map((tab) => (
+                    <button
+                      key={tab.id}
+                      className={`cat-tab-btn ${selectedCategory === tab.id ? "active" : ""}`}
+                      onClick={() => setSelectedCategory(tab.id)}
+                      type="button"
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Interactive Quick Starters Grid */}
+                <div className="quick-starters-grid">
+                  {filteredStarters.map((item, idx) => (
+                    <button
+                      key={idx}
+                      className="starter-card"
+                      onClick={() => handleSendMessage(item.prompt)}
+                      type="button"
+                    >
+                      <div className="starter-icon">{item.icon}</div>
+                      <div className="starter-content">
+                        <div className="starter-title">{item.title}</div>
+                        <div className="starter-desc">{item.desc}</div>
+                      </div>
+                      <span className="starter-arrow">→</span>
+                    </button>
+                  ))}
                 </div>
               </div>
-              <h2 className="welcome-title">Hey there! I'm SRU Buddy 👋</h2>
-              <p className="welcome-text">
-                Your friendly senior guide for SR University. Ask me about admissions,
-                compare branches, check fee structures, or explore campus life!
-              </p>
+            )}
 
-              {/* Interactive Quick Starters */}
-              <div className="quick-starters-grid">
-                {QUICK_STARTERS.map((item, idx) => (
-                  <button
-                    key={idx}
-                    className="starter-card"
-                    onClick={() => handleSendMessage(item.prompt)}
-                  >
-                    <div className="starter-icon">{item.icon}</div>
-                    <div className="starter-content">
-                      <div className="starter-title">{item.title}</div>
-                      <div className="starter-desc">{item.desc}</div>
+            {/* Rendered Messages */}
+            {messages.map((msg) => {
+              const isMsgStreaming = msg.id === streamingMsgId;
+
+              if (isMsgStreaming && msg.content === "") {
+                return (
+                  <div key={msg.id} className="message-bubble assistant thinking-bubble">
+                    <div className="message-avatar">
+                      <div className="sru-buddy-avatar pulse">
+                        <img src="/sru-logo.png" alt="SRU" className="buddy-logo-img" />
+                        <span className="buddy-online-indicator"></span>
+                      </div>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+                    <div className="message-body">
+                      <div className="message-content thinking-content-box">
+                        <ThinkingIndicator />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <MessageBubble
+                  key={msg.id}
+                  role={msg.role}
+                  content={msg.content}
+                  sources={msg.sources}
+                  suggestions={msg.suggestions}
+                  cards={msg.cards}
+                  flow={msg.flow}
+                  messageId={msg.id}
+                  conversationId={activeConvId}
+                  sessionId={sessionId}
+                  createdAt={msg.created_at}
+                  isStreaming={isMsgStreaming}
+                  onSuggestionClick={handleSendMessage}
+                />
+              );
+            })}
+
+            {error && <div className="error-toast">{error}</div>}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Scroll-to-bottom Floating Action Button */}
+          {showScrollBottom && (
+            <button
+              className="scroll-bottom-fab"
+              onClick={() => scrollToBottom()}
+              title="Scroll to latest message"
+              aria-label="Scroll to bottom"
+            >
+              ↓
+            </button>
           )}
 
-          {messages.map((msg) => {
-            const isMsgStreaming = msg.id === streamingMsgId;
-
-            // When streaming message has not received its first token yet, display thinking state inline
-            if (isMsgStreaming && msg.content === "") {
-              return (
-                <div key={msg.id} className="message-bubble assistant thinking-bubble">
-                  <div className="message-avatar">
-                    <div className="sru-buddy-avatar pulse">
-                      <span className="buddy-icon">🎓</span>
-                      <span className="buddy-online-indicator"></span>
-                    </div>
-                  </div>
-                  <div className="message-body">
-                    <div className="message-content thinking-content-box">
-                      <ThinkingIndicator />
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-
-            return (
-              <MessageBubble
-                key={msg.id}
-                role={msg.role}
-                content={msg.content}
-                suggestions={msg.suggestions}
-                cards={msg.cards}
-                flow={msg.flow}
-                messageId={msg.id}
-                conversationId={activeConvId}
-                sessionId={sessionId}
-                createdAt={msg.created_at}
-                isStreaming={isMsgStreaming}
-                onSuggestionClick={handleSendMessage}
-              />
-            );
-          })}
-
-          {error && <div className="error-toast">{error}</div>}
-
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Scroll-to-bottom Floating Action Button */}
-        {showScrollBottom && (
-          <button
-            className="scroll-bottom-fab"
-            onClick={() => scrollToBottom()}
-            title="Scroll to latest message"
-            aria-label="Scroll to bottom"
-          >
-            ↓
-          </button>
-        )}
-
-        {/* Input */}
-        <ChatInput onSend={handleSendMessage} disabled={isLoading} />
-      </main>
+          {/* Bottom Chat Input */}
+          <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+        </main>
+      </div>
     </div>
   );
 }

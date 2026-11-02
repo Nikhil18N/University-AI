@@ -1,23 +1,76 @@
 .chat-input-container {
-  padding: 16px 20px;
+  padding: 10px 18px max(14px, env(safe-area-inset-bottom, 14px));
   border-top: 1px solid var(--border);
   background: var(--surface-1);
+  box-shadow: 0 -4px 16px rgba(0, 30, 80, 0.03);
+  position: relative;
+  z-index: 20;
 }
 
+/* Quick Prompt Pills Row (Horizontal Scroll on Mobile) */
+.quick-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-pill-btn {
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.quick-pill-btn:hover:not(:disabled) {
+  background: var(--sru-blue-light);
+  color: var(--sru-blue);
+  border-color: var(--sru-blue);
+  transform: translateY(-1px);
+}
+
+.quick-pill-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.quick-pill-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Input Box Wrapper */
 .chat-input-wrapper {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 10px;
   background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 8px 8px 8px 16px;
-  transition: border-color 0.2s;
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 8px 10px 8px 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .chat-input-wrapper:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--sru-blue);
+  background: var(--surface-1);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 .chat-input {
@@ -26,45 +79,90 @@
   background: transparent;
   color: var(--text);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.94rem;
+  line-height: 1.45;
   resize: none;
   outline: none;
-  line-height: 1.5;
-  max-height: 150px;
+  max-height: 140px;
+  padding: 4px 0;
 }
 
 .chat-input::placeholder {
   color: var(--text-muted);
+  font-size: 0.88rem;
 }
 
+/* Send Button */
 .send-btn {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 12px;
   border: none;
-  background: var(--accent);
-  color: white;
+  background: var(--sru-blue);
+  color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(0, 85, 164, 0.28);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .send-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: var(--primary-hover);
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 85, 164, 0.38);
+}
+
+.send-btn:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .send-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.chat-input-hint {
-  text-align: center;
-  font-size: 0.75rem;
+/* Footer Tag */
+.chat-input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 6px;
+}
+
+.official-verify-tag {
+  font-size: 0.7rem;
+  font-weight: 500;
   color: var(--text-muted);
-  margin-top: 6px;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+/* Mobile Touch Optimization */
+@media (max-width: 768px) {
+  .chat-input-container {
+    padding: 8px 12px max(10px, env(safe-area-inset-bottom, 10px));
+  }
+
+  .chat-input-wrapper {
+    border-radius: 16px;
+    padding: 6px 8px 6px 14px;
+  }
+
+  .chat-input {
+    font-size: 0.95rem; /* Prevent auto-zoom on iOS safari (<16px zoom issue) */
+  }
+
+  .send-btn {
+    width: 42px;
+    height: 42px; /* 42px touch target */
+    border-radius: 12px;
+  }
+
+  .official-verify-tag {
+    font-size: 0.65rem;
+  }
 }

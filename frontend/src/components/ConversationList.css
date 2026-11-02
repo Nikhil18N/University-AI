@@ -3,65 +3,184 @@
   flex-direction: column;
   height: 100%;
   background: var(--surface-1);
+  color: var(--text);
+  border-right: 1px solid var(--border);
+  user-select: none;
 }
 
-.sidebar-header {
+/* Brand Header */
+.sidebar-brand-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 16px 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-1);
 }
 
-.sidebar-title {
-  font-size: 1.1rem;
+.sidebar-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-sru-logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 85, 164, 0.15));
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand-title {
+  font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text);
-  margin: 0;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-.new-chat-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.sidebar-brand-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--sru-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-close-mobile-btn {
+  display: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-2);
-  color: var(--text);
+  color: var(--text-2);
+  font-size: 14px;
   cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.sidebar-close-mobile-btn:hover {
+  background: var(--surface-3);
+  color: var(--text-1);
+}
+
+/* New Chat Primary Button */
+.sidebar-action-bar {
+  padding: 12px 14px 6px;
+}
+
+.new-chat-primary-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--sru-blue);
+  background: var(--sru-blue);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 85, 164, 0.22);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.new-chat-btn:hover {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+.new-chat-primary-btn:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 85, 164, 0.32);
 }
 
+.new-chat-primary-btn:active {
+  transform: translateY(0);
+}
+
+.new-chat-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Section Header */
+.sidebar-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.conv-count-badge {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Conversation Items List */
 .conversation-items {
   flex: 1;
   overflow-y: auto;
-  padding: 8px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .no-chats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  padding: 24px 16px;
+}
+
+.no-chats-icon {
+  font-size: 24px;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.no-chats p {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 2px;
+}
+
+.no-chats-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .conversation-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s;
-  margin-bottom: 2px;
+  transition: all 0.15s ease;
+  position: relative;
+  background: transparent;
 }
 
 .conversation-item:hover {
@@ -69,40 +188,112 @@
 }
 
 .conversation-item.active {
-  background: var(--accent-bg);
-  border-left: 3px solid var(--accent);
+  background: var(--primary-light);
+  border-left: 3px solid var(--sru-blue);
+  padding-left: 9px;
+}
+
+.conv-icon {
+  font-size: 0.88rem;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .conv-title {
   flex: 1;
-  font-size: 0.88rem;
-  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.conversation-item.active .conv-title {
+  color: var(--sru-blue);
+  font-weight: 600;
+}
+
 .delete-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-size: 16px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
-.conversation-item:hover .delete-btn {
-  opacity: 1;
+.conversation-item:hover .delete-btn,
+.conversation-item:focus-within .delete-btn {
+  opacity: 0.7;
 }
 
 .delete-btn:hover {
-  background: var(--danger);
-  color: white;
+  opacity: 1;
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 12px 14px 16px;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-1);
+}
+
+.sidebar-links-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.sidebar-quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.sidebar-link-pill {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+}
+
+.sidebar-link-pill:hover {
+  background: var(--primary-light);
+  color: var(--sru-blue);
+  border-color: var(--sru-blue);
+}
+
+.sidebar-campus-tag {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .sidebar-close-mobile-btn {
+    display: flex;
+  }
 }

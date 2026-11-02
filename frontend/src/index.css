@@ -1,79 +1,120 @@
-/* ======================================
-   University AI Companion — Design System
-   Modern Dual Light & Dark Themes
-   ====================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* ==========================================================================
+   SR UNIVERSITY (SRU) — OFFICIAL DESIGN SYSTEM & TOKENS
+   Refined from https://sru.edu.in
+   Primary Brand: #0055a4 (Deep Royal Blue) | Accent: #2979e2 (Electric Sky)
+   Mobile-First Architecture & Dual Light / Midnight-Navy Themes
+   ========================================================================== */
 
 :root,
 [data-theme="light"] {
-  /* Light Theme */
-  --bg: #f8fafc;
+  /* SR University Brand Colors */
+  --sru-blue: #0055a4;
+  --sru-blue-dark: #003e7a;
+  --sru-blue-light: #e8f1fb;
+  --sru-sky: #2979e2;
+  --sru-gold: #f59e0b;
+  --sru-gold-light: #fef3c7;
+  --sru-green: #10b981;
+  --sru-green-light: #d1fae5;
+
+  /* Surfaces & Canvas */
+  --bg: #f5f8fc;
   --surface-1: #ffffff;
-  --surface-2: #f1f5f9;
-  --surface-3: #e2e8f0;
+  --surface-2: #f0f4f9;
+  --surface-3: #e2e8f2;
+  --surface-elevated: #ffffff;
   --border: #e2e8f0;
-  --text: #0f172a;
-  --text-1: #0f172a;
-  --text-2: #475569;
-  --text-muted: #64748b;
-
-  /* Accent */
-  --accent: #0284c7;
-  --accent-hover: #0369a1;
-  --accent-glow: rgba(2, 132, 199, 0.15);
-  --accent-bg: rgba(2, 132, 199, 0.08);
-  --primary: #0284c7;
-  --primary-light: #e0f2fe;
-
-  /* Status */
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
-  --success: #22c55e;
+  --border-subtle: #edf2f7;
+  --border-focus: #0055a4;
 
   /* Typography */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: var(--text);
+  --text: #0f172a;
+  --text-1: #0a1b3a;
+  --text-2: #334155;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Semantic */
+  --primary: #0055a4;
+  --primary-hover: #004382;
+  --primary-light: #e8f1fb;
+  --primary-glow: rgba(0, 85, 164, 0.16);
+
+  --accent: #2979e2;
+  --accent-hover: #1c66c9;
+  --accent-light: rgba(41, 121, 226, 0.12);
+  --accent-glow: rgba(41, 121, 226, 0.22);
+  --accent-bg: rgba(0, 85, 164, 0.08);
+
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.08);
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 50, 110, 0.06);
+  --shadow-md: 0 4px 14px rgba(0, 50, 110, 0.08);
+  --shadow-lg: 0 10px 28px rgba(0, 50, 110, 0.12);
+  --shadow-card: 0 2px 10px rgba(0, 50, 110, 0.05);
 
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  /* Dark Theme */
-  --bg: #0b0f19;
-  --surface-1: #111827;
-  --surface-2: #1e293b;
-  --surface-3: #334155;
-  --border: #283548;
-  --text: #f3f4f6;
-  --text-1: #f9fafb;
-  --text-2: #94a3b8;
-  --text-muted: #64748b;
+  /* SR University Executive Midnight Navy */
+  --sru-blue: #2563eb;
+  --sru-blue-dark: #1d4ed8;
+  --sru-blue-light: rgba(37, 99, 235, 0.18);
+  --sru-sky: #38bdf8;
+  --sru-gold: #fbbf24;
+  --sru-gold-light: rgba(251, 191, 36, 0.15);
+  --sru-green: #34d399;
+  --sru-green-light: rgba(52, 211, 153, 0.15);
 
-  /* Accent */
-  --accent: #38bdf8;
-  --accent-hover: #0ea5e9;
-  --accent-glow: rgba(56, 189, 248, 0.2);
-  --accent-bg: rgba(56, 189, 248, 0.12);
+  /* Surfaces & Canvas */
+  --bg: #070e1c;
+  --surface-1: #0d182e;
+  --surface-2: #142343;
+  --surface-3: #1d315b;
+  --surface-elevated: #101e3b;
+  --border: #1e3358;
+  --border-subtle: #172744;
+  --border-focus: #38bdf8;
+
+  /* Typography */
+  --text: #f1f5f9;
+  --text-1: #ffffff;
+  --text-2: #cbd5e1;
+  --text-muted: #8899b5;
+  --text-inverse: #070e1c;
+
+  /* Semantic */
   --primary: #38bdf8;
-  --primary-light: rgba(56, 189, 248, 0.18);
+  --primary-hover: #0284c7;
+  --primary-light: rgba(56, 189, 248, 0.15);
+  --primary-glow: rgba(56, 189, 248, 0.25);
 
-  /* Status */
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --accent-light: rgba(56, 189, 248, 0.15);
+  --accent-glow: rgba(56, 189, 248, 0.3);
+  --accent-bg: rgba(56, 189, 248, 0.12);
+
   --danger: #f87171;
-  --danger-bg: rgba(248, 113, 113, 0.15);
-  --success: #4ade80;
+  --danger-bg: rgba(248, 113, 113, 0.14);
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.12);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
 
   color-scheme: dark;
 }
 
-/* Reset */
+/* Base Reset & Core Styles */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -83,20 +124,32 @@
 html, body {
   height: 100%;
   width: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Scrollbar */
+/* Scrollbar Customization */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -105,7 +158,7 @@ html, body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -120,6 +173,38 @@ html, body {
 
 /* Selection */
 ::selection {
-  background: var(--accent);
-  color: white;
+  background: var(--sru-blue);
+  color: #ffffff;
+}
+
+/* Utility Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
 }
