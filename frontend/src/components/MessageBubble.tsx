@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { submitFeedback, type SourceReference } from "../services/api";
+import { submitFeedback } from "../services/api";
 import { RenderCard } from "./Cards";
 import MarkdownContent from "./MarkdownContent";
 import { copyCleanText } from "../utils/cleanCopy";
@@ -8,7 +8,7 @@ import "./MessageBubble.css";
 interface Props {
   role: "user" | "assistant";
   content: string;
-  sources?: SourceReference[];
+  sources?: any[];
   suggestions?: string[];
   cards?: any[];
   flow?: any;
@@ -20,67 +20,43 @@ interface Props {
   onSuggestionClick?: (text: string) => void;
 }
 
-const EMOJI_REACTIONS = [
-  { emoji: "👍", label: "Helpful", rating: 1 },
-  { emoji: "👎", label: "Inaccurate", rating: -1 },
-  { emoji: "🔥", label: "Awesome" },
-  { emoji: "❤️", label: "Love" },
-  { emoji: "😂", label: "Haha" },
-  { emoji: "🤔", label: "Thinking" },
-];
-
-/** Format ISO timestamp string to human-friendly local time (e.g. 10:45 AM) */
-function formatMessageTime(isoString?: string): string {
-  if (!isoString) {
-    return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  }
-  try {
-    const date = new Date(isoString);
-    if (isNaN(date.getTime())) {
-      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    }
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return "";
-  }
-}
-
 export default function MessageBubble({
   role,
   content,
-  sources,
   suggestions,
   cards,
   flow,
   messageId,
   conversationId,
   sessionId,
-  createdAt,
   isStreaming,
   onSuggestionClick,
 }: Props) {
-  const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
-  const [copiedClean, setCopiedClean] = useState(false);
-  const [copiedRaw, setCopiedRaw] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
 
-  // If content is very long (> 1600 characters) and not streaming, provide collapsible view
-  const isLongMessage = !isStreaming && role === "assistant" && content.length > 1600;
+  const handleCopy = async () => {
+    const success = await copyCleanText(content);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
-  async function handleReaction(item: { emoji: string; label: string; rating?: number }) {
-    if (selectedReaction === item.emoji) return;
-    setSelectedReaction(item.emoji);
+  const handleRating = async (rating: 1 | -1) => {
+    const type = rating === 1 ? "up" : "down";
+    if (feedback === type) return;
+    setFeedback(type);
 
-    // If rating is associated (thumbs up / down), submit to backend feedback
-    if (item.rating && messageId && conversationId && sessionId && !isSubmitting) {
+    if (messageId && conversationId && sessionId && !isSubmitting) {
       setIsSubmitting(true);
       try {
         await submitFeedback({
           session_id: sessionId,
           conversation_id: conversationId,
           message_id: messageId,
-          rating: item.rating,
+          rating,
         });
       } catch (err) {
         console.error("Failed to submit feedback:", err);
@@ -88,64 +64,23 @@ export default function MessageBubble({
         setIsSubmitting(false);
       }
     }
-  }
-
-  // Clean copy strips markdown markers (for WhatsApp, Email, Docs)
-  async function handleCleanCopy() {
-    const success = await copyCleanText(content);
-    if (success) {
-      setCopiedClean(true);
-      setTimeout(() => setCopiedClean(false), 2000);
-    }
-  }
-
-  // Raw copy preserves markdown syntax
-  function handleRawCopy() {
-    navigator.clipboard.writeText(content);
-    setCopiedRaw(true);
-    setTimeout(() => setCopiedRaw(false), 2000);
-  }
-
-  const timeLabel = formatMessageTime(createdAt);
+  };
 
   return (
-    <div className={`message-bubble ${role}`}>
-      <div className="message-avatar">
-        {role === "user" ? (
-          <div className="user-avatar-badge" title="You">
-            <span>👤</span>
+    <div className={`message-bubble-row ${role}`}>
+      {role === "assistant" && (
+        <div className="message-avatar-col">
+          <div className="assistant-avatar-badge" title="SRU Buddy">
+            <img src="/sru-logo.png" alt="SRU" className="assistant-avatar-img" />
           </div>
-        ) : (
-          <div className="sru-buddy-avatar" title="SRU Buddy — Official AI">
-            <img src="/sru-logo.png" alt="SRU" className="buddy-logo-img" />
-            <span className="buddy-online-indicator"></span>
-          </div>
-        )}
-      </div>
-
-      <div className="message-body">
-        {/* Message Top Header: Identity & Timestamp */}
-        <div className="message-meta-header">
-          <span className="message-sender-name">
-            {role === "user" ? "You" : "SRU Buddy"}
-          </span>
-          {role === "assistant" && (
-            <span className="official-verified-badge" title="Verified against official university handbook">
-              ✓ Verified
-            </span>
-          )}
-          {timeLabel && (
-            <time className="message-timestamp" title={createdAt}>
-              {timeLabel}
-            </time>
-          )}
         </div>
+      )}
 
-        {/* Guided Flow Step Banner */}
+      <div className="message-content-col">
+        {/* Guided Flow Progress (if active) */}
         {role === "assistant" && flow && (
           <div className="flow-step-banner">
             <div className="flow-step-header">
-              <span className="flow-icon">🧭</span>
               <span className="flow-badge">Admission Wizard</span>
               <span className="flow-step-count">
                 Step {flow.step} of {flow.total_steps}
@@ -155,57 +90,35 @@ export default function MessageBubble({
               <div
                 className="flow-progress-fill"
                 style={{ width: `${(flow.step / flow.total_steps) * 100}%` }}
-              ></div>
+              />
             </div>
           </div>
         )}
 
-        {/* Message Content Bubble with Live Markdown & Streaming Caret */}
-        <div
-          className={`message-content ${
-            isLongMessage && !isExpanded ? "message-content-collapsed" : ""
-          }`}
-        >
+        {/* Message Content Bubble */}
+        <div className={`message-text-bubble ${role}`}>
           <MarkdownContent content={content} isStreaming={isStreaming} />
-
-          {/* Fade-out overlay when long message is collapsed */}
-          {isLongMessage && !isExpanded && (
-            <div className="collapsed-gradient-overlay" aria-hidden="true" />
-          )}
         </div>
 
-        {/* Expand / Collapse Toggle for Long Messages */}
-        {isLongMessage && (
-          <button
-            type="button"
-            className="expand-collapse-btn"
-            onClick={() => setIsExpanded((prev) => !prev)}
-          >
-            {isExpanded ? "▴ Show less" : "▾ Show full answer"}
-          </button>
-        )}
-
-        {/* Rich Interactive Cards (Shown once streaming is complete) */}
+        {/* Rich Interactive Cards (e.g. branch comparison, fee breakdown) */}
         {!isStreaming && role === "assistant" && cards && cards.length > 0 && (
-          <div className="message-cards-container fade-in-group">
+          <div className="message-cards-container">
             {cards.map((card, idx) => (
               <RenderCard key={idx} card={card} />
             ))}
           </div>
         )}
 
-        {/* Quick Suggestion Chips (Shown once streaming is complete) */}
+        {/* Clean Suggestion Chips */}
         {!isStreaming && role === "assistant" && suggestions && suggestions.length > 0 && (
-          <div className="suggestion-chips-wrapper fade-in-group">
-            <span className="chips-hint">Suggested follow-ups:</span>
+          <div className="suggestion-chips-wrapper">
             <div className="suggestion-chips-list">
               {suggestions.map((suggestion, idx) => (
                 <button
                   key={idx}
                   className="suggestion-chip"
                   onClick={() => onSuggestionClick?.(suggestion)}
-                  title={`Ask: ${suggestion}`}
-                  style={{ animationDelay: `${idx * 0.05}s` }}
+                  type="button"
                 >
                   {suggestion}
                 </button>
@@ -214,69 +127,53 @@ export default function MessageBubble({
           </div>
         )}
 
-        {/* Official Source References Citations */}
-        {!isStreaming && role === "assistant" && sources && sources.length > 0 && (
-          <div className="message-sources-wrapper fade-in-group">
-            <div className="sources-header">
-              <span className="sources-icon">🏛️</span>
-              <span className="sources-title">Verified University Documents Cited:</span>
-            </div>
-            <div className="sources-chips-list">
-              {sources.map((src, idx) => (
-                <div key={idx} className="source-citation-badge" title={src.department ? `Department: ${src.department}` : undefined}>
-                  <span className="source-badge-icon">📄</span>
-                  <span className="source-doc-name">{src.title}</span>
-                  {src.section && <span className="source-sec-tag">{src.section}</span>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Action Row: Emoji Reactions & Copy Button (Shown once streaming is complete) */}
-        {!isStreaming && role === "assistant" && (
-          <div className="message-action-bar fade-in-group">
-            <div className="emoji-reaction-group">
-              {EMOJI_REACTIONS.map((item) => (
-                <button
-                  key={item.emoji}
-                  className={`emoji-btn ${selectedReaction === item.emoji ? "selected" : ""}`}
-                  onClick={() => handleReaction(item)}
-                  title={item.label}
-                  type="button"
-                >
-                  <span className="emoji-char">{item.emoji}</span>
-                </button>
-              ))}
-              {selectedReaction && (
-                <span className="reaction-ack">
-                  {selectedReaction === "👍"
-                    ? "Verified!"
-                    : selectedReaction === "👎"
-                    ? "Feedback noted!"
-                    : "Reacted!"}
-                </span>
+        {/* Sleek ChatGPT-Style Action Bar (Copy + Thumbs feedback) */}
+        {!isStreaming && role === "assistant" && content.length > 0 && (
+          <div className="minimal-action-bar">
+            <button
+              className="action-icon-btn"
+              onClick={handleCopy}
+              title={copied ? "Copied!" : "Copy message"}
+              aria-label="Copy message"
+              type="button"
+            >
+              {copied ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
               )}
-            </div>
+            </button>
 
-            <div className="copy-action-group">
-              <button
-                className="copy-btn clean-copy-btn"
-                onClick={handleCleanCopy}
-                title="Copy clean plain text without Markdown markers (ideal for sharing)"
-                type="button"
-              >
-                {copiedClean ? "✓ Clean Copied!" : "📋 Clean Copy"}
-              </button>
-              <button
-                className="copy-btn raw-copy-btn"
-                onClick={handleRawCopy}
-                title="Copy raw Markdown"
-                type="button"
-              >
-                {copiedRaw ? "✓ MD" : "MD"}
-              </button>
-            </div>
+            <button
+              className={`action-icon-btn ${feedback === "up" ? "active" : ""}`}
+              onClick={() => handleRating(1)}
+              title="Good response"
+              aria-label="Good response"
+              type="button"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill={feedback === "up" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+              </svg>
+            </button>
+
+            <button
+              className={`action-icon-btn ${feedback === "down" ? "active" : ""}`}
+              onClick={() => handleRating(-1)}
+              title="Poor response"
+              aria-label="Poor response"
+              type="button"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill={feedback === "down" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
+              </svg>
+            </button>
+
+            {copied && <span className="copy-feedback-label">Copied</span>}
           </div>
         )}
       </div>

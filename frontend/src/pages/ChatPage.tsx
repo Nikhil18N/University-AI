@@ -60,6 +60,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   // Modals & Popovers
   const [showShareModal, setShowShareModal] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Theme & Sound states
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -76,6 +77,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelStreamRef = useRef<(() => void) | null>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
 
   // Apply theme to document
@@ -89,7 +91,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     loadConversations();
   }, []);
 
-  // Close export dropdown when clicking outside
+  // Close export & mobile menus when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -98,14 +100,20 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       ) {
         setShowExportMenu(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMobileMenu(false);
+      }
     }
-    if (showExportMenu) {
+    if (showExportMenu || showMobileMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showExportMenu]);
+  }, [showExportMenu, showMobileMenu]);
 
   // Track user's manual scroll position
   const handleScroll = () => {
@@ -382,8 +390,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
         {/* Main Canvas */}
         <main className="chat-main">
-          {/* Header */}
+          {/* Header (ChatGPT Mobile / Desktop Layout) */}
           <header className="chat-header">
+            {/* Left controls */}
             <div className="header-left">
               <button
                 className="header-icon-btn toggle-sidebar-btn"
@@ -399,7 +408,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               </button>
 
               <button
-                className="header-icon-btn new-chat-header-btn"
+                className="header-icon-btn new-chat-desktop-btn desktop-only"
                 onClick={handleNewChat}
                 aria-label="New chat"
                 title="New chat"
@@ -409,8 +418,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 </svg>
               </button>
 
-              {/* Brand Branding */}
-              <div className="header-brand-group">
+              {/* Brand Branding (Desktop) */}
+              <div className="header-brand-group desktop-only">
                 <img
                   src="/sru-logo.png"
                   alt="SRU Logo"
@@ -423,8 +432,15 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               </div>
             </div>
 
-            {/* Header Right Actions */}
-            <div className="header-actions">
+            {/* Mobile Centered Brand (ChatGPT Mobile style) */}
+            <div className="header-center-mobile mobile-only" onClick={handleNewChat}>
+              <img src="/sru-logo.png" alt="SRU" className="mobile-brand-logo" />
+              <span className="mobile-brand-title">SRU Buddy</span>
+              <span className="mobile-brand-chevron">▾</span>
+            </div>
+
+            {/* Desktop Header Right Actions */}
+            <div className="header-actions desktop-only">
               {/* Share Chat (ChatGPT style) */}
               {messages.length > 0 && (
                 <button
@@ -523,6 +539,107 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 </button>
               )}
             </div>
+
+            {/* Mobile Header Right (New Chat + Options menu ⋮) */}
+            <div className="header-actions-mobile mobile-only" ref={mobileMenuRef}>
+              <button
+                className="header-icon-btn"
+                onClick={handleNewChat}
+                title="New chat"
+                aria-label="New chat"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+
+              <button
+                className="header-icon-btn"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                title="Options"
+                aria-label="Options"
+                aria-expanded={showMobileMenu}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="1.5" />
+                  <circle cx="12" cy="5" r="1.5" />
+                  <circle cx="12" cy="19" r="1.5" />
+                </svg>
+              </button>
+
+              {showMobileMenu && (
+                <div className="mobile-options-popover">
+                  {messages.length > 0 && (
+                    <button
+                      className="mobile-popover-item"
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        setShowShareModal(true);
+                      }}
+                    >
+                      <span className="popover-icon">🔗</span>
+                      <span>Share Chat Link</span>
+                    </button>
+                  )}
+                  {messages.length > 0 && (
+                    <>
+                      <button
+                        className="mobile-popover-item"
+                        onClick={() => {
+                          setShowMobileMenu(false);
+                          handleExportPDF();
+                        }}
+                      >
+                        <span className="popover-icon">📄</span>
+                        <span>Export as PDF / Print</span>
+                      </button>
+                      <button
+                        className="mobile-popover-item"
+                        onClick={() => {
+                          setShowMobileMenu(false);
+                          handleExportMD();
+                        }}
+                      >
+                        <span className="popover-icon">📝</span>
+                        <span>Export as Markdown</span>
+                      </button>
+                    </>
+                  )}
+                  <button
+                    className="mobile-popover-item"
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      toggleTheme();
+                    }}
+                  >
+                    <span className="popover-icon">{theme === "light" ? "🌙" : "☀️"}</span>
+                    <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+                  </button>
+                  <button
+                    className="mobile-popover-item"
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      toggleSound();
+                    }}
+                  >
+                    <span className="popover-icon">{soundEnabled ? "🔊" : "🔇"}</span>
+                    <span>{soundEnabled ? "Sound: On" : "Sound: Muted"}</span>
+                  </button>
+                  {onOpenAdmin && (
+                    <button
+                      className="mobile-popover-item"
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        onOpenAdmin();
+                      }}
+                    >
+                      <span className="popover-icon">⚙️</span>
+                      <span>Admin Console</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </header>
 
           {/* Messages Canvas */}
@@ -603,7 +720,38 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               );
             })}
 
-            {error && <div className="error-toast">{error}</div>}
+            {error && (
+              <div className="error-toast-card">
+                <div className="error-toast-content">
+                  <span className="error-toast-icon">⚡</span>
+                  <div className="error-toast-text">
+                    <span className="error-toast-title">
+                      {error.includes("Failed to fetch")
+                        ? "Server is waking up (Render free tier)"
+                        : "Connection issue"}
+                    </span>
+                    <span className="error-toast-desc">
+                      {error.includes("Failed to fetch")
+                        ? "Backend takes ~30s to start from sleep. Please tap retry."
+                        : error}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  className="error-retry-action-btn"
+                  onClick={() => {
+                    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+                    if (lastUserMsg) {
+                      setError(null);
+                      handleSendMessage(lastUserMsg.content);
+                    }
+                  }}
+                  type="button"
+                >
+                  Retry ↺
+                </button>
+              </div>
+            )}
 
             <div ref={messagesEndRef} />
           </div>

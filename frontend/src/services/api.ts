@@ -166,7 +166,11 @@ export function sendMessageStream(
       }
     } catch (err: unknown) {
       if ((err as Error)?.name === "AbortError") return;
-      callbacks.onError?.(err instanceof Error ? err : new Error(String(err)));
+      let errorObj = err instanceof Error ? err : new Error(String(err));
+      if (errorObj.message.includes("Failed to fetch")) {
+        errorObj = new Error("Connection timed out (backend is waking up from sleep). Please tap Retry.");
+      }
+      callbacks.onError?.(errorObj);
     }
   })();
 
