@@ -8,13 +8,15 @@ class Settings(BaseSettings):
     """All settings are loaded from env vars or a .env file."""
 
     # ---- LLM ----
-    LLM_PROVIDER: str = "ollama"
+    LLM_PROVIDER: str = "gemini"
     LLM_BASE_URL: str = "http://localhost:11434"
-    LLM_MODEL: str = "llama3.2:1b"
+    LLM_MODEL: str = "gemini-1.5-flash"
+    GEMINI_API_KEY: str | None = None
+    GOOGLE_API_KEY: str | None = None
 
     # ---- Embedding ----
-    EMBEDDING_PROVIDER: str = "ollama"
-    EMBEDDING_MODEL: str = "nomic-embed-text"
+    EMBEDDING_PROVIDER: str = "gemini"
+    EMBEDDING_MODEL: str = "text-embedding-004"
 
     # ---- Database ----
     DATABASE_URL: str = "postgresql+asyncpg://university_ai:university_ai_dev@localhost:5433/university_ai"
@@ -25,7 +27,7 @@ class Settings(BaseSettings):
     # ---- ChromaDB ----
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8000
-    CHROMA_PERSIST_DIR: str | None = None
+    CHROMA_PERSIST_DIR: str | None = "./chroma_data"
     RAG_MAX_DISTANCE: float = 0.5
 
     # ---- Admin ----

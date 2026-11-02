@@ -15,9 +15,18 @@ def create_llm_provider() -> LLMProvider:
             base_url=settings.LLM_BASE_URL,
             model=settings.LLM_MODEL,
         )
+    elif provider == "gemini":
+        from app.providers.gemini import GeminiProvider
+        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY (or GOOGLE_API_KEY) must be set in environment variables.")
+        return GeminiProvider(
+            api_key=api_key,
+            model=settings.LLM_MODEL,
+        )
     else:
         raise ValueError(
-            f"Unknown LLM provider: {provider!r}. Supported: ollama"
+            f"Unknown LLM provider: {provider!r}. Supported: ollama, gemini"
         )
 
 
@@ -31,7 +40,16 @@ def create_embedding_provider() -> EmbeddingProvider:
             base_url=settings.LLM_BASE_URL,
             model=settings.EMBEDDING_MODEL,
         )
+    elif provider == "gemini":
+        from app.providers.embedding_gemini import GeminiEmbeddingProvider
+        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY (or GOOGLE_API_KEY) must be set in environment variables.")
+        return GeminiEmbeddingProvider(
+            api_key=api_key,
+            model=settings.EMBEDDING_MODEL,
+        )
     else:
         raise ValueError(
-            f"Unknown embedding provider: {provider!r}. Supported: ollama"
+            f"Unknown embedding provider: {provider!r}. Supported: ollama, gemini"
         )

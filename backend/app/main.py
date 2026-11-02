@@ -129,15 +129,19 @@ async def health_check() -> HealthResponse:
     except Exception:
         services["chromadb"] = "unhealthy"
 
-    # Check Ollama
-    try:
-        import httpx
+    # Check LLM
+    if settings.LLM_PROVIDER == "gemini":
+        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY
+        services["gemini"] = "healthy" if api_key else "unconfigured (missing GEMINI_API_KEY)"
+    else:
+        try:
+            import httpx
 
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(f"{settings.LLM_BASE_URL}/api/tags")
-            services["ollama"] = "healthy" if resp.status_code == 200 else "unhealthy"
-    except Exception:
-        services["ollama"] = "unhealthy"
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(f"{settings.LLM_BASE_URL}/api/tags")
+                services["ollama"] = "healthy" if resp.status_code == 200 else "unhealthy"
+        except Exception:
+            services["ollama"] = "unhealthy"
 
     overall = "healthy" if all(v == "healthy" for v in services.values()) else "degraded"
     return HealthResponse(status=overall, services=services)
