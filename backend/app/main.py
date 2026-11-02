@@ -101,6 +101,20 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
+# ---- Root status ----
+@app.get("/", tags=["system"])
+@app.head("/", tags=["system"])
+async def root():
+    """Root health check for Render / load balancer pings."""
+    return {
+        "status": "healthy",
+        "service": "University AI Companion API",
+        "docs": "/docs",
+        "health": "/health",
+        "api_v1": "/api/v1",
+    }
+
+
 # ---- Health check ----
 @app.get("/health", response_model=HealthResponse, tags=["system"])
 async def health_check() -> HealthResponse:

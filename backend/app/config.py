@@ -49,16 +49,18 @@ class Settings(BaseSettings):
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
     def get_gemini_api_keys(self) -> list[str]:
-        """Return a deduplicated list of Gemini API keys configured from GEMINI_API_KEYS, GEMINI_API_KEY, or GOOGLE_API_KEY."""
+        """Return a deduplicated list of Gemini API keys configured from GEMINI_API_KEYS, GEMINI_API_KEY, or GOOGLE_API_KEY.
+        Handles comma-separated strings in any key variable so users can paste lists into GEMINI_API_KEY or GEMINI_API_KEYS.
+        """
         all_keys: list[str] = []
-        if self.GEMINI_API_KEYS:
-            all_keys.extend(k.strip() for k in self.GEMINI_API_KEYS.split(",") if k.strip())
-        if self.GEMINI_API_KEY and self.GEMINI_API_KEY.strip():
-            all_keys.append(self.GEMINI_API_KEY.strip())
-        if self.GOOGLE_API_KEY and self.GOOGLE_API_KEY.strip():
-            all_keys.append(self.GOOGLE_API_KEY.strip())
-        if self.LLM_API_KEY and self.LLM_PROVIDER.lower() == "gemini" and self.LLM_API_KEY.strip():
-            all_keys.append(self.LLM_API_KEY.strip())
+        candidates = [self.GEMINI_API_KEYS, self.GEMINI_API_KEY, self.GOOGLE_API_KEY]
+        if self.LLM_PROVIDER.lower() == "gemini" and self.LLM_API_KEY:
+            candidates.append(self.LLM_API_KEY)
+
+        for raw in candidates:
+            if raw:
+                all_keys.extend(k.strip() for k in str(raw).split(",") if k.strip())
+
         return list(dict.fromkeys(all_keys))
 
 
