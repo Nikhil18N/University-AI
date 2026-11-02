@@ -62,9 +62,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  // Theme & Sound states
+  // Theme & Sound states (default to dark OLED mode matching ChatGPT mobile reference)
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    return (localStorage.getItem("sru_theme") as "light" | "dark") || "light";
+    return (localStorage.getItem("sru_theme") as "light" | "dark") || "dark";
   });
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
     return localStorage.getItem("sru_sound") !== "false";
@@ -658,14 +658,14 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
               if (isMsgStreaming && msg.content === "") {
                 return (
-                  <div key={msg.id} className="message-bubble assistant thinking-bubble">
-                    <div className="message-avatar">
-                      <div className="sru-buddy-avatar pulse">
-                        <img src="/sru-logo.png" alt="SRU" className="buddy-logo-img" />
+                  <div key={msg.id} className="message-bubble-row assistant thinking-row">
+                    <div className="message-avatar-col">
+                      <div className="assistant-avatar-badge" title="SRU Buddy">
+                        <img src="/sru-logo.png" alt="SRU" className="assistant-avatar-img" />
                       </div>
                     </div>
-                    <div className="message-body">
-                      <div className="message-content thinking-content-box">
+                    <div className="message-content-col">
+                      <div className="message-text-bubble assistant">
                         <ThinkingIndicator />
                       </div>
                     </div>

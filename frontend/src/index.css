@@ -139,6 +139,12 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
+img, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 #root {
   height: 100%;
   width: 100%;

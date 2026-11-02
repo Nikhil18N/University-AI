@@ -46,19 +46,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 3px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 [data-theme="dark"] .assistant-avatar-badge {
-  background: #1e293b;
-  border-color: #334155;
+  background: #171717;
+  border-color: #262626;
 }
 
 .assistant-avatar-img {
   width: 100%;
   height: 100%;
+  max-width: 20px;
+  max-height: 20px;
   object-fit: contain;
+  display: block;
 }
 
 /* Message Content Column */
