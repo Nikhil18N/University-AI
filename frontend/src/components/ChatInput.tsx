@@ -18,11 +18,50 @@ export default function ChatInput({ onSend, disabled }: Props) {
     }
   }, [text]);
 
+  // Always keep input focused on mount
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
+
+  // Automatically refocus when assistant finishes responding
+  useEffect(() => {
+    if (!disabled) {
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [disabled]);
+
+  // If user starts typing anywhere on the page, automatically direct focus to the chat input
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      ) {
+        return;
+      }
+      if (e.key.length === 1 && !disabled) {
+        textareaRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [disabled]);
+
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setText("");
+    // Keep focus ready for next prompt
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

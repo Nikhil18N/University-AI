@@ -13,6 +13,8 @@ class FeedbackItem(BaseModel):
     message_id: UUID
     rating: int
     comment: str | None = None
+    question: str | None = None
+    answer: str | None = None
     created_at: datetime
 
 

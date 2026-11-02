@@ -11,8 +11,10 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "gemini"
     LLM_BASE_URL: str = "http://localhost:11434"
     LLM_MODEL: str = "gemini-3.5-flash-lite"
-    GEMINI_API_KEY: str | None = None
+    LLM_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str | None = None
+    OPENROUTER_API_KEY: str = ""
 
     # ---- Embedding ----
     EMBEDDING_PROVIDER: str = "gemini"

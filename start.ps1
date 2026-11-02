@@ -15,8 +15,17 @@ try {
 }
 
 # 2. Ollama
-Write-Host "`n[2/4] Starting Ollama server..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "ollama serve"
+Write-Host "`n[2/4] Checking Ollama server (required for RAG embeddings)..." -ForegroundColor Yellow
+$ollamaRunning = $false
+try {
+    $null = Invoke-RestMethod -Uri "http://localhost:11434/api/tags" -TimeoutSec 2 -ErrorAction Stop
+    $ollamaRunning = $true
+    Write-Host "Ollama server is already running and ready." -ForegroundColor Green
+} catch {
+    Write-Host "Starting Ollama server..." -ForegroundColor Yellow
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", "ollama serve"
+    Start-Sleep -Seconds 3
+}
 
 # 3. Backend
 Write-Host "`n[3/4] Starting FastAPI backend (port 8080)..." -ForegroundColor Yellow

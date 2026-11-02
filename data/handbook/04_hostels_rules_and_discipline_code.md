@@ -4,6 +4,11 @@
 * **Guiding Principle**: "Your Home Away from Home" — providing a secure, healthy, and disciplined residential environment.
 * **Room Features**:
   - Separate hostel buildings for boys and girls on campus.
+  - **Visitor & Cross-Gender Entry Policy**:
+    - Male students and male visitors are strictly prohibited from entering female hostel buildings, floors, or rooms under any circumstances.
+    - Female students and female visitors are strictly prohibited from entering male hostel buildings, floors, or rooms.
+    - Cross-gender room visits for group study or any other reason are strictly forbidden; group studies must be conducted in common academic areas such as the University Library or cafeteria during regular hours.
+    - Unauthorized entry into opposite-gender hostels is a severe disciplinary violation attracting suspension and expulsion.
   - Occupancy: **Triple sharing basis** (rooms are also available in quadruple configuration in specific blocks).
   - Types: Both **Air-Conditioned (AC)** and **Non-AC** rooms available.
   - Allotted furniture: Every student is provided a dedicated bed, mattress, study table, chair, and cupboard.

@@ -47,6 +47,13 @@ def test_needs_reformulation_for_continuation():
     assert needs_reformulation("details please", context) is True
 
 
+def test_needs_reformulation_for_student_profile():
+    context = "user: Can I join SRU?\nassistant: Welcome! What degree are you interested in, and what are your 12th marks?"
+    assert needs_reformulation("I got 75% in 12th PCM and interested in AI", context) is True
+    assert needs_reformulation("my score is 60% in intermediate", context) is True
+    assert needs_reformulation("interested in computer science", context) is True
+
+
 @pytest.mark.asyncio
 async def test_reformulate_query():
     context = "user: Tell me about hostel regulations\nassistant: Hostels have rules."

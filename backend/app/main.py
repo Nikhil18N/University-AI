@@ -1,4 +1,5 @@
 """FastAPI application entry point."""
+# Reload configuration trigger for apodex model
 
 import logging
 from contextlib import asynccontextmanager
@@ -129,11 +130,8 @@ async def health_check() -> HealthResponse:
     except Exception:
         services["chromadb"] = "unhealthy"
 
-    # Check LLM
-    if settings.LLM_PROVIDER == "gemini":
-        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY
-        services["gemini"] = "healthy" if api_key else "unconfigured (missing GEMINI_API_KEY)"
-    else:
+    # Check LLM / Embedding Provider
+    if settings.LLM_PROVIDER.lower() == "ollama" or settings.EMBEDDING_PROVIDER.lower() == "ollama":
         try:
             import httpx
 
@@ -142,6 +140,10 @@ async def health_check() -> HealthResponse:
                 services["ollama"] = "healthy" if resp.status_code == 200 else "unhealthy"
         except Exception:
             services["ollama"] = "unhealthy"
+    else:
+        # Provider is Gemini or OpenRouter
+        api_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY or settings.OPENROUTER_API_KEY
+        services[settings.LLM_PROVIDER.lower()] = "healthy" if api_key else "unconfigured (missing API key)"
 
     overall = "healthy" if all(v == "healthy" for v in services.values()) else "degraded"
     return HealthResponse(status=overall, services=services)

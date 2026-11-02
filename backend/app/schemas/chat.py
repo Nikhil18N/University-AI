@@ -25,7 +25,9 @@ class SourceReference(BaseModel):
 
     document_id: str
     title: str
+    section: str | None = None
     page: int | None = None
+    page_url: str | None = None
     department: str | None = None
     effective_date: str | None = None
 
@@ -37,6 +39,9 @@ class ChatResponse(BaseModel):
     message_id: UUID
     answer: str
     sources: list[SourceReference] = Field(default_factory=list)
+    suggestions: list[str] = Field(default_factory=list)
+    cards: list[dict] = Field(default_factory=list)
+    flow: dict | None = None
     model: str | None = None
 
 
@@ -47,6 +52,9 @@ class MessageResponse(BaseModel):
     role: str
     content: str
     sources: list[SourceReference] | None = None
+    suggestions: list[str] = Field(default_factory=list)
+    cards: list[dict] = Field(default_factory=list)
+    flow: dict | None = None
     model: str | None = None
     created_at: datetime
 

@@ -20,6 +20,7 @@ IntentType = Literal[
     "STUDENT_SPECIFIC",
     "UNIVERSITY",
     "GENERAL_CONVERSATION",
+    "OUT_OF_SCOPE",
     "UNKNOWN",
 ]
 
@@ -63,8 +64,40 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
     ),
 ]
 
+# Direct requests for personal student records lookup (e.g. "what is my attendance", "check my GPA")
 STUDENT_SPECIFIC_PATTERN = re.compile(
-    r"\b(my\s+(attendance|grades?|gpa|marks|results?|timetable|schedule|fees?|dues?|application)|pay\s+my\s+fee)\b",
+    r"(\b(what\s+is\s+my|what\s+are\s+my|tell\s+me\s+my|show\s+my|check\s+my|view\s+my|get\s+my|fetch\s+my|can\s+you\s+check\s+my)\s+(attendance|grades?|gpa|cgpa|marks|results?|timetable|schedule|fee\s+dues|dues)\b|"
+    r"^\s*(my\s+(attendance|grades?|gpa|marks|results?|timetable|fee\s+dues|dues))\s*[?!.,]?\s*$|"
+    r"\bpay\s+my\s+fee\b)",
+    re.IGNORECASE,
+)
+
+# Negations, disclaimers, or corrections mentioning attributes (e.g., "i never mentioned my marks", "didn't say my score")
+STUDENT_NEGATION_PATTERN = re.compile(
+    r"\b(never|didn't|did\s+not|not|haven't|don't|why)\s+(mention|mentioned|say|said|give|given|share|shared|tell|told|state|stated|ask|asking)\b",
+    re.IGNORECASE,
+)
+
+# Out-of-scope / prompt-injection / jailbreak guardrail
+# These queries should NEVER be routed through the RAG or LLM fallback as a university query.
+OUT_OF_SCOPE_PATTERN = re.compile(
+    r"\b("
+    # Prompt injection / jailbreak attempts
+    r"ignore\s+(all\s+)?(previous|above|prior)\s+instructions|"
+    r"you\s+are\s+now\s+(DAN|GPT|a\s+different|an\s+unrestricted)|"
+    r"act\s+as\s+(DAN|an\s+AI\s+without|an\s+unrestricted|a\s+different)|"
+    r"(reveal|tell\s+me|show\s+me|print|output|repeat|say)\s+(your|the)\s+(system\s+prompt|instructions|context|internal\s+prompt|prompt)|"
+    r"(bypass|override|disable|remove)\s+(your\s+)?(filter|restriction|safety|guardrail|training)|"
+    r"pretend\s+(you\s+are|to\s+be)|jailbreak|"
+    # Completely off-topic requests
+    r"book\s+(me\s+a?\s+)?(flight|train|bus|hotel|ticket|cab|taxi|uber|ola)|"
+    r"(order|buy|purchase|deliver)\s+(food|pizza|groceries|medicine)|"
+    r"(prime\s+minister|president|chief\s+minister|minister)\s+of\s+(india|andhra|telangana|ap|ts)|"
+    r"write\s+(me\s+a?\s+)?.*?(code|script|program|essay|article|tool)\s+(to|that|for)\s+(hack|crack|break|exploit|bypass|steal)|"
+    r"\b(hack|crack|break\s+into|exploit|bypass|steal|ddos|phish)\b.*?\b(website|account|password|database|wifi|server|system)\b|"
+    r"(hacking|phishing|ddos|malware|ransomware|keylogger|exploit)\b.*\b(tutorial|guide|how\s+to|script|code)|"
+    r"what\s+is\s+(\d+\s*[+\-*/]\s*\d+|the\s+capital\s+of|the\s+population\s+of)"
+    r")\b",
     re.IGNORECASE,
 )
 
@@ -98,6 +131,10 @@ UNIVERSITY_KEYWORDS = {
     "prof", "hod", "vc",
     "mrks",
     "clg", "collge", "cllg", "univ", "varsity", "sru",
+    # Synonyms, colloquialisms, and qualifications
+    "discount", "discounts", "concession", "concessions", "waiver", "waivers",
+    "dorm", "dorms", "dormitory", "inter", "intermediate", "12th", "pcm", "boards",
+    "salary", "salaries", "package", "packages",
 }
 
 
@@ -119,25 +156,69 @@ def _is_greeting_without_question(text: str) -> bool:
     return True
 
 
-def fast_classify(message: str) -> IntentType | None:
+# Direct score, percentage, or qualification statements (e.g. "93%", "93", "85% in PCM", "i got 85 in 12th", "my marks are 85")
+SCORE_REPLY_PATTERN = re.compile(
+    r"^\s*(?:(?:i\s+(?:got|scored|have|achieved|secured)|my\s+marks?\s*(?:is|are)?|my\s+12th\s*marks?\s*(?:is|are)?)\s*[:=]?\s*)?\d{1,3}(?:\.\d+)?\s*%?(?:\s*(?:marks?|out\s+of\s+\d+)?(?:\s*(?:in|for)\s+(?:12th|pcm|intermediate|inter|boards?|class\s*12))?)?\s*$",
+    re.I,
+)
+
+STUDENT_SCORE_STATEMENT_PATTERN = re.compile(
+    r"\b(?:got|scored|have|marks?\s*(?:is|are)?)\s*[:=]?\s*(\d{2}(?:\.\d+)?)\s*(?:%|percent)?\s*(?:in|for)?\s*(?:12th|inter|intermediate|pcm|boards?)\b",
+    re.I,
+)
+
+# Affirmative responses to assistant offers or questions (e.g. "yes", "yeah", "yep", "sure", "tell me more", "yes please")
+AFFIRMATIVE_FOLLOWUP_PATTERN = re.compile(
+    r"^\s*(yes|yeah|yep|sure|definitely|absolutely|yes\s+please|tell\s+me\s+more|more\s+details|go\s+ahead|please\s+do|please|why\s+not|yup)[.!?\s]*$",
+    re.IGNORECASE,
+)
+
+# Explicit personal record lookup expressions
+PERSONAL_RECORD_LOOKUP = re.compile(
+    r"(\b(my\s+(attendance|grades?|gpa|cgpa|marks|results?|timetable|fee\s+dues|dues|schedule)|pay\s+my\s+fee)\b|"
+    r"\b(what\s+is\s+my|what\s+are\s+my|tell\s+me\s+my|show\s+my|check\s+my|view\s+my|get\s+my|fetch\s+my)\b)",
+    re.I,
+)
+
+
+def fast_classify(message: str, conversation_context: str = "") -> IntentType | None:
     """Check fast regex patterns and keyword indicators."""
     text = message.strip()
 
-    # 1. Student-specific auth check takes precedence
+    # 0. Out-of-scope / prompt-injection / jailbreak guardrail (checked FIRST)
+    if OUT_OF_SCOPE_PATTERN.search(text):
+        return "OUT_OF_SCOPE"
+
+    # 1. Corrections, clarifications, and negations (e.g. "i never mentioned my marks", "didn't say my score")
+    if STUDENT_NEGATION_PATTERN.search(text):
+        return "GENERAL_CONVERSATION"
+
+    # 2. Direct score or percentage statement (e.g. "93%", "85% in 12th", "i got 85 in 12th")
+    if SCORE_REPLY_PATTERN.match(text) or STUDENT_SCORE_STATEMENT_PATTERN.search(text):
+        return "UNIVERSITY"
+
+    # 2.5 Affirmative confirmation to bot questions/offers (e.g. "yes", "yeah", "sure", "tell me more")
+    if AFFIRMATIVE_FOLLOWUP_PATTERN.match(text):
+        if conversation_context.strip():
+            return "UNIVERSITY"
+        if re.match(r"^\s*(yes|yes\s+please|tell\s+me\s+more|more\s+details)[.!?\s]*$", text, re.I):
+            return "GENERAL_CONVERSATION"
+
+    # 3. Student-specific individual record lookup requests
     if STUDENT_SPECIFIC_PATTERN.search(text):
         return "STUDENT_SPECIFIC"
 
-    # 2. University keyword check — even if query starts with a greeting
+    # 4. University keyword check — even if query starts with a greeting
     #    (e.g., "Hi, how to apply for admission?")
     words = set(re.findall(r"\w+", text.lower()))
     if words & UNIVERSITY_KEYWORDS:
         return "UNIVERSITY"
 
-    # 3. Check for greetings that do not contain substantive questions
+    # 5. Check for greetings that do not contain substantive questions
     if _is_greeting_without_question(text):
         return "GREETING"
 
-    # 4. Other conversational patterns (thanks, goodbyes, acknowledgments, help)
+    # 6. Other conversational patterns (thanks, goodbyes, acknowledgments, help)
     for pattern, intent in FAST_PATTERNS:
         if intent != "GREETING" and pattern.search(text):
             return intent
@@ -155,7 +236,7 @@ async def classify_intent(
     Returns (intent, confidence).
     """
     # 1. Try fast classifier first (0ms latency)
-    fast_result = fast_classify(message)
+    fast_result = fast_classify(message, conversation_context=conversation_context)
     if fast_result is not None:
         logger.debug("Fast classified '%s' as %s", message[:40], fast_result)
         return fast_result, 0.95
@@ -200,6 +281,14 @@ async def classify_intent(
             "UNKNOWN",
         }
         if intent in valid_intents:
+            # Guard against small LLMs falsely classifying short answers as STUDENT_SPECIFIC
+            if intent == "STUDENT_SPECIFIC" and not PERSONAL_RECORD_LOOKUP.search(message):
+                logger.info(
+                    "Guardrail: Overriding false STUDENT_SPECIFIC classification for '%s'",
+                    message[:40],
+                )
+                intent = "UNIVERSITY" if conversation_context.strip() else "GENERAL_CONVERSATION"
+
             return intent, confidence  # type: ignore
 
     except Exception as e:

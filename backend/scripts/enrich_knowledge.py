@@ -101,6 +101,15 @@ EXTRA_ELIGIBILITY_QA = [
         "This 60% requirement applies to all branches, including CSE, for both regular and direct/management quota admissions."
     ),
     (
+        "I scored 60% in my 12th class, can I get admission?",
+        "Yes, absolutely! Since the university requirement is a minimum of 60% aggregate marks, a score of exactly 60% (600 out of 1000 marks) "
+        "meets the eligibility criteria. You are fully eligible for admission to all branches including B.Tech CSE under both regular and direct/management quota."
+    ),
+    (
+        "My score is 61% in 12th class, am I eligible for admission?",
+        "Yes, absolutely! Since your score of 61% exceeds the required 60% cutoff, you are fully eligible for admission to SR University."
+    ),
+    (
         "I got 599 out of 1000 marks in my 12th class, so am I eligible to get admission?",
         "With 599 out of 1000 marks in your 12th class, your score is 59.9%, which is just 1 mark below the university's "
         "standard minimum cutoff of 60% (600/1000). The official eligibility requirement is 60%. Because your score of 59.9% "

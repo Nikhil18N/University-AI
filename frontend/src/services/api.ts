@@ -8,7 +8,9 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").
 export interface SourceReference {
   document_id: string;
   title: string;
+  section?: string;
   page?: number;
+  page_url?: string;
   department?: string;
   effective_date?: string;
 }
@@ -18,6 +20,9 @@ export interface ChatResponse {
   message_id: string;
   answer: string;
   sources: SourceReference[];
+  suggestions?: string[];
+  cards?: any[];
+  flow?: any;
   model?: string;
 }
 
@@ -26,6 +31,9 @@ export interface MessageData {
   role: "user" | "assistant";
   content: string;
   sources?: SourceReference[];
+  suggestions?: string[];
+  cards?: any[];
+  flow?: any;
   model?: string;
   created_at: string;
 }
@@ -81,6 +89,88 @@ export async function sendMessage(
   } catch (err) {
     handleNetworkError(err, "Failed to send message");
   }
+}
+
+/**
+ * Send a chat message with Server-Sent Events (SSE) streaming tokens in real time.
+ */
+export function sendMessageStream(
+  sessionId: string,
+  message: string,
+  conversationId: string | null | undefined,
+  callbacks: {
+    onStart?: (conversationId: string) => void;
+    onToken?: (delta: string) => void;
+    onDone?: (data: ChatResponse) => void;
+    onError?: (error: Error) => void;
+  }
+): () => void {
+  const controller = new AbortController();
+
+  (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/chat/stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message,
+          conversation_id: conversationId || null,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Failed to stream message");
+      }
+
+      if (!res.body) {
+        throw new Error("No response stream available");
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data: ")) continue;
+          const jsonStr = trimmed.slice(6);
+          let parsed: any;
+          try {
+            parsed = JSON.parse(jsonStr);
+          } catch {
+            // Ignore partial frames
+            continue;
+          }
+
+          if (parsed.type === "start") {
+            callbacks.onStart?.(parsed.conversation_id);
+          } else if (parsed.type === "token") {
+            callbacks.onToken?.(parsed.delta);
+          } else if (parsed.type === "done") {
+            callbacks.onDone?.(parsed);
+          } else if (parsed.type === "error") {
+            throw new Error(parsed.detail || "Error streaming response");
+          }
+        }
+      }
+    } catch (err: unknown) {
+      if ((err as Error)?.name === "AbortError") return;
+      callbacks.onError?.(err instanceof Error ? err : new Error(String(err)));
+    }
+  })();
+
+  return () => controller.abort();
 }
 
 /**
@@ -158,6 +248,29 @@ export interface AdminStats {
   negative_feedback: number;
 }
 
+export interface FeedbackPayload {
+  session_id: string;
+  conversation_id: string;
+  message_id: string;
+  rating: number;
+  comment?: string;
+}
+
+export async function submitFeedback(
+  payload: FeedbackPayload
+): Promise<{ id: string; status: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to submit feedback");
+  }
+  return res.json();
+}
+
 export interface FeedbackItem {
   id: string;
   session_id: string;
@@ -165,6 +278,8 @@ export interface FeedbackItem {
   message_id: string;
   rating: number;
   comment: string | null;
+  question?: string | null;
+  answer?: string | null;
   created_at: string;
 }
 

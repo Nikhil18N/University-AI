@@ -346,18 +346,34 @@ export default function AdminPage({ onBackToChat }: Props) {
                     <thead>
                       <tr>
                         <th>Rating</th>
+                        <th>User Question</th>
+                        <th>AI Response</th>
                         <th>Comment</th>
-                        <th>Session ID</th>
                         <th>Date</th>
                       </tr>
                     </thead>
                     <tbody>
                       {feedback.map((f) => (
                         <tr key={f.id}>
-                          <td>{f.rating === 1 ? "👍 Helpful" : "👎 Unhelpful"}</td>
-                          <td>{f.comment || <span style={{ color: "var(--text-2)" }}>No comment</span>}</td>
-                          <td style={{ fontFamily: "monospace", fontSize: "0.8rem" }}>{f.session_id.slice(0, 8)}...</td>
-                          <td>{new Date(f.created_at).toLocaleString()}</td>
+                          <td style={{ whiteSpace: "nowrap" }}>
+                            {f.rating === 1 ? (
+                              <span style={{ color: "#4ade80", fontWeight: 600 }}>👍 Helpful</span>
+                            ) : (
+                              <span style={{ color: "#f87171", fontWeight: 600 }}>👎 Inaccurate</span>
+                            )}
+                          </td>
+                          <td style={{ maxWidth: "240px", wordBreak: "break-word" }}>
+                            {f.question || <span style={{ color: "var(--text-2)" }}>—</span>}
+                          </td>
+                          <td style={{ maxWidth: "320px", wordBreak: "break-word", fontSize: "0.85rem" }}>
+                            {f.answer ? (
+                              <span>{f.answer.length > 150 ? `${f.answer.slice(0, 150)}...` : f.answer}</span>
+                            ) : (
+                              <span style={{ color: "var(--text-2)" }}>—</span>
+                            )}
+                          </td>
+                          <td>{f.comment || <span style={{ color: "var(--text-2)" }}>—</span>}</td>
+                          <td style={{ whiteSpace: "nowrap" }}>{new Date(f.created_at).toLocaleString()}</td>
                         </tr>
                       ))}
                     </tbody>

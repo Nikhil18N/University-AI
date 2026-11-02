@@ -1,0 +1,134 @@
+/* Thinking Indicator Card & Animated Step Labels */
+
+.thinking-indicator-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 280px;
+  max-width: 440px;
+}
+
+.thinking-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.thinking-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.thinking-badge-step {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--surface-3, rgba(2, 132, 199, 0.12));
+  color: var(--accent, #0284c7);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.thinking-badge-timer {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+}
+
+.typing-dots-animated {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dots-animated span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent, #0284c7);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+.typing-dots-animated span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots-animated span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.thinking-active-step-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInStep 0.3s ease;
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-icon-bounce {
+  font-size: 1.15rem;
+  display: inline-block;
+  animation: stepIconBounce 2s ease infinite;
+}
+
+@keyframes stepIconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.step-title-animated {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+  line-height: 1.35;
+}
+
+/* Step Progress Track */
+.thinking-progress-track {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.thinking-step-segment {
+  height: 4px;
+  flex: 1;
+  background: var(--surface-3, rgba(0, 0, 0, 0.1));
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.thinking-step-segment.active {
+  background: var(--accent, #0284c7);
+  box-shadow: 0 0 6px var(--accent, #0284c7);
+}
+
+.thinking-step-segment.completed {
+  background: #22c55e;
+}

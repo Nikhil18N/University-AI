@@ -4,11 +4,13 @@ import logging
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.deps import get_llm_provider, get_rag_service
+from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service
 from app.db.session import get_db
 from app.providers.base import LLMProvider
+from app.providers.embedding_base import EmbeddingProvider
 from app.schemas.chat import (
     ChatRequest,
     ChatResponse,
@@ -47,10 +49,38 @@ async def send_message(
         return await chat_service.handle_chat(db, request, llm, rag)
     except Exception as e:
         logger.error("Chat error: %s", e, exc_info=True)
+        err_msg = str(e)
+        if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
+            detail = "AI model rate limit reached. Please wait a moment and try again."
+        elif "11434" in err_msg or ("ConnectError" in type(e).__name__ and "embedding" in err_msg.lower()):
+            detail = "Could not connect to Ollama embedding service. Please run 'ollama serve' to enable document retrieval."
+        elif "5433" in err_msg or "ConnectionRefusedError" in type(e).__name__:
+            detail = "Database service unreachable. Please ensure PostgreSQL is running."
+        else:
+            detail = "Something went wrong processing your message. Please try again."
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something went wrong processing your message. Please try again.",
+            detail=detail,
         )
+
+
+@router.post("/chat/stream")
+async def send_message_stream(
+    request: ChatRequest,
+    db: AsyncSession = Depends(get_db),
+    llm: LLMProvider = Depends(get_llm_provider),
+    rag: RAGService = Depends(get_rag_service),
+) -> StreamingResponse:
+    """Send a chat message and stream tokens via Server-Sent Events (SSE)."""
+    return StreamingResponse(
+        chat_service.handle_chat_stream(db, request, llm, rag),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get(
@@ -116,6 +146,7 @@ async def delete_conversation(
 async def submit_feedback(
     request: FeedbackRequest,
     db: AsyncSession = Depends(get_db),
+    embeddings: EmbeddingProvider = Depends(get_embedding_provider),
 ) -> FeedbackResponse:
     """Submit user feedback (thumbs up/down and optional comment)."""
-    return await conversation_service.create_feedback(db, request)
+    return await conversation_service.create_feedback(db, request, embeddings)

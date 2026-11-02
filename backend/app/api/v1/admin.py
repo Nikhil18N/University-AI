@@ -198,8 +198,30 @@ async def list_admin_feedback(
     result = await db.execute(stmt)
     items = result.scalars().all()
 
-    return FeedbackListResponse(
-        items=[
+    feedback_items = []
+    for f in items:
+        stmt_msg = select(Message).where(Message.id == f.message_id)
+        res_msg = await db.execute(stmt_msg)
+        msg = res_msg.scalar_one_or_none()
+        answer = msg.content if msg else None
+
+        question = None
+        if msg:
+            stmt_user = (
+                select(Message)
+                .where(
+                    Message.conversation_id == msg.conversation_id,
+                    Message.role == "user",
+                    Message.created_at <= msg.created_at,
+                )
+                .order_by(Message.created_at.desc())
+                .limit(1)
+            )
+            res_user = await db.execute(stmt_user)
+            user_msg = res_user.scalar_one_or_none()
+            question = user_msg.content if user_msg else None
+
+        feedback_items.append(
             FeedbackItem(
                 id=f.id,
                 session_id=f.session_id,
@@ -207,9 +229,14 @@ async def list_admin_feedback(
                 message_id=f.message_id,
                 rating=f.rating,
                 comment=f.comment,
+                question=question,
+                answer=answer,
                 created_at=f.created_at,
             )
-            for f in items
-        ],
-        total=len(items),
+        )
+
+    return FeedbackListResponse(
+        items=feedback_items,
+        total=len(feedback_items),
     )
+

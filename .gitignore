@@ -12,15 +12,20 @@ env/
 # Pytest / Cache
 .pytest_cache/
 
+# Environment files & secrets
+.env
+.env.*
+*.env
+!.env.example
+!*.env.example
+
 # Uploads
 uploads/*
 !uploads/.gitkeep
+
+# Node & Neon
 .neon
 node_modules/
-# Environment and secrets
-.env
-.env.*
-!.env.example
 
 # Database and vector storage
 chroma_data/
