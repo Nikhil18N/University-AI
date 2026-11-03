@@ -17,12 +17,24 @@ class ExemplarService:
 
     def __init__(self, embedding_provider: EmbeddingProvider | None = None):
         self.embeddings = embedding_provider
+        self._exemplar_count: int = 0
         try:
             from app.db.chroma import get_chroma_client
             self._chroma_client = get_chroma_client()
         except Exception as e:
             logger.warning("Could not connect to ChromaDB for exemplars: %s", e)
             self._chroma_client = None
+        self._refresh_exemplar_count()
+
+    def _refresh_exemplar_count(self) -> None:
+        """Read the exemplar collection size and cache it; safe to call at startup."""
+        try:
+            collection = self._get_collection()
+            if collection is not None:
+                self._exemplar_count = collection.count()
+        except Exception as e:  # pragma: no cover
+            logger.warning("Could not refresh exemplar count: %s", e)
+            self._exemplar_count = 0
 
     def _get_collection(self) -> chromadb.Collection | None:
         if not self._chroma_client:
@@ -62,6 +74,7 @@ class ExemplarService:
                     "answer": answer[:3000],
                 }],
             )
+            self._exemplar_count += 1
             logger.info("Successfully registered verified exemplar for query: %s", question[:60])
             return True
         except Exception as e:
@@ -76,6 +89,7 @@ class ExemplarService:
 
         try:
             collection.delete(ids=[str(message_id)])
+            self._exemplar_count = max(0, self._exemplar_count - 1)
             logger.info("Removed exemplar: %s", message_id)
             return True
         except Exception as e:
@@ -86,9 +100,21 @@ class ExemplarService:
         self,
         query: str,
         distance_threshold: float = 0.28,
+        precomputed_embedding: list[float] | None = None,
     ) -> dict | None:
-        """Find a highly similar verified question and return its approved answer."""
+        """Find a highly similar verified question and return its approved answer.
+
+        Args:
+            query: The user's question text.
+            distance_threshold: Cosine distance threshold for a match to be accepted.
+            precomputed_embedding: Optional pre-computed query embedding. When
+                provided the ``embed_single()`` API call is skipped entirely.
+        """
         if not self.embeddings or not query.strip():
+            return None
+
+        # Fast-path: skip embedding + DB round-trip when collection is empty.
+        if self._exemplar_count == 0:
             return None
 
         collection = self._get_collection()
@@ -96,7 +122,10 @@ class ExemplarService:
             return None
 
         try:
-            query_embedding = await self.embeddings.embed_single(query)
+            if precomputed_embedding is not None:
+                query_embedding = precomputed_embedding
+            else:
+                query_embedding = await self.embeddings.embed_single(query)
             results = collection.query(
                 query_embeddings=[query_embedding],
                 n_results=1,

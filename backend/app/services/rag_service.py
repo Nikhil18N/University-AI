@@ -50,6 +50,18 @@ class RAGService:
 
         Returns a list of dicts with keys: content, metadata, distance.
         """
+        chunks, _ = await self.retrieve_with_embedding(query, top_k=top_k)
+        return chunks
+
+    async def retrieve_with_embedding(
+        self, query: str, top_k: int = 4
+    ) -> tuple[list[dict], list[float]]:
+        """Retrieve chunks and also return the query embedding vector.
+
+        Returns ``(chunks, query_embedding)`` so callers can reuse the
+        embedding (e.g. to skip a second ``embed_single()`` call in
+        ``prepare_rag_request``).
+        """
         query_embedding = await self.embeddings.embed_single(query)
         collection = self._get_collection()
 
@@ -82,15 +94,26 @@ class RAGService:
             len(chunks),
             query[:100],
         )
-        return chunks
+        return chunks, query_embedding
 
     async def prepare_rag_request(
         self,
         question: str,
         conversation_context: str,
         retrieved_chunks: list[dict],
+        precomputed_embedding: list[float] | None = None,
     ) -> tuple[list[dict[str, str]], list[dict], str]:
-        """Format evidence and prompt for the LLM. Returns (messages, sources, evidence_text)."""
+        """Format evidence and prompt for the LLM. Returns (messages, sources, evidence_text).
+
+        Args:
+            question: The user's question.
+            conversation_context: Prior conversation history for context.
+            retrieved_chunks: Chunks returned by ``retrieve()`` / ``retrieve_with_embedding()``.
+            precomputed_embedding: Optional query embedding already computed
+                during retrieval. When provided it is forwarded to
+                ``find_matching_exemplar()`` so the embedding API is not called
+                a second time.
+        """
         if not retrieved_chunks:
             return [], [], ""
 
@@ -124,7 +147,9 @@ class RAGService:
 
         evidence_text = "\n\n".join(evidence_parts)
 
-        matching_exemplar = await self.exemplars.find_matching_exemplar(question)
+        matching_exemplar = await self.exemplars.find_matching_exemplar(
+            question, precomputed_embedding=precomputed_embedding
+        )
         if matching_exemplar:
             exemplar_block = (
                 "Verified Exemplar (High-Quality Prior Answer for Reference):\n"
@@ -154,6 +179,7 @@ class RAGService:
         question: str,
         conversation_context: str,
         retrieved_chunks: list[dict],
+        precomputed_embedding: list[float] | None = None,
     ) -> tuple[str, list[dict]]:
         """Generate a grounded answer using retrieved evidence.
 
@@ -168,7 +194,10 @@ class RAGService:
             )
 
         messages, sources, evidence_text = await self.prepare_rag_request(
-            question, conversation_context, retrieved_chunks
+            question,
+            conversation_context,
+            retrieved_chunks,
+            precomputed_embedding=precomputed_embedding,
         )
         answer = await self.llm.generate(messages, temperature=0.3)
 
@@ -218,8 +247,9 @@ class RAGService:
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         retrieval_query = search_query or question
+        query_embedding = None
         try:
-            chunks = await self.retrieve(retrieval_query, top_k=top_k)
+            chunks, query_embedding = await self.retrieve_with_embedding(retrieval_query, top_k=top_k)
         except Exception as e:
             logger.error("RAG retrieval failed: %s. Proceeding with fallback.", e)
             chunks = []
@@ -231,6 +261,9 @@ class RAGService:
         ):
             effective_question = f"{question} ({search_query})"
         answer, sources = await self.generate_answer(
-            effective_question, conversation_context, chunks
+            effective_question,
+            conversation_context,
+            chunks,
+            precomputed_embedding=query_embedding,
         )
         return answer, sources

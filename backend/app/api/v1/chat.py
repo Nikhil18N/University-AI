@@ -3,11 +3,12 @@
 import logging
 from uuid import UUID
 
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service
+from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service, get_redis
 from app.db.session import get_db
 from app.providers.base import LLMProvider
 from app.providers.embedding_base import EmbeddingProvider
@@ -38,6 +39,7 @@ async def send_message(
     db: AsyncSession = Depends(get_db),
     llm: LLMProvider = Depends(get_llm_provider),
     rag: RAGService = Depends(get_rag_service),
+    redis: Any = Depends(get_redis),
 ) -> ChatResponse:
     """Send a chat message and receive an AI response.
 
@@ -46,7 +48,7 @@ async def send_message(
     - `session_id` is a browser-generated UUID for tracking conversations.
     """
     try:
-        return await chat_service.handle_chat(db, request, llm, rag)
+        return await chat_service.handle_chat(db, request, llm, rag, redis_client=redis)
     except Exception as e:
         logger.error("Chat error: %s", e, exc_info=True)
         err_msg = str(e)
@@ -70,10 +72,11 @@ async def send_message_stream(
     db: AsyncSession = Depends(get_db),
     llm: LLMProvider = Depends(get_llm_provider),
     rag: RAGService = Depends(get_rag_service),
+    redis: Any = Depends(get_redis),
 ) -> StreamingResponse:
     """Send a chat message and stream tokens via Server-Sent Events (SSE)."""
     return StreamingResponse(
-        chat_service.handle_chat_stream(db, request, llm, rag),
+        chat_service.handle_chat_stream(db, request, llm, rag, redis_client=redis),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
