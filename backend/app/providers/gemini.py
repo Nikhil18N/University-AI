@@ -38,7 +38,7 @@ class GeminiProvider(LLMProvider):
         self.model = legacy_models.get(model, model)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         self._client = httpx.AsyncClient(
-            timeout=httpx.Timeout(15.0, connect=5.0),
+            timeout=httpx.Timeout(30.0, connect=8.0),
         )
 
     @property

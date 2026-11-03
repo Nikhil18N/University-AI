@@ -5,26 +5,26 @@
     "description": "Take a virtual tour of the 170+ acre lush green SR University campus, smart classrooms, research centers, and open learning spaces.",
     "category": "Campus Tour",
     "duration": "3:45",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=9kYIkkadZkU",
     "thumbnail_url": "https://i.ytimg.com/vi/9kYIkkadZkU/hqdefault.jpg",
     "channel_name": "SR University Official",
     "channel_url": "https://www.youtube.com/@SRUniversity/videos",
-    "keywords": [
-      "campus",
-      "tour",
-      "infrastructure",
-      "drone",
-      "facilities",
-      "view",
-      "walkthrough",
-      "buildings",
-      "green",
-      "smart classrooms",
-      "library",
-      "environment",
-      "how does it look",
-      "show me campus",
-      "overview"
+    "positive_intents": [
+      "How does the SR University campus look visually, campus tour walkthrough, buildings overview",
+      "Campus architecture, greenery, infrastructure, drone view of university grounds",
+      "Show me the campus, what does the campus look like, campus environment and beauty",
+      "Tell me how campus looks, give me a campus tour, show campus",
+      "University campus video, see the campus, campus highlights and overview",
+      "Campus scenery, campus landscape, campus buildings and design"
+    ],
+    "negative_intents": [
+      "Ragging, bullying, student harassment, or disciplinary issues",
+      "Tuition cost, placement statistics, salary packages, fee structure",
+      "Mess food timings, hostel curfew, attendance percentage requirements",
+      "Student complaints, misconduct reports, anti-ragging committee contact",
+      "Canteen timings, bus routes, library closing hours, examination schedule",
+      "What happens if caught ragging, zero tolerance policy penalties"
     ]
   },
   {
@@ -33,24 +33,24 @@
     "description": "Student experience, residential life, diversity, academic environment, and why students from across India choose SR University.",
     "category": "Campus Life & Hostels",
     "duration": "4:12",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=yYgB3h4wkug",
     "thumbnail_url": "https://i.ytimg.com/vi/yYgB3h4wkug/hqdefault.jpg",
     "channel_name": "SR University Official",
     "channel_url": "https://www.youtube.com/@SRUniversity/videos",
-    "keywords": [
-      "student life",
-      "journey",
-      "experience",
-      "hostel",
-      "hostels",
-      "living",
-      "campus life",
-      "diversity",
-      "accommodation",
-      "residential",
-      "stay",
-      "mess",
-      "food"
+    "positive_intents": [
+      "How do the hostel rooms look, show me hostel facilities, hostel room video tour",
+      "Student life at SR University, residential experience, campus living experience",
+      "What is it like living in SR University hostels, hostel interior, hostel amenities",
+      "Show hostel, hostel room walkthrough, student accommodation visual tour",
+      "Campus life video, day in the life of a student, student journey video"
+    ],
+    "negative_intents": [
+      "Hostel fee, hostel charges, accommodation cost per year, hostel pricing",
+      "Hostel curfew timings, hostel rules and regulations, gate closing time",
+      "Mess food timings, mess menu schedule, dining hall schedule",
+      "Hostel warden contact, hostel complaint procedure, hostel allotment process",
+      "Ragging in residential area, bullying, harassment by seniors"
     ]
   },
   {
@@ -59,23 +59,24 @@
     "description": "VC Prof. Deepak Garg on industry-aligned curricula, experiential learning, Centers of Excellence, and tech innovation at SRU.",
     "category": "Innovation & Research",
     "duration": "5:20",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=AMMg_mC_bCI",
     "thumbnail_url": "https://i.ytimg.com/vi/AMMg_mC_bCI/hqdefault.jpg",
     "channel_name": "SR University Official",
     "channel_url": "https://www.youtube.com/@SRUniversity/videos",
-    "keywords": [
-      "academics",
-      "curriculum",
-      "vice chancellor",
-      "learning",
-      "innovation",
-      "research",
-      "engineering",
-      "quality",
-      "programs",
-      "b.tech",
-      "faculty",
-      "srix"
+    "positive_intents": [
+      "VC speech, vice chancellor address, professor Deepak Garg talk, SRU leadership video",
+      "Academic excellence video, innovation and research at SR University, SRiX overview",
+      "Show me what SRiX is, technology incubator video, startup culture video at SRU",
+      "Research centers at SR University video, centers of excellence walkthrough",
+      "University academic quality video, curriculum and teaching approach demonstration"
+    ],
+    "negative_intents": [
+      "Academic fee, tuition cost, research funding eligibility criteria",
+      "How to apply to SRiX, SRiX application form, admission eligibility",
+      "Faculty salary, professor contact details, teaching staff directory",
+      "Attendance policy, exam rules, backlog procedure, CGPA calculation",
+      "Ragging policy, discipline committee contact, misconduct reporting procedure"
     ]
   },
   {
@@ -84,21 +85,23 @@
     "description": "Welcome ceremony for new engineering students, induction highlights, campus walkthrough, and commencement of college life.",
     "category": "Admissions & Orientation",
     "duration": "3:15",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=EAiqa1jLzuw",
     "thumbnail_url": "https://i.ytimg.com/vi/EAiqa1jLzuw/hqdefault.jpg",
     "channel_name": "SR University Official",
     "channel_url": "https://www.youtube.com/@SRUniversity/videos",
-    "keywords": [
-      "swagatam",
-      "orientation",
-      "freshers",
-      "induction",
-      "admission",
-      "admissions",
-      "welcome",
-      "joining",
-      "first year",
-      "commencement"
+    "positive_intents": [
+      "Orientation day video, freshers welcome ceremony, Swagatam event visual highlights",
+      "What happens during orientation at SRU, induction program video",
+      "First day at SR University, joining day video, welcome ceremony for new students",
+      "Freshers orientation video, new student induction walkthrough, campus welcome event"
+    ],
+    "negative_intents": [
+      "Admission process steps, how to apply online, application form link",
+      "Orientation schedule date and time, induction program date",
+      "Documents required for admission, certificate verification, seat confirmation",
+      "Admission fee payment, last date to pay fees, challan number",
+      "Ragging during orientation week, anti-ragging guidelines for freshers"
     ]
   },
   {
@@ -107,22 +110,25 @@
     "description": "Vibrant student life, cultural festival Navadhara, music, celebrations, student clubs, and campus community spirit at SRU.",
     "category": "Fests & Student Life",
     "duration": "3:30",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=mF_4tWXedd4",
     "thumbnail_url": "https://i.ytimg.com/vi/mF_4tWXedd4/hqdefault.jpg",
     "channel_name": "SR University Official",
     "channel_url": "https://www.youtube.com/@SRUniversity/videos",
-    "keywords": [
-      "cultural",
-      "fest",
-      "navadhara",
-      "celebration",
-      "events",
-      "student clubs",
-      "sports",
-      "activities",
-      "spark",
-      "annual day",
-      "fests"
+    "positive_intents": [
+      "Navadhara cultural fest video, annual festival highlights, cultural event video at SRU",
+      "Show me the cultural events at SR University, student performances, music and dance video",
+      "Campus celebration video, student clubs video, annual day event footage",
+      "What cultural activities happen at SRU, fests and events video, campus vibe video",
+      "Spark fest video, student life events, extracurricular activities video at SRU",
+      "Show me events at SRU, event videos, college events and celebrations"
+    ],
+    "negative_intents": [
+      "Navadhara schedule, event timings, cultural fest registration deadline",
+      "How to participate in cultural events, student club membership form, registration",
+      "Cultural fest budget, sponsorship, prize money details for events",
+      "Event description text, what is Navadhara about, fest information brochure",
+      "Misconduct at events, safety concerns at cultural events, ragging during fests"
     ]
   },
   {
@@ -131,25 +137,46 @@
     "description": "Cinematic night view of the illuminated SR University campus, modern hostels, and peaceful walkways.",
     "category": "Campus Night Life",
     "duration": "2:18",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=ZPihQwl5it8",
     "thumbnail_url": "https://i.ytimg.com/vi/ZPihQwl5it8/hqdefault.jpg",
     "channel_name": "SR University Official",
     "channel_url": "https://www.youtube.com/@SRUniversity/videos",
-    "keywords": [
-      "night",
-      "night life",
-      "night view",
-      "campus night",
-      "evening",
-      "peaceful",
-      "cinematic",
-      "lighting",
-      "illumination",
-      "hostel night",
-      "walkway",
-      "campus vibe",
-      "how is night life",
-      "nightlife"
+    "positive_intents": [
+      "Campus night view video, illuminated university at night, cinematic night campus",
+      "How does the campus look at night, night photography of SRU campus, evening view",
+      "Night life on campus video, peaceful campus walkways at night, campus lighting video",
+      "Show me campus at night, hostel night view, campus evening ambiance video"
+    ],
+    "negative_intents": [
+      "Night curfew rules, hostel closing time, gate timings at night",
+      "Night study rooms availability, library night operating hours",
+      "Security personnel at night, watchman duty, night safety procedures",
+      "Ragging at night, after-dark incidents, nocturnal harassment concerns"
+    ]
+  },
+  {
+    "id": "sru_fest_reel_1",
+    "title": "Navadhara Fest Highlights & Student Vibes",
+    "description": "Student energy, live concert moments, dance battles, and campus celebration reels from Navadhara cultural fest on SR University Instagram.",
+    "category": "Fests & Cultural Life",
+    "duration": "Reel (0:45)",
+    "platform": "instagram",
+    "url": "https://www.instagram.com/sruniversity_official/",
+    "thumbnail_url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=640&q=80",
+    "channel_name": "@sruniversity_official",
+    "channel_url": "https://www.instagram.com/sruniversity_official/",
+    "positive_intents": [
+      "Instagram reels of SR University, cultural fest reels, Navadhara Instagram highlights",
+      "Show me Instagram videos of SRU, cultural celebration reels, student vibe reels",
+      "Short video of cultural fest, student energy reels, live concert moments video",
+      "Social media videos of SRU, Instagram content of SR University fests and events"
+    ],
+    "negative_intents": [
+      "SRU Instagram followers count, social media account statistics",
+      "How to follow SRU on Instagram, Instagram handle, official social media link",
+      "Instagram marketing strategy, how SRU uses social media, digital presence info",
+      "Ragging videos on Instagram, misconduct reels, complaint videos posted online"
     ]
   }
 ]

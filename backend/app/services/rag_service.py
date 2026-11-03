@@ -135,12 +135,15 @@ class RAGService:
         else:
             exemplar_block = ""
 
+        from app.services.video_service import get_media_catalog_for_prompt
+
         rag_prompt = render_prompt(
             "rag",
             question=question,
             conversation=conversation_context,
             evidence=evidence_text,
             exemplar=exemplar_block,
+            media_catalog=get_media_catalog_for_prompt(),
         )
 
         messages = [

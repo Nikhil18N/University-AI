@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # ---- ChromaDB ----
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8000
-    CHROMA_PERSIST_DIR: str | None = "./chroma_data"
+    CHROMA_PERSIST_DIR: str | None = None
     RAG_MAX_DISTANCE: float = 0.65
 
     # ---- Admin ----

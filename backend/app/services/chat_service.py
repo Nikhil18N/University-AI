@@ -30,6 +30,7 @@ from app.services.profile_service import build_counsellor_guidance, extract_stud
 from app.services.rag_service import RAGService
 from app.services.reformulation_service import needs_reformulation, reformulate_query
 from app.services.suggestion_service import generate_suggestions
+from app.services.video_service import extract_media_tags
 
 logger = logging.getLogger(__name__)
 
@@ -236,7 +237,9 @@ async def handle_chat(
             answer = await llm_provider.generate(messages)
             logger.info("Handled via conversational LLM (%s)", intent)
 
-    # 6. Generate smart suggestion chips and rich cards
+    # 6. Extract media recommendations and generate smart cards
+    answer, media_ids = extract_media_tags(answer)
+
     suggestions = generate_suggestions(
         intent=intent,
         user_message=request.message,
@@ -250,6 +253,7 @@ async def handle_chat(
         answer=answer,
         profile=profile,
         sources=sources,
+        media_ids=media_ids,
     )
 
     # 7. Save assistant message with metadata
@@ -283,6 +287,29 @@ async def handle_chat(
         flow=flow_info,
         model=settings.LLM_MODEL,
     )
+
+
+async def stream_filter_media_tags(token_stream: AsyncIterator[str]) -> AsyncIterator[str]:
+    """Yield tokens from stream while filtering out trailing [MEDIA:...] tags."""
+    buffer = ""
+    async for token in token_stream:
+        buffer += token
+        if "[" in buffer:
+            if "]" in buffer:
+                cleaned, _ = extract_media_tags(buffer)
+                if cleaned:
+                    yield cleaned
+                buffer = ""
+            elif len(buffer) > 100:
+                yield buffer
+                buffer = ""
+        else:
+            yield buffer
+            buffer = ""
+    if buffer:
+        cleaned, _ = extract_media_tags(buffer)
+        if cleaned:
+            yield cleaned
 
 
 def chunk_text_stream(text: str) -> list[str]:
@@ -411,7 +438,7 @@ async def handle_chat_stream(
                         effective_q, rag_context, chunks
                     )
                     streamed_tokens = []
-                    async for token in llm_provider.stream(messages, temperature=0.3):
+                    async for token in stream_filter_media_tags(llm_provider.stream(messages, temperature=0.3)):
                         streamed_tokens.append(token)
                         yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
 
@@ -453,12 +480,14 @@ async def handle_chat_stream(
                     system_prompt = f"{system_prompt}\n\n{guidance}".strip()
                 messages = [{"role": "system", "content": system_prompt}] + recent
                 streamed_tokens = []
-                async for token in llm_provider.stream(messages):
+                async for token in stream_filter_media_tags(llm_provider.stream(messages)):
                     streamed_tokens.append(token)
                     yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
                 answer = "".join(streamed_tokens)
 
-        # Suggestions and rich cards
+        # Suggestions and rich cards (with LLM media decision)
+        answer, media_ids = extract_media_tags(answer)
+
         suggestions = generate_suggestions(
             intent=intent,
             user_message=request.message,
@@ -472,6 +501,7 @@ async def handle_chat_stream(
             answer=answer,
             profile=profile,
             sources=sources,
+            media_ids=media_ids,
         )
 
         # Save to database

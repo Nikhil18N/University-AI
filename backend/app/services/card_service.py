@@ -1,7 +1,12 @@
 """Card service — detects and generates structured interactive cards for rich UI rendering."""
 
 import re
-from app.services.video_service import get_relevant_videos, create_video_card
+from app.services.video_service import (
+    get_relevant_videos,
+    create_video_card,
+    get_media_by_ids,
+    get_recommender,
+)
 
 COMPARISON_CSE_AIML = {
     "type": "comparison",
@@ -152,8 +157,9 @@ def generate_cards(
     answer: str,
     profile: dict | None = None,
     sources: list[dict] | None = None,
+    media_ids: list[str] | None = None,
 ) -> list[dict]:
-    """Generate structured interactive cards based on message context and student profile."""
+    """Generate structured interactive cards based on message context, student profile, and LLM media decisions."""
     cards = []
     msg_lower = user_message.lower()
     ans_lower = answer.lower()
@@ -174,17 +180,42 @@ def generate_cards(
     ):
         cards.append(CURRICULUM_CARD)
 
-    # 4. Campus tour card (render static spot highlights if not explicitly asking for video)
-    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip"))
-    if not is_video_query and any(k in msg_lower for k in ("campus", "tour", "facilities", "campus life", "hostels and campus")):
-        if not any(k in msg_lower for k in ("fee", "cost", "vs")):
+    # 4. Campus tour card (render static spot highlights only if explicitly inquiring about campus spots/facilities)
+    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "reel"))
+    campus_spot_cues = (
+        "campus facilities",
+        "facilities on campus",
+        "campus infrastructure",
+        "what facilities",
+        "overview of facilities",
+        "campus spots",
+        "tour the campus",
+        "campus highlights",
+    )
+    if not is_video_query and any(cue in msg_lower for cue in campus_spot_cues):
+        if not any(k in msg_lower for k in ("fee", "cost", "vs", "ragging", "exam", "attendance", "rule")):
             cards.append(CAMPUS_TOUR_CARD)
 
-    # 5. University YouTube Video Recommendations (Contextual & Discoverable)
-    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "tour", "walkthrough", "drone"))
-    relevant_videos = get_relevant_videos(user_message, answer, sources)
-    if relevant_videos:
-        cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_video))
+    # 5. University YouTube & Instagram Media Recommendations (Contrastive Bi-Encoder)
+    # Primary: semantic intent routing — works for explicit ("show me a video") and
+    # visual/exploratory queries ("tell me how campus looks", "what does hostel look like").
+    # Queries like ragging, fees, attendance, mess timings return [] (no card shown).
+    if media_ids:
+        # LLM explicitly tagged a media resource — use it directly
+        matched_videos = get_media_by_ids(media_ids)
+        if matched_videos:
+            cards.append(create_video_card(matched_videos, is_explicit=True))
+    else:
+        # Contrastive Bi-Encoder: recommend videos based on semantic intent.
+        # Handles ALL visual/exploratory queries without requiring the word 'video'.
+        # Ragging, policy, fees, timings queries produce [] — no false positive cards.
+        recommended = get_recommender().recommend(user_message, limit=2)
+        if recommended:
+            is_explicit_video = any(
+                cue in msg_lower
+                for cue in ("video", "watch", "youtube", "tour", "reel", "reels", "clip")
+            )
+            cards.append(create_video_card(recommended, is_explicit=is_explicit_video))
 
     # 5. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):
