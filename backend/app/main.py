@@ -53,9 +53,25 @@ async def lifespan(app: FastAPI):
 
     asyncio.create_task(ensure_documents_seeded())
 
+    # Initialize optional Redis client for response caching
+    app.state.redis = None
+    if settings.REDIS_URL:
+        try:
+            import redis.asyncio as aioredis
+            app.state.redis = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+            logger.info("Redis response cache enabled (%s)", settings.REDIS_URL[:30])
+        except Exception as e:
+            logger.warning("Redis response cache disabled: %s", e)
+
     yield
 
     # Cleanup
+    if getattr(app.state, "redis", None) is not None:
+        try:
+            await app.state.redis.aclose()
+        except Exception:
+            pass
+
     from app.api.v1.deps import _llm_provider, _embedding_provider
 
     if _llm_provider and hasattr(_llm_provider, "close"):

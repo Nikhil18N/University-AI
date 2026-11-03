@@ -243,11 +243,14 @@ async def test_gemini_embedding_multi_key_failover():
 
 
 def test_factory_gemini_multi_keys():
-    with patch("app.config.settings.LLM_PROVIDER", "gemini"):
-        with patch("app.config.settings.GEMINI_API_KEYS", "key-one, key-two, key-three"):
-            p = create_llm_provider()
-            assert isinstance(p, GeminiProvider)
-            assert len(p.key_pool) == 3
-            assert p.key_pool.keys == ["key-one", "key-two", "key-three"]
+    with patch("app.config.settings.LLM_PROVIDER", "gemini"), \
+         patch("app.config.settings.GEMINI_API_KEYS", "key-one, key-two, key-three"), \
+         patch("app.config.settings.GEMINI_API_KEY", ""), \
+         patch("app.config.settings.GOOGLE_API_KEY", None), \
+         patch("app.config.settings.LLM_API_KEY", ""):
+        p = create_llm_provider()
+        assert isinstance(p, GeminiProvider)
+        assert len(p.key_pool) == 3
+        assert p.key_pool.keys == ["key-one", "key-two", "key-three"]
 
 

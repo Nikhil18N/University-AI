@@ -1,6 +1,7 @@
 """Dependencies for API routes."""
 
-from fastapi import Depends, Header, HTTPException, status
+from typing import Any
+from fastapi import Depends, Header, HTTPException, Request, status
 
 from app.config import settings
 from app.db.session import get_db
@@ -52,3 +53,8 @@ async def verify_admin_key(
             detail="Invalid admin API key",
         )
     return x_admin_key
+
+
+def get_redis(request: Request) -> Any | None:
+    """Return the Redis client from app state, or None if not configured."""
+    return getattr(request.app.state, "redis", None)
