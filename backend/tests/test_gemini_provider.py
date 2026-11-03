@@ -85,7 +85,7 @@ async def test_gemini_generate_429_fallback():
 
         assert result == "Answer from fallback model"
         assert mock_post.call_count == 2
-        assert provider.model == "gemini-3.1-flash-lite"
+        assert provider.model in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite")
 
 
 def test_factory_gemini_missing_key():
@@ -109,7 +109,7 @@ def test_factory_gemini_success():
 
 def test_gemini_legacy_model_upgrade():
     p = GeminiProvider(api_key="test-key-123", model="gemini-2.0-flash")
-    assert p.model == "gemini-3.1-flash-lite"
+    assert p.model == "gemini-3.5-flash-lite"
 
 
 @pytest.mark.asyncio

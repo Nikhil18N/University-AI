@@ -18,22 +18,23 @@ class GeminiProvider(LLMProvider):
     def __init__(
         self,
         api_key: str | list[str] = "",
-        model: str = "gemini-3.1-flash-lite",
+        model: str = "gemini-3.5-flash-lite",
         api_keys: list[str] | str | None = None,
     ):
         raw_keys = api_keys if api_keys is not None else api_key
         if not raw_keys:
             raise ValueError("Gemini API key is required.")
         self.key_pool = APIKeyPool(raw_keys)
-        # Automatically upgrade deprecated/unavailable models
+        # Automatically upgrade deprecated/unavailable models to high-quota Flash Lite models (15 RPM / 500 RPD)
         legacy_models = {
-            "gemini-2.0-flash": "gemini-3.1-flash-lite",
-            "gemini-2.0-flash-lite": "gemini-3.1-flash-lite",
-            "gemini-2.5-flash": "gemini-3.1-flash-lite",
-            "gemini-2.5-flash-lite": "gemini-3.1-flash-lite",
-            "gemini-1.5-flash": "gemini-3.1-flash-lite",
-            "gemini-1.5-flash-8b": "gemini-3.1-flash-lite",
-            "gemini-3.5-flash-lite": "gemini-3.1-flash-lite",
+            "gemini-2.0-flash": "gemini-3.5-flash-lite",
+            "gemini-2.0-flash-lite": "gemini-3.5-flash-lite",
+            "gemini-2.5-flash": "gemini-3.5-flash-lite",
+            "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
+            "gemini-1.5-flash": "gemini-3.5-flash-lite",
+            "gemini-1.5-flash-8b": "gemini-3.5-flash-lite",
+            "gemini-3.1-flash-lite": "gemini-3.1-flash-lite",
+            "gemini-3.5-flash-lite": "gemini-3.5-flash-lite",
         }
         self.model = legacy_models.get(model, model)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
@@ -105,18 +106,13 @@ class GeminiProvider(LLMProvider):
     ) -> str:
         """Send messages to Gemini and return the full response with automatic multi-key and quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
-        models_to_try = [self.model] + [
-            m
-            for m in [
-                "gemini-3.1-flash-lite",
-                "gemini-3.8-flash",
-                "gemini-3.6-flash",
-                "gemini-3.7-flash",
-                "gemini-3.5-flash-lite",
-                "gemini-flash-latest",
-            ]
-            if m != self.model
-        ]
+        # STRICT QUOTA PROTECTION:
+        # Only use high-quota Flash-Lite models (15 RPM / 500 RPD).
+        # NEVER fall back to 3.6-flash or 3.8-flash (5 RPM / 20 RPD) which burn the daily 20-call cap.
+        models_to_try = [self.model]
+        for fallback in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite"):
+            if fallback not in models_to_try:
+                models_to_try.append(fallback)
 
         total_keys = len(self.key_pool)
         last_response = None
@@ -187,18 +183,13 @@ class GeminiProvider(LLMProvider):
     ) -> AsyncIterator[str]:
         """Stream tokens from Gemini with automatic multi-key and quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
-        models_to_try = [self.model] + [
-            m
-            for m in [
-                "gemini-3.1-flash-lite",
-                "gemini-3.8-flash",
-                "gemini-3.6-flash",
-                "gemini-3.7-flash",
-                "gemini-3.5-flash-lite",
-                "gemini-flash-latest",
-            ]
-            if m != self.model
-        ]
+        # STRICT QUOTA PROTECTION:
+        # Only use high-quota Flash-Lite models (15 RPM / 500 RPD).
+        # NEVER fall back to 3.6-flash or 3.8-flash (5 RPM / 20 RPD) which burn the daily 20-call cap.
+        models_to_try = [self.model]
+        for fallback in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite"):
+            if fallback not in models_to_try:
+                models_to_try.append(fallback)
 
         total_keys = len(self.key_pool)
 
