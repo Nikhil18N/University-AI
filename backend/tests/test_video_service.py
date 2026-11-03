@@ -9,18 +9,29 @@ from app.services.video_service import (
 
 
 def test_load_videos():
-    """Verify videos load correctly from university_videos.json."""
-    videos = load_videos()
+    """Verify videos and reels load correctly from university_videos.json."""
+    videos = load_videos(force_reload=True)
     assert isinstance(videos, list)
-    assert len(videos) >= 4
+    assert len(videos) >= 6
+    has_youtube = False
+    has_instagram = False
     for v in videos:
         assert "id" in v
         assert "title" in v
         assert "url" in v
         assert "thumbnail_url" in v
         assert "keywords" in v
-        assert "https://www.youtube.com/watch?v=" in v["url"]
-        assert "i.ytimg.com/vi/" in v["thumbnail_url"] or "img.youtube.com/vi/" in v["thumbnail_url"]
+        platform = v.get("platform", "youtube")
+        if platform == "youtube":
+            has_youtube = True
+            assert "youtube.com/watch?v=" in v["url"]
+        elif platform == "instagram":
+            has_instagram = True
+            assert "instagram.com/sr_university" in v["url"]
+            assert v.get("handle") == "@sr_university"
+
+    assert has_youtube, "Expected at least one YouTube video"
+    assert has_instagram, "Expected at least one Instagram reel"
 
 
 def test_blacklist_queries_return_no_videos():
@@ -84,6 +95,13 @@ def test_contextual_visual_queries_return_videos():
     )
     assert len(srix_vids) > 0
     assert any("srix" in v["title"].lower() or "innovation" in v["category"].lower() for v in srix_vids)
+
+
+def test_instagram_queries_prioritize_reels():
+    """Verify asking for reels/instagram prioritizes Instagram content."""
+    reels = get_relevant_videos("Any Instagram reels of the fest?", "Navadhara is our annual cultural festival.")
+    assert len(reels) > 0
+    assert any(v.get("platform") == "instagram" for v in reels)
 
 
 def test_create_video_card():

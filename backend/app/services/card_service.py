@@ -174,14 +174,14 @@ def generate_cards(
     ):
         cards.append(CURRICULUM_CARD)
 
-    # 4. Campus tour card (render static spot highlights if not explicitly asking for video)
-    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip"))
+    # 4. Campus tour card (render static spot highlights if not explicitly asking for video/reels)
+    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "reel", "reels", "insta", "instagram"))
     if not is_video_query and any(k in msg_lower for k in ("campus", "tour", "facilities", "campus life", "hostels and campus")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
 
-    # 5. University YouTube Video Recommendations (Contextual & Discoverable)
-    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "tour", "walkthrough", "drone"))
+    # 5. University YouTube & Instagram Media Recommendations (Contextual & Discoverable)
+    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "tour", "walkthrough", "drone", "reel", "reels", "insta", "instagram"))
     relevant_videos = get_relevant_videos(user_message, answer, sources)
     if relevant_videos:
         cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_video))
