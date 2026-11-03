@@ -184,13 +184,18 @@ async def get_recent_messages(
 
 
 async def get_all_user_messages(
-    db: AsyncSession, conversation_id: uuid.UUID
+    db: AsyncSession, conversation_id: uuid.UUID, limit: int = 20
 ) -> list[dict[str, str]]:
-    """Get all user messages across the conversation to reliably retain student profile slots."""
+    """Get recent user messages to reliably retain student profile slots.
+
+    Fetches at most *limit* messages (default 20) to keep the DB query
+    bounded as conversations grow.
+    """
     stmt = (
         select(Message)
         .where(Message.conversation_id == conversation_id, Message.role == "user")
         .order_by(Message.created_at.asc())
+        .limit(limit)
     )
     result = await db.execute(stmt)
     messages = result.scalars().all()

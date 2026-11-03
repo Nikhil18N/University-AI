@@ -389,7 +389,7 @@ async def reformulate_query(
     Pipeline:
     1. canonicalize_query() — fast deterministic correction (typos, synonyms, fuzzy)
     2. needs_reformulation() — decide if LLM rewrite is needed
-    3. LLM reformulation — coreference resolution + further normalization
+    3. LLM reformulation — coreference resolution; returns the cleaned LLM output directly
     """
     canonical_message = canonicalize_query(message)
     if not needs_reformulation(message, conversation_context):
@@ -413,7 +413,7 @@ async def reformulate_query(
                 message[:50],
                 cleaned[:60],
             )
-            return canonicalize_query(cleaned)
+            return cleaned
 
     except Exception as e:
         logger.warning("Query reformulation failed for '%s': %s", message[:50], e)
