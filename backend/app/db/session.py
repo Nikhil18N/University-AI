@@ -5,7 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.config import settings
 
 def get_database_url() -> str:
-    url = settings.DATABASE_URL
+    url = (settings.DATABASE_URL or "").strip().strip('"').strip("'")
+    if url.startswith("DATABASE_URL="):
+        url = url[len("DATABASE_URL="):].strip().strip('"').strip("'")
     if url.startswith("postgresql://"):
         return url.replace("postgresql://", "postgresql+asyncpg://", 1)
     if url.startswith("postgres://"):
@@ -17,6 +19,8 @@ _db_url = get_database_url()
 _connect_args = {}
 if ":6543" in _db_url:
     _connect_args["prepared_statement_cache_size"] = 0
+elif _db_url.startswith("sqlite"):
+    _connect_args["check_same_thread"] = False
 
 engine = create_async_engine(
     _db_url,
