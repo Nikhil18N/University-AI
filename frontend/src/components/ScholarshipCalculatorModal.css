@@ -1,23 +1,23 @@
 /* ==========================================================================
    ScholarshipCalculatorModal.css
-   Modern, responsive modal for SR University Fee & Scholarship Calculator
+   Executive Minimalist Styling for SR University Scholarship & Fee Portal
    ========================================================================== */
 
 .scholarship-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 16px;
-  animation: calcFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes calcFadeIn {
+@keyframes modalFadeIn {
   from {
     opacity: 0;
   }
@@ -27,25 +27,25 @@
 }
 
 .scholarship-modal-card {
-  background: var(--surface-1, #1e1e1e);
-  color: var(--text, #f3f4f6);
-  border: 1px solid var(--border, #333333);
-  border-radius: 18px;
+  background: var(--surface-1, #18181b);
+  color: var(--text, #f4f4f5);
+  border: 1px solid var(--border, #27272a);
+  border-radius: 16px;
   width: 100%;
-  max-width: 680px;
+  max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  padding: 24px;
-  gap: 20px;
-  animation: calcSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 22px 24px;
+  gap: 18px;
+  animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes calcSlideUp {
+@keyframes modalSlideUp {
   from {
-    transform: translateY(20px) scale(0.97);
+    transform: translateY(16px) scale(0.98);
   }
   to {
     transform: translateY(0) scale(1);
@@ -57,7 +57,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border, #2d2d2d);
+  border-bottom: 1px solid var(--border, #27272a);
   padding-bottom: 14px;
 }
 
@@ -67,126 +67,181 @@
   gap: 12px;
 }
 
-.calc-icon {
-  font-size: 2rem;
-  background: rgba(99, 102, 241, 0.15);
-  border-radius: 12px;
-  padding: 8px;
+.calc-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(99, 102, 241, 0.25);
 }
 
-.calc-header h3 {
+.calc-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text-1, #ffffff);
 }
 
 .calc-subtitle {
   margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: var(--text-muted, #9ca3af);
+  font-size: 0.8rem;
+  color: var(--text-muted, #a1a1aa);
 }
 
 .calc-close-btn {
   background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  color: var(--text-muted, #9ca3af);
+  border: 1px solid transparent;
+  color: var(--text-muted, #a1a1aa);
   cursor: pointer;
-  padding: 6px 10px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .calc-close-btn:hover {
-  background: var(--surface-2, #2d2d2d);
+  background: var(--surface-2, #27272a);
   color: var(--text, #ffffff);
+  border-color: var(--border, #3f3f46);
 }
 
 /* Form controls */
 .calc-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .calc-grid-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .calc-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .calc-field label {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--text-muted, #9ca3af);
+  color: var(--text-muted, #a1a1aa);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
-.calc-field select {
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: var(--surface-2, #262626);
+.calc-select {
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--surface-2, #27272a);
   color: var(--text, #ffffff);
   border: 1px solid var(--border, #3f3f46);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-family: inherit;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   cursor: pointer;
 }
 
-.calc-field select:focus {
+.calc-select:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
 }
 
 .calc-submit-btn {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
   color: #ffffff;
   border: none;
-  border-radius: 10px;
-  padding: 12px 20px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 2px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
 }
 
 .calc-submit-btn:hover {
+  background: linear-gradient(135deg, #4338ca, #4f46e5);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
 }
 
 .calc-submit-btn:active {
   transform: translateY(0);
 }
 
+/* Stale Banner */
+.calc-stale-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+/* Placeholder Empty State */
+.calc-placeholder-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface-2, #212124);
+  border: 1px dashed var(--border, #3f3f46);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.calc-placeholder-icon {
+  color: var(--text-muted, #71717a);
+  flex-shrink: 0;
+}
+
+.calc-placeholder-text h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-1, #e4e4e7);
+}
+
+.calc-placeholder-text p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, #a1a1aa);
+  line-height: 1.45;
+}
+
 /* Result Box */
 .calc-result-box {
-  background: var(--surface-2, #18181b);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 14px;
-  padding: 18px;
+  background: var(--surface-2, #1f1f23);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  animation: calcFadeIn 0.25s ease;
+  gap: 14px;
+  animation: modalFadeIn 0.22s ease;
 }
 
 .result-top-badge {
@@ -195,48 +250,67 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 10px;
 }
 
 .award-badge {
-  background: rgba(16, 185, 129, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
   color: #34d399;
   border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.86rem;
 }
 
 .exam-tag {
-  font-size: 0.8rem;
-  color: var(--text-muted, #9ca3af);
+  font-size: 0.78rem;
+  color: var(--text-muted, #a1a1aa);
 }
 
+.exam-tag strong {
+  color: var(--text-1, #f4f4f5);
+}
+
+/* 3-Column Financial Summary */
 .fee-comparison-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  background: var(--surface-1, #121212);
-  padding: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background: var(--surface-1, #121214);
+  padding: 12px 14px;
   border-radius: 10px;
+  border: 1px solid var(--border, #27272a);
 }
 
 .fee-stat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .stat-label {
-  font-size: 0.75rem;
-  color: var(--text-muted, #a1a1aa);
+  font-size: 0.72rem;
+  color: var(--text-muted, #71717a);
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 
 .stat-val {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--text, #ffffff);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #71717a);
 }
 
 .stat-val.strikethrough {
@@ -251,22 +325,25 @@
 
 .stat-val.payable {
   color: #818cf8;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
 }
 
-/* Progression table for CSE */
+/* 4-Year Progression */
 .progression-table-wrap {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border, #2d2d2d);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border, #27272a);
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px 12px;
 }
 
 .progression-title {
-  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--text-muted, #d1d5db);
+  color: var(--text-muted, #d4d4d8);
 }
 
 .progression-grid {
@@ -276,43 +353,61 @@
 }
 
 .prog-col {
-  background: var(--surface-2, #262626);
+  background: var(--surface-2, #27272a);
   padding: 8px;
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  border: 1px solid var(--border, #3f3f46);
 }
 
 .prog-yr {
-  font-size: 0.75rem;
-  color: var(--text-muted, #9ca3af);
+  font-size: 0.72rem;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
 }
 
 .prog-val {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #a5b4fc;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Notes */
+.prog-unit {
+  font-size: 0.68rem;
+  color: var(--text-muted, #71717a);
+}
+
+/* Institutional Notes */
 .calc-notes {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 0.82rem;
-  color: var(--text-muted, #d1d5db);
+  font-size: 0.78rem;
+  color: var(--text-muted, #d4d4d8);
   background: rgba(0, 0, 0, 0.15);
-  padding: 12px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #27272a);
 }
 
 .note-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   line-height: 1.4;
 }
 
-.note-item.special-scholarship {
+.note-item svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #818cf8;
+}
+
+.note-item.special-scholarship svg {
   color: #f472b6;
 }
 
@@ -320,19 +415,25 @@
 .calc-footer-actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: 2px;
 }
 
 .btn-ask-buddy {
-  background: var(--surface-2, #262626);
+  background: var(--surface-2, #27272a);
   color: var(--text, #ffffff);
   border: 1px solid var(--border, #3f3f46);
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 0.88rem;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 0.85rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.15s ease;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn-ask-buddy:hover {
@@ -341,35 +442,61 @@
   color: #ffffff;
 }
 
-/* Light mode adjustments */
+/* Light Mode Overrides */
 [data-theme="light"] .scholarship-modal-card {
   background: #ffffff;
-  color: #1f2937;
-  border-color: #e5e7eb;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  color: #18181b;
+  border-color: #e4e4e7;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="light"] .calc-header h3 {
-  color: #111827;
+[data-theme="light"] .calc-header {
+  border-bottom-color: #f4f4f5;
 }
 
-[data-theme="light"] .calc-field select {
+[data-theme="light"] .calc-title {
+  color: #09090b;
+}
+
+[data-theme="light"] .calc-icon-badge {
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+[data-theme="light"] .calc-select {
+  background: #fbfbfb;
+  color: #18181b;
+  border-color: #e4e4e7;
+}
+
+[data-theme="light"] .calc-placeholder-box {
   background: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+[data-theme="light"] .calc-placeholder-text h4 {
   color: #111827;
-  border-color: #d1d5db;
 }
 
 [data-theme="light"] .calc-result-box {
   background: #f8fafc;
-  border-color: #cbd5e1;
+  border-color: #e2e8f0;
 }
 
 [data-theme="light"] .fee-comparison-row {
   background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .progression-table-wrap {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
 }
 
 [data-theme="light"] .prog-col {
-  background: #f1f5f9;
+  background: #ffffff;
+  border-color: #cbd5e1;
 }
 
 [data-theme="light"] .prog-val {
@@ -377,22 +504,28 @@
 }
 
 [data-theme="light"] .calc-notes {
-  background: #f8fafc;
+  background: #ffffff;
+  border-color: #e2e8f0;
   color: #4b5563;
 }
 
 [data-theme="light"] .btn-ask-buddy {
   background: #f3f4f6;
   color: #1f2937;
-  border-color: #d1d5db;
+  border-color: #e5e7eb;
 }
 
 [data-theme="light"] .btn-ask-buddy:hover {
   background: #4f46e5;
   color: #ffffff;
+  border-color: #4f46e5;
 }
 
 @media (max-width: 600px) {
+  .fee-comparison-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
   .progression-grid {
     grid-template-columns: repeat(2, 1fr);
   }

@@ -3,7 +3,23 @@ import { submitFeedback } from "../services/api";
 import { RenderCard } from "./Cards";
 import MarkdownContent from "./MarkdownContent";
 import { copyCleanText } from "../utils/cleanCopy";
+import { renderUniIcon } from "./Icons";
 import "./MessageBubble.css";
+
+function parseSuggestionChip(text: string): { icon: React.ReactNode; label: string } {
+  const emojiRegex = /^(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u;
+  const match = text.match(emojiRegex);
+  if (match) {
+    const emoji = match[1];
+    const textLabel = text.slice(match[0].length).trim();
+    const icon = renderUniIcon(emoji, 13, "chip-vector-icon");
+    return { icon, label: textLabel || text };
+  }
+  if (text.includes("%") || text.includes("< 60%") || text.includes(">")) {
+    return { icon: renderUniIcon("🎯", 13, "chip-vector-icon"), label: text };
+  }
+  return { icon: null, label: text };
+}
 
 interface Props {
   role: "user" | "assistant";
@@ -113,16 +129,20 @@ export default function MessageBubble({
         {!isStreaming && role === "assistant" && suggestions && suggestions.length > 0 && (
           <div className="suggestion-chips-wrapper">
             <div className="suggestion-chips-list">
-              {suggestions.map((suggestion, idx) => (
-                <button
-                  key={idx}
-                  className="suggestion-chip"
-                  onClick={() => onSuggestionClick?.(suggestion)}
-                  type="button"
-                >
-                  {suggestion}
-                </button>
-              ))}
+              {suggestions.map((suggestion, idx) => {
+                const { icon, label } = parseSuggestionChip(suggestion);
+                return (
+                  <button
+                    key={idx}
+                    className="suggestion-chip"
+                    onClick={() => onSuggestionClick?.(suggestion)}
+                    type="button"
+                  >
+                    {icon && <span className="suggestion-chip-icon">{icon}</span>}
+                    <span className="suggestion-chip-text">{label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

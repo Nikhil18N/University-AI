@@ -1,4 +1,13 @@
 import React, { useState } from "react";
+import {
+  renderUniIcon,
+  AlertTriangleIcon,
+  InfoIcon,
+  SparklesIcon,
+  PinIcon,
+  CheckIcon,
+  FileTextIcon,
+} from "./Icons";
 import "./MarkdownContent.css";
 
 interface Props {
@@ -40,7 +49,17 @@ function CodeBlock({ code, language }: CodeBlockProps) {
           title="Copy code to clipboard"
           type="button"
         >
-          {copied ? "✓ Copied" : "📋 Copy"}
+          {copied ? (
+            <>
+              <CheckIcon size={13} color="#10b981" />
+              <span>Copied</span>
+            </>
+          ) : (
+            <>
+              <FileTextIcon size={13} />
+              <span>Copy</span>
+            </>
+          )}
         </button>
       </div>
       <pre className="chat-code-pre">
@@ -64,6 +83,26 @@ function CodeBlock({ code, language }: CodeBlockProps) {
  * 9. Lists, links, inline code, bold, and italic
  */
 export default function MarkdownContent({ content, isStreaming }: Props) {
+  // Helper to convert inline emojis into uniform SVG icons
+  const renderTextWithEmojiIcons = (rawStr: string, keyPrefix: string | number): React.ReactNode => {
+    const emojiRegex = /(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/u;
+    if (!emojiRegex.test(rawStr)) return rawStr;
+
+    const tokens = rawStr.split(emojiRegex);
+    return tokens.map((token, tokIdx) => {
+      if (!token) return null;
+      const icon = renderUniIcon(token, 15, "inline-uni-icon");
+      if (icon) {
+        return (
+          <span key={`${keyPrefix}-icon-${tokIdx}`} className="inline-icon-wrapper" title={token}>
+            {icon}
+          </span>
+        );
+      }
+      return token;
+    });
+  };
+
   // Format inline tokens: bold, italic, strikethrough, inline code, links
   const formatInline = (text: string): React.ReactNode[] => {
     // Regex matches **bold**, *italic*, ~~strikethrough~~, `code`, and [link](url)
@@ -75,21 +114,21 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
 
       // Bold: **text**
       if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
-        return <strong key={index}>{part.slice(2, -2)}</strong>;
+        return <strong key={index}>{renderTextWithEmojiIcons(part.slice(2, -2), index)}</strong>;
       }
 
       // Strikethrough: ~~text~~
       if (part.startsWith("~~") && part.endsWith("~~") && part.length >= 4) {
         return (
           <del key={index} className="chat-strikethrough">
-            {part.slice(2, -2)}
+            {renderTextWithEmojiIcons(part.slice(2, -2), index)}
           </del>
         );
       }
 
       // Italic: *text*
       if (part.startsWith("*") && part.endsWith("*") && part.length >= 2) {
-        return <em key={index}>{part.slice(1, -1)}</em>;
+        return <em key={index}>{renderTextWithEmojiIcons(part.slice(1, -1), index)}</em>;
       }
 
       // Inline code: `text`
@@ -114,13 +153,13 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
               rel="noopener noreferrer"
               className="chat-inline-link"
             >
-              {linkText}
+              {renderTextWithEmojiIcons(linkText, index)}
             </a>
           );
         }
       }
 
-      return part;
+      return renderTextWithEmojiIcons(part, index);
     });
   };
 
@@ -310,14 +349,14 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
           ? [firstLineRemaining, ...quoteLines.slice(1)]
           : quoteLines.slice(1);
 
-        const calloutMeta: Record<string, { icon: string; title: string }> = {
-          NOTE: { icon: "ℹ️", title: "Note" },
-          TIP: { icon: "💡", title: "Pro Tip" },
-          WARNING: { icon: "⚠️", title: "Notice" },
-          IMPORTANT: { icon: "📌", title: "Important" },
-          CAUTION: { icon: "🚨", title: "Caution" },
+        const calloutMeta: Record<string, { icon: React.ReactNode; title: string }> = {
+          NOTE: { icon: <InfoIcon size={16} />, title: "Official Note" },
+          TIP: { icon: <SparklesIcon size={16} />, title: "Recommendation" },
+          WARNING: { icon: <AlertTriangleIcon size={16} />, title: "Important Notice" },
+          IMPORTANT: { icon: <PinIcon size={16} />, title: "Requirement" },
+          CAUTION: { icon: <AlertTriangleIcon size={16} />, title: "Caution" },
         };
-        const meta = calloutMeta[calloutType] || { icon: "💡", title: calloutType };
+        const meta = calloutMeta[calloutType] || { icon: <InfoIcon size={16} />, title: calloutType };
 
         renderedBlocks.push(
           <div
@@ -338,19 +377,38 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
           </div>
         );
       } else {
-        // Standard blockquote
-        renderedBlocks.push(
-          <blockquote
-            key={`blockquote-${renderedBlocks.length}-${i}`}
-            className="chat-blockquote"
-          >
-            {quoteLines.map((ql, qlIdx) => (
-              <p key={qlIdx} className="quote-text">
-                {formatInline(ql)}
-              </p>
-            ))}
-          </blockquote>
-        );
+        const quoteFullText = quoteLines.join(" ");
+        const isOfficialDisclaimer = quoteFullText.toLowerCase().includes("may contain inaccuracies");
+        if (isOfficialDisclaimer) {
+          const cleanText = quoteFullText.replace(/^[⚠️\s*]+/, "").replace(/[*_]/g, "");
+          renderedBlocks.push(
+            <div
+              key={`disclaimer-badge-${renderedBlocks.length}-${i}`}
+              className="chat-official-disclaimer-callout"
+            >
+              <div className="disclaimer-callout-icon">
+                <AlertTriangleIcon size={14} />
+              </div>
+              <div className="disclaimer-callout-text">
+                {cleanText}
+              </div>
+            </div>
+          );
+        } else {
+          // Standard blockquote
+          renderedBlocks.push(
+            <blockquote
+              key={`blockquote-${renderedBlocks.length}-${i}`}
+              className="chat-blockquote"
+            >
+              {quoteLines.map((ql, qlIdx) => (
+                <p key={qlIdx} className="quote-text">
+                  {formatInline(ql)}
+                </p>
+              ))}
+            </blockquote>
+          );
+        }
       }
       continue;
     }

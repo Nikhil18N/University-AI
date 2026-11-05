@@ -5,6 +5,7 @@ import ConversationList from "../components/ConversationList";
 import ThinkingIndicator from "../components/ThinkingIndicator";
 import ShareModal from "../components/ShareModal";
 import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
+import { CalculatorIcon } from "../components/Icons";
 import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
 import {
@@ -671,7 +672,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   title="Fee & Scholarship Calculator"
                   aria-label="Fee & Scholarship Calculator"
                 >
-                  <span className="calc-nav-icon">🧮</span>
+                  <span className="calc-nav-icon"><CalculatorIcon size={15} /></span>
                   <span className="calc-nav-text">Calculator</span>
                 </button>
 

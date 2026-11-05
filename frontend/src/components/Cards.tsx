@@ -1,4 +1,18 @@
 import { useState } from "react";
+import {
+  ScaleIcon,
+  TargetIcon,
+  BriefcaseIcon,
+  FlaskIcon,
+  SparklesIcon,
+  RupeeIcon,
+  AwardIcon,
+  BookOpenIcon,
+  BuildingIcon,
+  FileTextIcon,
+  BoltIcon,
+  VideoIcon,
+} from "./Icons";
 import "./Cards.css";
 
 interface CardProps {
@@ -11,7 +25,9 @@ export function ComparisonCard({ card }: CardProps) {
   return (
     <div className="rich-card comparison-card">
       <div className="card-header">
-        <span className="card-badge">⚖️ Comparison</span>
+        <span className="card-badge">
+          <ScaleIcon size={14} /> Comparison
+        </span>
         <h4 className="card-title">{card.title}</h4>
       </div>
       <div className="comparison-grid">
@@ -22,19 +38,25 @@ export function ComparisonCard({ card }: CardProps) {
               <h5 className="col-name">{col.name}</h5>
             </div>
             <div className="col-section">
-              <span className="section-label">🎯 Focus:</span>
+              <span className="section-label">
+                <TargetIcon size={13} /> Focus:
+              </span>
               <p>{col.focus}</p>
             </div>
             <div className="col-section">
-              <span className="section-label">💼 Career Paths:</span>
+              <span className="section-label">
+                <BriefcaseIcon size={13} /> Career Paths:
+              </span>
               <p>{col.careers}</p>
             </div>
             <div className="col-section">
-              <span className="section-label">🔬 Specialized Labs:</span>
+              <span className="section-label">
+                <FlaskIcon size={13} /> Specialized Labs:
+              </span>
               <p>{col.labs}</p>
             </div>
             <div className="col-advantage">
-              <span>⭐ Key Edge:</span> {col.key_advantage}
+              <span><SparklesIcon size={13} /> Key Edge:</span> {col.key_advantage}
             </div>
           </div>
         ))}
@@ -49,7 +71,9 @@ export function FeeBreakdownCard({ card }: CardProps) {
   return (
     <div className="rich-card fee-card">
       <div className="card-header">
-        <span className="card-badge">💰 Fee Structure</span>
+        <span className="card-badge">
+          <RupeeIcon size={14} /> Fee Structure
+        </span>
         <h4 className="card-title">{card.title}</h4>
       </div>
       <div className="fee-table-wrapper">
@@ -76,7 +100,9 @@ export function FeeBreakdownCard({ card }: CardProps) {
       </div>
       {card.scholarship_note && (
         <div className="card-callout scholarship-callout">
-          <span className="callout-icon">🎓</span>
+          <span className="callout-icon">
+            <AwardIcon size={15} />
+          </span>
           <div>
             <strong>Merit Scholarship Alert:</strong> {card.scholarship_note}
           </div>
@@ -93,7 +119,9 @@ export function CurriculumCard({ card }: CardProps) {
   return (
     <div className="rich-card curriculum-card">
       <div className="card-header">
-        <span className="card-badge">📚 Curriculum</span>
+        <span className="card-badge">
+          <BookOpenIcon size={14} /> Curriculum
+        </span>
         <h4 className="card-title">{card.title}</h4>
       </div>
       <div className="curriculum-tabs">
@@ -132,7 +160,9 @@ export function CampusTourCard({ card }: CardProps) {
   return (
     <div className="rich-card campus-tour-card">
       <div className="card-header">
-        <span className="card-badge">🏫 Campus Life</span>
+        <span className="card-badge">
+          <BuildingIcon size={14} /> Campus Life
+        </span>
         <h4 className="card-title">{card.title}</h4>
       </div>
       <div className="campus-spots-list">
@@ -158,7 +188,15 @@ export function ProfileCard({ card }: CardProps) {
     <div className="rich-card profile-card">
       <div className="card-header">
         <span className={`card-badge ${isSuccess ? "badge-success" : "badge-warning"}`}>
-          {isSuccess ? "🎉 Evaluation: Qualified" : "📋 Evaluation: Review"}
+          {isSuccess ? (
+            <>
+              <AwardIcon size={14} /> Evaluation: Qualified
+            </>
+          ) : (
+            <>
+              <FileTextIcon size={14} /> Evaluation: Review
+            </>
+          )}
         </span>
         <h4 className="card-title">{card.title}</h4>
       </div>
@@ -278,17 +316,23 @@ export function VideoRecommendationsCard({ card }: { card: any }) {
                 </div>
 
                 {/* "Watch" pill — slides up on hover, bottom-left */}
-                <span className="yt-watch-pill">▶ Watch</span>
+                <span className="yt-watch-pill">
+                  <VideoIcon size={12} /> Watch
+                </span>
 
                 {/* "New" pill on first video, top-left */}
                 {isFirst && <span className="yt-new-pill">New</span>}
 
                 {isShort ? (
-                  <span className="yt-duration-badge yt-short-badge">⚡ Shorts</span>
+                  <span className="yt-duration-badge yt-short-badge">
+                    <BoltIcon size={12} /> Shorts
+                  </span>
                 ) : vid.duration ? (
                   <span className="yt-duration-badge">{vid.duration}</span>
                 ) : (
-                  <span className="yt-duration-badge">▶ Video</span>
+                  <span className="yt-duration-badge">
+                    <VideoIcon size={12} /> Video
+                  </span>
                 )}
               </div>
 

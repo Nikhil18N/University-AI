@@ -168,6 +168,9 @@
 }
 
 .suggestion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--surface-1);
@@ -180,11 +183,23 @@
   transition: all 0.15s ease;
 }
 
+.suggestion-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sru-blue, #6366f1);
+  flex-shrink: 0;
+}
+
 .suggestion-chip:hover {
   background: var(--surface-2);
   border-color: var(--sru-blue);
   color: var(--sru-blue);
   transform: translateY(-1px);
+}
+
+.suggestion-chip:hover .suggestion-chip-icon {
+  color: var(--sru-blue);
 }
 
 /* Bottom Bar: Action Buttons (Left) + Right-Aligned Beta Disclaimer */
