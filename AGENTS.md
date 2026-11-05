@@ -23,11 +23,13 @@ You are implementing the University AI Companion.
 18. Do not delete working functionality to make a new feature pass.
 19. Preserve source metadata through the entire RAG pipeline.
 20. Every RAG answer should be capable of returning source references.
+21. Always create a new branch for development (e.g. `feat/...` or `fix/...`) before making changes; never make development changes directly on `main`.
 
 ## Development workflow
 1. Inspect the relevant docs.
-2. Identify affected components.
-3. State the implementation plan.
-4. Implement the smallest complete change.
-5. Test it.
-6. Update documentation if behavior changed.
+2. Create a new branch for development before starting implementation.
+3. Identify affected components.
+4. State the implementation plan.
+5. Implement the smallest complete change.
+6. Test it.
+7. Update documentation if behavior changed.
