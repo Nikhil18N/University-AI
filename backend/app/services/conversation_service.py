@@ -180,7 +180,14 @@ async def get_recent_messages(
     result = await db.execute(stmt)
     messages = list(reversed(result.scalars().all()))
 
-    return [{"role": m.role, "content": m.content} for m in messages]
+    return [
+        {
+            "role": m.role,
+            "content": m.content,
+            "metadata": m.metadata_ if isinstance(m.metadata_, dict) else {},
+        }
+        for m in messages
+    ]
 
 
 async def get_all_user_messages(
@@ -200,7 +207,14 @@ async def get_all_user_messages(
     result = await db.execute(stmt)
     messages = result.scalars().all()
 
-    return [{"role": m.role, "content": m.content} for m in messages]
+    return [
+        {
+            "role": m.role,
+            "content": m.content,
+            "metadata": m.metadata_ if isinstance(m.metadata_, dict) else {},
+        }
+        for m in messages
+    ]
 
 
 async def update_conversation_title(

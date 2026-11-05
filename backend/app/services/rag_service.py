@@ -72,10 +72,15 @@ class RAGService:
         )
 
         chunks = []
-        if results["documents"] and results["documents"][0]:
+        if results.get("documents") and results["documents"][0]:
+            raw_metadatas = results.get("metadatas")
+            has_metadatas = bool(raw_metadatas and raw_metadatas[0])
+            raw_distances = results.get("distances")
+            has_distances = bool(raw_distances and raw_distances[0])
             for i, doc in enumerate(results["documents"][0]):
-                metadata = results["metadatas"][0][i] if results["metadatas"] else {}
-                distance = results["distances"][0][i] if results["distances"] else None
+                raw_meta = raw_metadatas[0][i] if (has_metadatas and i < len(raw_metadatas[0])) else {}
+                metadata = raw_meta if isinstance(raw_meta, dict) else {}
+                distance = raw_distances[0][i] if (has_distances and i < len(raw_distances[0])) else None
                 chunks.append({
                     "content": doc,
                     "metadata": metadata,
@@ -85,7 +90,7 @@ class RAGService:
         chunks = [
             chunk
             for chunk in chunks
-            if chunk["distance"] is None
+            if chunk.get("distance") is None
             or chunk["distance"] <= settings.RAG_MAX_DISTANCE
         ]
 
@@ -122,14 +127,18 @@ class RAGService:
         seen_docs = set()
 
         for i, chunk in enumerate(retrieved_chunks, 1):
-            meta = chunk["metadata"]
+            if not isinstance(chunk, dict):
+                continue
+            raw_meta = chunk.get("metadata")
+            meta = raw_meta if isinstance(raw_meta, dict) else {}
             section = meta.get("section", "")
             page_url = meta.get("page_url", "")
             label = section or meta.get("title", "Unknown")
+            chunk_content = chunk.get("content", "")
             evidence_parts.append(
                 f"[Source {i}] {label}"
                 + (f" — {page_url}" if page_url else "")
-                + f"\n{chunk['content']}"
+                + f"\n{chunk_content}"
             )
 
             doc_key = (meta.get("document_id", ""), meta.get("section", meta.get("page", "")))

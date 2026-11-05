@@ -108,3 +108,75 @@ def test_official_admissions_contacts():
     text = "Please reach out to the admissions office at 0870-2818333 or info@sru.edu.in."
     assert any(c in text for c in official_contacts)
     assert not any(c in text for c in unverified_contacts)
+
+
+@pytest.mark.asyncio
+async def test_prepare_rag_request_handles_none_and_missing_metadata():
+    """Verify prepare_rag_request handles chunks with None or missing metadata without crashing."""
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    with patch("app.db.chroma.get_chroma_client") as mock_gc:
+        mock_col = MagicMock()
+        mock_col.count.return_value = 0
+        mock_col.query.return_value = {"metadatas": [], "distances": []}
+        mock_client = MagicMock()
+        mock_client.get_or_create_collection.return_value = mock_col
+        mock_gc.return_value = mock_client
+
+        from app.services.rag_service import RAGService
+
+        llm = MagicMock()
+        embedder = MagicMock()
+        embedder.embed_single = AsyncMock(return_value=[0.1, 0.2])
+        rag = RAGService(llm, embedder)
+
+        # Chunks containing None metadata, empty dict, missing metadata key, and non-dict
+        chunks = [
+            {"content": "Hostel mess provides nutritious 4 meals daily.", "metadata": None, "distance": 0.12},
+            {"content": "Hostel rooms include Wi-Fi.", "metadata": {}, "distance": 0.15},
+            {"content": "Girls AC hostel is ₹1,25,000/yr.", "metadata": {"section": "Hostels", "title": "Hostel Handbook"}, "distance": 0.18},
+            {"content": "Non-AC rooms are available."},
+            "invalid non-dict chunk",
+        ]
+
+        messages, sources, evidence = await rag.prepare_rag_request(
+            question="🍽️ Mess & Food Quality",
+            conversation_context="",
+            retrieved_chunks=chunks,
+        )
+
+        assert len(messages) == 2
+        assert len(sources) >= 1
+        assert "Hostel mess provides nutritious 4 meals daily." in evidence
+        assert "Girls AC hostel is ₹1,25,000/yr." in evidence
+
+
+@pytest.mark.asyncio
+async def test_retrieve_with_embedding_handles_none_metadata():
+    """Verify retrieve_with_embedding safely normalizes None metadata returned by ChromaDB."""
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    with patch("app.db.chroma.get_chroma_client") as mock_gc:
+        mock_col = MagicMock()
+        mock_col.query.return_value = {
+            "documents": [["Food details", "Mess menu"]],
+            "metadatas": [[None, {"section": "Mess"}]],
+            "distances": [[0.1, 0.2]],
+        }
+        mock_client = MagicMock()
+        mock_client.get_or_create_collection.return_value = mock_col
+        mock_gc.return_value = mock_client
+
+        from app.services.rag_service import RAGService
+
+        llm = MagicMock()
+        embedder = MagicMock()
+        embedder.embed_single = AsyncMock(return_value=[0.1, 0.2])
+        rag = RAGService(llm, embedder)
+
+        chunks, emb = await rag.retrieve_with_embedding("Mess & Food")
+
+        assert len(chunks) == 2
+        assert isinstance(chunks[0]["metadata"], dict)
+        assert chunks[0]["metadata"] == {}
+        assert chunks[1]["metadata"]["section"] == "Mess"

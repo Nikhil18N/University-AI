@@ -185,7 +185,9 @@ async def handle_chat(
 
     if is_video_yes:
         last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
-        matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+        asst_meta = last_asst_msg.get("metadata") if isinstance(last_asst_msg, dict) else {}
+        asst_meta = asst_meta if isinstance(asst_meta, dict) else {}
+        matching_videos = asst_meta.get("matched_videos")
         if not matching_videos and rag_service:
             prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
             if prior_user_msg:
@@ -408,7 +410,9 @@ async def handle_chat_stream(
 
         if is_video_yes:
             last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
-            matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+            asst_meta = last_asst_msg.get("metadata") if isinstance(last_asst_msg, dict) else {}
+            asst_meta = asst_meta if isinstance(asst_meta, dict) else {}
+            matching_videos = asst_meta.get("matched_videos")
             if not matching_videos and rag_service:
                 prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
                 if prior_user_msg:
