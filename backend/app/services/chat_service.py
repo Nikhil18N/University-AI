@@ -14,6 +14,7 @@ from app.config import settings
 from app.providers.base import LLMProvider
 from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
 from app.services import conversation_service, prompt_service
+from app.services.cache_service import get_cached_answer, set_cached_answer
 from app.services.card_service import generate_cards
 from app.services.flow_service import (
     detect_flow_trigger,
@@ -30,6 +31,15 @@ from app.services.profile_service import build_counsellor_guidance, extract_stud
 from app.services.rag_service import RAGService
 from app.services.reformulation_service import needs_reformulation, reformulate_query
 from app.services.suggestion_service import generate_suggestions
+from app.services.video_service import (
+    check_video_affirmative_or_negative,
+    create_video_card,
+    format_video_offer_prompt,
+    get_post_video_suggestions,
+    get_relevant_videos,
+    get_semantic_videos,
+    is_explicit_video_query,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +153,7 @@ async def handle_chat(
     request: ChatRequest,
     llm_provider: LLMProvider,
     rag_service: RAGService | None = None,
+    redis_client: object | None = None,
 ) -> ChatResponse:
     """Process a chat message and return a rich response with suggestions and cards."""
     # 1. Get or create conversation
@@ -163,12 +174,49 @@ async def handle_chat(
 
     sources: list[dict] = []
     flow_info: dict | None = None
+    is_video_yes = False
+    is_video_no = False
+    semantic_videos: list[dict] = []
+
+    # Check if user is confirming or declining a prior video tour offer
+    is_video_yes, is_video_no = check_video_affirmative_or_negative(
+        request.message, recent
+    )
+
+    if is_video_yes:
+        last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
+        matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+        if not matching_videos and rag_service:
+            prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
+            if prior_user_msg:
+                try:
+                    prior_embs = await rag_service.embeddings.embed([prior_user_msg["content"]])
+                    matching_videos = get_semantic_videos(prior_embs[0], limit=2, max_distance=0.30)
+                except Exception:
+                    matching_videos = None
+
+        cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
+        answer = f"Here is the official video tour of our {cat}:"
+        cards = [create_video_card(matching_videos, is_explicit=True)] if matching_videos else []
+        suggestions = get_post_video_suggestions(cat)
+        intent = "UNIVERSITY"
+        profile = extract_student_profile(recent)
+
+    elif is_video_no:
+        answer = "No problem at all! Feel free to ask anything else about SR University."
+        cards = []
+        suggestions = [
+            "🎯 B.Tech Admissions",
+            "💰 Fee Structure",
+            "📊 Placement Records",
+            "🔬 Lab Facilities",
+        ]
+        intent = "ACKNOWLEDGMENT"
+        profile = extract_student_profile(recent)
 
     # Check for guided conversation flow (Admission Wizard)
-    is_wizard_trigger = detect_flow_trigger(request.message) is not None
-    wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
-
-    if is_wizard_trigger or wizard_step:
+    elif detect_flow_trigger(request.message) is not None or get_wizard_step_from_history(recent[:-1], request.message):
+        wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
         if not wizard_step:
             wizard_step = {
                 "flow_name": "admission_wizard",
@@ -218,17 +266,23 @@ async def handle_chat(
                     llm_provider=llm_provider,
                 )
 
-            guidance = build_counsellor_guidance(profile, current_query=request.message)
-            rag_context = conversation_context
-            if guidance:
-                rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
+            cached = await get_cached_answer(redis_client, search_query)
+            if cached:
+                answer, sources = cached
+                logger.info("Handled via cached RAG response (search query: '%s')", search_query[:50])
+            else:
+                guidance = build_counsellor_guidance(profile, current_query=request.message)
+                rag_context = conversation_context
+                if guidance:
+                    rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
 
-            answer, sources = await rag_service.query(
-                question=request.message,
-                search_query=search_query,
-                conversation_context=rag_context,
-            )
-            logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
+                answer, sources = await rag_service.query(
+                    question=request.message,
+                    search_query=search_query,
+                    conversation_context=rag_context,
+                )
+                await set_cached_answer(redis_client, search_query, answer, sources)
+                logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
 
         else:
             system_prompt = prompt_service.load_prompt("system")
@@ -236,21 +290,37 @@ async def handle_chat(
             answer = await llm_provider.generate(messages)
             logger.info("Handled via conversational LLM (%s)", intent)
 
-    # 6. Generate smart suggestion chips and rich cards
-    suggestions = generate_suggestions(
-        intent=intent,
-        user_message=request.message,
-        answer=answer,
-        sources=sources,
-        profile=profile,
-        flow_state=flow_info,
-    )
-    cards = generate_cards(
-        user_message=request.message,
-        answer=answer,
-        profile=profile,
-        sources=sources,
-    )
+    # Pure Semantic Vector Search for Video Recommendations (Zero Keywords)
+    explicit_video = is_explicit_video_query(request.message)
+    query_embedding = getattr(rag_service, "last_query_embedding", None)
+
+    if not is_video_yes and not is_video_no:
+        if query_embedding:
+            semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
+            if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                cat = semantic_videos[0].get("category", "our campus")
+                answer = format_video_offer_prompt(answer, cat)
+
+        # 6. Generate smart suggestion chips and rich cards
+        suggestions = generate_suggestions(
+            intent=intent,
+            user_message=request.message,
+            answer=answer,
+            sources=sources,
+            profile=profile,
+            flow_state=flow_info,
+        )
+        if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+            suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
+
+        cards = generate_cards(
+            user_message=request.message,
+            answer=answer,
+            profile=profile,
+            sources=sources,
+            query_embedding=query_embedding,
+            is_video_confirmed=is_video_yes,
+        )
 
     # 7. Save assistant message with metadata
     assistant_msg = await conversation_service.add_message(
@@ -260,7 +330,13 @@ async def handle_chat(
         content=answer,
         model=settings.LLM_MODEL,
         sources=sources if sources else None,
-        metadata={"suggestions": suggestions, "cards": cards, "flow": flow_info},
+        metadata={
+            "suggestions": suggestions,
+            "cards": cards,
+            "flow": flow_info,
+            "matched_videos": semantic_videos if semantic_videos else None,
+            "video_offer": bool(semantic_videos and not explicit_video and intent == "UNIVERSITY"),
+        },
     )
 
     # 8. Auto-title on first exchange
@@ -296,6 +372,7 @@ async def handle_chat_stream(
     request: ChatRequest,
     llm_provider: LLMProvider,
     rag_service: RAGService | None = None,
+    redis_client: object | None = None,
 ) -> AsyncIterator[str]:
     """Process a chat message and stream tokens via Server-Sent Events (SSE)."""
     try:
@@ -314,7 +391,6 @@ async def handle_chat_stream(
 
         # 3. Build context
         recent = await conversation_service.get_recent_messages(db, conversation.id)
-        all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
         conversation_context = "\n".join(
             f"{m['role']}: {m['content']}" for m in recent[:-1]
         )
@@ -322,12 +398,54 @@ async def handle_chat_stream(
         sources: list[dict] = []
         flow_info: dict | None = None
         answer = ""
+        query_embedding: list[float] | None = None
 
-        # Check for guided flow
-        is_wizard_trigger = detect_flow_trigger(request.message) is not None
-        wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
+        # Check for guided flow or video confirmation/decline
+        is_video_yes, is_video_no = check_video_affirmative_or_negative(
+            request.message, recent
+        )
 
-        if is_wizard_trigger or wizard_step:
+        if is_video_yes:
+            last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
+            matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+            if not matching_videos and rag_service:
+                prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
+                if prior_user_msg:
+                    try:
+                        prior_embs = await rag_service.embeddings.embed([prior_user_msg["content"]])
+                        matching_videos = get_semantic_videos(prior_embs[0], limit=2, max_distance=0.30)
+                    except Exception:
+                        matching_videos = None
+
+            cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
+            answer = f"Here is the official video tour of {cat}:"
+            cards = [create_video_card(matching_videos, is_explicit=True)] if matching_videos else []
+            suggestions = get_post_video_suggestions(cat)
+            intent = "UNIVERSITY"
+            profile = {}
+
+            for chunk in chunk_text_stream(answer):
+                yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                await asyncio.sleep(0.01)
+
+        elif is_video_no:
+            answer = "No problem at all! Feel free to ask anything else about SR University."
+            cards = []
+            suggestions = [
+                "🎯 B.Tech Admissions",
+                "💰 Fee Structure",
+                "📊 Placement Records",
+                "🔬 Lab Facilities",
+            ]
+            intent = "ACKNOWLEDGMENT"
+            profile = {}
+
+            for chunk in chunk_text_stream(answer):
+                yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                await asyncio.sleep(0.01)
+
+        elif detect_flow_trigger(request.message) is not None or get_wizard_step_from_history(recent[:-1], request.message):
+            wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
             if not wizard_step:
                 wizard_step = {
                     "flow_name": "admission_wizard",
@@ -339,6 +457,8 @@ async def handle_chat_stream(
                 }
             answer, flow_info = execute_wizard_step(wizard_step)
             intent = "ADMISSION_FLOW"
+            # Lazy-fetch all_user_messages for non-UNIVERSITY paths
+            all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
             profile = extract_student_profile(all_user_messages)
 
             # Stream words smoothly preserving all formatting
@@ -353,21 +473,29 @@ async def handle_chat_stream(
                 conversation_context=conversation_context,
                 llm_provider=llm_provider,
             )
-            profile = extract_student_profile(all_user_messages)
 
             if intent == "STUDENT_SPECIFIC":
+                # Lazy-fetch for non-UNIVERSITY path
+                all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
+                profile = extract_student_profile(all_user_messages)
                 answer = STUDENT_AUTH_MESSAGE
                 for chunk in chunk_text_stream(answer):
                     yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                     await asyncio.sleep(0.012)
 
             elif intent == "OUT_OF_SCOPE":
+                # Lazy-fetch for non-UNIVERSITY path
+                all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
+                profile = extract_student_profile(all_user_messages)
                 answer = OUT_OF_SCOPE_MESSAGE
                 for chunk in chunk_text_stream(answer):
                     yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                     await asyncio.sleep(0.012)
 
             elif intent in FAST_CONVERSATIONAL_RESPONSES:
+                # Lazy-fetch for non-UNIVERSITY path
+                all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
+                profile = extract_student_profile(all_user_messages)
                 has_context = bool(conversation_context.strip())
                 answer = get_conversational_response(intent, has_context=has_context)
                 for chunk in chunk_text_stream(answer):
@@ -383,68 +511,93 @@ async def handle_chat_stream(
                         llm_provider=llm_provider,
                     )
 
-                chunks = await rag_service.retrieve(search_query)
-                clean_q = request.message.lower().strip(" .!?,")
-                effective_q = request.message
-                if search_query and (
-                    clean_q in ("yes", "yeah", "yep", "sure", "ok", "tell me more", "more details", "go ahead", "definitely", "yes please", "why not")
-                    or len(clean_q.split()) <= 2
-                ):
-                    effective_q = f"{request.message} ({search_query})"
-
-                guidance = build_counsellor_guidance(profile, current_query=request.message)
-                rag_context = conversation_context
-                if guidance:
-                    rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
-
-                if not chunks:
-                    answer = (
-                        "I couldn't find relevant information in the university documents "
-                        "to answer that question. You may want to check with the university "
-                        "office directly."
-                    )
+                cached = await get_cached_answer(redis_client, search_query)
+                if cached:
+                    cached_answer, cached_sources = cached
+                    answer = cached_answer
+                    sources = cached_sources
+                    all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
+                    profile = extract_student_profile(all_user_messages)
                     for chunk in chunk_text_stream(answer):
                         yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                         await asyncio.sleep(0.012)
                 else:
-                    messages, sources, evidence_text = await rag_service.prepare_rag_request(
-                        effective_q, rag_context, chunks
+                    # Run embedding/retrieval and user-message fetch in parallel — no dependency between them
+                    (chunks, query_embedding), all_user_messages = await asyncio.gather(
+                        rag_service.retrieve_with_embedding(search_query),
+                        conversation_service.get_all_user_messages(db, conversation.id),
                     )
-                    streamed_tokens = []
-                    async for token in llm_provider.stream(messages, temperature=0.3):
-                        streamed_tokens.append(token)
-                        yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
+                    profile = extract_student_profile(all_user_messages)
 
-                    answer = "".join(streamed_tokens)
+                    clean_q = request.message.lower().strip(" .!?,")
+                    effective_q = request.message
+                    if search_query and (
+                        clean_q in ("yes", "yeah", "yep", "sure", "ok", "tell me more", "more details", "go ahead", "definitely", "yes please", "why not")
+                        or len(clean_q.split()) <= 2
+                    ):
+                        effective_q = f"{request.message} ({search_query})"
 
-                    # Check runtime hallucination guardrails
-                    is_faithful, unsupported = verify_numeric_faithfulness(
-                        answer=answer,
-                        evidence_text=evidence_text,
-                        conversation_context=rag_context,
-                        question=effective_q,
-                    )
-                    if not is_faithful:
-                        logger.warning("Stream correction triggered for unsupported numbers %s", unsupported)
-                        correction_instruction = (
-                            f"CORRECTION: Your previous draft stated number(s) or percentage(s) that are NOT present "
-                            f"in the evidence or conversation: {', '.join(unsupported)}. "
-                            f"Rewrite your response using strictly verified numbers from the evidence."
+                    guidance = build_counsellor_guidance(profile, current_query=request.message)
+                    rag_context = conversation_context
+                    if guidance:
+                        rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
+
+                    if not chunks:
+                        answer = (
+                            "I couldn't find relevant information in the university documents "
+                            "to answer that question. You may want to check with the university "
+                            "office directly."
                         )
-                        correction_messages = messages + [
-                            {"role": "assistant", "content": answer},
-                            {"role": "user", "content": correction_instruction},
-                        ]
-                        corrected = await llm_provider.generate(correction_messages, temperature=0.1)
-                        second_check, still_unsupported = verify_numeric_faithfulness(
-                            corrected, evidence_text, rag_context, effective_q
+                        for chunk in chunk_text_stream(answer):
+                            yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                            await asyncio.sleep(0.012)
+                    else:
+                        messages, sources, evidence_text = await rag_service.prepare_rag_request(
+                            effective_q, rag_context, chunks, precomputed_embedding=query_embedding
                         )
-                        if second_check or len(still_unsupported) < len(unsupported):
-                            answer = corrected
+                        streamed_tokens = []
+                        async for token in llm_provider.stream(messages, temperature=0.3):
+                            streamed_tokens.append(token)
+                            yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
 
-                    is_url_faithful, unverified_urls = verify_url_faithfulness(answer, evidence_text)
-                    if not is_url_faithful:
-                        answer = sanitize_hallucinated_urls(answer, unverified_urls)
+                        answer = "".join(streamed_tokens)
+
+                        # Check runtime hallucination guardrails
+                        is_faithful, unsupported = verify_numeric_faithfulness(
+                            answer=answer,
+                            evidence_text=evidence_text,
+                            conversation_context=rag_context,
+                            question=effective_q,
+                        )
+                        if not is_faithful and len(unsupported) >= 2:
+                            logger.warning("Stream correction triggered for unsupported numbers %s", unsupported)
+                            correction_instruction = (
+                                f"CORRECTION: Your previous draft stated number(s) or percentage(s) that are NOT present "
+                                f"in the evidence or conversation: {', '.join(unsupported)}. "
+                                f"Rewrite your response using strictly verified numbers from the evidence."
+                            )
+                            correction_messages = messages + [
+                                {"role": "assistant", "content": answer},
+                                {"role": "user", "content": correction_instruction},
+                            ]
+                            corrected = await llm_provider.generate(correction_messages, temperature=0.1)
+                            second_check, still_unsupported = verify_numeric_faithfulness(
+                                corrected, evidence_text, rag_context, effective_q
+                            )
+                            if second_check or len(still_unsupported) < len(unsupported):
+                                answer = corrected
+                        elif not is_faithful and len(unsupported) < 2:
+                            logger.warning(
+                                "Single unsupported numeric claim '%s' in streamed answer — skipping correction LLM call",
+                                unsupported,
+                            )
+
+                        is_url_faithful, unverified_urls = verify_url_faithfulness(answer, evidence_text)
+                        if not is_url_faithful:
+                            answer = sanitize_hallucinated_urls(answer, unverified_urls)
+
+                        # Cache verified RAG response
+                        await set_cached_answer(redis_client, search_query, answer, sources)
 
                     # Stage 8: Mandatory disclaimer verification in stream
                     if not any(term in answer for term in ["May contain inaccuracies", "Verify with official university"]):
@@ -464,21 +617,41 @@ async def handle_chat_stream(
                     yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
                 answer = "".join(streamed_tokens)
 
-        # Suggestions and rich cards
-        suggestions = generate_suggestions(
-            intent=intent,
-            user_message=request.message,
-            answer=answer,
-            sources=sources,
-            profile=profile,
-            flow_state=flow_info,
-        )
-        cards = generate_cards(
-            user_message=request.message,
-            answer=answer,
-            profile=profile,
-            sources=sources,
-        )
+        semantic_videos = []
+        explicit_video = is_explicit_video_query(request.message)
+
+        if not is_video_yes and not is_video_no:
+            if query_embedding:
+                semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
+                if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                    cat = semantic_videos[0].get("category", "our campus")
+                    new_answer = format_video_offer_prompt(answer, cat)
+                    if new_answer != answer:
+                        delta_prompt = new_answer[len(answer):]
+                        for chunk in chunk_text_stream(delta_prompt):
+                            yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                        answer = new_answer
+
+            # Suggestions and rich cards
+            suggestions = generate_suggestions(
+                intent=intent,
+                user_message=request.message,
+                answer=answer,
+                sources=sources,
+                profile=profile,
+                flow_state=flow_info,
+            )
+            if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
+
+            cards = generate_cards(
+                user_message=request.message,
+                answer=answer,
+                profile=profile,
+                sources=sources,
+                query_embedding=query_embedding,
+                is_video_confirmed=is_video_yes,
+            )
 
         # Save to database
         assistant_msg = await conversation_service.add_message(
@@ -488,7 +661,13 @@ async def handle_chat_stream(
             content=answer,
             model=settings.LLM_MODEL,
             sources=sources if sources else None,
-            metadata={"suggestions": suggestions, "cards": cards, "flow": flow_info},
+            metadata={
+                "suggestions": suggestions,
+                "cards": cards,
+                "flow": flow_info,
+                "matched_videos": semantic_videos if semantic_videos else None,
+                "video_offer": bool(semantic_videos and not explicit_video and intent == "UNIVERSITY"),
+            },
         )
 
         if conversation.title == "New conversation":

@@ -31,6 +31,13 @@ PLACEMENT_SUGGESTIONS = [
     "🚀 SRiX Startup Incubator",
 ]
 
+PLACEMENT_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "💼 Top Recruiters",
+    "📈 Highest Package",
+]
+
 GENERAL_FEE_SUGGESTIONS = [
     "🎓 B.Tech CSE Fees",
     "⚡ B.Tech ECE & Core Fees",
@@ -66,6 +73,34 @@ ACADEMIC_SUGGESTIONS = [
     "🎓 Fully Flexible Credit System",
     "🏥 Medical Condonation Policy",
     "🔬 Core Labs & Projects",
+]
+
+HOSTEL_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "🍽️ Mess & Food Quality",
+    "🕒 Hostel Timings & Rules",
+]
+
+CAMPUS_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "🔬 Specialized AI Labs",
+    "⚽ Sports Arena",
+]
+
+SRIX_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "🚀 Student Startups",
+    "🤝 Seed Funding & Grants",
+]
+
+TRANSPORT_SUGGESTIONS = [
+    "🚌 Bus Timings",
+    "💳 Transport Fee",
+    "📍 Warangal & Hanamkonda Routes",
+    "🏠 Hostel Facilities",
 ]
 
 CURRICULUM_SUGGESTIONS = [
@@ -130,8 +165,19 @@ def generate_suggestions(
             "💼 Placement Records & CTC",
         ]
 
+    # 2b-2. Transport & Bus queries (no videos)
+    if any(k in msg_lower for k in ("bus", "buses", "transport", "transportation", "commute", "van", "route", "rtc")):
+        return TRANSPORT_SUGGESTIONS
+
     # 2c. Video or Tour explicit query
-    if any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like")):
+    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like"))
+    if is_explicit_video:
+        if "hostel" in msg_lower:
+            return HOSTEL_SUGGESTIONS
+        if "srix" in msg_lower:
+            return SRIX_VIDEO_OFFER_SUGGESTIONS
+        if "placement" in msg_lower:
+            return PLACEMENT_SUGGESTIONS
         return VIDEO_TOUR_SUGGESTIONS
 
     # 3. Eligibility & Cutoff
@@ -150,6 +196,8 @@ def generate_suggestions(
 
     # 5. Placements & Jobs
     if any(k in msg_lower for k in ("placement", "package", "ctc", "recruiter", "job", "internship", "hiring", "salary")):
+        if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
+            return PLACEMENT_VIDEO_OFFER_SUGGESTIONS
         return PLACEMENT_SUGGESTIONS
 
     # 6. Fees, Tuition & Scholarships
@@ -160,31 +208,47 @@ def generate_suggestions(
     if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "caution deposit")):
         return GENERAL_FEE_SUGGESTIONS
 
-    # 7. Hostels, Mess & Campus Life
-    if any(k in msg_lower for k in ("hostel", "mess", "food", "room", "curfew", "timing", "campus", "sports", "bus", "transport")):
+    # 7. Startups & SRiX incubator
+    if any(k in msg_lower for k in ("srix", "startup", "incubator", "entrepreneur")):
+        if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
+            return SRIX_VIDEO_OFFER_SUGGESTIONS
+        raw_suggestions = SRIX_VIDEO_OFFER_SUGGESTIONS
+
+    # 8. Hostels, Mess & Living
+    elif any(k in msg_lower for k in ("hostel", "mess", "food", "room", "curfew", "timing", "warden")):
+        if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
+            return HOSTEL_VIDEO_OFFER_SUGGESTIONS
         raw_suggestions = HOSTEL_SUGGESTIONS
 
-    # 8. Academics, Attendance & Condonation
+    # 9. Campus Life & Infrastructure
+    elif any(k in msg_lower for k in ("campus", "infrastructure", "library", "blocks", "sports")):
+        if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
+            return CAMPUS_VIDEO_OFFER_SUGGESTIONS
+        raw_suggestions = CAMPUS_VIDEO_OFFER_SUGGESTIONS
+
+    # 10. Academics, Attendance & Condonation
     elif any(k in msg_lower for k in ("attendance", "detention", "condon", "exam", "gpa", "cgpa", "credit", "ffcs")):
         raw_suggestions = ACADEMIC_SUGGESTIONS
 
-    # 9. Courses & Curriculum
+    # 11. Courses & Curriculum
     elif any(k in msg_lower for k in ("curriculum", "syllabus", "subject", "courses", "credits", "labs")):
         raw_suggestions = CURRICULUM_SUGGESTIONS
 
-    # 10. Greeting / General conversational
+    # 12. Greeting / General conversational
     elif intent in ("GREETING", "HOW_ARE_YOU", "HELP", "ACKNOWLEDGMENT", "THANKS"):
         raw_suggestions = DEFAULT_GREETING_SUGGESTIONS
 
-    # 11. Default contextual fallbacks based on answer content
+    # 13. Default contextual fallbacks based on answer content
     elif "placement" in ans_lower or "lpa" in ans_lower:
         raw_suggestions = PLACEMENT_SUGGESTIONS
     elif "fee" in ans_lower or "rs." in ans_lower or "₹" in ans_lower:
-        raw_suggestions = FEE_SUGGESTIONS
+        raw_suggestions = GENERAL_FEE_SUGGESTIONS
     elif "hostel" in ans_lower:
         raw_suggestions = HOSTEL_SUGGESTIONS
     elif "attendance" in ans_lower:
         raw_suggestions = ACADEMIC_SUGGESTIONS
+    elif "campus" in ans_lower:
+        raw_suggestions = CAMPUS_VIDEO_OFFER_SUGGESTIONS
     else:
         raw_suggestions = DEFAULT_UNIVERSITY_SUGGESTIONS
 

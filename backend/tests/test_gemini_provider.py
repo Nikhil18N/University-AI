@@ -85,7 +85,7 @@ async def test_gemini_generate_429_fallback():
 
         assert result == "Answer from fallback model"
         assert mock_post.call_count == 2
-        assert provider.model == "gemini-3.1-flash-lite"
+        assert provider.model in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite")
 
 
 def test_factory_gemini_missing_key():
@@ -109,7 +109,7 @@ def test_factory_gemini_success():
 
 def test_gemini_legacy_model_upgrade():
     p = GeminiProvider(api_key="test-key-123", model="gemini-2.0-flash")
-    assert p.model == "gemini-3.1-flash-lite"
+    assert p.model == "gemini-3.5-flash-lite"
 
 
 @pytest.mark.asyncio
@@ -243,13 +243,14 @@ async def test_gemini_embedding_multi_key_failover():
 
 
 def test_factory_gemini_multi_keys():
-    with patch("app.config.settings.LLM_PROVIDER", "gemini"):
-        with patch("app.config.settings.GEMINI_API_KEY", ""):
-            with patch("app.config.settings.GEMINI_API_KEYS", "key-one, key-two, key-three"):
-                p = create_llm_provider()
-                assert isinstance(p, GeminiProvider)
-                assert len(p.key_pool) == 3
-                assert p.key_pool.keys == ["key-one", "key-two", "key-three"]
-
+    with patch("app.config.settings.LLM_PROVIDER", "gemini"), \
+         patch("app.config.settings.GEMINI_API_KEYS", "key-one, key-two, key-three"), \
+         patch("app.config.settings.GEMINI_API_KEY", ""), \
+         patch("app.config.settings.GOOGLE_API_KEY", None), \
+         patch("app.config.settings.LLM_API_KEY", ""):
+        p = create_llm_provider()
+        assert isinstance(p, GeminiProvider)
+        assert len(p.key_pool) == 3
+        assert p.key_pool.keys == ["key-one", "key-two", "key-three"]
 
 

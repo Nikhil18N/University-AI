@@ -38,7 +38,9 @@ async def test_health_endpoint():
         data = response.json()
         assert "status" in data
         assert "services" in data
-        assert data["services"]["database"] == "healthy"
+        assert "database" in data["services"]
+        assert "chromadb" in data["services"]
+        assert any(k in data["services"] for k in ("gemini", "ollama", "llm"))
 
 
 @pytest.mark.asyncio

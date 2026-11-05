@@ -46,6 +46,11 @@ async def ensure_documents_seeded() -> int:
         count = collection.count()
         if count > 0:
             logger.info("ChromaDB '%s' collection has %d documents. No seeding needed.", COLLECTION_NAME, count)
+            try:
+                from app.services.video_service import sync_video_vectors
+                await sync_video_vectors()
+            except Exception as ve:
+                logger.warning("Could not sync video vectors: %s", ve)
             return count
 
         logger.warning(
@@ -72,6 +77,13 @@ async def ensure_documents_seeded() -> int:
 
             await ingest_handbook()
             logger.info("Auto-seeded handbook markdown documents.")
+
+        # Ensure semantic video vectors are synced in ChromaDB
+        try:
+            from app.services.video_service import sync_video_vectors
+            await sync_video_vectors()
+        except Exception as ve:
+            logger.warning("Could not sync video vectors during auto-seed: %s", ve)
 
         new_count = collection.count()
         logger.info("Document auto-seeding completed. Total chunks in ChromaDB: %d", new_count)

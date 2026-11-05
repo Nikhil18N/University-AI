@@ -186,86 +186,136 @@ export function ProfileCard({ card }: CardProps) {
   );
 }
 
+const CATEGORY_COLOR_MAP: Record<string, string> = {
+  "Campus Tour": "blue",
+  "Hostels & Living": "purple",
+  "Placements & Careers": "green",
+  "Startups & Innovation (SRiX)": "orange",
+  "CS, AI & Technology": "teal",
+  "Sports & Activities": "red",
+  "Testimonials & Reviews": "yellow",
+};
+
+function getCategoryColor(category: string | undefined): string {
+  if (!category) return "grey";
+  return CATEGORY_COLOR_MAP[category] ?? "grey";
+}
+
 export function VideoRecommendationsCard({ card }: { card: any }) {
   const videos = card.videos || [];
   const channelUrl = card.channel_url || "https://www.youtube.com/@SRUniversity/videos";
   const channelName = card.channel_name || "SR University Official";
+  const videoCount = videos.length;
 
-  if (!videos.length) return null;
+  if (!videoCount) return null;
 
   return (
-    <div className="rich-card video-recommendations-card">
+    <div className="rich-card video-recommendations-card yt-red-border">
       <div className="video-card-header">
         <div className="video-card-header-left">
-          <span className="video-header-icon">🎥</span>
           <div>
-            <h4 className="video-card-title">{card.title || "Related University Videos"}</h4>
+            <div className="yt-header-title-row">
+              <h4 className="video-card-title">{card.title || "Related University Videos"}</h4>
+              {videoCount > 0 && (
+                <span className="yt-count-pill">{videoCount} {videoCount === 1 ? "video" : "videos"}</span>
+              )}
+            </div>
             <span className="video-card-subtitle">Official videos from {channelName}</span>
           </div>
         </div>
-        <a
-          href={channelUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="channel-link-btn"
-          title="Visit official YouTube channel"
-        >
-          <svg className="yt-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
-          Channel
-        </a>
+        <div className="video-card-header-actions">
+          <a
+            href={channelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="channel-link-btn yt-btn"
+            title="Visit official YouTube channel"
+          >
+            <svg className="social-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            YouTube
+          </a>
+        </div>
       </div>
 
       <div className="yt-carousel-row">
-        {videos.map((vid: any, idx: number) => (
-          <a
-            key={vid.id || idx}
-            href={vid.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="yt-card-item"
-            title={`Watch: ${vid.title}`}
-          >
-            <div className="yt-thumb-wrapper">
-              <img
-                src={vid.thumbnail_url || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`}
-                alt={vid.title}
-                className="yt-thumb-img"
-                loading="eager"
-                decoding="async"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const img = e.currentTarget as HTMLImageElement;
-                  if (!img.src.includes("mqdefault")) {
-                    img.src = `https://i.ytimg.com/vi/${vid.id}/mqdefault.jpg`;
-                  }
-                }}
-              />
-              {vid.duration && <span className="yt-duration-badge">{vid.duration}</span>}
-            </div>
+        {videos.map((vid: any, idx: number) => {
+          const isShort = vid.type === "short" || (typeof vid.url === "string" && vid.url.includes("/shorts/"));
+          const categoryColor = getCategoryColor(vid.category);
+          const isFirst = idx === 0;
+          return (
+            <a
+              key={vid.id || idx}
+              href={vid.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="yt-card-item"
+              title={`Watch: ${vid.title}`}
+              style={{ animationDelay: `${idx * 80}ms` } as React.CSSProperties}
+            >
+              <div className="yt-thumb-wrapper">
+                <img
+                  src={vid.thumbnail_url || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`}
+                  alt={vid.title}
+                  className="yt-thumb-img"
+                  loading="eager"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (!img.src.includes("mqdefault")) {
+                      img.src = `https://i.ytimg.com/vi/${vid.id}/mqdefault.jpg`;
+                    }
+                  }}
+                />
 
-            <div className="yt-card-details">
-              <div className="yt-channel-avatar" title={vid.channel_name || "SR University Official"}>
-                <span>SRU</span>
+                {/* Central play button overlay — appears on hover */}
+                <div className="yt-play-overlay" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="#ef4444">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+
+                {/* "Watch" pill — slides up on hover, bottom-left */}
+                <span className="yt-watch-pill">▶ Watch</span>
+
+                {/* "New" pill on first video, top-left */}
+                {isFirst && <span className="yt-new-pill">New</span>}
+
+                {isShort ? (
+                  <span className="yt-duration-badge yt-short-badge">⚡ Shorts</span>
+                ) : vid.duration ? (
+                  <span className="yt-duration-badge">{vid.duration}</span>
+                ) : (
+                  <span className="yt-duration-badge">▶ Video</span>
+                )}
               </div>
 
-              <div className="yt-text-meta">
-                <h5 className="yt-video-title">{vid.title}</h5>
-                <div className="yt-submeta">
-                  <span className="yt-channel-name">{vid.channel_name || "SR University"}</span>
-                  {vid.category && <span className="yt-category-bullet"> • {vid.category}</span>}
+              <div className="yt-card-details">
+                <div className="yt-channel-avatar" title={vid.channel_name || "SR University"}>
+                  <span>SRU</span>
+                </div>
+
+                <div className="yt-text-meta">
+                  <h5 className="yt-video-title">{vid.title}</h5>
+                  <div className="yt-submeta">
+                    <span className="yt-channel-name">{vid.channel_name || "SR University"}</span>
+                    {vid.category && (
+                      <span className={`yt-category-tag yt-cat-${categoryColor}`}>{vid.category}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="yt-card-action" title="Open media" onClick={(e) => e.preventDefault()}>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7z"/>
+                  </svg>
                 </div>
               </div>
-
-              <div className="yt-card-action" title="More options" onClick={(e) => e.preventDefault()}>
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                  <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                </svg>
-              </div>
-            </div>
-          </a>
-        ))}
+            </a>
+          );
+        })}
       </div>
 
       <div className="video-card-footer">
@@ -273,9 +323,9 @@ export function VideoRecommendationsCard({ card }: { card: any }) {
           href={channelUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="more-videos-link"
+          className="more-videos-link yt-footer-link"
         >
-          Explore more videos on @SRUniversity YouTube ↗
+          Watch more on @SRUniversity YouTube ↗
         </a>
       </div>
     </div>

@@ -187,6 +187,28 @@ PERSONAL_RECORD_LOOKUP = re.compile(
     re.I,
 )
 
+# Common conversational university queries that can be classified fast without LLM round trip
+COMMON_UNIVERSITY_PHRASES = re.compile(
+    r"\b("
+    # Application/admission phrases
+    r"how\s+(?:do|can|to)\s+(?:i\s+)?(?:apply|get\s+admission|enroll|register|join)|"
+    r"what\s+(?:are\s+the\s+)?(?:steps?|process|procedure|requirements?|documents?)\s+(?:for|to)\s+(?:apply|admission|enrollment)|"
+    r"when\s+(?:does?|do|can)\s+(?:i\s+)?(?:apply|register|enroll|join)|"
+    # Information seeking about programs / facilities
+    r"tell\s+me\s+(?:about|more|everything)\s+(?:about\s+)?(?:the\s+)?(?:placement|hostel|fee|scholarship|campus|course|program|admission|department)|"
+    r"(?:more\s+)?(?:info|information|details?)\s+(?:about|on|regarding)\s+(?:placement|hostel|fee|scholarship|admission|campus)|"
+    r"what\s+is\s+the\s+(?:process|procedure|criteria|requirement|deadline)\s+(?:for|of|to)|"
+    # Comparison queries
+    r"(?:which|what)\s+(?:is\s+)?(?:better|good|best)\s+(?:branch|course|program|department)|"
+    r"(?:difference|diff)\s+between|"
+    # Direct inquiry patterns
+    r"(?:is\s+there|are\s+there|do\s+you\s+have)\s+(?:any\s+)?(?:hostel|bus|transport|scholarship|internship|lab|sports|gym|mess)|"
+    r"(?:how\s+much|what\s+is\s+the)\s+(?:fee|cost|charges?|rent|deposit)\s+(?:for|of)|"
+    r"how\s+many\s+(?:seats?|branches?|departments?|students?|companies?)"
+    r")\b",
+    re.IGNORECASE,
+)
+
 
 def fast_classify(message: str, conversation_context: str = "") -> IntentType | None:
     """Check fast regex patterns and keyword indicators."""
@@ -215,10 +237,10 @@ def fast_classify(message: str, conversation_context: str = "") -> IntentType | 
     if STUDENT_SPECIFIC_PATTERN.search(text):
         return "STUDENT_SPECIFIC"
 
-    # 4. University keyword check — even if query starts with a greeting
-    #    (e.g., "Hi, how to apply for admission?")
+    # 4. University keyword check & common conversational phrases
+    #    (e.g., "Hi, how to apply for admission?" or "how do I apply")
     words = set(re.findall(r"\w+", text.lower()))
-    if words & UNIVERSITY_KEYWORDS:
+    if (words & UNIVERSITY_KEYWORDS) or COMMON_UNIVERSITY_PHRASES.search(text):
         return "UNIVERSITY"
 
     # 5. Check for greetings that do not contain substantive questions
