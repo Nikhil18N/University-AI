@@ -345,3 +345,196 @@ export async function fetchAdminFeedback(adminKey: string): Promise<{ items: Fee
   if (!res.ok) throw new Error("Failed to fetch feedback");
   return res.json();
 }
+
+export interface AdminConversationItem {
+  id: string;
+  session_id: string;
+  title: string;
+  message_count: number;
+  user_message_count: number;
+  assistant_message_count: number;
+  positive_feedback_count: number;
+  negative_feedback_count: number;
+  created_at: string;
+  updated_at: string;
+  last_message_preview: string | null;
+}
+
+export interface AdminMessageFeedback {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}
+
+export interface AdminMessageDetail {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  model: string | null;
+  sources: Array<{
+    document_id: string;
+    title: string;
+    section?: string | null;
+    page?: number | null;
+    page_url?: string | null;
+    department?: string | null;
+  }> | null;
+  feedback: AdminMessageFeedback | null;
+  created_at: string;
+}
+
+export interface AdminConversationDetail {
+  id: string;
+  session_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages: AdminMessageDetail[];
+}
+
+export interface AdminConversationsResponse {
+  conversations: AdminConversationItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export async function fetchAdminConversations(
+  adminKey: string,
+  params: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    feedbackFilter?: string;
+  } = {}
+): Promise<AdminConversationsResponse> {
+  const query = new URLSearchParams();
+  if (params.page) query.set("page", String(params.page));
+  if (params.pageSize) query.set("page_size", String(params.pageSize));
+  if (params.search) query.set("search", params.search);
+  if (params.feedbackFilter) query.set("feedback_filter", params.feedbackFilter);
+
+  const res = await fetch(`${API_BASE}/api/v1/admin/conversations?${query.toString()}`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to fetch conversations");
+  return res.json();
+}
+
+export async function fetchAdminConversationDetail(
+  adminKey: string,
+  conversationId: string
+): Promise<AdminConversationDetail> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/conversations/${conversationId}`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to fetch conversation details");
+  return res.json();
+}
+
+export async function deleteAdminConversation(
+  adminKey: string,
+  conversationId: string
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/conversations/${conversationId}`, {
+    method: "DELETE",
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to delete conversation");
+}
+
+export async function promoteExemplar(
+  adminKey: string,
+  payload: { message_id: string; question: string; answer: string }
+): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/exemplars/promote`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Key": adminKey,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to promote exemplar");
+  }
+  return res.json();
+}
+
+export async function downloadAllConversations(
+  adminKey: string,
+  format: "markdown" | "json" = "markdown",
+  filters?: { search?: string; feedbackFilter?: string }
+): Promise<void> {
+  const query = new URLSearchParams();
+  query.set("format", format);
+  if (filters?.search) query.set("search", filters.search);
+  if (filters?.feedbackFilter && filters.feedbackFilter !== "all") {
+    query.set("feedback_filter", filters.feedbackFilter);
+  }
+
+  const res = await fetch(`${API_BASE}/api/v1/admin/conversations/export?${query.toString()}`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to export conversations dataset");
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const ext = format === "json" ? "json" : "md";
+  a.download = `university_ai_student_chats_${new Date().toISOString().slice(0, 10)}.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
+export interface EvaluationRecordItem {
+  id: string;
+  test_id: string | null;
+  category: string | null;
+  question: string;
+  expected_answer: string | null;
+  actual_answer: string;
+  groundedness_score: number;
+  latency_ms: number | null;
+  passed: boolean;
+  created_at: string | null;
+}
+
+export interface EvaluationListResponse {
+  total: number;
+  page: number;
+  page_size: number;
+  records: EvaluationRecordItem[];
+}
+
+export async function fetchAdminEvaluations(
+  adminKey: string,
+  page: number = 1,
+  pageSize: number = 50
+): Promise<EvaluationListResponse> {
+  const res = await fetch(
+    `${API_BASE}/api/v1/admin/evaluations?page=${page}&page_size=${pageSize}`,
+    {
+      headers: { "X-Admin-Key": adminKey },
+    }
+  );
+  if (!res.ok) throw new Error("Failed to load evaluation records");
+  return res.json();
+}
+
+export async function runAdminBenchmark(adminKey: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/evaluations/run`, {
+    method: "POST",
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to run benchmark suite");
+  return res.json();
+}
+
+
+

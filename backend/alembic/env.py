@@ -14,6 +14,7 @@ from app.db.base import Base
 from app.models.conversation import Conversation  # noqa: F401
 from app.models.message import Message  # noqa: F401
 from app.models.document import Document, DocumentVersion  # noqa: F401
+from app.models.evaluation import EvaluationRecord  # noqa: F401
 from app.models.feedback import Feedback  # noqa: F401
 
 config = context.config

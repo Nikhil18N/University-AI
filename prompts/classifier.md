@@ -22,6 +22,7 @@ Classify the user's message in the context of recent conversation into one of th
 - Only classify as UNIVERSITY if the user is asking a university-specific question, policy query, campus inquiry, or follow-up (e.g. "how much is that?", "what about late registration?", "where is it?", "can I sit for placements?").
 - If a message mixes casual chitchat, greetings, personal banter, or courtesy (e.g. "haha cool!", "yo bro thanks!", "lmao my roommate was so loud") WITH a university-related question or policy inquiry (e.g. "btw wht is the min elgblty for cse?", "anyway what time does the hostel close?"), ALWAYS classify it as UNIVERSITY so the question can be answered.
 - Recognize common student abbreviations, slang, and spelling errors (e.g. "admsn" = admission, "elgblty" = eligibility, "plcmnt" = placement, "pakg" = package, "attndnc" = attendance, "schlrshp" = scholarship, "hostle" = hostel, "clg" = college, "wht abt" = what about) as university inquiries.
+- Multilingual / Regional Slang Support: Recognize inquiries phrased in informal Telugu-English or Hinglish (e.g. "bhai cse fee kitni hai", "hostel lo wifi unda and mess food ela untundi", "attndnc 70% unte exam rayoccha", "direct admission process cheppandi") as UNIVERSITY inquiries.
 
 Recent Conversation:
 {{context}}

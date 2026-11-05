@@ -22,6 +22,13 @@ POST /api/v1/admin/documents/{id}/reindex
 DELETE /api/v1/admin/documents/{id}
 GET /api/v1/admin/stats
 GET /api/v1/admin/feedback
+GET /api/v1/admin/conversations
+GET /api/v1/admin/conversations/export
+GET /api/v1/admin/conversations/{conversation_id}
+DELETE /api/v1/admin/conversations/{conversation_id}
+POST /api/v1/admin/exemplars/promote
+
+
 
 ## Chat request example
 
@@ -104,5 +111,9 @@ GET /api/v1/admin/feedback
 ## Public Access Model
 For public anonymous access, endpoints use `session_id` (a browser-generated UUID stored in localStorage) to track conversations and feedback without requiring student login or signup. Admin endpoints (`/api/v1/admin/*`) require the `X-Admin-Key` header.
 GET `/api/v1/admin/feedback` returns feedback items with `question` and `answer` context. Positive feedback (rating=1) automatically indexes the Q&A into ChromaDB collection `verified_exemplars` for dynamic few-shot self-improvement.
+
+## Model Evaluation & Benchmark Endpoints (Admin Only)
+- `POST /api/v1/admin/evaluations/run`: Executes benchmark suite from `evaluation/evaluation_dataset.jsonl` against RAG and stores results in `evaluation_records`.
+- `GET /api/v1/admin/evaluations`: Paginated list of benchmark and response evaluation records with groundedness scores, latencies, and pass/fail indicators.
 
 Use consistent error schemas and HTTP status codes.

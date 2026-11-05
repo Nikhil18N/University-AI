@@ -79,6 +79,13 @@ HANDBOOK_DOCS = [
         "department": "Admissions & Financial Aid",
         "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
     },
+    {
+        "file": "09_verified_sru_facts.md",
+        "title": "SRU Verified Knowledge Registry — Official Facts & Standards",
+        "document_type": "registry",
+        "department": "Admissions & University Administration",
+        "effective_date": datetime(2025, 8, 1, tzinfo=timezone.utc),
+    },
 ]
 
 

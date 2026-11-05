@@ -1,0 +1,399 @@
+/* ==========================================================================
+   ScholarshipCalculatorModal.css
+   Modern, responsive modal for SR University Fee & Scholarship Calculator
+   ========================================================================== */
+
+.scholarship-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: calcFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes calcFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.scholarship-modal-card {
+  background: var(--surface-1, #1e1e1e);
+  color: var(--text, #f3f4f6);
+  border: 1px solid var(--border, #333333);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 20px;
+  animation: calcSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes calcSlideUp {
+  from {
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.calc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border, #2d2d2d);
+  padding-bottom: 14px;
+}
+
+.calc-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.calc-icon {
+  font-size: 2rem;
+  background: rgba(99, 102, 241, 0.15);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-1, #ffffff);
+}
+
+.calc-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+.calc-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.calc-close-btn:hover {
+  background: var(--surface-2, #2d2d2d);
+  color: var(--text, #ffffff);
+}
+
+/* Form controls */
+.calc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calc-grid-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted, #9ca3af);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.calc-field select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface-2, #262626);
+  color: var(--text, #ffffff);
+  border: 1px solid var(--border, #3f3f46);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.calc-field select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.calc-submit-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.calc-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.calc-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Result Box */
+.calc-result-box {
+  background: var(--surface-2, #18181b);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: calcFadeIn 0.25s ease;
+}
+
+.result-top-badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.award-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.exam-tag {
+  font-size: 0.8rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+.fee-comparison-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  background: var(--surface-1, #121212);
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.fee-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+}
+
+.stat-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text, #ffffff);
+}
+
+.stat-val.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-muted, #71717a);
+  font-weight: 500;
+}
+
+.stat-val.savings {
+  color: #34d399;
+}
+
+.stat-val.payable {
+  color: #818cf8;
+  font-size: 1.3rem;
+}
+
+/* Progression table for CSE */
+.progression-table-wrap {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border, #2d2d2d);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.progression-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-muted, #d1d5db);
+}
+
+.progression-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.prog-col {
+  background: var(--surface-2, #262626);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.prog-yr {
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+.prog-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #a5b4fc;
+}
+
+/* Notes */
+.calc-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-muted, #d1d5db);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.note-item {
+  line-height: 1.4;
+}
+
+.note-item.special-scholarship {
+  color: #f472b6;
+}
+
+/* Footer Action */
+.calc-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-ask-buddy {
+  background: var(--surface-2, #262626);
+  color: var(--text, #ffffff);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.btn-ask-buddy:hover {
+  background: #4f46e5;
+  border-color: #6366f1;
+  color: #ffffff;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .scholarship-modal-card {
+  background: #ffffff;
+  color: #1f2937;
+  border-color: #e5e7eb;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .calc-header h3 {
+  color: #111827;
+}
+
+[data-theme="light"] .calc-field select {
+  background: #f9fafb;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .calc-result-box {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .fee-comparison-row {
+  background: #ffffff;
+}
+
+[data-theme="light"] .prog-col {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] .prog-val {
+  color: #4338ca;
+}
+
+[data-theme="light"] .calc-notes {
+  background: #f8fafc;
+  color: #4b5563;
+}
+
+[data-theme="light"] .btn-ask-buddy {
+  background: #f3f4f6;
+  color: #1f2937;
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .btn-ask-buddy:hover {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .progression-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

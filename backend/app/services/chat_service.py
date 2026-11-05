@@ -599,6 +599,12 @@ async def handle_chat_stream(
                         # Cache verified RAG response
                         await set_cached_answer(redis_client, search_query, answer, sources)
 
+                    # Stage 8: Mandatory disclaimer verification in stream
+                    if not any(term in answer for term in ["May contain inaccuracies", "Verify with official university"]):
+                        disclaimer_delta = "\n\n> ⚠️ *May contain inaccuracies. Verify with official university sources.*"
+                        answer += disclaimer_delta
+                        yield f"data: {json.dumps({'type': 'token', 'delta': disclaimer_delta})}\n\n"
+
             else:
                 system_prompt = prompt_service.load_prompt("system")
                 guidance = build_counsellor_guidance(profile, current_query=request.message)
