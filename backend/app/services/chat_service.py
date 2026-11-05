@@ -399,6 +399,7 @@ async def handle_chat_stream(
         flow_info: dict | None = None
         answer = ""
         query_embedding: list[float] | None = None
+        profile: dict = {}
 
         # Check for guided flow or video confirmation/decline
         is_video_yes, is_video_no = check_video_affirmative_or_negative(
@@ -677,4 +678,5 @@ async def handle_chat_stream(
 
     except Exception as e:
         logger.error("Chat stream error: %s", e, exc_info=True)
-        yield f"data: {json.dumps({'type': 'error', 'detail': str(e)})}\n\n"
+        user_message = "Something went wrong while connecting to the university server. Please try again in a moment."
+        yield f"data: {json.dumps({'type': 'error', 'detail': user_message})}\n\n"

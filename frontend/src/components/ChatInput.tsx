@@ -10,7 +10,7 @@ interface Props {
 }
 
 const QUICK_ACTIONS = [
-  { label: "🧭 Admission Wizard 2026", prompt: "I want admission - start the admission wizard" },
+  { label: "🧭 Admission Wizard 2027-28", prompt: "I want admission - start the admission wizard" },
   { label: "💰 Fee & Scholarship Guide", prompt: "What is the complete fee structure and merit scholarship for B.Tech?" },
   { label: "🏠 Hostel Rules & Curfew", prompt: "What are the hostel rules, mess schedule, and curfew timings?" },
   { label: "📊 Placement Highlights", prompt: "Tell me about SR University placement records and top recruiters" },
@@ -53,10 +53,7 @@ export default function ChatInput({ onSend, isLoading, onStop, disabled }: Props
 
   const handleSubmit = () => {
     const trimmed = text.trim();
-    if (!trimmed || disabled) return;
-    if (isLoading && onStop) {
-      onStop();
-    }
+    if (!trimmed || disabled || isLoading) return;
     onSend(trimmed);
     setText("");
     setShowPlusMenu(false);
@@ -68,11 +65,14 @@ export default function ChatInput({ onSend, isLoading, onStop, disabled }: Props
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit();
+      if (!isLoading) {
+        handleSubmit();
+      }
     }
   };
 
   const handleQuickPromptClick = (prompt: string) => {
+    if (isLoading) return;
     setShowPlusMenu(false);
     onSend(prompt);
   };

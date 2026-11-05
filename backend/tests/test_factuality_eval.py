@@ -12,8 +12,8 @@ class TestFactualityEvaluation:
     def test_btech_cutoff_grounded_answer(self):
         answer = (
             "Candidates seeking admission to B.Tech programs at SR University must have passed "
-            "10+2 or Intermediate with a minimum of 60% aggregate marks in PCM (Mathematics, Physics, Chemistry). "
-            "This corresponds to 600 marks out of 1000 in standard board examinations."
+            "10+2 or Intermediate with a minimum of 50% aggregate marks in PCM (Mathematics, Physics, Chemistry). "
+            "This corresponds to 500 marks out of 1000 in standard board examinations."
         )
         res = evaluate_answer_factuality("btech_eligibility_cutoff", answer)
         assert res.is_faithful is True
@@ -83,8 +83,8 @@ class TestFactualityEvaluation:
 
     def test_cse_tuition_fee_grounded(self):
         answer = (
-            "The annual tuition fee for B.Tech Computer Science and Engineering (CSE) at SR University "
-            "is Rs. 2,10,000 per year, payable on a semester basis of Rs. 1,05,000 per semester."
+            "The official tuition fee for B.Tech Computer Science and Engineering (CSE) at SR University "
+            "is ₹1,47,500 per semester, which equals ₹2,95,000 per year for annual tuition."
         )
         res = evaluate_answer_factuality("btech_cse_tuition_fee", answer)
         assert res.is_faithful is True
@@ -101,12 +101,12 @@ class TestFactualityEvaluation:
 
     def test_full_benchmark_batch_evaluation(self):
         sample_grounded_answers = {
-            "btech_eligibility_cutoff": "Candidates must have 60% in 10+2 PCM (600/1000 marks) for B.Tech.",
+            "btech_eligibility_cutoff": "Candidates must have 50% in 10+2 PCM (500/1000 marks) for B.Tech.",
             "direct_admission_entrance_exam": "No entrance exam is required for direct quota admission based on 10+2 board marks.",
             "attendance_minimum_requirement": "Students must have 75% attendance. 50% attendance is strictly not allowed.",
             "attendance_condonation_policy": "Attendance between 65% and 74% can be granted condonation for genuine medical reasons.",
-            "btech_cse_tuition_fee": "The annual tuition fee for CSE is Rs. 2,10,000/- per year.",
-            "merit_scholarships_slabs": "Students scoring 97%+ get up to 30% scholarship, and 90% to 96.9% get up to 20% scholarship.",
+            "btech_cse_tuition_fee": "The official tuition fee for CSE is ₹1,47,500 per semester (₹2,95,000 per year).",
+            "merit_scholarships_slabs": "Students scoring 92% to 97.99% in intermediate qualify for a 40% merit scholarship for CSE.",
             "highest_placement_package": "The highest package is 51 LPA at Microsoft and average package is 6 LPA.",
         }
         benchmark_summary = evaluate_all_benchmark_answers(sample_grounded_answers)

@@ -52,25 +52,25 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
         question="What is the minimum eligibility criteria for B.Tech admission at SR University?",
         handbook_source="data/handbook/08_admissions_fees_scholarships_and_eligibility.md",
         ground_truth_claims=[
-            "Minimum 60% aggregate marks in 10+2 / Intermediate PCM",
-            "Corresponds to 600 marks out of 1000",
+            "Minimum 50% aggregate marks in 10+2 / Intermediate PCM",
+            "Corresponds to 500 marks out of 1000",
             "Applies uniformly across all engineering branches",
         ],
         required_keywords_any=[
-            ["60%", "60 percent", "600"],
+            ["50%", "50 percent", "500"],
             ["10+2", "12th", "intermediate", "pcm", "qualifying"],
         ],
         prohibited_hallucinations=[
             (
-                re.compile(r"(?:minimum\s+)?(?:50|55|70|75|80)\s*%\s*(?:cutoff|aggregate|marks|percentage|required|eligibility)", re.I),
-                "Hallucinated cutoff: B.Tech cutoff is strictly 60%, not 50%, 55%, 70%, 75%, or 80%",
+                re.compile(r"(?:(?:minimum|cutoff|aggregate|marks|percentage|required|eligibility)\b.*?\b(?:60|65|70|75|80)\s*%|(?:60|65|70|75|80)\s*%\s*(?:cutoff|aggregate|marks|percentage|required|eligibility))", re.I),
+                "Hallucinated cutoff: B.Tech cutoff is officially 50%, not 60%, 65%, 70%, 75%, or 80%",
             ),
             (
-                re.compile(r"\b(599|590|580|550|500)\s*(?:out\s+of\s+1000|\/1000)?\s*(?:is\s+eligible|qualifies|accepted)\b", re.I),
-                "Hallucination: Marks below 600/1000 claimed as eligible",
+                re.compile(r"\b(499|480|450|400)\s*(?:out\s+of\s+1000|\/1000)?\s*(?:is\s+eligible|qualifies|accepted)\b", re.I),
+                "Hallucination: Marks below 500/1000 claimed as unconditionally eligible",
             ),
         ],
-        allowed_numbers=["60%", "600", "1000", "10+2", "12th", "8331003030", "8331004040"],
+        allowed_numbers=["50%", "500", "58%", "52%", "1000", "10+2", "12th", "0870-2818333", "0870-2818311"],
     ),
     "direct_admission_entrance_exam": FactualityBenchmarkItem(
         policy_id="direct_admission_entrance_exam",
@@ -142,19 +142,21 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
         question="What is the annual tuition fee for B.Tech Computer Science (CSE)?",
         handbook_source="data/handbook/08_admissions_fees_scholarships_and_eligibility.md",
         ground_truth_claims=[
-            "Annual tuition fee for CSE is Rs. 2,10,000/- per year",
-            "Semester-wise fee is Rs. 1,05,000/- per semester",
+            "Official tuition fee for CSE is ₹1,47,500 per semester",
+            "Annual tuition fee is ₹2,95,000 per year",
+            "One-time fees include ₹5,000 enrollment and ₹25,000 admission fee",
         ],
         required_keywords_any=[
-            ["2,10,000", "210000", "2.10 lakh", "2.1 lakh", "2.10lakh", "2,10,000/-"],
+            ["1,47,500", "147500", "2,95,000", "295000", "1.475", "2.95"],
+            ["semester", "per year", "annual"],
         ],
         prohibited_hallucinations=[
             (
-                re.compile(r"\b(?:rs\.?|inr|₹)?\s*(?:50,000|1,00,000|3,50,000|5,00,000|5\s*lakhs?|10\s*lakhs?)\b", re.I),
-                "Hallucination: Fabricated tuition fee number for CSE",
+                re.compile(r"\b(?:rs\.?|inr|₹)?\s*(?:50,000|1,40,000|2,10,000|5,00,000|10\s*lakhs?)\b", re.I),
+                "Hallucination: Outdated or fabricated tuition fee number for CSE (must be ₹1,47,500/semester = ₹2,95,000/yr)",
             ),
         ],
-        allowed_numbers=["2,10,000", "1,05,000", "2.1", "2.10", "20,000", "30,000"],
+        allowed_numbers=["1,47,500", "2,95,000", "5,000", "25,000", "30,000", "3,25,000", "147500", "295000"],
     ),
     "merit_scholarships_slabs": FactualityBenchmarkItem(
         policy_id="merit_scholarships_slabs",
@@ -162,23 +164,22 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
         question="What merit scholarships does SR University offer for intermediate students?",
         handbook_source="data/handbook/08_admissions_fees_scholarships_and_eligibility.md",
         ground_truth_claims=[
-            "Merit scholarships are awarded strictly based on 12th / Intermediate marks",
-            "97%+ (970+ marks out of 1000) qualifies for up to 30% scholarship",
-            "90% to 96.9% (900-969 marks out of 1000) qualifies for up to 20% scholarship",
-            "Allocated on a first-come, first-served basis",
+            "Merit scholarships are awarded strictly based on 12th / Intermediate marks or entrance ranks",
+            "92% to 97.99% in Intermediate qualifies for 40% scholarship for CSE",
+            "98%+ qualifies for 50% to 100% scholarship",
+            "85% to 91.99% qualifies for 25% scholarship",
         ],
         required_keywords_any=[
-            ["30%", "30 percent"],
-            ["20%", "20 percent"],
-            ["97", "970", "90", "900"],
+            ["40%", "40 percent"],
+            ["scholarship", "merit", "concession", "waiver"],
         ],
         prohibited_hallucinations=[
             (
-                re.compile(r"\b(100%\s*(full\s*scholarship|free\s*ride|guaranteed\s*free))\b", re.I),
+                re.compile(r"\b(100%\s*(full\s*scholarship|free\s*ride|guaranteed\s*free)\s*for\s*all)\b", re.I),
                 "Hallucination: Claiming 100% full fee waiver is unconditionally guaranteed for all intermediate students",
             ),
         ],
-        allowed_numbers=["30%", "20%", "97%", "90%", "970", "1000", "900", "969"],
+        allowed_numbers=["40%", "50%", "100%", "25%", "15%", "92%", "98%", "85%", "75%", "88,500", "1,77,000"],
     ),
     "highest_placement_package": FactualityBenchmarkItem(
         policy_id="highest_placement_package",
