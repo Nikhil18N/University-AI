@@ -31,6 +31,15 @@ from app.services.profile_service import build_counsellor_guidance, extract_stud
 from app.services.rag_service import RAGService
 from app.services.reformulation_service import needs_reformulation, reformulate_query
 from app.services.suggestion_service import generate_suggestions
+from app.services.video_service import (
+    check_video_affirmative_or_negative,
+    create_video_card,
+    format_video_offer_prompt,
+    get_post_video_suggestions,
+    get_relevant_videos,
+    get_semantic_videos,
+    is_explicit_video_query,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -165,12 +174,49 @@ async def handle_chat(
 
     sources: list[dict] = []
     flow_info: dict | None = None
+    is_video_yes = False
+    is_video_no = False
+    semantic_videos: list[dict] = []
+
+    # Check if user is confirming or declining a prior video tour offer
+    is_video_yes, is_video_no = check_video_affirmative_or_negative(
+        request.message, recent
+    )
+
+    if is_video_yes:
+        last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
+        matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+        if not matching_videos and rag_service:
+            prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
+            if prior_user_msg:
+                try:
+                    prior_embs = await rag_service.embeddings.embed([prior_user_msg["content"]])
+                    matching_videos = get_semantic_videos(prior_embs[0], limit=2, max_distance=0.30)
+                except Exception:
+                    matching_videos = None
+
+        cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
+        answer = f"Here is the official video tour of our {cat}:"
+        cards = [create_video_card(matching_videos, is_explicit=True)] if matching_videos else []
+        suggestions = get_post_video_suggestions(cat)
+        intent = "UNIVERSITY"
+        profile = extract_student_profile(recent)
+
+    elif is_video_no:
+        answer = "No problem at all! Feel free to ask anything else about SR University."
+        cards = []
+        suggestions = [
+            "🎯 B.Tech Admissions",
+            "💰 Fee Structure",
+            "📊 Placement Records",
+            "🔬 Lab Facilities",
+        ]
+        intent = "ACKNOWLEDGMENT"
+        profile = extract_student_profile(recent)
 
     # Check for guided conversation flow (Admission Wizard)
-    is_wizard_trigger = detect_flow_trigger(request.message) is not None
-    wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
-
-    if is_wizard_trigger or wizard_step:
+    elif detect_flow_trigger(request.message) is not None or get_wizard_step_from_history(recent[:-1], request.message):
+        wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
         if not wizard_step:
             wizard_step = {
                 "flow_name": "admission_wizard",
@@ -244,21 +290,37 @@ async def handle_chat(
             answer = await llm_provider.generate(messages)
             logger.info("Handled via conversational LLM (%s)", intent)
 
-    # 6. Generate smart suggestion chips and rich cards
-    suggestions = generate_suggestions(
-        intent=intent,
-        user_message=request.message,
-        answer=answer,
-        sources=sources,
-        profile=profile,
-        flow_state=flow_info,
-    )
-    cards = generate_cards(
-        user_message=request.message,
-        answer=answer,
-        profile=profile,
-        sources=sources,
-    )
+    # Pure Semantic Vector Search for Video Recommendations (Zero Keywords)
+    explicit_video = is_explicit_video_query(request.message)
+    query_embedding = getattr(rag_service, "last_query_embedding", None)
+
+    if not is_video_yes and not is_video_no:
+        if query_embedding:
+            semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
+            if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                cat = semantic_videos[0].get("category", "our campus")
+                answer = format_video_offer_prompt(answer, cat)
+
+        # 6. Generate smart suggestion chips and rich cards
+        suggestions = generate_suggestions(
+            intent=intent,
+            user_message=request.message,
+            answer=answer,
+            sources=sources,
+            profile=profile,
+            flow_state=flow_info,
+        )
+        if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+            suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
+
+        cards = generate_cards(
+            user_message=request.message,
+            answer=answer,
+            profile=profile,
+            sources=sources,
+            query_embedding=query_embedding,
+            is_video_confirmed=is_video_yes,
+        )
 
     # 7. Save assistant message with metadata
     assistant_msg = await conversation_service.add_message(
@@ -268,7 +330,13 @@ async def handle_chat(
         content=answer,
         model=settings.LLM_MODEL,
         sources=sources if sources else None,
-        metadata={"suggestions": suggestions, "cards": cards, "flow": flow_info},
+        metadata={
+            "suggestions": suggestions,
+            "cards": cards,
+            "flow": flow_info,
+            "matched_videos": semantic_videos if semantic_videos else None,
+            "video_offer": bool(semantic_videos and not explicit_video and intent == "UNIVERSITY"),
+        },
     )
 
     # 8. Auto-title on first exchange
@@ -330,12 +398,54 @@ async def handle_chat_stream(
         sources: list[dict] = []
         flow_info: dict | None = None
         answer = ""
+        query_embedding: list[float] | None = None
 
-        # Check for guided flow
-        is_wizard_trigger = detect_flow_trigger(request.message) is not None
-        wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
+        # Check for guided flow or video confirmation/decline
+        is_video_yes, is_video_no = check_video_affirmative_or_negative(
+            request.message, recent
+        )
 
-        if is_wizard_trigger or wizard_step:
+        if is_video_yes:
+            last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
+            matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+            if not matching_videos and rag_service:
+                prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
+                if prior_user_msg:
+                    try:
+                        prior_embs = await rag_service.embeddings.embed([prior_user_msg["content"]])
+                        matching_videos = get_semantic_videos(prior_embs[0], limit=2, max_distance=0.30)
+                    except Exception:
+                        matching_videos = None
+
+            cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
+            answer = f"Here is the official video tour of {cat}:"
+            cards = [create_video_card(matching_videos, is_explicit=True)] if matching_videos else []
+            suggestions = get_post_video_suggestions(cat)
+            intent = "UNIVERSITY"
+            profile = {}
+
+            for chunk in chunk_text_stream(answer):
+                yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                await asyncio.sleep(0.01)
+
+        elif is_video_no:
+            answer = "No problem at all! Feel free to ask anything else about SR University."
+            cards = []
+            suggestions = [
+                "🎯 B.Tech Admissions",
+                "💰 Fee Structure",
+                "📊 Placement Records",
+                "🔬 Lab Facilities",
+            ]
+            intent = "ACKNOWLEDGMENT"
+            profile = {}
+
+            for chunk in chunk_text_stream(answer):
+                yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                await asyncio.sleep(0.01)
+
+        elif detect_flow_trigger(request.message) is not None or get_wizard_step_from_history(recent[:-1], request.message):
+            wizard_step = get_wizard_step_from_history(recent[:-1], request.message)
             if not wizard_step:
                 wizard_step = {
                     "flow_name": "admission_wizard",
@@ -501,21 +611,41 @@ async def handle_chat_stream(
                     yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
                 answer = "".join(streamed_tokens)
 
-        # Suggestions and rich cards
-        suggestions = generate_suggestions(
-            intent=intent,
-            user_message=request.message,
-            answer=answer,
-            sources=sources,
-            profile=profile,
-            flow_state=flow_info,
-        )
-        cards = generate_cards(
-            user_message=request.message,
-            answer=answer,
-            profile=profile,
-            sources=sources,
-        )
+        semantic_videos = []
+        explicit_video = is_explicit_video_query(request.message)
+
+        if not is_video_yes and not is_video_no:
+            if query_embedding:
+                semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
+                if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                    cat = semantic_videos[0].get("category", "our campus")
+                    new_answer = format_video_offer_prompt(answer, cat)
+                    if new_answer != answer:
+                        delta_prompt = new_answer[len(answer):]
+                        for chunk in chunk_text_stream(delta_prompt):
+                            yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                        answer = new_answer
+
+            # Suggestions and rich cards
+            suggestions = generate_suggestions(
+                intent=intent,
+                user_message=request.message,
+                answer=answer,
+                sources=sources,
+                profile=profile,
+                flow_state=flow_info,
+            )
+            if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
+
+            cards = generate_cards(
+                user_message=request.message,
+                answer=answer,
+                profile=profile,
+                sources=sources,
+                query_embedding=query_embedding,
+                is_video_confirmed=is_video_yes,
+            )
 
         # Save to database
         assistant_msg = await conversation_service.add_message(
@@ -525,7 +655,13 @@ async def handle_chat_stream(
             content=answer,
             model=settings.LLM_MODEL,
             sources=sources if sources else None,
-            metadata={"suggestions": suggestions, "cards": cards, "flow": flow_info},
+            metadata={
+                "suggestions": suggestions,
+                "cards": cards,
+                "flow": flow_info,
+                "matched_videos": semantic_videos if semantic_videos else None,
+                "video_offer": bool(semantic_videos and not explicit_video and intent == "UNIVERSITY"),
+            },
         )
 
         if conversation.title == "New conversation":

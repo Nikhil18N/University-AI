@@ -411,6 +411,12 @@
   max-width: 100%;
 }
 
+/* Replace generic icon with YouTube-red left border accent */
+.video-recommendations-card.yt-red-border {
+  border-top: none;
+  border-left: 3px solid #ef4444;
+}
+
 .video-card-header {
   display: flex;
   justify-content: space-between;
@@ -427,7 +433,25 @@
 }
 
 .video-header-icon {
-  font-size: 1.1rem;
+  display: none;
+}
+
+.yt-header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.yt-count-pill {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  white-space: nowrap;
 }
 
 .video-card-title {
@@ -553,6 +577,20 @@
   cursor: pointer;
   scroll-snap-align: start;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* Staggered entrance */
+  opacity: 0;
+  animation: yt-card-entrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes yt-card-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .yt-card-item:hover {
@@ -606,6 +644,86 @@
   border-radius: 4px;
   letter-spacing: 0.02em;
   line-height: 1.2;
+}
+
+.yt-short-badge {
+  background: rgba(239, 68, 68, 0.95);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Central Play Button Overlay ── */
+.yt-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.yt-play-overlay svg {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+}
+
+.yt-play-overlay::before {
+  content: "";
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.yt-card-item:hover .yt-play-overlay {
+  opacity: 1;
+}
+
+/* ── "Watch" pill — slides up on hover ── */
+.yt-watch-pill {
+  position: absolute;
+  bottom: 32px;
+  left: 7px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 3;
+  white-space: nowrap;
+}
+
+.yt-card-item:hover .yt-watch-pill {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── "New" pill — top-left corner of first card ── */
+.yt-new-pill {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  z-index: 4;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Details row below thumbnail (Avatar + Text + 3-dots) */
@@ -678,6 +796,31 @@
 .yt-category-bullet {
   color: var(--text-2, #606060);
 }
+
+/* ── Category color-coded tags ── */
+.yt-category-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  letter-spacing: 0.2px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.yt-cat-blue   { background: #dbeafe; color: #1d4ed8; }
+.yt-cat-purple { background: #ede9fe; color: #7c3aed; }
+.yt-cat-green  { background: #dcfce7; color: #15803d; }
+.yt-cat-orange { background: #ffedd5; color: #c2410c; }
+.yt-cat-teal   { background: #ccfbf1; color: #0f766e; }
+.yt-cat-red    { background: #fee2e2; color: #dc2626; }
+.yt-cat-yellow { background: #fef3c7; color: #b45309; }
+.yt-cat-grey   { background: #f1f5f9; color: #475569; }
 
 /* 3-dots action icon on the right */
 .yt-card-action {

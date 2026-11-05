@@ -31,6 +31,13 @@ PLACEMENT_SUGGESTIONS = [
     "🤝 SRiX Startup Incubator",
 ]
 
+PLACEMENT_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "💼 Top Recruiters",
+    "📈 Highest Package",
+]
+
 FEE_SUGGESTIONS = [
     "🎓 Merit Scholarships",
     "💳 Payment Schedule",
@@ -43,6 +50,34 @@ HOSTEL_SUGGESTIONS = [
     "🍽️ Mess & Food Quality",
     "🕒 Hostel Timings & Rules",
     "🚌 Campus Transport",
+]
+
+HOSTEL_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "🍽️ Mess & Food Quality",
+    "🕒 Hostel Timings & Rules",
+]
+
+CAMPUS_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "🔬 Specialized AI Labs",
+    "⚽ Sports Arena",
+]
+
+SRIX_VIDEO_OFFER_SUGGESTIONS = [
+    "🎥 Yes, watch video",
+    "❌ No, thanks",
+    "🚀 Student Startups",
+    "🤝 Seed Funding & Grants",
+]
+
+TRANSPORT_SUGGESTIONS = [
+    "🚌 Bus Timings",
+    "💳 Transport Fee",
+    "📍 Warangal & Hanamkonda Routes",
+    "🏠 Hostel Facilities",
 ]
 
 CURRICULUM_SUGGESTIONS = [
@@ -107,8 +142,19 @@ def generate_suggestions(
             "💼 Placement Records & CTC",
         ]
 
+    # 2b-2. Transport & Bus queries (no videos)
+    if any(k in msg_lower for k in ("bus", "buses", "transport", "transportation", "commute", "van", "route", "rtc")):
+        return TRANSPORT_SUGGESTIONS
+
     # 2c. Video or Tour explicit query
-    if any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like")):
+    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like"))
+    if is_explicit_video:
+        if "hostel" in msg_lower:
+            return HOSTEL_SUGGESTIONS
+        if "srix" in msg_lower:
+            return SRIX_VIDEO_OFFER_SUGGESTIONS
+        if "placement" in msg_lower:
+            return PLACEMENT_SUGGESTIONS
         return VIDEO_TOUR_SUGGESTIONS
 
     # 3. Eligibility & Cutoff
@@ -124,31 +170,43 @@ def generate_suggestions(
 
     # 5. Placements & Jobs
     if any(k in msg_lower for k in ("placement", "package", "ctc", "recruiter", "job", "internship", "hiring", "salary")):
+        if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
+            return PLACEMENT_VIDEO_OFFER_SUGGESTIONS
         return PLACEMENT_SUGGESTIONS
 
     # 6. Fees, Tuition & Scholarships
     if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "scholarship", "caution deposit")):
         return FEE_SUGGESTIONS
 
-    # 7. Hostels, Mess & Campus Life
-    if any(k in msg_lower for k in ("hostel", "mess", "food", "room", "curfew", "timing", "campus", "sports", "bus", "transport")):
-        return HOSTEL_SUGGESTIONS
+    # 7. Startups & SRiX incubator
+    if any(k in msg_lower for k in ("srix", "startup", "incubator", "entrepreneur")):
+        return SRIX_VIDEO_OFFER_SUGGESTIONS
 
-    # 8. Courses & Curriculum
+    # 8. Hostels, Mess & Living
+    if any(k in msg_lower for k in ("hostel", "mess", "food", "room", "curfew", "timing", "warden")):
+        return HOSTEL_VIDEO_OFFER_SUGGESTIONS
+
+    # 9. Campus Life & Infrastructure
+    if any(k in msg_lower for k in ("campus", "infrastructure", "library", "blocks")):
+        return CAMPUS_VIDEO_OFFER_SUGGESTIONS
+
+    # 10. Courses & Curriculum
     if any(k in msg_lower for k in ("curriculum", "syllabus", "subject", "courses", "credits", "labs")):
         return CURRICULUM_SUGGESTIONS
 
-    # 9. Greeting / General conversational
+    # 11. Greeting / General conversational
     if intent in ("GREETING", "HOW_ARE_YOU", "HELP", "ACKNOWLEDGMENT", "THANKS"):
         return DEFAULT_GREETING_SUGGESTIONS
 
-    # 10. Default contextual fallbacks
+    # 12. Default contextual fallbacks
     # Check if answer mentions placements, fees, or hostels
     if "placement" in ans_lower or "lpa" in ans_lower:
         return PLACEMENT_SUGGESTIONS
     if "fee" in ans_lower or "rs." in ans_lower or "₹" in ans_lower:
         return FEE_SUGGESTIONS
     if "hostel" in ans_lower:
-        return HOSTEL_SUGGESTIONS
+        return HOSTEL_VIDEO_OFFER_SUGGESTIONS
+    if "campus" in ans_lower:
+        return CAMPUS_VIDEO_OFFER_SUGGESTIONS
 
     return DEFAULT_UNIVERSITY_SUGGESTIONS

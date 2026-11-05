@@ -250,9 +250,11 @@ class RAGService:
         query_embedding = None
         try:
             chunks, query_embedding = await self.retrieve_with_embedding(retrieval_query, top_k=top_k)
+            self.last_query_embedding = query_embedding
         except Exception as e:
             logger.error("RAG retrieval failed: %s. Proceeding with fallback.", e)
             chunks = []
+            self.last_query_embedding = None
         effective_question = question
         clean_q = question.lower().strip(" .!?,")
         if search_query and (

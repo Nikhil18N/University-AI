@@ -152,6 +152,8 @@ def generate_cards(
     answer: str,
     profile: dict | None = None,
     sources: list[dict] | None = None,
+    query_embedding: list[float] | None = None,
+    is_video_confirmed: bool = False,
 ) -> list[dict]:
     """Generate structured interactive cards based on message context and student profile."""
     cards = []
@@ -174,17 +176,25 @@ def generate_cards(
     ):
         cards.append(CURRICULUM_CARD)
 
-    # 4. Campus tour card (render static spot highlights if not explicitly asking for video/reels)
-    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "reel", "reels", "insta", "instagram"))
-    if not is_video_query and any(k in msg_lower for k in ("campus", "tour", "facilities", "campus life", "hostels and campus")):
+    # 4. Campus tour card (render static spot highlights if explicitly asking for campus walkthrough/tour)
+    is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "tour", "shorts"))
+    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
 
-    # 5. University YouTube & Instagram Media Recommendations (Contextual & Discoverable)
-    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "tour", "walkthrough", "drone", "reel", "reels", "insta", "instagram"))
-    relevant_videos = get_relevant_videos(user_message, answer, sources)
-    if relevant_videos:
-        cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_video))
+    # 5. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
+    # Zero keyword matching: relevance is governed purely by ChromaDB semantic cosine distance.
+    # Attached only when explicitly requested or confirmed via affirmative Yes/No response.
+    if (is_video_query or is_video_confirmed) and query_embedding:
+        relevant_videos = get_relevant_videos(
+            user_message=user_message,
+            answer=answer,
+            sources=sources,
+            query_embedding=query_embedding,
+            is_explicit=is_video_query,
+        )
+        if relevant_videos:
+            cards.append(create_video_card(relevant_videos, is_explicit=True))
 
     # 5. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):
