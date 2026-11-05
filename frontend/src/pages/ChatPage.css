@@ -374,6 +374,50 @@
   color: var(--sru-blue);
 }
 
+.calc-nav-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.calc-nav-pill-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366f1;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .calc-nav-pill-btn {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+
+[data-theme="light"] .calc-nav-pill-btn:hover {
+  background: #ddd6fe;
+  border-color: #7c3aed;
+  color: #5b21b6;
+}
+
+@media (max-width: 640px) {
+  .calc-nav-pill-btn .calc-nav-text {
+    display: none;
+  }
+  .calc-nav-pill-btn {
+    padding: 6px 8px;
+  }
+}
+
 /* Export Dropdown Menu */
 .export-menu-container {
   position: relative;

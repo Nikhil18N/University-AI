@@ -135,6 +135,13 @@ UNIVERSITY_KEYWORDS = {
     "discount", "discounts", "concession", "concessions", "waiver", "waivers",
     "dorm", "dorms", "dormitory", "inter", "intermediate", "12th", "pcm", "boards",
     "salary", "salaries", "package", "packages",
+    # Academic regulations & detention
+    "detention", "detained", "condonation", "condone", "backlog", "backlogs",
+    "revaluation", "reval", "supplementary", "outpass", "inpass",
+    # Telugu-English / Hinglish student colloquialisms
+    "kitna", "kitni", "kitne", "kaise", "kahan", "kab", "chahiye", "milega", "padhai",
+    "entha", "eppudu", "ekkada", "ela", "untundi", "untada", "vasthunda", "vasthadi",
+    "cheppandi", "cheppu", "undaa", "undi", "ledu", "kaadu", "anna", "bhai",
 }
 
 

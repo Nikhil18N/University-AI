@@ -75,8 +75,44 @@ async def ensure_documents_seeded() -> int:
 
         new_count = collection.count()
         logger.info("Document auto-seeding completed. Total chunks in ChromaDB: %d", new_count)
+
+        # Also ensure foundational verified exemplars are seeded
+        await ensure_exemplars_seeded()
+
         return new_count
 
     except Exception as e:
         logger.error("Auto-seeding encountered an error: %s", e, exc_info=True)
         return 0
+
+
+async def ensure_exemplars_seeded():
+    """Seed foundational verified exemplars into ChromaDB if not already present."""
+    try:
+        from app.providers.factory import create_embedding_provider
+        from app.services.exemplar_service import ExemplarService
+        import uuid
+
+        embed = create_embedding_provider()
+        svc = ExemplarService(embed)
+        collection = svc._get_collection()
+        if not collection:
+            return
+
+        q = "What is the eligibility criteria and admission process for B.Tech 2026?"
+        match = await svc.find_matching_exemplar(q, distance_threshold=0.20)
+        if not match:
+            ans = (
+                "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with "
+                "a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process "
+                "is straightforward as we offer direct admissions based on your board marks, meaning there is no "
+                "requirement to appear for any entrance exams.\n\n"
+                "To help me confirm your eligibility, could you please share your 10+2 PCM percentage? \n\n"
+                "Would you like to know more about our available engineering branches?"
+            )
+            await svc.register_exemplar(uuid.uuid4(), q, ans)
+            await svc.register_exemplar(uuid.uuid4(), "What is the eligibility criteria and admission process for B.Tech?", ans)
+            logger.info("Auto-seeded foundational B.Tech admission verified exemplar.")
+    except Exception as e:
+        logger.warning("Could not auto-seed exemplars: %s", e)
+

@@ -4,6 +4,7 @@ import ChatInput from "../components/ChatInput";
 import ConversationList from "../components/ConversationList";
 import ThinkingIndicator from "../components/ThinkingIndicator";
 import ShareModal from "../components/ShareModal";
+import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
 import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
 import {
@@ -62,6 +63,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   // Theme & Sound states (default to white / light mode)
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -332,6 +334,12 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   };
 
   async function handleSendMessage(text: string) {
+    const trimmed = text.trim();
+    if (trimmed === "🧮 Scholarship Calculator" || trimmed === "🧮 Open Scholarship Calculator") {
+      setIsCalculatorOpen(true);
+      return;
+    }
+
     if (isLoading && cancelStreamRef.current) {
       cancelStreamRef.current();
       cancelStreamRef.current = null;
@@ -656,6 +664,17 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   </div>
                 )}
 
+                {/* Scholarship Calculator */}
+                <button
+                  className="calc-nav-pill-btn"
+                  onClick={() => setIsCalculatorOpen(true)}
+                  title="Fee & Scholarship Calculator"
+                  aria-label="Fee & Scholarship Calculator"
+                >
+                  <span className="calc-nav-icon">🧮</span>
+                  <span className="calc-nav-text">Calculator</span>
+                </button>
+
                 {/* Theme Toggle */}
                 <button
                   className="header-icon-btn"
@@ -897,6 +916,17 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           onClose={() => setShowShareModal(false)}
           onExportPDF={handleExportPDF}
           onExportMD={handleExportMD}
+        />
+      )}
+
+      {/* Scholarship Calculator Modal */}
+      {isCalculatorOpen && (
+        <ScholarshipCalculatorModal
+          onClose={() => setIsCalculatorOpen(false)}
+          onAskBuddy={(prompt) => {
+            setIsCalculatorOpen(false);
+            handleSendMessage(prompt);
+          }}
         />
       )}
     </div>

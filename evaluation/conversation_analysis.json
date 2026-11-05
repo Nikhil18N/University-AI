@@ -1,0 +1,321 @@
+{
+  "generated_at": "2026-11-05T12:39:14.343364Z",
+  "source": "evaluation/all_conversations_raw.json",
+  "summary": {
+    "total_conversations": 64,
+    "total_messages": 366,
+    "total_user_messages": 193,
+    "total_assistant_messages": 173,
+    "avg_messages_per_conversation": 5.7,
+    "avg_turns_per_conversation": 3.0
+  },
+  "quality_flags": {
+    "empty_or_very_short_responses": {
+      "count": 2,
+      "threshold_chars": 10,
+      "conversations": [
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "479f71da-c079-4566-b0b3-07d17a9d9c25",
+          "title": "What is the eligibility criteria and admission pro...",
+          "content": "",
+          "created_at": "2026-11-02T17:34:15.617617+00:00"
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "b7f7a8ce-7086-45a1-a360-84baf6d3d1cb",
+          "title": "What is the eligibility criteria and admission pro...",
+          "content": "",
+          "created_at": "2026-11-02T17:36:08.291736+00:00"
+        }
+      ]
+    },
+    "suspected_hallucinations": {
+      "count": 52,
+      "note": "Heuristic only \u2014 assistant messages containing numbers/amounts without source citation",
+      "conversations": [
+        {
+          "conversation_id": "f7d8539e-a111-4e0d-9618-3e91a2230946",
+          "message_id": "069cf01a-55ed-4589-846f-726a2b470973",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightf"
+        },
+        {
+          "conversation_id": "8f99e082-20e0-46dd-bb9e-4c5bbe3d53da",
+          "message_id": "a1e79b7b-7652-4599-b004-1e16369c888c",
+          "content_preview": "Admissions to B.Tech programs at SR University require a minimum of 60% aggregate marks in your 10+2 / Intermediate PCM exams. For direct or management quota seats, no entrance exam score (like JEE Ma"
+        },
+        {
+          "conversation_id": "247aa867-6ca4-45f2-9ca3-350ce586f360",
+          "message_id": "7323b205-821a-4f1c-84fa-0a78f8b0ebd2",
+          "content_preview": "To be eligible for B.Tech Computer Science and Engineering, you need a minimum of 60% aggregate marks in your 10+2 PCM subjects, which typically corresponds to 600 out of 1000 marks. Since your score "
+        },
+        {
+          "conversation_id": "397a1924-014b-4b93-b296-f89a5ca35257",
+          "message_id": "a3132b4f-c5e3-4594-a200-0d17018b0ffd",
+          "content_preview": "Great news\u2014you are fully eligible for admission to our B.Tech programs! Since you have achieved the 60% aggregate in your PCM subjects, you meet our criteria perfectly and can proceed with your applic"
+        },
+        {
+          "conversation_id": "3c06a370-ced2-40cf-9042-515903f03f6d",
+          "message_id": "b3cc00d7-33c3-4f03-af66-932f61a4ced8",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightf"
+        },
+        {
+          "conversation_id": "3c06a370-ced2-40cf-9042-515903f03f6d",
+          "message_id": "cf6fc630-02cc-4900-9e4d-016498fe2cf6",
+          "content_preview": "Hey there! I am so sorry for the delay\u2014sometimes the digital gears take a second to spin up, but I'm here now and ready to help you get sorted for 2026! \n\n### Eligibility for B.Tech 2026\nTo get into o"
+        },
+        {
+          "conversation_id": "3c06a370-ced2-40cf-9042-515903f03f6d",
+          "message_id": "60dc43b2-a058-4dfc-92c5-b413bf9310d8",
+          "content_preview": "Our placement program is quite robust, with our students securing a top package of 51 LPA at Microsoft and maintaining a strong overall average of 6 LPA. To participate in these drives, you'll need to"
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "d795d412-b31d-4c60-b1c7-9d9e8b460370",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightf"
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "cb67626c-c8ec-4ea8-881c-901ccfd2cb93",
+          "content_preview": "That\u2019s a fantastic score, and I\u2019m happy to confirm that you are fully eligible for our B.Tech program! Since you\u2019ve met the 60% cutoff, you can proceed with your application through our admissions por"
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "c017aad9-8b41-4ee0-8ab6-c5332b63eaa7",
+          "content_preview": "SR University boasts a fantastic placement record, with our highest package reaching **51 LPA** (secured at Microsoft) and an average package of **6 LPA** across B.Tech branches. Over 200 top multinat"
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "1d988763-8e5e-432b-b0f9-c35e38ee7fa6",
+          "content_preview": "For our B.Tech programs, tuition fees are conveniently payable on a per-semester basis across your four years of study. Since you scored an impressive 90% in your 12th PCM, you are fully eligible for "
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "2d68d075-3d77-4a73-b74b-7b561bf6f325",
+          "content_preview": "Since you scored 90% in your 12th PCM, you are eligible for a merit-based scholarship of up to 20% on your tuition fees! Please keep in mind that these scholarships are awarded on a first-come, first-"
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "2093e933-2378-4cd3-b792-88fe9d67d374",
+          "content_preview": "Applying is a straightforward process: simply fill out the online application form, upload your required documents, and pay the application fee to submit your request. Since you have already achieved "
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "07af362d-c50d-430d-a2e6-b90c9a62d075",
+          "content_preview": "The highest placement package at SR University is an incredible **51 LPA**, which was offered by **Microsoft**! Across our graduating B.Tech batches, our students achieve a solid average package of 6 "
+        },
+        {
+          "conversation_id": "66b4f5b9-4701-4b93-a865-ee7e563fa386",
+          "message_id": "4972a499-13b0-4da0-93cc-e88f2564d4bf",
+          "content_preview": "SR University hosts premier companies during our campus placement drives, with global tech giants like **Microsoft** leading the charge (offering top packages up to 51 LPA) alongside major IT, core en"
+        },
+        {
+          "conversation_id": "7c766797-e4bd-4fc8-920e-d9b483073cd4",
+          "message_id": "186569dc-e3be-4b69-ae30-022624676d44",
+          "content_preview": "For B.Tech CSE, the annual tuition fee is Rs. 2,10,000, while other engineering branches range from Rs. 1,80,000 to Rs. 1,90,000 per year, payable in two equal semester installments. We offer merit sc"
+        },
+        {
+          "conversation_id": "7c766797-e4bd-4fc8-920e-d9b483073cd4",
+          "message_id": "85d4f05a-fc21-4c96-928e-3d0420113fb2",
+          "content_preview": "Our students consistently achieve strong placement outcomes, with an average package of 6 LPA and a notable high of 51 LPA offered by Microsoft. Our dedicated placement teams at the CJAC and CSSP work"
+        },
+        {
+          "conversation_id": "7c766797-e4bd-4fc8-920e-d9b483073cd4",
+          "message_id": "f70feeff-e354-46b9-b4c5-d376545efd6a",
+          "content_preview": "The highest placement package at SR University is an impressive 51 LPA, which was secured by a student at Microsoft. Our graduates consistently see strong results, with the overall average package sta"
+        },
+        {
+          "conversation_id": "0c3b4a46-dd22-44a6-9a0b-603c71850c64",
+          "message_id": "9b44bc22-bb62-4381-bfde-b76c0cc10854",
+          "content_preview": "SR University has a strong placement track record, highlighted by an impressive highest package of 51 LPA offered by Microsoft. Across the board, our students secure an average package of 6 LPA as the"
+        },
+        {
+          "conversation_id": "0c3b4a46-dd22-44a6-9a0b-603c71850c64",
+          "message_id": "4d53e635-d24e-4bb6-95d5-9998ddd53fbb",
+          "content_preview": "Our placement drives are powered by the Centre for Student Services and Placements (CSSP), which connects students with a wide range of industry leaders across various sectors. While Microsoft stands "
+        },
+        {
+          "conversation_id": "0c3b4a46-dd22-44a6-9a0b-603c71850c64",
+          "message_id": "9d40bb1c-73bb-4694-af52-2c395904996b",
+          "content_preview": "Our students have achieved a remarkable highest package of 51 LPA, which was offered by Microsoft. To qualify for these top-tier recruitment opportunities, students are expected to maintain a CGPA of "
+        },
+        {
+          "conversation_id": "2407b9b4-7b97-40a3-b58d-39bb978a0cc0",
+          "message_id": "85e9ca68-6c66-4a95-b705-855680b93082",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightf"
+        },
+        {
+          "conversation_id": "2407b9b4-7b97-40a3-b58d-39bb978a0cc0",
+          "message_id": "9c116aa9-694d-4815-b9a5-06627cb0d83e",
+          "content_preview": "For B.Tech Computer Science, the annual tuition fee is Rs. 2,10,000, while other engineering branches range between Rs. 1,80,000 and Rs. 1,90,000 per year, payable in two equal semester installments. "
+        },
+        {
+          "conversation_id": "2407b9b4-7b97-40a3-b58d-39bb978a0cc0",
+          "message_id": "5916ecb7-5877-4a66-b7a2-d3fef484d72a",
+          "content_preview": "Our students have achieved impressive placement success, with the highest package reaching 51 LPA offered by Microsoft and an average package of 6 LPA across graduating batches. Our dedicated placemen"
+        },
+        {
+          "conversation_id": "223a7f0c-8e15-429c-a27c-527285868842",
+          "message_id": "5452f382-9091-4764-b690-9c0297f1f99b",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. Since we offer direct admissions, "
+        },
+        {
+          "conversation_id": "223a7f0c-8e15-429c-a27c-527285868842",
+          "message_id": "d79d565c-f5a8-47a3-9f93-af58a82be781",
+          "content_preview": "If your score is below the 60% threshold, please reach out to our admissions office directly at 833 100 3030 or 833 100 4040. They can provide a personalized evaluation to see if any discretionary opt"
+        },
+        {
+          "conversation_id": "8973152e-c6f0-415d-85c4-ee04cb1e4a9f",
+          "message_id": "530d6cd3-6ad2-4e93-9101-4bfa83557b35",
+          "content_preview": "For B.Tech CSE, the annual tuition fee is Rs. 2,10,000, while other engineering branches range from Rs. 1,80,000 to Rs. 1,90,000 per year, payable in two equal semester installments. We offer merit-ba"
+        },
+        {
+          "conversation_id": "61d66d1f-15af-43be-b43b-9ff33ba29237",
+          "message_id": "4d35a496-deb4-48e5-a459-40fc5e4bcd30",
+          "content_preview": "\ud83c\udf89 **Instant Admission Verdict: FULLY ELIGIBLE!** (Step 4 of 4)\n\nWith **90%**, you comfortably meet and exceed our 60% minimum cutoff in 10+2 PCM for **B.Tech CSE (AI & ML)**!\n\ud83c\udf1f **Bonus:** With 90%+, y"
+        },
+        {
+          "conversation_id": "4a88faaa-7294-47fb-a050-94510f904462",
+          "message_id": "e351a836-450e-4336-b0be-0d74234406fa",
+          "content_preview": "Our students consistently land great opportunities, with an average package of 6 LPA and a top offer reaching 51 LPA from Microsoft. We partner with over 200 recruiters, including industry giants like"
+        },
+        {
+          "conversation_id": "72287ac9-ccd6-4803-9504-778e8fff403b",
+          "message_id": "be0efef0-19be-4448-a7fd-22eb8670abcc",
+          "content_preview": "Welcome to SR University! For our B.Tech programs, you'll need a minimum of 60% aggregate marks in your 10+2 or Intermediate examination in the subjects of Mathematics, Physics, and Chemistry. We offe"
+        },
+        {
+          "conversation_id": "c5cd59b6-7531-4cd1-864e-57626de190b1",
+          "message_id": "cd8b56b4-3797-43c9-8ba7-9cf1c372016a",
+          "content_preview": "Applying to SR University is a straightforward process: simply fill out the online application form, upload your required documents, and pay the application fee to submit your request. For B.Tech prog"
+        },
+        {
+          "conversation_id": "dacf4151-1a3f-4daa-9bd5-e0912f13c7dd",
+          "message_id": "d2ca0ef6-ee45-42be-9742-41e9d4afc022",
+          "content_preview": "Welcome to SR University! To join our B.Tech program, you'll need to have passed your 10+2 or equivalent exam with at least 60% aggregate marks in Physics, Chemistry, and Mathematics. We offer direct "
+        },
+        {
+          "conversation_id": "dacf4151-1a3f-4daa-9bd5-e0912f13c7dd",
+          "message_id": "53512750-d533-40a9-a8ba-8579cc38cc5d",
+          "content_preview": "Our students have achieved impressive placement success, with a top package of 51 LPA offered by Microsoft and an overall average of 6 LPA. We partner with over 200 top-tier recruiters, including Amaz"
+        },
+        {
+          "conversation_id": "dacf4151-1a3f-4daa-9bd5-e0912f13c7dd",
+          "message_id": "b100b9d3-6e78-4bd4-b3ea-77076c2b00a0",
+          "content_preview": "It\u2019s great to see you\u2019re looking at the big picture! Our placement records are a huge point of pride here at SRU. We focus on bridging the gap between classroom theory and industry demands, which is w"
+        },
+        {
+          "conversation_id": "dacf4151-1a3f-4daa-9bd5-e0912f13c7dd",
+          "message_id": "8beb7d85-b26c-468a-8054-8faf5a42c447",
+          "content_preview": "Applying to SRU is a straightforward process: you just need to fill out the online application form, upload your documents, and pay the application fee. Since we offer direct admission for B.Tech, you"
+        },
+        {
+          "conversation_id": "1023c907-7c48-4088-b3b0-cd2ef0e80bc8",
+          "message_id": "2a7fb7e8-2167-45fd-8e82-967b5a5b4f2b",
+          "content_preview": "Our placement program is quite strong, with students securing top offers like the 51 LPA package from Microsoft and an overall average of 6 LPA. We partner with over 200 national and multinational rec"
+        },
+        {
+          "conversation_id": "1023c907-7c48-4088-b3b0-cd2ef0e80bc8",
+          "message_id": "ed027332-fad7-48c6-b8df-0cccc15eadee",
+          "content_preview": "The highest placement package at SR University is an impressive 51 LPA, which was secured by our students at Microsoft. Our graduates also maintain a strong overall average of 6 LPA across various sec"
+        },
+        {
+          "conversation_id": "1023c907-7c48-4088-b3b0-cd2ef0e80bc8",
+          "message_id": "cad846b9-c52f-462f-9823-8558484d33b8",
+          "content_preview": "We offer merit-based scholarships for B.Tech students based on your 12th-grade marks, with up to 30% tuition fee waivers for those scoring 97% and above, and up to 20% for those scoring between 90% an"
+        },
+        {
+          "conversation_id": "25aa978e-4d48-4127-8e9e-ff36439b7eff",
+          "message_id": "88b0f0cc-e092-4567-af0e-c48e94a411f3",
+          "content_preview": "To be eligible for B.Tech at SR University for 2026, you need a minimum of 60% aggregate marks in your 10+2 / Intermediate PCM subjects. Admissions are currently open, and for direct management quota "
+        },
+        {
+          "conversation_id": "a2379c11-9b2d-4ca9-ae18-78d5009bdfd7",
+          "message_id": "f3c19b5c-cf2f-4309-b946-b3a6ea1e2bee",
+          "content_preview": "For B.Tech CSE, the annual tuition fee is Rs. 2,10,000 (payable semester-wise at Rs. 1,05,000 per semester), while other engineering branches range between Rs. 1,80,000 and Rs. 1,90,000 per year. \n\nMe"
+        },
+        {
+          "conversation_id": "d31b2113-91e1-41c7-9921-fd1b93c89889",
+          "message_id": "28a94dda-195f-49b4-b699-7f285d2767a8",
+          "content_preview": "Admissions for our B.Tech programs are open across all engineering branches, requiring a minimum of 60% aggregate marks in your 10+2 / Intermediate PCM subjects. For direct or management quota seats, "
+        },
+        {
+          "conversation_id": "e1c0b7a4-90f1-4755-a5ee-0ef605b13e6f",
+          "message_id": "9828cb07-40ff-404a-a9fe-b3c1f92a2aed",
+          "content_preview": "To be eligible for B.Tech at SR University, you need a minimum of 60% aggregate marks in your 10+2 / Intermediate PCM subjects. Admissions for 2026 are currently open, and for direct quota seats, no e"
+        },
+        {
+          "conversation_id": "4dd70573-de12-4e3f-a3b7-61d68d56771a",
+          "message_id": "75fce401-4a21-4d62-9c68-88f9c357f77d",
+          "content_preview": "To join the B.Tech program at SR University, you need a minimum of 60% aggregate marks in your 10+2 or Intermediate examinations with Mathematics, Physics, and Chemistry (or Computer Science). Admissi"
+        },
+        {
+          "conversation_id": "5e91b4c0-f23d-4207-9ae5-7109671bac0d",
+          "message_id": "42993055-72e0-43fb-aefa-6277e6681b89",
+          "content_preview": "Getting into our B.Tech programs at SR University is straightforward! Admission requires a minimum of 60% aggregate marks in your 10+2 / Intermediate (PCM), and for direct or management quota admissio"
+        },
+        {
+          "conversation_id": "fcc65ebf-3ba8-4869-bcdf-d62c61dbb289",
+          "message_id": "b404e09a-d10f-40c9-a701-71d9cee52521",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with at least 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightforwa"
+        },
+        {
+          "conversation_id": "c8804e77-04ee-419b-b716-5a88005a5eb3",
+          "message_id": "a1597182-5c00-42ba-8baa-1816ba385c30",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with at least 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightforwa"
+        },
+        {
+          "conversation_id": "c8804e77-04ee-419b-b716-5a88005a5eb3",
+          "message_id": "86f23228-0f51-4f56-8b2f-17f8e96be73e",
+          "content_preview": "If your aggregate score is below the 60% threshold, you should reach out directly to our admissions office at 833 100 3030 or 833 100 4040. They can provide a personalized evaluation to see if there a"
+        },
+        {
+          "conversation_id": "c8804e77-04ee-419b-b716-5a88005a5eb3",
+          "message_id": "72cfe720-d8a7-4ff7-aad6-0109143db83b",
+          "content_preview": "That\u2019s a fantastic score! Since you have achieved 90%+, you are not only fully eligible for our B.Tech program, but you also qualify for a merit-based tuition fee scholarship of up to 20%. \n\nSince the"
+        },
+        {
+          "conversation_id": "c8804e77-04ee-419b-b716-5a88005a5eb3",
+          "message_id": "236fa9f9-745f-4de3-b9c7-19d027a495c5",
+          "content_preview": "\ud83c\udf89 **Instant Admission Verdict: FULLY ELIGIBLE!** (Step 4 of 4)\n\nWith **90%**, you comfortably meet and exceed our 60% minimum cutoff in 10+2 PCM for **B.Tech CSE (AI & ML)**!\n\ud83c\udf1f **Bonus:** With 90%+, y"
+        },
+        {
+          "conversation_id": "cf8daa78-5191-4f88-942a-9d0d9bcdd80f",
+          "message_id": "f14bb14d-2ff3-4018-8fd7-339e40407236",
+          "content_preview": "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process is straightf"
+        },
+        {
+          "conversation_id": "c306da4e-9910-426c-94f5-07021405f747",
+          "message_id": "22f2351d-e949-43a8-b8f6-ae8bbb34b5d7",
+          "content_preview": "Our students have achieved an impressive highest package of 51 LPA at Microsoft, with an overall average package of 6 LPA across all B.Tech branches. We host over 200 top recruiters, including industr"
+        },
+        {
+          "conversation_id": "c306da4e-9910-426c-94f5-07021405f747",
+          "message_id": "302758c6-426a-4c1b-8261-e3f638bf2259",
+          "content_preview": "Welcome to SR University! Joining us is a straightforward process: simply fill out the online application form, upload your 10th and 12th-grade marks memos, and pay the application fee to submit your "
+        }
+      ]
+    }
+  },
+  "topic_distribution": {
+    "general": 80,
+    "admissions": 43,
+    "placements": 22,
+    "fees": 21,
+    "hostel": 17,
+    "campus": 13
+  },
+  "golden_eval_pairs_count": 0,
+  "conversation_length_distribution": {
+    "min_messages": 1,
+    "max_messages": 36,
+    "avg_messages": 5.7
+  },
+  "data_files": {
+    "original_verbatim": "evaluation/original_conversations.md",
+    "all_messages_jsonl": "evaluation/all_conversations.jsonl",
+    "corrected_examples": "evaluation/corrected_examples.jsonl",
+    "evaluation_dataset": "evaluation/evaluation_dataset.jsonl"
+  },
+  "preservation_note": "All 64 conversations are preserved verbatim in original_conversations.md. No conversations or messages have been deleted, modified, or truncated."
+}

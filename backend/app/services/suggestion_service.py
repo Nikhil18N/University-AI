@@ -2,12 +2,12 @@
 
 import re
 
-# Domain suggestion banks
+# Specialist domain suggestion banks
 ELIGIBILITY_CONFIRMED_SUGGESTIONS = [
-    "📋 How to Apply",
-    "💰 Fee Structure",
-    "🏠 Hostel Details",
-    "🔬 Lab Facilities",
+    "📋 How to Apply Online",
+    "💰 Complete Tuition Fee Schedule",
+    "🏠 Hostel Room & Mess Details",
+    "📊 Placement Statistics & Recruiters",
 ]
 
 ELIGIBILITY_QUERY_SUGGESTIONS = [
@@ -18,59 +18,82 @@ ELIGIBILITY_QUERY_SUGGESTIONS = [
 ]
 
 BRANCH_COMPARISON_SUGGESTIONS = [
-    "🔬 Lab Facilities",
-    "📊 Placement Stats",
-    "🆚 Compare with ECE",
-    "📋 How to Apply",
+    "🔬 Specialized AI & Robotics Labs",
+    "📊 B.Tech CSE Placement Records",
+    "🆚 Compare CSE with ECE",
+    "📋 Admission Eligibility Criteria",
 ]
 
 PLACEMENT_SUGGESTIONS = [
-    "💼 Top Recruiters",
-    "📈 Highest Package",
-    "🎯 Internship Options",
-    "🤝 SRiX Startup Incubator",
+    "💼 Top Recruiting Companies",
+    "📈 Microsoft 51 LPA Highest Package",
+    "🎯 One Student–One Job Policy",
+    "🚀 SRiX Startup Incubator",
 ]
 
-FEE_SUGGESTIONS = [
-    "🎓 Merit Scholarships",
-    "💳 Payment Schedule",
-    "🏠 Hostel & Mess Fees",
-    "📋 How to Apply",
+GENERAL_FEE_SUGGESTIONS = [
+    "🎓 B.Tech CSE Fees",
+    "⚡ B.Tech ECE & Core Fees",
+    "💼 MBA & Management Fees",
+    "🧮 Scholarship Calculator",
 ]
+
+BTECH_FEE_SUGGESTIONS = [
+    "🎓 B.Tech CSE Fee Breakdown",
+    "⚡ B.Tech ECE Fees",
+    "🔧 B.Tech Mechanical/Civil/EEE Fees",
+    "🧮 Scholarship Calculator",
+]
+
+SCHOLARSHIP_SUGGESTIONS = [
+    "🧮 Open Scholarship Calculator",
+    "🎓 B.Tech CSE Scholarship Slabs",
+    "⚡ B.Tech ECE Scholarship Slabs",
+    "🤝 Special Category Scholarship",
+]
+
+FEE_SUGGESTIONS = GENERAL_FEE_SUGGESTIONS
 
 HOSTEL_SUGGESTIONS = [
-    "🎥 Watch Hostel Tour",
-    "🍽️ Mess & Food Quality",
-    "🕒 Hostel Timings & Rules",
-    "🚌 Campus Transport",
+    "🕒 Hostel Curfew & In-Time Rules",
+    "🍽️ Mess Timings & Food Facilities",
+    "🔒 Hostel Safety & Visitor Policy",
+    "🚌 University Bus Routes & Timings",
+]
+
+ACADEMIC_SUGGESTIONS = [
+    "📚 75% Attendance & Detention Rule",
+    "🎓 Fully Flexible Credit System",
+    "🏥 Medical Condonation Policy",
+    "🔬 Core Labs & Projects",
 ]
 
 CURRICULUM_SUGGESTIONS = [
-    "🔬 Specialized AI Labs",
-    "📊 Placement Stats",
-    "🧑‍🏫 Faculty Guidance",
-    "📋 How to Apply",
+    "🔬 Hands-on AI & Machine Learning Labs",
+    "📊 Average & Highest Placement CTC",
+    "🧑‍🏫 Faculty Guidance & Mentorship",
+    "📋 How to Register for Courses",
 ]
 
 DEFAULT_GREETING_SUGGESTIONS = [
-    "🎯 B.Tech Admissions",
-    "🎥 Virtual Campus Tour",
-    "💰 Fee Structure",
-    "📊 Placement Highlights",
+    "🎯 B.Tech Admissions 2026",
+    "💰 Tuition Fees & Merit Scholarships",
+    "🏠 Hostel Living & Curfew Rules",
+    "📊 Placement Records & Top Packages",
 ]
 
 VIDEO_TOUR_SUGGESTIONS = [
-    "🎥 Watch Campus Tour",
-    "🎥 Watch Hostel Walkthrough",
-    "🚀 SRiX Startup Incubator",
-    "💼 Placements & Packages",
+    "🎥 Watch Campus Virtual Tour",
+    "🎥 Watch Hostel Living Walkthrough",
+    "🚀 Explore SRiX Startup Incubator",
+    "💼 Placement Drives & Microsoft CTC",
 ]
 
 DEFAULT_UNIVERSITY_SUGGESTIONS = [
-    "📋 Admission Process",
-    "💰 Fee Structure",
-    "🏠 Hostel Facilities",
-    "📊 Placement Records",
+    "📋 B.Tech Admission Process",
+    "💰 Fee Structure & Scholarships",
+    "🏠 Hostel Amenities & Timings",
+    "📊 Campus Placement Records",
 ]
 
 
@@ -112,11 +135,14 @@ def generate_suggestions(
         return VIDEO_TOUR_SUGGESTIONS
 
     # 3. Eligibility & Cutoff
-    if any(k in msg_lower for k in ("eligible", "eligibility", "cutoff", "percentage", "marks", "percent", "criteria")):
+    if any(k in msg_lower for k in ("eligible", "eligibility", "cutoff", "percentage", "marks", "percent", "criteria", "admission", "process")):
         if any(w in ans_lower for w in ("fully eligible", "you are eligible", "meets the", "exceeds the", "congratulations", "welcome")):
             return ELIGIBILITY_CONFIRMED_SUGGESTIONS
-        if any(w in ans_lower for w in ("share your", "board percentage", "qualifying percentage", "minimum 60%")):
+        if any(w in ans_lower for w in ("share your", "board percentage", "qualifying percentage", "minimum 60%", "pcm percentage")):
             return ELIGIBILITY_QUERY_SUGGESTIONS
+
+    if any(w in ans_lower for w in ("share your 10+2", "share your pcm", "pcm percentage", "share your board percentage")):
+        return ELIGIBILITY_QUERY_SUGGESTIONS
 
     # 4. Branch comparison (e.g. CSE vs AIML)
     if any(k in msg_lower for k in ("vs", "compare", "difference between", "specialization")):
@@ -127,28 +153,44 @@ def generate_suggestions(
         return PLACEMENT_SUGGESTIONS
 
     # 6. Fees, Tuition & Scholarships
-    if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "scholarship", "caution deposit")):
-        return FEE_SUGGESTIONS
+    if any(k in msg_lower for k in ("scholarship", "scholarships", "calculator", "waiver")):
+        return SCHOLARSHIP_SUGGESTIONS
+    if any(k in msg_lower for k in ("btech", "b.tech", "cse", "ece", "mech", "civil", "engineering")) and any(k in msg_lower for k in ("fee", "fees", "tuition")):
+        return BTECH_FEE_SUGGESTIONS
+    if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "caution deposit")):
+        return GENERAL_FEE_SUGGESTIONS
 
     # 7. Hostels, Mess & Campus Life
     if any(k in msg_lower for k in ("hostel", "mess", "food", "room", "curfew", "timing", "campus", "sports", "bus", "transport")):
-        return HOSTEL_SUGGESTIONS
+        raw_suggestions = HOSTEL_SUGGESTIONS
 
-    # 8. Courses & Curriculum
-    if any(k in msg_lower for k in ("curriculum", "syllabus", "subject", "courses", "credits", "labs")):
-        return CURRICULUM_SUGGESTIONS
+    # 8. Academics, Attendance & Condonation
+    elif any(k in msg_lower for k in ("attendance", "detention", "condon", "exam", "gpa", "cgpa", "credit", "ffcs")):
+        raw_suggestions = ACADEMIC_SUGGESTIONS
 
-    # 9. Greeting / General conversational
-    if intent in ("GREETING", "HOW_ARE_YOU", "HELP", "ACKNOWLEDGMENT", "THANKS"):
-        return DEFAULT_GREETING_SUGGESTIONS
+    # 9. Courses & Curriculum
+    elif any(k in msg_lower for k in ("curriculum", "syllabus", "subject", "courses", "credits", "labs")):
+        raw_suggestions = CURRICULUM_SUGGESTIONS
 
-    # 10. Default contextual fallbacks
-    # Check if answer mentions placements, fees, or hostels
-    if "placement" in ans_lower or "lpa" in ans_lower:
-        return PLACEMENT_SUGGESTIONS
-    if "fee" in ans_lower or "rs." in ans_lower or "₹" in ans_lower:
-        return FEE_SUGGESTIONS
-    if "hostel" in ans_lower:
-        return HOSTEL_SUGGESTIONS
+    # 10. Greeting / General conversational
+    elif intent in ("GREETING", "HOW_ARE_YOU", "HELP", "ACKNOWLEDGMENT", "THANKS"):
+        raw_suggestions = DEFAULT_GREETING_SUGGESTIONS
 
-    return DEFAULT_UNIVERSITY_SUGGESTIONS
+    # 11. Default contextual fallbacks based on answer content
+    elif "placement" in ans_lower or "lpa" in ans_lower:
+        raw_suggestions = PLACEMENT_SUGGESTIONS
+    elif "fee" in ans_lower or "rs." in ans_lower or "₹" in ans_lower:
+        raw_suggestions = FEE_SUGGESTIONS
+    elif "hostel" in ans_lower:
+        raw_suggestions = HOSTEL_SUGGESTIONS
+    elif "attendance" in ans_lower:
+        raw_suggestions = ACADEMIC_SUGGESTIONS
+    else:
+        raw_suggestions = DEFAULT_UNIVERSITY_SUGGESTIONS
+
+    # Anti-duplicate filter: never suggest a chip that matches what user just asked
+    filtered = [
+        s for s in raw_suggestions
+        if not any(word in msg_lower for word in s.lower().replace("📋", "").replace("💰", "").replace("🏠", "").replace("📊", "").replace("📚", "").replace("🎓", "").replace("💼", "").split() if len(word) > 4)
+    ]
+    return filtered[:4] if len(filtered) >= 2 else raw_suggestions[:4]
