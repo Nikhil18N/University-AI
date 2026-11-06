@@ -39,16 +39,16 @@ PLACEMENT_VIDEO_OFFER_SUGGESTIONS = [
 ]
 
 GENERAL_FEE_SUGGESTIONS = [
-    "🎓 B.Tech CSE Fees",
-    "⚡ B.Tech ECE & Core Fees",
+    "🎓 B.Tech Tuition Fees",
     "💼 MBA & Management Fees",
+    "🏠 Hostel & Mess Fees",
     "🧮 Scholarship Calculator",
 ]
 
 BTECH_FEE_SUGGESTIONS = [
     "🎓 B.Tech CSE Fee Breakdown",
     "⚡ B.Tech ECE Fees",
-    "🔧 B.Tech Mechanical/Civil/EEE Fees",
+    "🏠 Hostel & Mess Fees",
     "🧮 Scholarship Calculator",
 ]
 

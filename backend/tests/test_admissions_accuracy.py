@@ -50,7 +50,7 @@ def test_btech_cse_tuition_fee_grounding():
 
 
 def test_fee_breakdown_card_accuracy():
-    """Verify the UI fee card reflects official semester and one-time fees."""
+    """Verify the UI fee card reflects official semester fees without cross-contaminating hostel or transport."""
     cards = generate_cards(
         user_message="What is the fee for btech cse?",
         answer="The tuition fee is ₹1,47,500 per semester (₹2,95,000 per year).",
@@ -64,9 +64,10 @@ def test_fee_breakdown_card_accuracy():
     assert "1,47,500" in cse_item["amount"]
     assert "2,95,000" in cse_item["frequency"]
 
-    girls_hostel = next((item for item in card["items"] if "Girls" in item["category"]), None)
-    assert girls_hostel is not None
-    assert "1,25,000" in girls_hostel["amount"]
+    # Verify hostel and transport are strictly NOT present in the B.Tech CSE fee card
+    assert not any("Girls" in item["category"] or "Hostel" in item["category"] for item in card["items"])
+    assert not any("Transport" in item["category"] or "Bus" in item["category"] for item in card["items"])
+
 
 
 def test_merit_scholarship_40_percent_for_92_percent():

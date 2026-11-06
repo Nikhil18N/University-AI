@@ -70,7 +70,7 @@ def test_hostel_fee_scoping():
         answer="Hostel fee is ₹1,25,000 per year.",
     )
     assert any("Girls AC Hostel Fee" in s for s in suggestions)
-    assert not any("B.Tech CSE Fees" in s for s in suggestions)
+    assert not any("B.Tech CSE" in s for s in suggestions)
 
 
 def test_exam_fee_scoping():
@@ -96,12 +96,64 @@ def test_admission_fee_scoping():
     assert any("Admission" in i["category"] for i in cards[0]["items"])
 
 
-def test_btech_cse_fee_query_shows_tuition_breakdown():
-    """Verify general B.Tech CSE fee query returns comprehensive tuition breakdown."""
+def test_btech_cse_fee_query_shows_cse_only():
+    """Verify B.Tech CSE fee query returns CSE tuition, without hostel or other branches."""
+    from app.services.card_service import BTECH_CSE_FEE_CARD
     cards = generate_cards(
         user_message="What is the fee for btech cse?",
         answer="The tuition fee is ₹1,47,500 per semester (₹2,95,000 per year).",
     )
-    fee_cards = [c for c in cards if c["type"] == "fee_breakdown"]
-    assert len(fee_cards) >= 1
-    assert fee_cards[0] == FEE_BREAKDOWN_CARD
+    assert len(cards) == 1
+    assert cards[0] == BTECH_CSE_FEE_CARD
+    categories = [item["category"] for item in cards[0]["items"]]
+    assert any("CSE" in c for c in categories)
+    assert not any("ECE" in c for c in categories)
+    assert not any("Hostel" in c for c in categories)
+    assert not any("Transport" in c for c in categories)
+
+
+def test_btech_complete_fee_structure_shows_pure_academic_fees():
+    """Verify general B.Tech fee query returns all engineering branch tuitions, strictly NO hostel or transport."""
+    from app.services.card_service import BTECH_ACADEMIC_FEE_CARD
+    cards = generate_cards(
+        user_message="What is the complete fee structure and merit scholarship details for B.Tech?",
+        answer="B.Tech tuition fees vary by branch: CSE is ₹1,47,500/sem, ECE is ₹1,20,000/sem, and Core is ₹1,00,000/sem.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == BTECH_ACADEMIC_FEE_CARD
+    categories = [item["category"] for item in cards[0]["items"]]
+    assert any("CSE" in c for c in categories)
+    assert any("ECE" in c for c in categories)
+    assert any("Core" in c for c in categories)
+    assert any("Admission" in c for c in categories)
+    # Strictly zero cross-contamination
+    assert not any("Hostel" in c for c in categories)
+    assert not any("Transport" in c for c in categories)
+    assert not any("Bus" in c for c in categories)
+
+
+def test_merit_scholarship_slabs_card():
+    """Verify asking for merit scholarship details returns dedicated scholarship slab card."""
+    from app.services.card_service import MERIT_SCHOLARSHIP_CARD
+    cards = generate_cards(
+        user_message="what are the merit scholarship details?",
+        answer="Merit scholarships offer 10% to 50% tuition reduction based on your board or entrance scores.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == MERIT_SCHOLARSHIP_CARD
+    categories = [item["category"] for item in cards[0]["items"]]
+    assert any("40% Tuition Waiver" in c for c in categories)
+    assert any("30% Tuition Waiver" in c for c in categories)
+    assert not any("Hostel" in c for c in categories)
+    assert not any("Transport" in c for c in categories)
+
+
+def test_vague_fee_query_returns_no_card():
+    """Verify that a bare ambiguous fee question does not dump cards, allowing assistant to ask."""
+    cards = generate_cards(
+        user_message="what is the fee?",
+        answer="Fees depend on the program or facility. Which fee would you like to know about?",
+    )
+    # Should not attach an unprompted all-in-one card
+    assert len(cards) == 0
+

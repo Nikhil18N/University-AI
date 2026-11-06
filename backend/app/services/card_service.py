@@ -26,9 +26,51 @@ COMPARISON_CSE_AIML = {
     ],
 }
 
-FEE_BREAKDOWN_CARD = {
+BTECH_ACADEMIC_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "SR University Official Fee Breakdown (2026-27 / 2027-28)",
+    "title": "SR University B.Tech Tuition Fee Breakdown (2026-27 / 2027-28)",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "Tuition Fee (B.Tech CSE)",
+            "amount": "₹1,47,500 / Sem",
+            "frequency": "₹2,95,000 / Year",
+            "note": "Semester-wise billing; 40% scholarship for 92%+ in Inter",
+        },
+        {
+            "category": "Tuition Fee (B.Tech ECE)",
+            "amount": "₹1,20,000 / Sem",
+            "frequency": "₹2,40,000 / Year",
+            "note": "Semester-wise billing; merit scholarships up to 50%",
+        },
+        {
+            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE)",
+            "amount": "₹1,00,000 / Sem",
+            "frequency": "₹2,00,000 / Year",
+            "note": "Semester-wise billing; merit scholarships up to 50%",
+        },
+        {
+            "category": "Admission & Enrollment (One-time)",
+            "amount": "₹30,000",
+            "frequency": "One-time (Year 1)",
+            "note": "₹5,000 enrollment + ₹25,000 admission fee",
+        },
+        {
+            "category": "CSE Specialization Fee (Year 2+)",
+            "amount": "₹30,000 / Year",
+            "frequency": "From 2nd Year Onwards",
+            "note": "Applicable for AI&ML, Cyber Security, Data Science, AR/VR",
+        },
+    ],
+    "scholarship_note": "Merit scholarships offer 10% to 50% tuition reduction based on board marks, JEE Main, or EAMCET ranks.",
+}
+
+# Alias for backwards compatibility
+FEE_BREAKDOWN_CARD = BTECH_ACADEMIC_FEE_CARD
+
+BTECH_CSE_FEE_CARD = {
+    "type": "fee_breakdown",
+    "title": "B.Tech Computer Science & Engineering (CSE) Fee Structure",
     "currency": "INR",
     "items": [
         {
@@ -44,26 +86,54 @@ FEE_BREAKDOWN_CARD = {
             "note": "₹5,000 enrollment + ₹25,000 admission fee",
         },
         {
-            "category": "Girls Hostel (AC with Mess)",
-            "amount": "₹1,25,000 – ₹1,35,000",
-            "frequency": "Per Year",
-            "note": "4-sharing / 3-sharing AC with 4 meals daily, Wi-Fi & laundry",
-        },
-        {
-            "category": "Boys Hostel (with Mess)",
-            "amount": "₹85,000 – ₹1,35,000",
-            "frequency": "Per Year",
-            "note": "Non-AC (₹85k-95k) or AC (₹1.20L-1.35L) with meals & laundry",
-        },
-        {
-            "category": "Transport Facility (Optional)",
-            "amount": "₹22,000 – ₹30,000",
-            "frequency": "Per Year",
-            "note": "Tri-cities bus routes (Warangal, Hanamkonda, Kazipet)",
+            "category": "Specialization Fee (Year 2+)",
+            "amount": "₹30,000 / Year",
+            "frequency": "From 2nd Year Onwards",
+            "note": "For AI&ML, Cyber Security, Data Science, AR/VR",
         },
     ],
     "scholarship_note": "40% tuition scholarship for 92%–97.99% in 10+2 MPC for CSE; up to 100% for top rankers.",
 }
+
+MERIT_SCHOLARSHIP_CARD = {
+    "type": "fee_breakdown",
+    "title": "SR University B.Tech Merit Scholarship Slabs (2026-27)",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "40% Tuition Waiver Slab",
+            "amount": "₹88,500 / Sem (CSE)",
+            "frequency": "Per Semester (4 Years)",
+            "note": "92%–97.99% State Board | CBSE 90%+ | JEE Main 90%+ | TG EAPCET < 10k",
+        },
+        {
+            "category": "30% Tuition Waiver Slab",
+            "amount": "₹1,03,250 / Sem (CSE)",
+            "frequency": "Per Semester (4 Years)",
+            "note": "85%–91.99% State Board | CBSE 80%+ | JEE Main 80%+ | TG EAPCET 10k–20k",
+        },
+        {
+            "category": "20% Tuition Waiver Slab",
+            "amount": "₹1,18,000 / Sem (CSE)",
+            "frequency": "Per Semester (4 Years)",
+            "note": "75%–84.99% State Board | CBSE 70%+ | JEE Main 70%+ | TG EAPCET 20k–30k",
+        },
+        {
+            "category": "10% Tuition Waiver Slab",
+            "amount": "₹1,32,750 / Sem (CSE)",
+            "frequency": "Per Semester (4 Years)",
+            "note": "65%–74.99% State Board | CBSE 60%+ | JEE Main 60%+ | TG EAPCET 30k–40k",
+        },
+        {
+            "category": "50%–100% Top Ranker Slab",
+            "amount": "₹0 – ₹73,750 / Sem (CSE)",
+            "frequency": "Per Semester (4 Years)",
+            "note": "98%+ State Board | State Top 1000 / National Top Rankers",
+        },
+    ],
+    "scholarship_note": "Calculated on standard CSE tuition (₹1,47,500/sem). Slabs apply similarly to ECE and core engineering.",
+}
+
 
 TRANSPORT_FEE_CARD = {
     "type": "fee_breakdown",
@@ -268,6 +338,17 @@ def generate_cards(
     is_admission_fee_query = any(
         k in msg_lower for k in ("admission fee", "enrollment fee", "one-time fee", "onetime fee", "registration fee")
     )
+    is_scholarship_only_query = any(
+        k in msg_lower for k in ("scholarship slab", "scholarship slabs", "merit scholarship details", "scholarship percentage", "scholarship criteria", "scholarship %", "merit scholarship")
+    ) and not any(k in msg_lower for k in ("tuition fee", "fee structure", "how much fee", "complete fee"))
+
+    is_cse_fee_query = any(k in msg_lower for k in ("cse", "computer science")) and any(
+        k in msg_lower for k in ("fee", "fees", "tuition", "cost", "charge", "how much")
+    ) and not any(k in msg_lower for k in ("all branches", "complete fee", "other branches", "overall", "fee structure"))
+
+    is_btech_fee_query = any(k in msg_lower for k in ("btech", "b.tech", "engineering fee", "btech fee", "b.tech fee")) or (
+        any(k in msg_lower for k in ("btech", "b.tech")) and any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "scholarship"))
+    )
 
     if is_transport_fee_query:
         cards.append(TRANSPORT_FEE_CARD)
@@ -277,10 +358,17 @@ def generate_cards(
         cards.append(EXAM_FEE_CARD)
     elif is_admission_fee_query:
         cards.append(ADMISSION_FEE_CARD)
+    elif is_scholarship_only_query:
+        cards.append(MERIT_SCHOLARSHIP_CARD)
+    elif is_cse_fee_query:
+        cards.append(BTECH_CSE_FEE_CARD)
+    elif is_btech_fee_query:
+        cards.append(BTECH_ACADEMIC_FEE_CARD)
     elif any(k in msg_lower for k in ("fee", "fees", "tuition", "cost of study", "how much is the fee")):
-        # Only attach general breakdown if not an isolated single facility query
-        if not any(k in msg_lower for k in ("transport", "bus", "hostel", "mess", "exam")):
-            cards.append(FEE_BREAKDOWN_CARD)
+        # Only attach general breakdown if user explicitly asked for program fee structure / breakdown
+        if any(k in msg_lower for k in ("structure", "complete fee", "breakdown", "all fees", "details", "academic", "tuition")):
+            if not any(k in msg_lower for k in ("transport", "bus", "hostel", "mess", "exam")):
+                cards.append(BTECH_ACADEMIC_FEE_CARD)
 
 
     # 3. Curriculum card
