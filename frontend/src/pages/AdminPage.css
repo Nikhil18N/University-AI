@@ -928,6 +928,308 @@
 }
 
 /* ==========================================================================
+   PROSPECTIVE LEADS & ADMISSIONS MANAGEMENT STYLES
+   ========================================================================== */
+
+.leads-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.leads-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface-1);
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.leads-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.leads-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leads-search-input {
+  min-width: 260px;
+  max-width: 380px;
+  padding: 9px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-1);
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.leads-search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.leads-filter-select {
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-1);
+  font-size: 0.86rem;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.leads-filter-select:focus {
+  border-color: var(--primary);
+}
+
+.leads-table-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.leads-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.leads-data-table th {
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.leads-data-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-1);
+  vertical-align: middle;
+}
+
+.lead-row {
+  transition: background 0.15s ease;
+}
+
+.lead-row:hover {
+  background: var(--surface-2);
+}
+
+.lead-name-col strong {
+  display: block;
+  font-size: 0.94rem;
+  color: var(--text-1);
+}
+
+.lead-subtext {
+  font-size: 0.76rem;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.lead-phone-link {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s ease;
+}
+
+.lead-phone-link:hover {
+  text-decoration: underline;
+  color: #0284c7;
+}
+
+.lead-program-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lead-score-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.lead-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lead-source-badge.calculator {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.lead-source-badge.chat_inquiry {
+  background: rgba(14, 165, 233, 0.14);
+  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.lead-status-dropdown {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.lead-status-dropdown.status-new {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.lead-status-dropdown.status-contacted {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.lead-status-dropdown.status-counselled {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.lead-status-dropdown.status-applied {
+  background: rgba(14, 165, 233, 0.15);
+  color: #0ea5e9;
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+.lead-status-dropdown.status-enrolled {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.lead-status-dropdown.status-lost {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-conv-link {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-conv-link:hover {
+  background: var(--surface-2);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.leads-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.leads-pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leads-empty-state {
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--text-1);
+}
+
+@media (max-width: 768px) {
+  .leads-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .leads-toolbar-left {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .leads-search-input,
+  .leads-filter-select {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+  }
+  .leads-toolbar-right {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
    PRINT STYLES (For PDF Export via Browser Print)
    ========================================================================== */
 @media print {

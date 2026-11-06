@@ -11,7 +11,9 @@ import {
   CloseIcon,
   ShieldCheckIcon,
   RefreshIcon,
+  CheckIcon,
 } from "./Icons";
+import { createLead } from "../services/api";
 import "./ScholarshipCalculatorModal.css";
 
 interface Props {
@@ -118,8 +120,8 @@ const PROGRAMS: ProgramConfig[] = [
       { key: "ib", label: "IB Score" },
     ],
     slabs: [
-      { scholarshipPercent: 20, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "75 – 85%", eamcet: "20001 – 25000", sat: "1151 – 1200", ib: "27 – 29" }, payableFeeSem: 96000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "85.1 – 90%", eamcet: "15001 – 20000", sat: "1201 – 1250", ib: "30 – 32" }, payableFeeSem: 84000 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "75 – 85%", eamcet: "16001 – 18000", sat: "1151 – 1200", ib: "27 – 29" }, payableFeeSem: 96000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "85.1 – 90%", eamcet: "15001 – 16000", sat: "1201 – 1250", ib: "30 – 32" }, payableFeeSem: 84000 },
       { scholarshipPercent: 40, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%", jeeMains: "90.1 – 93%", eamcet: "10001 – 15000", sat: "1251 – 1300", ib: "33 – 35" }, payableFeeSem: 72000 },
       { scholarshipPercent: 50, ranges: { stateBoard: "90 – 94.99%", cbse: "85 – 89.99%", jeeMains: "93.1 – 95%", eamcet: "5001 – 10000", sat: "1301 – 1350", ib: "36 – 38" }, payableFeeSem: 60000 },
       { scholarshipPercent: 70, ranges: { stateBoard: "≥ 95%", cbse: "≥ 90%", jeeMains: "≥ 95.1%", eamcet: "1 – 5000", sat: "≥ 1351", ib: "≥ 39" }, payableFeeSem: 36000 },
@@ -127,7 +129,7 @@ const PROGRAMS: ProgramConfig[] = [
   },
   {
     id: "btech_core",
-    name: "B.Tech. Core Engineering (EEE / Mechanical / Civil)",
+    name: "B.Tech. Core (Mechanical / Civil / EEE)",
     degreeType: "Bachelors",
     baseTuitionSem: 100000,
     enrollmentFee: 5000,
@@ -137,73 +139,64 @@ const PROGRAMS: ProgramConfig[] = [
       { key: "cbse", label: "CBSE %" },
       { key: "jeeMains", label: "JEE Mains %" },
       { key: "eamcet", label: "EAMCET / EAPCET Rank" },
-      { key: "sat", label: "SAT Score" },
-      { key: "ib", label: "IB Score" },
     ],
     slabs: [
-      { scholarshipPercent: 20, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "75 – 85%", eamcet: "25001 – 30000", sat: "1151 – 1200", ib: "27 – 29" }, payableFeeSem: 80000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "85.1 – 90%", eamcet: "20001 – 25000", sat: "1201 – 1250", ib: "30 – 32" }, payableFeeSem: 70000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%", jeeMains: "90.1 – 93%", eamcet: "15001 – 20000", sat: "1251 – 1300", ib: "33 – 35" }, payableFeeSem: 60000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "90 – 94.99%", cbse: "85 – 89.99%", jeeMains: "93.1 – 95%", eamcet: "10001 – 15000", sat: "1301 – 1350", ib: "36 – 38" }, payableFeeSem: 50000 },
-      { scholarshipPercent: 70, ranges: { stateBoard: "≥ 95%", cbse: "≥ 90%", jeeMains: "≥ 95.1%", eamcet: "1 – 10000", sat: "≥ 1351", ib: "≥ 39" }, payableFeeSem: 30000 },
-    ],
-  },
-  {
-    id: "bca",
-    name: "BCA (Bachelor of Computer Applications)",
-    degreeType: "Bachelors",
-    baseTuitionSem: 60000,
-    enrollmentFee: 5000,
-    admissionFee: 10000,
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2) %" },
-      { key: "cbse", label: "CBSE %" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%" }, payableFeeSem: 54000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%" }, payableFeeSem: 48000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%" }, payableFeeSem: 42000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "90 – 94.99%", cbse: "85 – 89.99%" }, payableFeeSem: 36000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "≥ 95%", cbse: "≥ 90%" }, payableFeeSem: 30000 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "75 – 85%", eamcet: "16001 – 20000" }, payableFeeSem: 80000 },
+      { scholarshipPercent: 35, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "85.1 – 90%", eamcet: "10001 – 16000" }, payableFeeSem: 65000 },
+      { scholarshipPercent: 50, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%", jeeMains: "90.1 – 93%", eamcet: "5001 – 10000" }, payableFeeSem: 50000 },
+      { scholarshipPercent: 70, ranges: { stateBoard: "≥ 90%", cbse: "≥ 85%", jeeMains: "≥ 93.1%", eamcet: "1 – 5000" }, payableFeeSem: 30000 },
     ],
   },
   {
     id: "bba",
     name: "BBA (Bachelor of Business Administration)",
     degreeType: "Bachelors",
-    baseTuitionSem: 60000,
+    baseTuitionSem: 90000,
     enrollmentFee: 5000,
-    admissionFee: 10000,
+    admissionFee: 15000,
     supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2) %" },
+      { key: "stateBoard", label: "10+2 Any Stream %" },
       { key: "cbse", label: "CBSE %" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%" }, payableFeeSem: 54000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%" }, payableFeeSem: 48000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%" }, payableFeeSem: 42000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "90 – 94.99%", cbse: "85 – 89.99%" }, payableFeeSem: 36000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "≥ 95%", cbse: "≥ 90%" }, payableFeeSem: 30000 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%" }, payableFeeSem: 72000 },
+      { scholarshipPercent: 35, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%" }, payableFeeSem: 58500 },
+      { scholarshipPercent: 50, ranges: { stateBoard: "≥ 90%", cbse: "≥ 85%" }, payableFeeSem: 45000 },
+    ],
+  },
+  {
+    id: "bca",
+    name: "BCA (Bachelor of Computer Applications)",
+    degreeType: "Bachelors",
+    baseTuitionSem: 90000,
+    enrollmentFee: 5000,
+    admissionFee: 15000,
+    supportedExams: [
+      { key: "stateBoard", label: "10+2 Any Stream %" },
+      { key: "cbse", label: "CBSE %" },
+    ],
+    slabs: [
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%" }, payableFeeSem: 72000 },
+      { scholarshipPercent: 35, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%" }, payableFeeSem: 58500 },
+      { scholarshipPercent: 50, ranges: { stateBoard: "≥ 90%", cbse: "≥ 85%" }, payableFeeSem: 45000 },
     ],
   },
   {
     id: "bsc_agri",
     name: "B.Sc. (Hons) Agriculture",
     degreeType: "Bachelors",
-    baseTuitionSem: 100000,
+    baseTuitionSem: 97500,
     enrollmentFee: 5000,
-    admissionFee: 10000,
+    admissionFee: 25000,
     supportedExams: [
-      { key: "stateBoard", label: "10+2 Inter BiPC %" },
-      { key: "cbse", label: "CBSE %" },
-      { key: "eamcet", label: "EAMCET Rank (Ag Stream)" },
-      { key: "icar", label: "ICAR Percentile" },
+      { key: "stateBoard", label: "10+2 BiPC / MPC %" },
+      { key: "eamcet", label: "EAMCET Agri Stream Rank" },
+      { key: "icar", label: "ICAR AIEEA Rank" },
     ],
     slabs: [
-      { scholarshipPercent: 15, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", eamcet: "15001 – 20000", icar: "75 – 80%" }, payableFeeSem: 85000 },
-      { scholarshipPercent: 25, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", eamcet: "10001 – 15000", icar: "80.1 – 85%" }, payableFeeSem: 75000 },
-      { scholarshipPercent: 35, ranges: { stateBoard: "80 – 89.99%", cbse: "75 – 84.99%", eamcet: "5001 – 10000", icar: "85.1 – 90%" }, payableFeeSem: 65000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "≥ 90%", cbse: "≥ 85%", eamcet: "1 – 5000", icar: "≥ 90.1%" }, payableFeeSem: 50000 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", eamcet: "10001 – 15000", icar: "5001 – 8000" }, payableFeeSem: 78000 },
+      { scholarshipPercent: 35, ranges: { stateBoard: "80 – 89.99%", eamcet: "5001 – 10000", icar: "2001 – 5000" }, payableFeeSem: 63375 },
+      { scholarshipPercent: 50, ranges: { stateBoard: "≥ 90%", eamcet: "1 – 5000", icar: "1 – 2000" }, payableFeeSem: 48750 },
     ],
   },
   {
@@ -212,41 +205,21 @@ const PROGRAMS: ProgramConfig[] = [
     degreeType: "Masters",
     baseTuitionSem: 150000,
     enrollmentFee: 5000,
-    admissionFee: 10000,
+    admissionFee: 20000,
     supportedExams: [
-      { key: "degree", label: "Graduation (Degree) %" },
-      { key: "icet", label: "ICET Rank" },
+      { key: "degree", label: "Graduation Degree %" },
+      { key: "icet", label: "TS / AP ICET Rank" },
       { key: "catMat", label: "CAT / MAT Percentile" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { degree: "60 – 69.99%", icet: "15001 – 20000", catMat: "70 – 75%" }, payableFeeSem: 135000 },
-      { scholarshipPercent: 20, ranges: { degree: "70 – 79.99%", icet: "10001 – 15000", catMat: "75.1 – 80%" }, payableFeeSem: 120000 },
-      { scholarshipPercent: 30, ranges: { degree: "80 – 89.99%", icet: "5001 – 10000", catMat: "80.1 – 85%" }, payableFeeSem: 105000 },
-      { scholarshipPercent: 40, ranges: { degree: "90 – 94.99%", icet: "1001 – 5000", catMat: "85.1 – 90%" }, payableFeeSem: 90000 },
-      { scholarshipPercent: 50, ranges: { degree: "≥ 95%", icet: "1 – 1000", catMat: "≥ 90.1%" }, payableFeeSem: 75000 },
-    ],
-  },
-  {
-    id: "mca",
-    name: "MCA (Master of Computer Applications)",
-    degreeType: "Masters",
-    baseTuitionSem: 75000,
-    enrollmentFee: 5000,
-    admissionFee: 10000,
-    supportedExams: [
-      { key: "degree", label: "Graduation (BCA / B.Sc) %" },
-      { key: "icet", label: "ICET Rank" },
-    ],
-    slabs: [
-      { scholarshipPercent: 15, ranges: { degree: "60 – 69.99%", icet: "10001 – 15000" }, payableFeeSem: 63750 },
-      { scholarshipPercent: 25, ranges: { degree: "70 – 79.99%", icet: "5001 – 10000" }, payableFeeSem: 56250 },
-      { scholarshipPercent: 35, ranges: { degree: "80 – 89.99%", icet: "1001 – 5000" }, payableFeeSem: 48750 },
-      { scholarshipPercent: 50, ranges: { degree: "≥ 90%", icet: "1 – 1000" }, payableFeeSem: 37500 },
+      { scholarshipPercent: 20, ranges: { degree: "70 – 79.99%", icet: "5001 – 10000", catMat: "70 – 79.9%" }, payableFeeSem: 120000 },
+      { scholarshipPercent: 35, ranges: { degree: "80 – 89.99%", icet: "1001 – 5000", catMat: "80 – 89.9%" }, payableFeeSem: 97500 },
+      { scholarshipPercent: 50, ranges: { degree: "≥ 90%", icet: "1 – 1000", catMat: "≥ 90%" }, payableFeeSem: 75000 },
     ],
   },
   {
     id: "mtech",
-    name: "M.Tech (Engineering Post-Graduation)",
+    name: "M.Tech. (Engineering Postgraduate)",
     degreeType: "Masters",
     baseTuitionSem: 52250,
     enrollmentFee: 5000,
@@ -263,25 +236,111 @@ const PROGRAMS: ProgramConfig[] = [
   },
 ];
 
+/** Helper to match exact input score or rank into appropriate slab index */
+function matchSlabFromScore(
+  program: ProgramConfig,
+  examKey: string,
+  scoreInput: string
+): number {
+  if (!scoreInput.trim()) return 0;
+  const num = parseFloat(scoreInput.replace(/[^\d.]/g, ""));
+  if (isNaN(num)) return 0;
+
+  const slabs = program.slabs;
+  if (!slabs || slabs.length === 0) return 0;
+
+  const isRank =
+    examKey.toLowerCase().includes("rank") ||
+    examKey.toLowerCase().includes("eamcet") ||
+    examKey.toLowerCase().includes("icet") ||
+    examKey.toLowerCase().includes("icar");
+
+  if (isRank) {
+    // For ranks: lower number is higher percentile
+    for (let i = slabs.length - 1; i >= 0; i--) {
+      const slab = slabs[i];
+      const rangeStr = (slab.ranges as any)[examKey] || "";
+      const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
+      if (match) {
+        const low = parseInt(match[1], 10);
+        const high = parseInt(match[2], 10);
+        if (num >= low && num <= high) return i;
+      }
+    }
+    // Check if score is better than the top tier
+    for (let i = slabs.length - 1; i >= 0; i--) {
+      const rangeStr = (slabs[i].ranges as any)[examKey] || "";
+      const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
+      if (match && num <= parseInt(match[2], 10)) return i;
+    }
+    return 0;
+  }
+
+  // Percentage or Score based exam (higher is better)
+  for (let i = slabs.length - 1; i >= 0; i--) {
+    const slab = slabs[i];
+    const rangeStr = (slab.ranges as any)[examKey] || slab.ranges.stateBoard || "";
+    if (rangeStr.includes("≥") || rangeStr.includes(">=") || rangeStr.includes(">")) {
+      const minVal = parseFloat(rangeStr.replace(/[^\d.]/g, ""));
+      if (!isNaN(minVal) && num >= minVal) return i;
+    }
+    const match = rangeStr.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)/);
+    if (match) {
+      const low = parseFloat(match[1]);
+      const high = parseFloat(match[2]);
+      if (num >= low && num <= high) return i;
+    }
+  }
+
+  // If score exceeds the highest defined threshold
+  for (let i = slabs.length - 1; i >= 0; i--) {
+    const rangeStr = (slabs[i].ranges as any)[examKey] || slabs[i].ranges.stateBoard || "";
+    const match = rangeStr.match(/(\d+(?:\.\d+)?)/);
+    if (match && num >= parseFloat(match[1])) return i;
+  }
+
+  return 0;
+}
+
 interface CalculatedSnapshot {
   program: ProgramConfig;
   exam: { key: string; label: string };
   slab: ScholarshipSlab;
   rangeText: string;
   discountAmount: number;
+  enteredScore: string;
+  studentName: string;
+  studentPhone: string;
 }
 
 export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Props) {
-  // 1. Form interactive selection state
+  // Pre-load saved lead info if user already verified previously
+  const savedLead = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("sru_student_lead");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // 1. Form state
   const [selectedProgramId, setSelectedProgramId] = useState<string>("btech_cse");
   const [selectedExamKey, setSelectedExamKey] = useState<string>("stateBoard");
-  const [selectedSlabIndex, setSelectedSlabIndex] = useState<number>(1);
+  const [enteredScore, setEnteredScore] = useState<string>("85%");
+  const [selectedSlabIndex, setSelectedSlabIndex] = useState<number>(2);
+  const [isManualSlabOverride, setIsManualSlabOverride] = useState<boolean>(false);
 
-  // 2. Calculated snapshot state: ONLY updated when user clicks Calculate
+  // Student Authentication / Lead details
+  const [studentName, setStudentName] = useState<string>(savedLead?.name || "");
+  const [studentPhone, setStudentPhone] = useState<string>(savedLead?.phone || "");
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // 2. Calculated snapshot state
   const [calculatedSnapshot, setCalculatedSnapshot] = useState<CalculatedSnapshot | null>(null);
   const [isSelectionModified, setIsSelectionModified] = useState<boolean>(false);
 
-  // Active program configuration for the form dropdowns
+  // Active program & exam configuration
   const currentProgram = useMemo(
     () => PROGRAMS.find((p) => p.id === selectedProgramId) || PROGRAMS[0],
     [selectedProgramId]
@@ -292,34 +351,72 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     return activeExams.find((e) => e.key === selectedExamKey) || activeExams[0];
   }, [activeExams, selectedExamKey]);
 
-  // Handle Form Changes (Mark calculation as stale if results are already showing)
-  const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newProgId = e.target.value;
-    setSelectedProgramId(newProgId);
-    setSelectedSlabIndex(0);
-    const prog = PROGRAMS.find((p) => p.id === newProgId);
-    if (prog && !prog.supportedExams.some((x) => x.key === selectedExamKey)) {
-      setSelectedExamKey(prog.supportedExams[0].key);
+  // Handle score input change and auto-match slab
+  const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEnteredScore(val);
+    if (!isManualSlabOverride) {
+      const idx = matchSlabFromScore(currentProgram, currentExam.key, val);
+      setSelectedSlabIndex(idx);
     }
     if (calculatedSnapshot) setIsSelectionModified(true);
   };
 
-  const handleExamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedExamKey(e.target.value);
-    setSelectedSlabIndex(0);
+  // Program change
+  const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newProgId = e.target.value;
+    setSelectedProgramId(newProgId);
+    const prog = PROGRAMS.find((p) => p.id === newProgId);
+    let nextExamKey = selectedExamKey;
+    if (prog && !prog.supportedExams.some((x) => x.key === selectedExamKey)) {
+      nextExamKey = prog.supportedExams[0].key;
+      setSelectedExamKey(nextExamKey);
+    }
+    if (prog && !isManualSlabOverride) {
+      const idx = matchSlabFromScore(prog, nextExamKey, enteredScore);
+      setSelectedSlabIndex(idx);
+    }
     if (calculatedSnapshot) setIsSelectionModified(true);
   };
 
+  // Exam change
+  const handleExamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newExamKey = e.target.value;
+    setSelectedExamKey(newExamKey);
+    if (!isManualSlabOverride) {
+      const idx = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
+      setSelectedSlabIndex(idx);
+    }
+    if (calculatedSnapshot) setIsSelectionModified(true);
+  };
+
+  // Slab manual select
   const handleSlabChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSlabIndex(Number(e.target.value));
+    setIsManualSlabOverride(true);
     if (calculatedSnapshot) setIsSelectionModified(true);
   };
 
-  // ONLY calculate when user clicks the button
-  const handleCalculate = (e: React.FormEvent) => {
+  // Calculate & authenticate lead
+  const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const prog = PROGRAMS.find((p) => p.id === selectedProgramId) || PROGRAMS[0];
-    const exam = prog.supportedExams.find((x) => x.key === selectedExamKey) || prog.supportedExams[0];
+
+    // Validate student authentication inputs
+    const cleanName = studentName.trim();
+    const cleanPhoneDigits = studentPhone.replace(/\D/g, "");
+
+    if (!cleanName) {
+      setValidationError("Please enter student name to authenticate and view official fee structure.");
+      return;
+    }
+    if (cleanPhoneDigits.length < 10) {
+      setValidationError("Please enter a valid 10-digit mobile number for admissions verification.");
+      return;
+    }
+    setValidationError(null);
+
+    const prog = currentProgram;
+    const exam = currentExam;
     const slab = prog.slabs[selectedSlabIndex] || prog.slabs[0];
     const rangeText =
       (slab.ranges as any)[exam.key] ||
@@ -329,15 +426,46 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       prog.baseTuitionSem * (slab.scholarshipPercent / 100)
     );
 
+    // Save lead in localStorage and backend
+    const leadData = {
+      name: cleanName,
+      phone: studentPhone.trim(),
+      program_interest: prog.name,
+      score: enteredScore.trim() || rangeText,
+      exam_type: exam.label,
+      source: "scholarship_calculator",
+      metadata: {
+        calculated_discount: discount,
+        scholarship_percent: slab.scholarshipPercent,
+        payable_sem: slab.payableFeeSem,
+      },
+    };
+    try {
+      localStorage.setItem("sru_student_lead", JSON.stringify({ name: cleanName, phone: studentPhone.trim() }));
+      await createLead(leadData);
+    } catch (err) {
+      console.warn("Lead registration note:", err);
+    }
+
     setCalculatedSnapshot({
       program: prog,
       exam,
       slab,
       rangeText,
       discountAmount: discount,
+      enteredScore: enteredScore.trim(),
+      studentName: cleanName,
+      studentPhone: studentPhone.trim(),
     });
     setIsSelectionModified(false);
   };
+
+  // Matched slab info for badge
+  const matchedSlab = currentProgram.slabs[selectedSlabIndex] || currentProgram.slabs[0];
+  const matchedRangeStr =
+    (matchedSlab.ranges as any)[currentExam.key] ||
+    matchedSlab.ranges.stateBoard ||
+    "Standard Slab";
 
   return (
     <div className="scholarship-modal-backdrop" onClick={onClose}>
@@ -361,7 +489,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
         {/* Form Controls */}
         <form onSubmit={handleCalculate} className="calc-form">
           <div className="calc-grid-controls">
-            {/* 1. Program Selection */}
+            {/* 1. Academic Program */}
             <div className="calc-field">
               <label htmlFor="calc-prog-select">1. Academic Program</label>
               <select
@@ -404,34 +532,114 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </select>
             </div>
 
-            {/* 3. Score Range */}
-            <div className="calc-field">
-              <label htmlFor="calc-slab-select">3. Score / Rank Range</label>
-              <select
-                id="calc-slab-select"
-                value={selectedSlabIndex}
-                onChange={handleSlabChange}
-                className="calc-select"
-              >
-                {currentProgram.slabs.map((slab, idx) => {
-                  const rangeStr =
-                    (slab.ranges as any)[currentExam.key] ||
-                    slab.ranges.stateBoard ||
-                    `Slab ${idx + 1}`;
-                  return (
-                    <option key={idx} value={idx}>
-                      {rangeStr} ({slab.scholarshipPercent}% Waiver)
-                    </option>
-                  );
-                })}
-              </select>
+            {/* 3. Ask for Exact Score / Rank */}
+            <div className="calc-field calc-field-score">
+              <div className="calc-score-label-row">
+                <label htmlFor="calc-score-input">
+                  3. Enter Score / Rank
+                </label>
+                <button
+                  type="button"
+                  className="calc-toggle-btn"
+                  onClick={() => setIsManualSlabOverride(!isManualSlabOverride)}
+                >
+                  {isManualSlabOverride ? "← Enter exact score" : "Choose range list →"}
+                </button>
+              </div>
+
+              {!isManualSlabOverride ? (
+                <div className="calc-score-input-wrap">
+                  <input
+                    id="calc-score-input"
+                    type="text"
+                    className="calc-input calc-score-input"
+                    placeholder="e.g. 92.5% in Inter, 8500 rank, or 1320 in SAT"
+                    value={enteredScore}
+                    onChange={handleScoreChange}
+                  />
+                  {matchedSlab && (
+                    <div className="calc-matched-badge">
+                      <AwardIcon size={14} />
+                      <span>
+                        <strong>{matchedSlab.scholarshipPercent}% Scholarship Matched</strong>
+                        {" • "}{matchedRangeStr}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <select
+                  id="calc-slab-select"
+                  value={selectedSlabIndex}
+                  onChange={handleSlabChange}
+                  className="calc-select"
+                >
+                  {currentProgram.slabs.map((slab, idx) => {
+                    const rangeStr =
+                      (slab.ranges as any)[currentExam.key] ||
+                      slab.ranges.stateBoard ||
+                      `Slab ${idx + 1}`;
+                    return (
+                      <option key={idx} value={idx}>
+                        {rangeStr} ({slab.scholarshipPercent}% Waiver)
+                      </option>
+                    );
+                  })}
+                </select>
+              )}
             </div>
+          </div>
+
+          {/* Student Verification / Lead Capture Box */}
+          <div className="calc-auth-box">
+            <div className="calc-auth-header">
+              <ShieldCheckIcon size={15} />
+              <span>Student Verification & Admission Authentication</span>
+            </div>
+            <div className="calc-auth-grid">
+              <div className="calc-field">
+                <label htmlFor="calc-student-name">Student Full Name *</label>
+                <input
+                  id="calc-student-name"
+                  type="text"
+                  className="calc-input"
+                  placeholder="Enter student full name"
+                  value={studentName}
+                  onChange={(e) => {
+                    setStudentName(e.target.value);
+                    if (validationError) setValidationError(null);
+                  }}
+                  required
+                />
+              </div>
+              <div className="calc-field">
+                <label htmlFor="calc-student-phone">10-Digit Mobile Number *</label>
+                <input
+                  id="calc-student-phone"
+                  type="tel"
+                  className="calc-input"
+                  placeholder="e.g. 9876543210"
+                  value={studentPhone}
+                  onChange={(e) => {
+                    setStudentPhone(e.target.value);
+                    if (validationError) setValidationError(null);
+                  }}
+                  maxLength={15}
+                  required
+                />
+              </div>
+            </div>
+            {validationError && (
+              <div className="calc-error-banner">
+                <span>{validationError}</span>
+              </div>
+            )}
           </div>
 
           {/* Action Button */}
           <button type="submit" className="calc-submit-btn">
             <BoltIcon size={16} />
-            <span>Calculate Scholarship</span>
+            <span>Calculate Official Scholarship</span>
           </button>
         </form>
 
@@ -439,7 +647,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
         {calculatedSnapshot && isSelectionModified && (
           <div className="calc-stale-banner">
             <RefreshIcon size={14} />
-            <span>Parameters modified. Click <strong>Calculate Scholarship</strong> to update results.</span>
+            <span>Parameters modified. Click <strong>Calculate Official Scholarship</strong> to update results.</span>
           </div>
         )}
 
@@ -451,7 +659,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
             </div>
             <div className="calc-placeholder-text">
               <h4>Ready to evaluate your scholarship</h4>
-              <p>Select your program and qualifying examination score above, then click <strong>Calculate Scholarship</strong> to view your exact payable fee.</p>
+              <p>Enter your qualifying score and contact details above, then click <strong>Calculate Official Scholarship</strong> to see your exact payable fee and multi-year progression.</p>
             </div>
           </div>
         )}
@@ -467,6 +675,12 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               <div className="exam-tag">
                 Criteria: <strong>{calculatedSnapshot.exam.label}</strong> ({calculatedSnapshot.rangeText})
               </div>
+            </div>
+
+            {/* Verification confirmation */}
+            <div className="calc-verified-banner">
+              <CheckIcon size={14} />
+              <span>Verified for <strong>{calculatedSnapshot.studentName}</strong> ({calculatedSnapshot.studentPhone})</span>
             </div>
 
             {/* Three-Column Financial Summary */}
@@ -558,7 +772,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 onClick={() => {
                   onClose();
                   onAskBuddy(
-                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.exam.label} (${calculatedSnapshot.rangeText}) which pays ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem (${calculatedSnapshot.slab.scholarshipPercent}% waiver). Can you clarify admission verification and hostel accommodation options?`
+                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.exam.label} (${calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText}) which pays ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem (${calculatedSnapshot.slab.scholarshipPercent}% waiver). Can you clarify admission verification and hostel accommodation options?`
                   );
                 }}
               >

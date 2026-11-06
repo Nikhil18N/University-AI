@@ -40,6 +40,7 @@ async def lifespan(fastapi_app: FastAPI):
         import app.models.message
         import app.models.feedback
         import app.models.document
+        import app.models.lead
 
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
@@ -214,6 +215,9 @@ async def health_check() -> HealthResponse:
 # ---- Register routers ----
 from app.api.v1.chat import router as chat_router
 from app.api.v1.admin import router as admin_router
+from app.api.v1.lead import router as lead_router
 
 app.include_router(chat_router)
 app.include_router(admin_router)
+app.include_router(lead_router)
+

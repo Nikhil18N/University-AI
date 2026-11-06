@@ -33,7 +33,8 @@ from app.schemas.admin import (
 )
 from app.schemas.common import ErrorResponse
 from app.schemas.document import DocumentListResponse, DocumentResponse
-from app.services import admin_service
+from app.schemas.lead import LeadListResponse, LeadResponse, LeadStatsResponse, LeadStatusUpdate
+from app.services import admin_service, lead_service
 from app.services.ingestion_service import IngestionService
 
 logger = logging.getLogger(__name__)
@@ -425,5 +426,104 @@ async def list_evaluations(
             for r in records
         ],
     }
+
+
+# ---- Prospective Leads & Admissions Inquiries ----
+
+@router.get("/leads", response_model=LeadListResponse)
+async def list_leads(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+    search: str | None = Query(None),
+    program: str | None = Query(None),
+    source: str | None = Query(None),
+    status: str | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+) -> LeadListResponse:
+    """List prospective student leads with filtering, search, and pagination."""
+    total, leads = await lead_service.list_leads(
+        db=db,
+        page=page,
+        page_size=page_size,
+        search=search,
+        program=program,
+        source=source,
+        status=status,
+    )
+    return LeadListResponse(
+        total=total,
+        items=[LeadResponse.model_validate(l) for l in leads],
+    )
+
+
+@router.get("/leads/stats", response_model=LeadStatsResponse)
+async def get_lead_stats(
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+) -> LeadStatsResponse:
+    """Get aggregated lead statistics and conversion counts."""
+    stats = await lead_service.get_lead_stats(db)
+    return LeadStatsResponse(**stats)
+
+
+@router.patch("/leads/{lead_id}/status", response_model=LeadResponse)
+async def update_lead_status(
+    lead_id: UUID,
+    payload: LeadStatusUpdate,
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+) -> LeadResponse:
+    """Update admissions status of a prospective lead."""
+    updated = await lead_service.update_lead_status(db, lead_id, payload.status)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    return LeadResponse.model_validate(updated)
+
+
+@router.get("/leads/export")
+async def export_leads(
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+):
+    """Export all prospective leads as CSV for university admissions CRM matching."""
+    import csv
+    import io
+
+    _, leads = await lead_service.list_leads(db=db, page=1, page_size=10000)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "ID",
+        "Name",
+        "Phone",
+        "Email",
+        "Program Interest",
+        "Score",
+        "Exam Type",
+        "Source",
+        "Status",
+        "Created At",
+    ])
+    for l in leads:
+        writer.writerow([
+            str(l.id),
+            l.name,
+            l.phone,
+            l.email or "",
+            l.program_interest or "",
+            l.score or "",
+            l.exam_type or "",
+            l.source,
+            l.status,
+            l.created_at.isoformat() if l.created_at else "",
+        ])
+
+    return Response(
+        content=output.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=sru_prospective_leads.csv"},
+    )
+
 
 

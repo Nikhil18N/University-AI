@@ -536,5 +536,129 @@ export async function runAdminBenchmark(adminKey: string): Promise<any> {
   return res.json();
 }
 
+// ---- Prospective Leads API ----
+
+export interface ProspectiveLeadItem {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  program_interest: string | null;
+  score: string | null;
+  exam_type: string | null;
+  source: string;
+  conversation_id: string | null;
+  status: string;
+  created_at: string;
+  metadata?: any;
+}
+
+export interface LeadListResponse {
+  total: number;
+  items: ProspectiveLeadItem[];
+  leads?: ProspectiveLeadItem[];
+}
+
+export interface LeadStats {
+  total_leads: number;
+  chat_leads: number;
+  calculator_leads: number;
+  today_leads: number;
+  enrolled_leads: number;
+}
+
+export interface CreateLeadPayload {
+  name: string;
+  phone: string;
+  email?: string;
+  program_interest?: string;
+  score?: string;
+  exam_type?: string;
+  source?: string;
+  conversation_id?: string;
+  metadata?: any;
+}
+
+export async function createLead(payload: CreateLeadPayload): Promise<ProspectiveLeadItem> {
+  const res = await fetch(`${API_BASE}/api/v1/leads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to register lead");
+  }
+  return res.json();
+}
+
+export async function fetchAdminLeads(
+  adminKey: string,
+  params: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    program?: string;
+    source?: string;
+    status?: string;
+  } = {}
+): Promise<LeadListResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.pageSize) searchParams.set("page_size", String(params.pageSize));
+  if (params.search) searchParams.set("search", params.search);
+  if (params.program) searchParams.set("program", params.program);
+  if (params.source) searchParams.set("source", params.source);
+  if (params.status) searchParams.set("status", params.status);
+
+  const res = await fetch(`${API_BASE}/api/v1/admin/leads?${searchParams.toString()}`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to load prospective leads");
+  return res.json();
+}
+
+export async function fetchAdminLeadStats(adminKey: string): Promise<LeadStats> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/leads/stats`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to load lead statistics");
+  return res.json();
+}
+
+export async function updateLeadStatus(
+  adminKey: string,
+  leadId: string,
+  status: string
+): Promise<ProspectiveLeadItem> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/leads/${leadId}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Key": adminKey,
+    },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error("Failed to update lead status");
+  return res.json();
+}
+
+export async function exportAdminLeads(adminKey: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/leads/export`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to export leads");
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sru_prospective_leads_${new Date().toISOString().split("T")[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
+
 
 

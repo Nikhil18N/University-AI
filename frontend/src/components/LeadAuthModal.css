@@ -1,0 +1,235 @@
+/* LeadAuthModal.css - Student Verification Modal for SR University */
+
+.lead-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lead-modal-card {
+  background: var(--surface-1, #18181b);
+  color: var(--text, #f4f4f5);
+  border: 1px solid var(--border, #27272a);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px;
+  gap: 16px;
+  animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lead-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+}
+
+.lead-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.lead-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-1, #ffffff);
+}
+
+.lead-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.lead-close-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #a1a1aa);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.lead-close-btn:hover {
+  background: var(--surface-2, #27272a);
+  color: var(--text, #ffffff);
+}
+
+.lead-prompt-banner {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: #c7d2fe;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lead-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.lead-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lead-input {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--surface-2, #27272a);
+  color: var(--text, #ffffff);
+  border: 1px solid var(--border, #3f3f46);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lead-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+}
+
+.lead-error-text {
+  color: #f87171;
+  font-size: 0.82rem;
+  margin-top: -4px;
+}
+
+.lead-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lead-submit-btn {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+.lead-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4338ca, #4f46e5);
+  transform: translateY(-1px);
+}
+
+.lead-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lead-skip-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #a1a1aa);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 6px;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.lead-skip-btn:hover {
+  color: var(--text, #ffffff);
+}
+
+/* Light Theme */
+[data-theme="light"] .lead-modal-card {
+  background: #ffffff;
+  color: #18181b;
+  border-color: #e4e4e7;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .lead-title {
+  color: #09090b;
+}
+
+[data-theme="light"] .lead-icon-badge {
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+[data-theme="light"] .lead-prompt-banner {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+
+[data-theme="light"] .lead-input {
+  background: #fbfbfb;
+  color: #18181b;
+  border-color: #e4e4e7;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .lead-modal-backdrop {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .lead-modal-card {
+    padding: 18px 16px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .lead-title {
+    font-size: 1.05rem;
+  }
+
+  .lead-submit-btn {
+    min-height: 46px;
+  }
+}

@@ -5,6 +5,7 @@ import ConversationList from "../components/ConversationList";
 import ThinkingIndicator from "../components/ThinkingIndicator";
 import ShareModal from "../components/ShareModal";
 import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
+import LeadAuthModal from "../components/LeadAuthModal";
 import { CalculatorIcon } from "../components/Icons";
 import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
@@ -65,6 +66,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [showLeadAuthModal, setShowLeadAuthModal] = useState<boolean>(false);
+  const [pendingAuthMessage, setPendingAuthMessage] = useState<string | null>(null);
+  const [authReason, setAuthReason] = useState<string | undefined>(undefined);
 
   // Theme & Sound states (default to white / light mode)
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -334,13 +338,54 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     exportToText(activeChatTitle, messages);
   };
 
+  function isHighIntentLeadQuery(text: string): boolean {
+    const lower = text.toLowerCase();
+    const feeKeywords = [
+      "fee", "fees", "tuition", "scholarship", "cost", "hostel fee", "mess fee", "bus fee", "transport fee"
+    ];
+    const admissionKeywords = [
+      "admission", "admissions", "join", "joining", "apply", "seat", "eligibility",
+      "how to get into", "how to join", "cutoff", "cut off", "rank requirement",
+      "interested in joining", "take admission", "b.tech admission", "how to apply"
+    ];
+    return feeKeywords.some((k) => lower.includes(k)) || admissionKeywords.some((k) => lower.includes(k));
+  }
+
+  function isStudentLeadVerified(): boolean {
+    try {
+      const lead = localStorage.getItem("sru_student_lead");
+      if (!lead) return false;
+      const parsed = JSON.parse(lead);
+      const digits = (parsed?.phone || "").replace(/\D/g, "");
+      return digits.length >= 10 && Boolean(parsed?.name);
+    } catch {
+      return false;
+    }
+  }
+
   async function handleSendMessage(text: string) {
     const trimmed = text.trim();
+    if (!trimmed) return;
+
     if (trimmed === "🧮 Scholarship Calculator" || trimmed === "🧮 Open Scholarship Calculator") {
       setIsCalculatorOpen(true);
       return;
     }
 
+    // Middleware: Authenticate prospective student before answering high-intent fee & admission queries
+    if (isHighIntentLeadQuery(trimmed) && !isStudentLeadVerified()) {
+      setPendingAuthMessage(trimmed);
+      setAuthReason(
+        "To view complete SR University fee structures, scholarship calculations, and priority admission guidance, please authenticate with your student name and mobile number."
+      );
+      setShowLeadAuthModal(true);
+      return;
+    }
+
+    await executeSendMessage(trimmed);
+  }
+
+  async function executeSendMessage(text: string) {
     if (isLoading && cancelStreamRef.current) {
       cancelStreamRef.current();
       cancelStreamRef.current = null;
@@ -930,6 +975,24 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           }}
         />
       )}
+
+      {/* Prospective Student Authentication Modal */}
+      <LeadAuthModal
+        isOpen={showLeadAuthModal}
+        onClose={() => {
+          setShowLeadAuthModal(false);
+          setPendingAuthMessage(null);
+        }}
+        onSuccess={(_lead) => {
+          setShowLeadAuthModal(false);
+          if (pendingAuthMessage) {
+            const nextMsg = pendingAuthMessage;
+            setPendingAuthMessage(null);
+            executeSendMessage(nextMsg);
+          }
+        }}
+        reasonText={authReason}
+      />
     </div>
   );
 }
