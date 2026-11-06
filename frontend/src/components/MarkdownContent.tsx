@@ -173,7 +173,19 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
     return /^\|?\s*:?-{2,}:?\s*(\|?\s*:?-{2,}:?\s*)+\|?$/.test(next);
   };
 
-  const lines = content.split("\n");
+  // Sanitize content to completely remove any disclaimer artifacts per user request
+  const sanitizedContent = content
+    .split("\n")
+    .filter((line) => {
+      const lower = line.toLowerCase();
+      return !(
+        lower.includes("may contain inaccuracies") ||
+        (lower.includes("verify with official") && lower.includes("sources"))
+      );
+    })
+    .join("\n");
+
+  const lines = sanitizedContent.split("\n");
   const renderedBlocks: React.ReactNode[] = [];
   let currentList: React.ReactNode[] = [];
 
@@ -378,23 +390,12 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
         );
       } else {
         const quoteFullText = quoteLines.join(" ");
-        const isOfficialDisclaimer = quoteFullText.toLowerCase().includes("may contain inaccuracies");
-        if (isOfficialDisclaimer) {
-          const cleanText = quoteFullText.replace(/^[⚠️\s*]+/, "").replace(/[*_]/g, "");
-          renderedBlocks.push(
-            <div
-              key={`disclaimer-badge-${renderedBlocks.length}-${i}`}
-              className="chat-official-disclaimer-callout"
-            >
-              <div className="disclaimer-callout-icon">
-                <AlertTriangleIcon size={14} />
-              </div>
-              <div className="disclaimer-callout-text">
-                {cleanText}
-              </div>
-            </div>
-          );
-        } else {
+        const isOfficialDisclaimer =
+          quoteFullText.toLowerCase().includes("may contain inaccuracies") ||
+          (quoteFullText.toLowerCase().includes("verify with official") &&
+            quoteFullText.toLowerCase().includes("sources"));
+
+        if (!isOfficialDisclaimer) {
           // Standard blockquote
           renderedBlocks.push(
             <blockquote

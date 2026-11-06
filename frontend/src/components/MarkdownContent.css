@@ -442,31 +442,3 @@
   color: var(--sru-blue, #6366f1);
 }
 
-/* Official University Disclaimer Callout */
-.chat-official-disclaimer-callout {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 12px 0 4px 0;
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.22);
-  color: var(--text-muted, #a1a1aa);
-  font-size: 0.78rem;
-  font-style: italic;
-  line-height: 1.4;
-}
-
-.disclaimer-callout-icon {
-  display: flex;
-  align-items: center;
-  color: #f59e0b;
-  flex-shrink: 0;
-}
-
-[data-theme="light"] .chat-official-disclaimer-callout {
-  background: #fffbeb;
-  border-color: #fde68a;
-  color: #92400e;
-}

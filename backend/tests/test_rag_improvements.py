@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.services.rag_service import MANDATORY_DISCLAIMER, RAGService
+from app.services.rag_service import RAGService
 from app.services.suggestion_service import (
     generate_suggestions,
     ACADEMIC_SUGGESTIONS,
@@ -14,30 +14,30 @@ from app.services.suggestion_service import (
 
 
 @pytest.mark.asyncio
-async def test_rag_appends_mandatory_disclaimer():
-    """Verify that generate_answer appends the mandatory disclaimer if missing."""
+async def test_rag_generates_clean_answer_without_disclaimer():
+    """Verify that generate_answer returns a clean answer without appending disclaimer."""
     mock_llm = MagicMock()
-    mock_llm.generate = AsyncMock(return_value="Tuition fee for B.Tech CSE is Rs. 2,10,000 per year.")
+    mock_llm.generate = AsyncMock(return_value="Tuition fee for B.Tech CSE is Rs. 1,47,500 per semester.")
     mock_embed = MagicMock()
 
     with patch("app.services.rag_service.chromadb.PersistentClient"):
         rag = RAGService(llm_provider=mock_llm, embedding_provider=mock_embed)
         # Mock prepare_rag_request
-        rag.prepare_rag_request = AsyncMock(return_value=([], [], "Tuition fee is Rs. 2,10,000."))
+        rag.prepare_rag_request = AsyncMock(return_value=([], [], "Tuition fee is Rs. 1,47,500."))
         
         answer, sources = await rag.generate_answer(
             question="What is the fee for CSE?",
             conversation_context="",
-            retrieved_chunks=[{"content": "Tuition fee is Rs. 2,10,000.", "metadata": {}}],
+            retrieved_chunks=[{"content": "Tuition fee is Rs. 1,47,500.", "metadata": {}}],
         )
 
-        assert "May contain inaccuracies" in answer
-        assert "Verify with official university sources" in answer
+        assert "May contain inaccuracies" not in answer
+        assert "Verify with official university sources" not in answer
 
 
 @pytest.mark.asyncio
-async def test_rag_preserves_existing_disclaimer():
-    """Verify that if disclaimer is already in the LLM answer, it is not duplicated."""
+async def test_rag_sanitizes_stray_disclaimer():
+    """Verify that if disclaimer is in the raw LLM answer, it is sanitized out."""
     existing_answer = (
         "B.Tech CSE requires 60% PCM.\n\n"
         "> ⚠️ *May contain inaccuracies. Verify with official university sources.*"
@@ -56,8 +56,8 @@ async def test_rag_preserves_existing_disclaimer():
             retrieved_chunks=[{"content": "Evidence", "metadata": {}}],
         )
 
-        # Should only appear once
-        assert answer.count("May contain inaccuracies") == 1
+        assert "May contain inaccuracies" not in answer
+
 
 
 def test_specialist_suggestion_chips():

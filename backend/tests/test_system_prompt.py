@@ -1,11 +1,11 @@
-"""Tests for the upgraded 11-section system prompt and RAG prompt."""
+"""Tests for the upgraded system prompt and RAG prompt."""
 
 from pathlib import Path
 from app.services.prompt_service import load_prompt, render_prompt
 
 
-def test_system_prompt_contains_all_11_sections():
-    """Verify system.md contains all 11 required intelligence upgrade sections."""
+def test_system_prompt_contains_all_core_sections():
+    """Verify system.md contains all core intelligence upgrade sections."""
     prompt = load_prompt("system")
     assert "## 1. Identity & Role" in prompt
     assert "## 2. Core Principles" in prompt
@@ -16,8 +16,7 @@ def test_system_prompt_contains_all_11_sections():
     assert "## 7. Specialist Workflows & Domain Standards" in prompt
     assert "## 8. Out-of-Scope & Privacy Boundaries" in prompt
     assert "## 9. Response Style & Markdown Standards" in prompt
-    assert "## 10. Mandatory Disclaimer Requirement" in prompt
-    assert "## 11. Final Quality Checklist" in prompt
+    assert "## 10. Final Quality Checklist" in prompt
 
 
 def test_system_prompt_contains_critical_rules():
@@ -26,13 +25,11 @@ def test_system_prompt_contains_critical_rules():
     assert "SRU Buddy" in prompt
     assert "60% aggregate marks" in prompt
     assert "Fully Flexible Credit System" in prompt
-    assert "May contain inaccuracies" in prompt
-    assert "Verify with official university sources" in prompt
     assert "Strictly No Double Questions" in prompt
 
 
-def test_rag_prompt_contains_disclaimer_rule():
-    """Verify rag.md contains the mandatory disclaimer instruction."""
+def test_rag_prompt_contains_core_formatting():
+    """Verify rag.md contains the core formatting standards."""
     prompt = load_prompt("rag")
-    assert "MANDATORY OFFICIAL SOURCES DISCLAIMER" in prompt
-    assert "May contain inaccuracies. Verify with official university sources" in prompt
+    assert "MARKDOWN FORMATTING STANDARDS" in prompt
+

@@ -114,7 +114,5 @@ Rules:
   • Callouts (> [!NOTE], > [!TIP]): Highlight critical notices, deadlines, or tips using blockquote callouts.
   • Code blocks (```): Use syntax blocks when sharing code or technical configs.
   • Strikethrough (~~text~~): Use strikethrough when noting superseded fees or revised dates.
-- MANDATORY OFFICIAL SOURCES DISCLAIMER:
-  • At the very end of your response, append on its own line:
-    > ⚠️ *May contain inaccuracies. Verify with official university sources.*
+
 
