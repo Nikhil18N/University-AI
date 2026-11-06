@@ -12,6 +12,7 @@ import {
   ShieldCheckIcon,
   RefreshIcon,
   CheckIcon,
+  InfoIcon,
 } from "./Icons";
 import { createLead } from "../services/api";
 import "./ScholarshipCalculatorModal.css";
@@ -237,17 +238,42 @@ const PROGRAMS: ProgramConfig[] = [
 ];
 
 /** Helper to match exact input score or rank into appropriate slab index */
+export interface ScoreMatchResult {
+  slabIndex: number;
+  percentage?: number;
+  displayText: string;
+  status: "matched" | "below_criteria" | "invalid";
+}
+
 function matchSlabFromScore(
   program: ProgramConfig,
   examKey: string,
   scoreInput: string
-): number {
-  if (!scoreInput.trim()) return 0;
-  const num = parseFloat(scoreInput.replace(/[^\d.]/g, ""));
-  if (isNaN(num)) return 0;
+): ScoreMatchResult {
+  const trimmed = scoreInput.trim();
+  if (!trimmed) {
+    return { slabIndex: -1, displayText: "", status: "invalid" };
+  }
 
   const slabs = program.slabs;
-  if (!slabs || slabs.length === 0) return 0;
+  if (!slabs || slabs.length === 0) {
+    return { slabIndex: -1, displayText: "", status: "invalid" };
+  }
+
+  // 1. Check for fraction / out-of format: e.g. "780/1000", "450/500", "850 / 1000"
+  const fractionMatch = trimmed.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  let obtainedNum = 0;
+  let totalMax = 0;
+  if (fractionMatch) {
+    obtainedNum = parseFloat(fractionMatch[1]);
+    totalMax = parseFloat(fractionMatch[2]);
+  } else {
+    const match = trimmed.match(/(\d+(?:\.\d+)?)/);
+    if (!match) {
+      return { slabIndex: -1, displayText: "", status: "invalid" };
+    }
+    obtainedNum = parseFloat(match[1]);
+  }
 
   const isRank =
     examKey.toLowerCase().includes("rank") ||
@@ -255,8 +281,12 @@ function matchSlabFromScore(
     examKey.toLowerCase().includes("icet") ||
     examKey.toLowerCase().includes("icar");
 
+  const isSat = examKey.toLowerCase().includes("sat");
+  const isIb = examKey.toLowerCase().includes("ib");
+
+  // CASE A: RANK-BASED EXAM (Lower rank number is better)
   if (isRank) {
-    // For ranks: lower number is higher percentile
+    const rank = Math.round(obtainedNum);
     for (let i = slabs.length - 1; i >= 0; i--) {
       const slab = slabs[i];
       const rangeStr = (slab.ranges as any)[examKey] || "";
@@ -264,42 +294,146 @@ function matchSlabFromScore(
       if (match) {
         const low = parseInt(match[1], 10);
         const high = parseInt(match[2], 10);
-        if (num >= low && num <= high) return i;
+        if (rank >= low && rank <= high) {
+          return {
+            slabIndex: i,
+            displayText: `Rank ${rank.toLocaleString("en-IN")}`,
+            status: "matched",
+          };
+        }
       }
     }
-    // Check if score is better than the top tier
-    for (let i = slabs.length - 1; i >= 0; i--) {
-      const rangeStr = (slabs[i].ranges as any)[examKey] || "";
-      const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
-      if (match && num <= parseInt(match[2], 10)) return i;
+    // Check if rank is better than top slab (e.g. rank 15 when top slab is 1-5000)
+    const topRange = (slabs[slabs.length - 1].ranges as any)[examKey] || "";
+    const topMatch = topRange.match(/(\d+)\s*[–-]\s*(\d+)/);
+    if (topMatch && rank < parseInt(topMatch[1], 10) && rank > 0) {
+      return {
+        slabIndex: slabs.length - 1,
+        displayText: `Rank ${rank.toLocaleString("en-IN")}`,
+        status: "matched",
+      };
     }
-    return 0;
+    return {
+      slabIndex: -1,
+      displayText: `Rank ${rank.toLocaleString("en-IN")} (Above Cutoff)`,
+      status: "below_criteria",
+    };
   }
 
-  // Percentage or Score based exam (higher is better)
+  // CASE B: SAT SCORE (Out of 1600, higher is better)
+  if (isSat) {
+    const sat = Math.round(obtainedNum);
+    for (let i = slabs.length - 1; i >= 0; i--) {
+      const slab = slabs[i];
+      const rangeStr = (slab.ranges as any)[examKey] || "";
+      if (rangeStr.includes("≥") || rangeStr.includes(">=") || rangeStr.includes(">")) {
+        const minVal = parseFloat(rangeStr.replace(/[^\d.]/g, ""));
+        if (!isNaN(minVal) && sat >= minVal) {
+          return { slabIndex: i, displayText: `SAT ${sat}`, status: "matched" };
+        }
+      }
+      const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
+      if (match) {
+        const low = parseInt(match[1], 10);
+        const high = parseInt(match[2], 10);
+        if (sat >= low && sat <= high) {
+          return { slabIndex: i, displayText: `SAT ${sat}`, status: "matched" };
+        }
+      }
+    }
+    return {
+      slabIndex: -1,
+      displayText: `SAT ${sat} (Below Cutoff)`,
+      status: "below_criteria",
+    };
+  }
+
+  // CASE C: IB SCORE (Out of 45, higher is better)
+  if (isIb) {
+    const ib = Math.round(obtainedNum);
+    for (let i = slabs.length - 1; i >= 0; i--) {
+      const slab = slabs[i];
+      const rangeStr = (slab.ranges as any)[examKey] || "";
+      if (rangeStr.includes("≥") || rangeStr.includes(">=") || rangeStr.includes(">")) {
+        const minVal = parseFloat(rangeStr.replace(/[^\d.]/g, ""));
+        if (!isNaN(minVal) && ib >= minVal) {
+          return { slabIndex: i, displayText: `IB ${ib}`, status: "matched" };
+        }
+      }
+      const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
+      if (match) {
+        const low = parseInt(match[1], 10);
+        const high = parseInt(match[2], 10);
+        if (ib >= low && ib <= high) {
+          return { slabIndex: i, displayText: `IB ${ib}`, status: "matched" };
+        }
+      }
+    }
+    return {
+      slabIndex: -1,
+      displayText: `IB ${ib} (Below Cutoff)`,
+      status: "below_criteria",
+    };
+  }
+
+  // CASE D: PERCENTAGE & MARKS-BASED EXAMS
+  // (State Board 10+2 / Inter %, CBSE %, JEE Mains %, Degree %, etc.)
+  let percentage: number;
+  let displayText: string;
+
+  if (totalMax > 0) {
+    percentage = Math.round((obtainedNum / totalMax) * 10000) / 100;
+    displayText = `${obtainedNum}/${totalMax} (${percentage}%)`;
+  } else if (obtainedNum > 100) {
+    // User typed raw marks without slash, e.g. "780" or "850" or "940" or "450"
+    if (examKey === "cbse" && obtainedNum <= 500) {
+      percentage = Math.round((obtainedNum / 500) * 10000) / 100;
+      displayText = `${obtainedNum}/500 (${percentage}%)`;
+    } else if (obtainedNum <= 1000) {
+      // Telangana & Andhra Pradesh 10+2 / Intermediate marks are out of 1000!
+      // 780 marks -> 78.0%!
+      percentage = Math.round((obtainedNum / 10) * 100) / 100;
+      displayText = `${obtainedNum}/1000 (${percentage}%)`;
+    } else {
+      return {
+        slabIndex: -1,
+        displayText: `${obtainedNum} (Invalid mark range)`,
+        status: "invalid",
+      };
+    }
+  } else {
+    percentage = Math.round(obtainedNum * 100) / 100;
+    displayText = `${percentage}%`;
+  }
+
+  // Match normalized percentage against slabs (highest scholarship down to lowest)
   for (let i = slabs.length - 1; i >= 0; i--) {
     const slab = slabs[i];
     const rangeStr = (slab.ranges as any)[examKey] || slab.ranges.stateBoard || "";
+
     if (rangeStr.includes("≥") || rangeStr.includes(">=") || rangeStr.includes(">")) {
       const minVal = parseFloat(rangeStr.replace(/[^\d.]/g, ""));
-      if (!isNaN(minVal) && num >= minVal) return i;
+      if (!isNaN(minVal) && percentage >= minVal) {
+        return { slabIndex: i, percentage, displayText, status: "matched" };
+      }
     }
+
     const match = rangeStr.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)/);
     if (match) {
       const low = parseFloat(match[1]);
       const high = parseFloat(match[2]);
-      if (num >= low && num <= high) return i;
+      if (percentage >= low && percentage <= high) {
+        return { slabIndex: i, percentage, displayText, status: "matched" };
+      }
     }
   }
 
-  // If score exceeds the highest defined threshold
-  for (let i = slabs.length - 1; i >= 0; i--) {
-    const rangeStr = (slabs[i].ranges as any)[examKey] || slabs[i].ranges.stateBoard || "";
-    const match = rangeStr.match(/(\d+(?:\.\d+)?)/);
-    if (match && num >= parseFloat(match[1])) return i;
-  }
-
-  return 0;
+  return {
+    slabIndex: -1,
+    percentage,
+    displayText: `${displayText} (Below Cutoff)`,
+    status: "below_criteria",
+  };
 }
 
 interface CalculatedSnapshot {
@@ -351,13 +485,18 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     return activeExams.find((e) => e.key === selectedExamKey) || activeExams[0];
   }, [activeExams, selectedExamKey]);
 
+  // Compute current score match
+  const scoreMatch = useMemo(() => {
+    return matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
+  }, [currentProgram, currentExam.key, enteredScore]);
+
   // Handle score input change and auto-match slab
   const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEnteredScore(val);
     if (!isManualSlabOverride) {
-      const idx = matchSlabFromScore(currentProgram, currentExam.key, val);
-      setSelectedSlabIndex(idx);
+      const res = matchSlabFromScore(currentProgram, currentExam.key, val);
+      setSelectedSlabIndex(res.slabIndex);
     }
     if (calculatedSnapshot) setIsSelectionModified(true);
   };
@@ -373,8 +512,8 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       setSelectedExamKey(nextExamKey);
     }
     if (prog && !isManualSlabOverride) {
-      const idx = matchSlabFromScore(prog, nextExamKey, enteredScore);
-      setSelectedSlabIndex(idx);
+      const res = matchSlabFromScore(prog, nextExamKey, enteredScore);
+      setSelectedSlabIndex(res.slabIndex);
     }
     if (calculatedSnapshot) setIsSelectionModified(true);
   };
@@ -384,8 +523,8 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     const newExamKey = e.target.value;
     setSelectedExamKey(newExamKey);
     if (!isManualSlabOverride) {
-      const idx = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
-      setSelectedSlabIndex(idx);
+      const res = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
+      setSelectedSlabIndex(res.slabIndex);
     }
     if (calculatedSnapshot) setIsSelectionModified(true);
   };
@@ -417,21 +556,37 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
     const prog = currentProgram;
     const exam = currentExam;
-    const slab = prog.slabs[selectedSlabIndex] || prog.slabs[0];
-    const rangeText =
-      (slab.ranges as any)[exam.key] ||
-      slab.ranges.stateBoard ||
-      `Slab ${selectedSlabIndex + 1}`;
-    const discount = Math.round(
-      prog.baseTuitionSem * (slab.scholarshipPercent / 100)
-    );
+    const isNoScholarship = selectedSlabIndex === -1;
+    const slab: ScholarshipSlab = isNoScholarship
+      ? {
+          scholarshipPercent: 0,
+          payableFeeSem: prog.baseTuitionSem,
+          ranges: { [exam.key]: "Standard Tuition (Below Cutoff)" },
+          cseYearlyPayable:
+            prog.id === "btech_cse"
+              ? { yr1: 147500, yr2: 155000, yr3: 163000, yr4: 171000 }
+              : undefined,
+        }
+      : prog.slabs[selectedSlabIndex] || prog.slabs[0];
+
+    const rangeText = isNoScholarship
+      ? "Standard Tuition (No Merit Waiver)"
+      : (slab.ranges as any)[exam.key] ||
+        slab.ranges.stateBoard ||
+        `Slab ${selectedSlabIndex + 1}`;
+
+    const discount = isNoScholarship
+      ? 0
+      : Math.round(prog.baseTuitionSem * (slab.scholarshipPercent / 100));
+
+    const finalScoreDisplay = scoreMatch.displayText || enteredScore.trim() || rangeText;
 
     // Save lead in localStorage and backend
     const leadData = {
       name: cleanName,
       phone: studentPhone.trim(),
       program_interest: prog.name,
-      score: enteredScore.trim() || rangeText,
+      score: finalScoreDisplay,
       exam_type: exam.label,
       source: "scholarship_calculator",
       metadata: {
@@ -453,7 +608,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       slab,
       rangeText,
       discountAmount: discount,
-      enteredScore: enteredScore.trim(),
+      enteredScore: finalScoreDisplay,
       studentName: cleanName,
       studentPhone: studentPhone.trim(),
     });
@@ -461,11 +616,13 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
   };
 
   // Matched slab info for badge
-  const matchedSlab = currentProgram.slabs[selectedSlabIndex] || currentProgram.slabs[0];
-  const matchedRangeStr =
-    (matchedSlab.ranges as any)[currentExam.key] ||
-    matchedSlab.ranges.stateBoard ||
-    "Standard Slab";
+  const matchedSlab =
+    selectedSlabIndex >= 0 ? currentProgram.slabs[selectedSlabIndex] : null;
+  const matchedRangeStr = matchedSlab
+    ? (matchedSlab.ranges as any)[currentExam.key] ||
+      matchedSlab.ranges.stateBoard ||
+      "Standard Slab"
+    : "No Merit Scholarship Applicable";
 
   return (
     <div className="scholarship-modal-backdrop" onClick={onClose}>
@@ -557,12 +714,33 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                     value={enteredScore}
                     onChange={handleScoreChange}
                   />
-                  {matchedSlab && (
+                  {scoreMatch.status === "matched" && matchedSlab && (
                     <div className="calc-matched-badge">
                       <AwardIcon size={14} />
                       <span>
                         <strong>{matchedSlab.scholarshipPercent}% Scholarship Matched</strong>
                         {" • "}{matchedRangeStr}
+                        {scoreMatch.displayText && !matchedRangeStr.includes(scoreMatch.displayText)
+                          ? ` (${scoreMatch.displayText})`
+                          : ""}
+                      </span>
+                    </div>
+                  )}
+                  {scoreMatch.status === "below_criteria" && (
+                    <div className="calc-matched-badge below-cutoff">
+                      <InfoIcon size={14} />
+                      <span>
+                        <strong>Standard Tuition (No Merit Scholarship)</strong>
+                        {" • "}{scoreMatch.displayText}
+                      </span>
+                    </div>
+                  )}
+                  {scoreMatch.status === "invalid" && enteredScore.trim() && (
+                    <div className="calc-matched-badge below-cutoff">
+                      <InfoIcon size={14} />
+                      <span>
+                        <strong>Check Score Entry</strong>
+                        {" • "}{scoreMatch.displayText || "Please enter valid marks or rank"}
                       </span>
                     </div>
                   )}
@@ -574,6 +752,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                   onChange={handleSlabChange}
                   className="calc-select"
                 >
+                  <option value="-1">Standard Tuition Fee (No Merit Scholarship / Below Cutoff) (0% Waiver)</option>
                   {currentProgram.slabs.map((slab, idx) => {
                     const rangeStr =
                       (slab.ranges as any)[currentExam.key] ||
@@ -668,9 +847,18 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
         {calculatedSnapshot && (
           <div className="calc-result-box">
             <div className="result-top-badge">
-              <div className="award-badge">
-                <AwardIcon size={18} />
-                <span>{calculatedSnapshot.slab.scholarshipPercent}% Merit Scholarship Awarded</span>
+              <div className={`award-badge ${calculatedSnapshot.slab.scholarshipPercent === 0 ? "standard-fee" : ""}`}>
+                {calculatedSnapshot.slab.scholarshipPercent > 0 ? (
+                  <>
+                    <AwardIcon size={18} />
+                    <span>{calculatedSnapshot.slab.scholarshipPercent}% Merit Scholarship Awarded</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheckIcon size={18} />
+                    <span>Standard Tuition Fee Applicable (No Merit Waiver)</span>
+                  </>
+                )}
               </div>
               <div className="exam-tag">
                 Criteria: <strong>{calculatedSnapshot.exam.label}</strong> ({calculatedSnapshot.rangeText})
@@ -687,17 +875,23 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
             <div className="fee-comparison-row">
               <div className="fee-stat">
                 <span className="stat-label">Standard Tuition</span>
-                <span className="stat-val strikethrough">
+                <span className={`stat-val ${calculatedSnapshot.discountAmount > 0 ? "strikethrough" : ""}`}>
                   ₹{calculatedSnapshot.program.baseTuitionSem.toLocaleString("en-IN")}
                 </span>
                 <span className="stat-sub">Per semester</span>
               </div>
-              <div className="fee-stat highlight-green">
+              <div className={`fee-stat ${calculatedSnapshot.discountAmount > 0 ? "highlight-green" : ""}`}>
                 <span className="stat-label">Scholarship Savings</span>
                 <span className="stat-val savings">
-                  -₹{calculatedSnapshot.discountAmount.toLocaleString("en-IN")}
+                  {calculatedSnapshot.discountAmount > 0
+                    ? `-₹${calculatedSnapshot.discountAmount.toLocaleString("en-IN")}`
+                    : "₹0"}
                 </span>
-                <span className="stat-sub">{calculatedSnapshot.slab.scholarshipPercent}% tuition waiver</span>
+                <span className="stat-sub">
+                  {calculatedSnapshot.slab.scholarshipPercent > 0
+                    ? `${calculatedSnapshot.slab.scholarshipPercent}% tuition waiver`
+                    : "No waiver (below cutoff)"}
+                </span>
               </div>
               <div className="fee-stat primary-payable">
                 <span className="stat-label">You Pay Tuition</span>

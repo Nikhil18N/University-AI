@@ -267,6 +267,12 @@
   font-size: 0.86rem;
 }
 
+.award-badge.standard-fee {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
 .exam-tag {
   font-size: 0.78rem;
   color: var(--text-muted, #a1a1aa);
@@ -577,6 +583,12 @@
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 0.78rem;
+}
+
+.calc-matched-badge.below-cutoff {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
 }
 
 /* Student Verification Box */
