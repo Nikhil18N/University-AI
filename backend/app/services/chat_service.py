@@ -39,6 +39,7 @@ from app.services.video_service import (
     get_relevant_videos,
     get_semantic_videos,
     is_explicit_video_query,
+    sanitize_answer_video_prompts,
 )
 
 logger = logging.getLogger(__name__)
@@ -302,6 +303,10 @@ async def handle_chat(
             if semantic_videos and not explicit_video and intent == "UNIVERSITY":
                 cat = semantic_videos[0].get("category", "our campus")
                 answer = format_video_offer_prompt(answer, cat)
+            else:
+                answer = sanitize_answer_video_prompts(answer)
+        else:
+            answer = sanitize_answer_video_prompts(answer)
 
         # 6. Generate smart suggestion chips and rich cards
         suggestions = generate_suggestions(
@@ -626,6 +631,12 @@ async def handle_chat_stream(
         explicit_video = is_explicit_video_query(request.message)
 
         if not is_video_yes and not is_video_no:
+            if not query_embedding and rag_service:
+                try:
+                    query_embedding = await rag_service.embeddings.embed_single(request.message)
+                except Exception:
+                    query_embedding = None
+
             if query_embedding:
                 semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
                 if semantic_videos and not explicit_video and intent == "UNIVERSITY":
@@ -633,9 +644,14 @@ async def handle_chat_stream(
                     new_answer = format_video_offer_prompt(answer, cat)
                     if new_answer != answer:
                         delta_prompt = new_answer[len(answer):]
-                        for chunk in chunk_text_stream(delta_prompt):
-                            yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                        if delta_prompt:
+                            for chunk in chunk_text_stream(delta_prompt):
+                                yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                         answer = new_answer
+                else:
+                    answer = sanitize_answer_video_prompts(answer)
+            else:
+                answer = sanitize_answer_video_prompts(answer)
 
             # Suggestions and rich cards
             suggestions = generate_suggestions(

@@ -246,22 +246,60 @@ def get_relevant_videos(
     return []
 
 
+_TRAILING_VIDEO_OFFER_PATTERN = re.compile(
+    r"\n*(?:Would you like|Do you want|Should we|Feel free to|Let me know if you would like)[^\n?]*video[^\n?]*\??(?:\s*\([^\)]*\))?\s*$",
+    re.I,
+)
+
+
+def strip_video_offer_prompt(answer: str) -> str:
+    """Remove any trailing video offer question from answer string."""
+    return _TRAILING_VIDEO_OFFER_PATTERN.sub("", answer).strip()
+
+
+def sanitize_answer_video_prompts(answer: str) -> str:
+    """Remove any hallucinated video tour prompts when no video is being offered."""
+    disclaimer = ""
+    cleaned = answer.strip()
+    disclaimer_match = re.search(r"(\n*> ⚠️\s*\*May contain inaccuracies[^\n]*\*)\s*$", cleaned, re.I)
+    if disclaimer_match:
+        disclaimer = disclaimer_match.group(1)
+        cleaned = cleaned[:disclaimer_match.start()].strip()
+
+    cleaned = strip_video_offer_prompt(cleaned)
+    if disclaimer:
+        cleaned = f"{cleaned}\n{disclaimer}"
+    return cleaned
+
+
 def format_video_offer_prompt(answer: str, category_name: str = "this") -> str:
     """Ensure answer ends with a clean Yes/No video offer invitation using the semantically matched video category."""
     offer_question = f"Would you like to watch a short video tour of {category_name}? (Yes / No)"
 
-    if _VIDEO_OFFER_REGEX.search(answer):
-        return answer
+    disclaimer = ""
+    cleaned = answer.strip()
 
+    # Extract trailing disclaimer if already present
+    disclaimer_match = re.search(r"(\n*> ⚠️\s*\*May contain inaccuracies[^\n]*\*)\s*$", cleaned, re.I)
+    if disclaimer_match:
+        disclaimer = disclaimer_match.group(1)
+        cleaned = cleaned[:disclaimer_match.start()].strip()
+
+    # Strip any existing video offer so we never duplicate or retain a stale category
+    cleaned = strip_video_offer_prompt(cleaned)
+
+    # Also replace any trailing conversational follow-up question so there are never double questions
     trailing_pattern = re.compile(
         r"\n*(?:Would you like|Do you want|Should we|Feel free to|Let me know if you would like)[^\n?]+\?\s*$",
         re.I,
     )
-    if trailing_pattern.search(answer):
-        cleaned = trailing_pattern.sub("", answer).strip()
-        return f"{cleaned}\n\n{offer_question}"
+    if trailing_pattern.search(cleaned):
+        cleaned = trailing_pattern.sub("", cleaned).strip()
 
-    return f"{answer.rstrip()}\n\n{offer_question}"
+    result = f"{cleaned}\n\n{offer_question}"
+    if disclaimer:
+        result = f"{result}\n{disclaimer}"
+    return result
 
 
 def check_video_affirmative_or_negative(

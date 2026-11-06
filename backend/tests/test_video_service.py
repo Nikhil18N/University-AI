@@ -220,3 +220,32 @@ def test_format_video_offer_prompt():
     formatted = format_video_offer_prompt(ans, "Hostels & Living")
     assert "Would you like to watch a short video tour of Hostels & Living? (Yes / No)" in formatted
     assert "Would you like more info?" not in formatted
+
+
+def test_format_video_offer_prompt_replaces_mismatched_category():
+    """Verify format_video_offer_prompt replaces a stale or mismatched category with the correct one."""
+    ans = (
+        "SR University maintains an impressive placement record with an average package of 6 LPA, "
+        "while the highest package reached 51 LPA through an offer from Microsoft.\n\n"
+        "Would you like to watch a short video tour of Hostel Life & Amenities? (Yes / No)\n\n"
+        "> ⚠️ *May contain inaccuracies. Verify with official university sources.*"
+    )
+    formatted = format_video_offer_prompt(ans, "Placements & Careers")
+    assert "Would you like to watch a short video tour of Placements & Careers? (Yes / No)" in formatted
+    assert "Hostel Life & Amenities" not in formatted
+    assert formatted.endswith("> ⚠️ *May contain inaccuracies. Verify with official university sources.*")
+
+
+def test_sanitize_answer_video_prompts():
+    """Verify sanitize_answer_video_prompts removes hallucinated video prompts when no video is matched."""
+    from app.services.video_service import sanitize_answer_video_prompts
+
+    ans = (
+        "Here are the transport details.\n\n"
+        "Would you like to watch a short video tour of Transport? (Yes / No)\n\n"
+        "> ⚠️ *May contain inaccuracies. Verify with official university sources.*"
+    )
+    sanitized = sanitize_answer_video_prompts(ans)
+    assert "Would you like to watch a short video tour" not in sanitized
+    assert "Here are the transport details." in sanitized
+    assert "> ⚠️ *May contain inaccuracies. Verify with official university sources.*" in sanitized
