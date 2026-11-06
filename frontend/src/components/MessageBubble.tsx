@@ -202,7 +202,7 @@ export default function MessageBubble({
             )}
 
             <div className="ai-response-disclaimer">
-              <span>SRU Buddy Beta • Verify with official sources</span>
+              <span>SRU Buddy is AI and can make mistakes. Verify with official sources</span>
             </div>
           </div>
         )}
