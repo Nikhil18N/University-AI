@@ -140,7 +140,8 @@ class ExemplarService:
             ):
                 dist = results["distances"][0][0]
                 if dist <= distance_threshold:
-                    meta = results["metadatas"][0][0]
+                    raw_meta = results["metadatas"][0][0]
+                    meta = raw_meta if isinstance(raw_meta, dict) else {}
                     logger.info(
                         "Found matching verified exemplar (dist=%.3f) for query: %s",
                         dist,

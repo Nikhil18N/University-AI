@@ -182,7 +182,9 @@ def get_semantic_videos(
         matched = []
         seen_ids: set[str] = set()
         for meta, dist in zip(results["metadatas"][0], results["distances"][0]):
-            if dist <= max_distance:
+            if not isinstance(meta, dict):
+                continue
+            if dist is not None and dist <= max_distance:
                 vid_id = meta.get("id") or meta.get("url", "")
                 if vid_id not in seen_ids:
                     seen_ids.add(vid_id)
@@ -287,9 +289,10 @@ def check_video_affirmative_or_negative(
             return True, False
         return False, False
 
-    assistant_content = last_assistant_msg.get("content", "")
-    metadata = last_assistant_msg.get("metadata") or {}
-    suggestions = metadata.get("suggestions") or []
+    assistant_content = last_assistant_msg.get("content", "") if isinstance(last_assistant_msg, dict) else ""
+    raw_meta = last_assistant_msg.get("metadata") if isinstance(last_assistant_msg, dict) else {}
+    metadata = raw_meta if isinstance(raw_meta, dict) else {}
+    suggestions = metadata.get("suggestions") if isinstance(metadata.get("suggestions"), list) else []
 
     video_offered = (
         bool(_VIDEO_OFFER_REGEX.search(assistant_content))

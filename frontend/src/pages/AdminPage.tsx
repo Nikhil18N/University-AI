@@ -306,7 +306,7 @@ export default function AdminPage({ onBackToChat }: Props) {
           <form onSubmit={handleLogin}>
             <input
               type="password"
-              placeholder="Admin API Key (e.g. change-me-in-production)"
+              placeholder="Enter Admin API Key"
               value={keyInput}
               onChange={(e) => setKeyInput(e.target.value)}
               required

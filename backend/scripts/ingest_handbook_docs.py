@@ -75,9 +75,9 @@ HANDBOOK_DOCS = [
     {
         "file": "08_admissions_fees_scholarships_and_eligibility.md",
         "title": "SRU Student Handbook — Admissions, Fees, Scholarships & Eligibility",
-        "document_type": "handbook",
+        "document_type": "admissions_policy",
         "department": "Admissions & Financial Aid",
-        "effective_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+        "effective_date": datetime(2026, 6, 1, tzinfo=timezone.utc),
     },
     {
         "file": "09_verified_sru_facts.md",

@@ -185,7 +185,9 @@ async def handle_chat(
 
     if is_video_yes:
         last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
-        matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+        asst_meta = last_asst_msg.get("metadata") if isinstance(last_asst_msg, dict) else {}
+        asst_meta = asst_meta if isinstance(asst_meta, dict) else {}
+        matching_videos = asst_meta.get("matched_videos")
         if not matching_videos and rag_service:
             prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
             if prior_user_msg:
@@ -399,6 +401,7 @@ async def handle_chat_stream(
         flow_info: dict | None = None
         answer = ""
         query_embedding: list[float] | None = None
+        profile: dict = {}
 
         # Check for guided flow or video confirmation/decline
         is_video_yes, is_video_no = check_video_affirmative_or_negative(
@@ -407,7 +410,9 @@ async def handle_chat_stream(
 
         if is_video_yes:
             last_asst_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "assistant"), None)
-            matching_videos = (last_asst_msg.get("metadata") or {}).get("matched_videos") if last_asst_msg else None
+            asst_meta = last_asst_msg.get("metadata") if isinstance(last_asst_msg, dict) else {}
+            asst_meta = asst_meta if isinstance(asst_meta, dict) else {}
+            matching_videos = asst_meta.get("matched_videos")
             if not matching_videos and rag_service:
                 prior_user_msg = next((m for m in reversed(recent[:-1]) if m.get("role") == "user"), None)
                 if prior_user_msg:
@@ -683,4 +688,5 @@ async def handle_chat_stream(
 
     except Exception as e:
         logger.error("Chat stream error: %s", e, exc_info=True)
-        yield f"data: {json.dumps({'type': 'error', 'detail': str(e)})}\n\n"
+        user_message = "Something went wrong while connecting to the university server. Please try again in a moment."
+        yield f"data: {json.dumps({'type': 'error', 'detail': user_message})}\n\n"

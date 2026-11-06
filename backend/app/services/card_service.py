@@ -28,41 +28,41 @@ COMPARISON_CSE_AIML = {
 
 FEE_BREAKDOWN_CARD = {
     "type": "fee_breakdown",
-    "title": "SR University Annual Fee Breakdown",
+    "title": "SR University Official Fee Breakdown (2026-27 / 2027-28)",
     "currency": "INR",
     "items": [
         {
             "category": "Tuition Fee (B.Tech CSE)",
-            "amount": "₹1,40,000",
-            "frequency": "Per Year",
-            "note": "Merit scholarships up to 50% available",
+            "amount": "₹1,47,500 / Sem",
+            "frequency": "₹2,95,000 / Year",
+            "note": "Semester-wise billing; 40% scholarship for 92%+ in Inter",
         },
         {
-            "category": "Hostel Accommodation",
-            "amount": "₹60,000 – ₹95,000",
-            "frequency": "Per Year",
-            "note": "Non-AC / AC room options with 24/7 security",
+            "category": "Admission & Enrollment (One-time)",
+            "amount": "₹30,000",
+            "frequency": "One-time (Year 1)",
+            "note": "₹5,000 enrollment + ₹25,000 admission fee",
         },
         {
-            "category": "Mess & Dining",
-            "amount": "₹45,000",
+            "category": "Girls Hostel (AC with Mess)",
+            "amount": "₹1,25,000 – ₹1,35,000",
             "frequency": "Per Year",
-            "note": "Nutritious veg & non-veg meals 4 times daily",
+            "note": "4-sharing / 3-sharing AC with 4 meals daily, Wi-Fi & laundry",
+        },
+        {
+            "category": "Boys Hostel (with Mess)",
+            "amount": "₹85,000 – ₹1,35,000",
+            "frequency": "Per Year",
+            "note": "Non-AC (₹85k-95k) or AC (₹1.20L-1.35L) with meals & laundry",
         },
         {
             "category": "Transport Facility (Optional)",
             "amount": "₹22,000 – ₹30,000",
             "frequency": "Per Year",
-            "note": "Covers Warangal, Hanamkonda & Kazipet routes",
-        },
-        {
-            "category": "Caution Deposit (Refundable)",
-            "amount": "₹5,000",
-            "frequency": "One-time",
-            "note": "Refunded upon program completion",
+            "note": "Tri-cities bus routes (Warangal, Hanamkonda, Kazipet)",
         },
     ],
-    "scholarship_note": "Merit waiver up to 50% tuition for 90%+ in 10+2 PCM or top rankers.",
+    "scholarship_note": "40% tuition scholarship for 92%–97.99% in 10+2 MPC for CSE; up to 100% for top rankers.",
 }
 
 CURRICULUM_CARD = {

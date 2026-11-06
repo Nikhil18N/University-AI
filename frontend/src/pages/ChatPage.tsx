@@ -27,9 +27,9 @@ interface Props {
 
 const MINIMAL_STARTERS = [
   {
-    title: "Admissions 2026",
+    title: "Admissions 2027-28",
     desc: "Eligibility criteria, cutoff ranks & application procedure",
-    prompt: "What is the eligibility criteria and admission process for B.Tech 2026?",
+    prompt: "What is the eligibility criteria and admission process for B.Tech 2027-28?",
   },
   {
     title: "Fees & Scholarships",
@@ -344,6 +344,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     if (isLoading && cancelStreamRef.current) {
       cancelStreamRef.current();
       cancelStreamRef.current = null;
+    } else if (isLoading) {
+      return;
     }
 
     setIsLoading(true);

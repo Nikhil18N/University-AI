@@ -23,15 +23,14 @@
 ## 2. Undergraduate (B.Tech) Admissions & Eligibility Criteria
 
 - **[FACT-ID: ADM-001] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Minimum Eligibility Threshold**: Minimum **60% aggregate marks** in 10+2 / Intermediate PCM (Physics, Chemistry, Mathematics).
-  - **State Board Marks Equivalent**: In 1000-mark systems (TS BIE / AP BIE), minimum **600 marks out of 1000** is required.
+  - **Minimum Eligibility Threshold**: Minimum **50% aggregate marks** in 10+2 / Intermediate PCM (Physics, Chemistry, Mathematics).
+  - **State Board Marks Equivalent**: In 1000-mark systems (TS BIE / AP BIE), minimum **500 marks out of 1000** is required.
   - **Strict Cutoff Rule**:
-    - 60% or 600 marks: **Fully Eligible**.
-    - 61% (or any score >= 60%): **Fully Eligible** (never state that 60% or 61% is "shy of" or "short of" the cutoff).
-    - Under 60% (e.g. 59.9% or 599 marks): Falls below the mandatory cutoff; applicants must contact the admissions desk for special evaluation.
+    - 50% (500 marks), 52%, 58%, 60%, 61%: **Fully Eligible** (the cutoff is 50%, NOT 60%; never state that 58% or 61% is "shy of" or "short of" the cutoff).
+    - Under 50% (e.g. under 500 marks): Falls below the published cutoff; applicants are encouraged to contact the admissions desk for alternative academic options.
   - **Branch Uniformity**: Applies uniformly to B.Tech CSE, AI&ML, Data Science, Cyber Security, ECE, EEE, and Mechanical Engineering.
-  - **Direct / Management Quota**: No entrance exam (JEE Main / TS EAMCET) is required for direct/management quota seats. Admission is based on 10+2 PCM marks and seat availability.
-  - **Official Admissions Contacts**: Phone: **833 100 3030** / **833 100 4040**, Email: `admissions@sru.edu.in`, Portal: `https://sru.edu.in/admissions`.
+  - **Direct / Management Quota**: Admission is based on 10+2 marks and seat availability. Entrance ranks determine merit scholarship slabs.
+  - **Official Admissions Contacts**: Phone: **0870-2818333** / **0870-2818311** (Mobile: **833 100 3030** / **833 100 4040**), Email: `admissions@sru.edu.in` / `info@sru.edu.in`, Portal: `https://apply.sru.edu.in`.
 
 ---
 
