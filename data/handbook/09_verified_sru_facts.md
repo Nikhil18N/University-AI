@@ -59,6 +59,8 @@
   - **M.Tech**: **₹52,250 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
   - **M.Sc. Agriculture**: **₹90,000 / semester** | **M.Sc. Programs**: **₹37,500 / semester**.
   - **Other Fees**: Wi-Fi, Cultural, Placements & ERP: **₹15,000** | Exam Fee: **₹5,000 / year**.
+  - **Transport & Bus Fee**: **₹22,000 – ₹30,000 per year** for tri-cities bus routes (Warangal, Hanamkonda, Kazipet). Contact: Mr. A. Keerthi Reddy (**9640606408**, `transport@sru.edu.in`).
+  - **Strict Fee Category Scoping Rule**: When asked about a specific fee (transport, hostel, tuition, exam, or admission), return ONLY that specific fee. Never cross-contaminate or dump unrequested fees.
 
 ---
 

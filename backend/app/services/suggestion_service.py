@@ -65,7 +65,7 @@ HOSTEL_SUGGESTIONS = [
     "🕒 Hostel Curfew & In-Time Rules",
     "🍽️ Mess Timings & Food Facilities",
     "🔒 Hostel Safety & Visitor Policy",
-    "🚌 University Bus Routes & Timings",
+    "🏠 AC vs Non-AC Room Options",
 ]
 
 ACADEMIC_SUGGESTIONS = [
@@ -100,7 +100,7 @@ TRANSPORT_SUGGESTIONS = [
     "🚌 Bus Timings",
     "💳 Transport Fee",
     "📍 Warangal & Hanamkonda Routes",
-    "🏠 Hostel Facilities",
+    "📍 Kazipet & Subedari Stops",
 ]
 
 CURRICULUM_SUGGESTIONS = [
@@ -200,13 +200,27 @@ def generate_suggestions(
             return PLACEMENT_VIDEO_OFFER_SUGGESTIONS
         return PLACEMENT_SUGGESTIONS
 
-    # 6. Fees, Tuition & Scholarships
+    # 6. Fees, Tuition & Scholarships (Strict Category Scoping)
     if any(k in msg_lower for k in ("scholarship", "scholarships", "calculator", "waiver")):
         return SCHOLARSHIP_SUGGESTIONS
+    if any(k in msg_lower for k in ("bus", "transport", "commute", "van route")) and any(
+        k in msg_lower for k in ("fee", "fees", "cost", "charge", "price", "how much", "rate", "pass")
+    ):
+        return TRANSPORT_SUGGESTIONS
+    if any(k in msg_lower for k in ("hostel", "mess", "boarding", "room rent")) and any(
+        k in msg_lower for k in ("fee", "fees", "cost", "charge", "price", "how much", "rate", "rent")
+    ):
+        return [
+            "🏠 Girls AC Hostel Fee",
+            "🏠 Boys Non-AC & AC Fee",
+            "🍽️ Mess & Food Facilities",
+            "🕒 Hostel Curfew & In-Time",
+        ]
     if any(k in msg_lower for k in ("btech", "b.tech", "cse", "ece", "mech", "civil", "engineering")) and any(k in msg_lower for k in ("fee", "fees", "tuition")):
         return BTECH_FEE_SUGGESTIONS
     if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "caution deposit")):
         return GENERAL_FEE_SUGGESTIONS
+
 
     # 7. Startups & SRiX incubator
     if any(k in msg_lower for k in ("srix", "startup", "incubator", "entrepreneur")):

@@ -144,7 +144,12 @@
 ## 4. Other University Fees
 * **Wi-Fi, Cultural Events, Placements & ERP**: **₹15,000**
 * **Exam Fee (Per Year)**: **₹5,000**
-* **Transportation Fee**: Varies according to route and distance (Kazipet, Hanamkonda, Warangal, Huzurabad, Jammikunta, Karimnagar).
+* **Transportation & Bus Fee (Annual)**:
+  - Tri-cities routes (Warangal, Hanamkonda, Kazipet): **₹22,000 – ₹30,000 per year** (varies by boarding stage).
+  - Outstation routes (Huzurabad, Jammikunta, Karimnagar): as per distance slabs.
+  - Fleet features: 30+ designated pickup points across the tri-cities with GPS-tracked buses.
+  - Transport In-charge: Mr. A. Keerthi Reddy (Phone: **9640606408**, Email: `transport@sru.edu.in`).
+
 
 ---
 

@@ -65,6 +65,95 @@ FEE_BREAKDOWN_CARD = {
     "scholarship_note": "40% tuition scholarship for 92%–97.99% in 10+2 MPC for CSE; up to 100% for top rankers.",
 }
 
+TRANSPORT_FEE_CARD = {
+    "type": "fee_breakdown",
+    "title": "SR University Transport & Bus Fee (2026-27 / 2027-28)",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "Tri-Cities Bus Routes (Warangal, Hanamkonda, Kazipet)",
+            "amount": "₹22,000 – ₹30,000",
+            "frequency": "Per Year",
+            "note": "GPS-tracked fleet with 30+ designated pickup stops across the tri-cities",
+        },
+        {
+            "category": "Extended Outstation Routes (Huzurabad, Jammikunta, Karimnagar)",
+            "amount": "As per distance slab",
+            "frequency": "Per Year",
+            "note": "Direct campus transit operated by SR University transport department",
+        },
+    ],
+    "scholarship_note": "Transport in-charge: Mr. A. Keerthi Reddy (9640606408, transport@sru.edu.in).",
+}
+
+HOSTEL_FEE_CARD = {
+    "type": "fee_breakdown",
+    "title": "SR University Residential Hostel & Dining Fees (Annual)",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "Girls Hostel (AC 4-Sharing)",
+            "amount": "₹1,25,000",
+            "frequency": "Per Year",
+            "note": "Includes 4 meals daily, Wi-Fi, laundry & 24/7 biometric security",
+        },
+        {
+            "category": "Girls Hostel (AC 3-Sharing)",
+            "amount": "₹1,35,000",
+            "frequency": "Per Year",
+            "note": "Includes 4 meals daily, Wi-Fi, laundry & 24/7 biometric security",
+        },
+        {
+            "category": "Boys Hostel (Non-AC 4/3-Sharing)",
+            "amount": "₹85,000 – ₹95,000",
+            "frequency": "Per Year",
+            "note": "Includes 4 meals daily, Wi-Fi, study lounges & laundry",
+        },
+        {
+            "category": "Boys Hostel (AC 4/3-Sharing)",
+            "amount": "₹1,20,000 – ₹1,35,000",
+            "frequency": "Per Year",
+            "note": "Includes 4 meals daily, Wi-Fi, gym & laundry",
+        },
+    ],
+    "scholarship_note": "In-time curfew is 8:30 PM. Nutritious veg and non-veg dining provided 4 times daily.",
+}
+
+EXAM_FEE_CARD = {
+    "type": "fee_breakdown",
+    "title": "SR University Examination Fee Structure",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "Annual Examination Fee",
+            "amount": "₹5,000",
+            "frequency": "Per Year",
+            "note": "Covers semester-end evaluations per Controller of Examinations notifications",
+        },
+    ],
+}
+
+ADMISSION_FEE_CARD = {
+    "type": "fee_breakdown",
+    "title": "SR University One-Time Admission & Enrollment Fees",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "Enrollment Fee (One-time)",
+            "amount": "₹5,000",
+            "frequency": "One-time (Year 1)",
+            "note": "Mandatory one-time registration and enrollment fee",
+        },
+        {
+            "category": "Admission Fee (One-time)",
+            "amount": "₹25,000",
+            "frequency": "One-time (Year 1)",
+            "note": "Institutional admission and processing fee",
+        },
+    ],
+}
+
+
 CURRICULUM_CARD = {
     "type": "curriculum",
     "title": "B.Tech CSE Curriculum Architecture",
@@ -166,9 +255,33 @@ def generate_cards(
     ):
         cards.append(COMPARISON_CSE_AIML)
 
-    # 2. Fee breakdown card
-    if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost of study", "how much is the fee")):
-        cards.append(FEE_BREAKDOWN_CARD)
+    # 2. Fee breakdown card (Strict Category Scoping — show only what the user asks for)
+    is_transport_fee_query = any(k in msg_lower for k in ("bus", "transport", "commute", "van")) and any(
+        k in msg_lower for k in ("fee", "fees", "cost", "charge", "price", "how much", "rate", "pass", "ticket")
+    )
+    is_hostel_fee_query = any(k in msg_lower for k in ("hostel", "mess", "boarding", "room rent")) and any(
+        k in msg_lower for k in ("fee", "fees", "cost", "charge", "price", "how much", "rate", "package")
+    )
+    is_exam_fee_query = any(k in msg_lower for k in ("exam", "examination", "supply", "supplementary", "revaluation")) and any(
+        k in msg_lower for k in ("fee", "fees", "cost", "charge", "how much")
+    )
+    is_admission_fee_query = any(
+        k in msg_lower for k in ("admission fee", "enrollment fee", "one-time fee", "onetime fee", "registration fee")
+    )
+
+    if is_transport_fee_query:
+        cards.append(TRANSPORT_FEE_CARD)
+    elif is_hostel_fee_query:
+        cards.append(HOSTEL_FEE_CARD)
+    elif is_exam_fee_query:
+        cards.append(EXAM_FEE_CARD)
+    elif is_admission_fee_query:
+        cards.append(ADMISSION_FEE_CARD)
+    elif any(k in msg_lower for k in ("fee", "fees", "tuition", "cost of study", "how much is the fee")):
+        # Only attach general breakdown if not an isolated single facility query
+        if not any(k in msg_lower for k in ("transport", "bus", "hostel", "mess", "exam")):
+            cards.append(FEE_BREAKDOWN_CARD)
+
 
     # 3. Curriculum card
     if any(k in msg_lower for k in ("curriculum", "syllabus", "subjects", "course structure", "credits")) and (
