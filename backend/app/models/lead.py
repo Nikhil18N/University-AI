@@ -30,7 +30,7 @@ class ProspectiveLead(Base):
         ForeignKey("conversations.id", ondelete="SET NULL"),
         nullable=True,
     )
-    status: Mapped[str] = mapped_column(String(50), default="interested", nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="new", nullable=False)
     metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

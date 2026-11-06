@@ -30,6 +30,47 @@ def test_lead_schema_validation():
         LeadCreate(name="   ", phone="9876543210")
 
 
+def test_lead_response_orm_serialization_metadata_collision():
+    """Verify LeadResponse correctly serializes ORM models with metadata_ without colliding with Base.metadata."""
+    import uuid
+    from datetime import datetime, timezone
+    from app.models.lead import ProspectiveLead
+
+    lead_orm = ProspectiveLead(
+        id=uuid.uuid4(),
+        name="Sunil Varma",
+        phone="9876543210",
+        program_interest="B.Tech CSE",
+        source="scholarship_calculator",
+        status="new",
+        created_at=datetime.now(timezone.utc),
+        metadata_={"scholarship_percent": 30, "payable_fee": 104000},
+    )
+
+    # Base.metadata exists on the SQLAlchemy model
+    assert hasattr(lead_orm, "metadata")
+    assert not isinstance(lead_orm.metadata, dict)  # It's an sqlalchemy.MetaData object
+
+    # LeadResponse should extract metadata_ cleanly without crashing on Base.metadata
+    res = LeadResponse.model_validate(lead_orm)
+    assert res.name == "Sunil Varma"
+    assert res.metadata == {"scholarship_percent": 30, "payable_fee": 104000}
+    assert res.status == "new"
+
+    # Also check dict validation
+    dict_payload = {
+        "id": uuid.uuid4(),
+        "name": "Sunil Varma",
+        "phone": "9876543210",
+        "source": "scholarship_calculator",
+        "status": "new",
+        "created_at": datetime.now(timezone.utc),
+        "metadata": {"scholarship_percent": 40},
+    }
+    res_dict = LeadResponse.model_validate(dict_payload)
+    assert res_dict.metadata == {"scholarship_percent": 40}
+
+
 @pytest.mark.asyncio
 async def test_public_create_lead_endpoint():
     """Test POST /api/v1/leads registers a student lead without needing admin key."""

@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 
 
 class LeadCreate(BaseModel):
@@ -58,9 +58,9 @@ class LeadResponse(BaseModel):
     conversation_id: UUID | None = None
     status: str
     created_at: datetime
-    metadata: dict | None = None
+    metadata: dict | None = Field(None, validation_alias=AliasChoices("metadata_", "metadata"))
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class LeadListResponse(BaseModel):

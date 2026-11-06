@@ -25,7 +25,7 @@ async def create_lead(db: AsyncSession, data: LeadCreate) -> ProspectiveLead:
         source=data.source,
         conversation_id=data.conversation_id,
         metadata_=data.metadata,
-        status="interested",
+        status="new",
     )
     db.add(lead)
     await db.commit()
@@ -58,7 +58,10 @@ async def list_leads(
         stmt = stmt.where(ProspectiveLead.program_interest.ilike(f"%{program.strip()}%"))
 
     if source and source != "all":
-        stmt = stmt.where(ProspectiveLead.source == source)
+        if source in ("calculator", "scholarship_calculator"):
+            stmt = stmt.where(ProspectiveLead.source.in_(["calculator", "scholarship_calculator"]))
+        else:
+            stmt = stmt.where(ProspectiveLead.source == source)
 
     if status and status != "all":
         stmt = stmt.where(ProspectiveLead.status == status)
@@ -88,7 +91,9 @@ async def get_lead_stats(db: AsyncSession) -> dict:
     chat_q = select(func.count(ProspectiveLead.id)).where(ProspectiveLead.source == "chat_inquiry")
     chat_leads = (await db.execute(chat_q)).scalar() or 0
 
-    calc_q = select(func.count(ProspectiveLead.id)).where(ProspectiveLead.source == "scholarship_calculator")
+    calc_q = select(func.count(ProspectiveLead.id)).where(
+        ProspectiveLead.source.in_(["calculator", "scholarship_calculator"])
+    )
     calculator_leads = (await db.execute(calc_q)).scalar() or 0
 
     # Today's leads
