@@ -152,6 +152,14 @@ def _is_greeting_without_question(text: str) -> bool:
     """Return True if message is a greeting or courtesy, but not a substantive question."""
     if not re.match(r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)\b", text, re.IGNORECASE):
         return False
+
+    # Remarks or corrections about time of day (e.g. "hello it afternoon", "it is afternoon", "am asking u is it morning or afternoon")
+    # are conversational banter/corrections, NOT blind greetings.
+    if re.search(r"\b(?:it'?s|it\s+is|is\s+it|actually)\s+(?:morning|afternoon|evening|night)\b", text, re.IGNORECASE):
+        return False
+    if re.search(r"\b(?:morning|afternoon|evening|night)\b", text, re.IGNORECASE) and not re.match(r"^\s*good\s+(morning|afternoon|evening)\b", text, re.IGNORECASE):
+        return False
+
     # Courtesy check: "how are you" or "how is it going" is part of greeting
     if re.search(r"\bhow\s+(are\s+you|is\s+it\s+going)\b", text, re.IGNORECASE):
         return True

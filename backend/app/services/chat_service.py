@@ -2,7 +2,7 @@
 
 import asyncio
 from collections.abc import AsyncIterator
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import json
 import logging
 import random
@@ -14,7 +14,6 @@ from app.config import settings
 from app.providers.base import LLMProvider
 from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
 from app.services import conversation_service, prompt_service
-from app.services.cache_service import get_cached_answer, set_cached_answer
 from app.services.card_service import generate_cards
 from app.services.flow_service import (
     detect_flow_trigger,
@@ -44,6 +43,9 @@ from app.services.video_service import (
 
 logger = logging.getLogger(__name__)
 
+# Indian Standard Time (SR University is located in Warangal, Telangana, India)
+IST = timezone(timedelta(hours=5, minutes=30))
+
 STUDENT_AUTH_MESSAGE = (
     "I do not have access to individual student records (such as your personal "
     "attendance percentage, course grades, CGPA, or specific fee payment status). "
@@ -60,15 +62,61 @@ OUT_OF_SCOPE_MESSAGE = (
 
 
 def get_time_aware_greeting() -> str:
-    """Return a time-appropriate greeting salutation."""
-    hour = datetime.now().hour
+    """Return an IST time-appropriate greeting salutation (SR University is located in Telangana, India)."""
+    hour = datetime.now(IST).hour
     if 5 <= hour < 12:
         return "Good morning! ☀️"
     elif 12 <= hour < 17:
         return "Good afternoon! 🌤️"
     elif 17 <= hour < 22:
         return "Good evening! 🌙"
-    return "Hey night owl! 🦉"
+    return "Hello! ✨"
+
+
+def should_offer_video_tour(message: str) -> bool:
+    """Return True only if the user query naturally welcomes a visual or campus tour."""
+    msg = message.lower()
+    tour_keywords = (
+        "campus tour", "hostel tour", "see the campus", "see the hostel",
+        "how does it look", "how does the campus look", "look like", "drone",
+        "walkthrough", "virtual tour", "campus video", "hostel video", "watch video",
+        "video tour", "show video"
+    )
+    if any(k in msg for k in tour_keywords):
+        return True
+
+    # If the user is asking about admissions, fees, ranks, marks, scholarships, or general evaluation, do NOT offer video
+    disallowed_keywords = (
+        "fee", "fees", "cost", "scholarship", "cutoff", "percentage", "marks", "rank",
+        "eligibility", "eligible", "syllabus", "curriculum", "apply", "good",
+        "why", "ad", "instagram", "rule", "regulations", "attendance", "mistake", "wrong"
+    )
+    if any(k in msg for k in disallowed_keywords):
+        return False
+
+    facility_keywords = ("campus life", "hostel rooms", "srix", "incubator", "sports facilities")
+    return any(k in msg for k in facility_keywords)
+
+
+def sanitize_staff_contact_numbers(text: str) -> str:
+    """Scrub personal mobile phone numbers of internal staff members from student-facing output.
+    Keeps official university helpline numbers (0870-2818333, 0870-2818311, etc.).
+    """
+    if not text:
+        return text
+
+    # 1. Staff names followed by mobile numbers (e.g. 'Mr. A. Bala Krishna at 8886522500'):
+    cleaned = re.sub(
+        r"(?:Mr\.|Ms\.|Dr\.)\s+[A-Za-z\.\s]+\s*(?:at|on|:|-)?\s*(?:\+91[\s-]?)?[6-9]\d{9}\b",
+        "the IT & Campus Helpdesk (helpdesk@sru.edu.in / 0870-2818333)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    # 2. Known individual staff mobiles if mentioned standalone:
+    known_staff_mobiles = ["8886522500", "8008917297"]
+    for num in known_staff_mobiles:
+        cleaned = cleaned.replace(num, "0870-2818333 (Ext. Helpdesk)")
+    return cleaned
 
 
 GREETING_RESPONSES_INITIAL: list[str] = [
@@ -199,7 +247,16 @@ async def handle_chat(
                     matching_videos = None
 
         cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
-        answer = f"Here is the official video tour of our {cat}:"
+        if matching_videos:
+            vid_links = "\n".join(
+                f"- 🎥 [{v.get('title', 'Watch Video Tour')}]({v.get('url')})" for v in matching_videos
+            )
+            answer = f"Here is the official video tour of {cat}:\n\n{vid_links}"
+        else:
+            answer = (
+                f"Here is the official SR University YouTube channel to explore {cat} tours: "
+                f"[SR University Official Channel](https://www.youtube.com/@SRUniversity/videos)"
+            )
         cards = [create_video_card(matching_videos, is_explicit=True)] if matching_videos else []
         suggestions = get_post_video_suggestions(cat)
         intent = "UNIVERSITY"
@@ -269,23 +326,17 @@ async def handle_chat(
                     llm_provider=llm_provider,
                 )
 
-            cached = await get_cached_answer(redis_client, search_query)
-            if cached:
-                answer, sources = cached
-                logger.info("Handled via cached RAG response (search query: '%s')", search_query[:50])
-            else:
-                guidance = build_counsellor_guidance(profile, current_query=request.message)
-                rag_context = conversation_context
-                if guidance:
-                    rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
+            guidance = build_counsellor_guidance(profile, current_query=request.message)
+            rag_context = conversation_context
+            if guidance:
+                rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
 
-                answer, sources = await rag_service.query(
-                    question=request.message,
-                    search_query=search_query,
-                    conversation_context=rag_context,
-                )
-                await set_cached_answer(redis_client, search_query, answer, sources)
-                logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
+            answer, sources = await rag_service.query(
+                question=request.message,
+                search_query=search_query,
+                conversation_context=rag_context,
+            )
+            logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
 
         else:
             system_prompt = prompt_service.load_prompt("system")
@@ -300,7 +351,7 @@ async def handle_chat(
     if not is_video_yes and not is_video_no:
         if query_embedding:
             semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
-            if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+            if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
                 cat = semantic_videos[0].get("category", "our campus")
                 answer = format_video_offer_prompt(answer, cat)
             else:
@@ -317,7 +368,7 @@ async def handle_chat(
             profile=profile,
             flow_state=flow_info,
         )
-        if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+        if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
             suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
 
         cards = generate_cards(
@@ -328,6 +379,9 @@ async def handle_chat(
             query_embedding=query_embedding,
             is_video_confirmed=is_video_yes,
         )
+
+    # Sanitize any personal staff mobile numbers from output
+    answer = sanitize_staff_contact_numbers(answer)
 
     # 7. Save assistant message with metadata
     assistant_msg = await conversation_service.add_message(
@@ -428,7 +482,16 @@ async def handle_chat_stream(
                         matching_videos = None
 
             cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
-            answer = f"Here is the official video tour of {cat}:"
+            if matching_videos:
+                vid_links = "\n".join(
+                    f"- 🎥 [{v.get('title', 'Watch Video Tour')}]({v.get('url')})" for v in matching_videos
+                )
+                answer = f"Here is the official video tour of {cat}:\n\n{vid_links}"
+            else:
+                answer = (
+                    f"Here is the official SR University YouTube channel to explore {cat} tours: "
+                    f"[SR University Official Channel](https://www.youtube.com/@SRUniversity/videos)"
+                )
             cards = [create_video_card(matching_videos, is_explicit=True)] if matching_videos else []
             suggestions = get_post_video_suggestions(cat)
             intent = "UNIVERSITY"
@@ -521,94 +584,79 @@ async def handle_chat_stream(
                         llm_provider=llm_provider,
                     )
 
-                cached = await get_cached_answer(redis_client, search_query)
-                if cached:
-                    cached_answer, cached_sources = cached
-                    answer = cached_answer
-                    sources = cached_sources
-                    all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
-                    profile = extract_student_profile(all_user_messages)
+                # Run embedding/retrieval and user-message fetch in parallel — no dependency between them
+                (chunks, query_embedding), all_user_messages = await asyncio.gather(
+                    rag_service.retrieve_with_embedding(search_query),
+                    conversation_service.get_all_user_messages(db, conversation.id),
+                )
+                profile = extract_student_profile(all_user_messages)
+
+                clean_q = request.message.lower().strip(" .!?,")
+                effective_q = request.message
+                if search_query and (
+                    clean_q in ("yes", "yeah", "yep", "sure", "ok", "tell me more", "more details", "go ahead", "definitely", "yes please", "why not")
+                    or len(clean_q.split()) <= 2
+                ):
+                    effective_q = f"{request.message} ({search_query})"
+
+                guidance = build_counsellor_guidance(profile, current_query=request.message)
+                rag_context = conversation_context
+                if guidance:
+                    rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
+
+                if not chunks:
+                    answer = (
+                        "I couldn't find relevant information in the university documents "
+                        "to answer that question. You may want to check with the university "
+                        "office directly."
+                    )
                     for chunk in chunk_text_stream(answer):
                         yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                         await asyncio.sleep(0.012)
                 else:
-                    # Run embedding/retrieval and user-message fetch in parallel — no dependency between them
-                    (chunks, query_embedding), all_user_messages = await asyncio.gather(
-                        rag_service.retrieve_with_embedding(search_query),
-                        conversation_service.get_all_user_messages(db, conversation.id),
+                    messages, sources, evidence_text = await rag_service.prepare_rag_request(
+                        effective_q, rag_context, chunks, precomputed_embedding=query_embedding
                     )
-                    profile = extract_student_profile(all_user_messages)
+                    streamed_tokens = []
+                    async for token in llm_provider.stream(messages, temperature=0.3):
+                        streamed_tokens.append(token)
+                        yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
 
-                    clean_q = request.message.lower().strip(" .!?,")
-                    effective_q = request.message
-                    if search_query and (
-                        clean_q in ("yes", "yeah", "yep", "sure", "ok", "tell me more", "more details", "go ahead", "definitely", "yes please", "why not")
-                        or len(clean_q.split()) <= 2
-                    ):
-                        effective_q = f"{request.message} ({search_query})"
+                    answer = "".join(streamed_tokens)
 
-                    guidance = build_counsellor_guidance(profile, current_query=request.message)
-                    rag_context = conversation_context
-                    if guidance:
-                        rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
-
-                    if not chunks:
-                        answer = (
-                            "I couldn't find relevant information in the university documents "
-                            "to answer that question. You may want to check with the university "
-                            "office directly."
+                    # Check runtime hallucination guardrails
+                    is_faithful, unsupported = verify_numeric_faithfulness(
+                        answer=answer,
+                        evidence_text=evidence_text,
+                        conversation_context=rag_context,
+                        question=effective_q,
+                    )
+                    if not is_faithful and len(unsupported) >= 2:
+                        logger.warning("Stream correction triggered for unsupported numbers %s", unsupported)
+                        correction_instruction = (
+                            f"CORRECTION: Your previous draft stated number(s) or percentage(s) that are NOT present "
+                            f"in the evidence or conversation: {', '.join(unsupported)}. "
+                            f"Rewrite your response using strictly verified numbers from the evidence."
                         )
-                        for chunk in chunk_text_stream(answer):
-                            yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
-                            await asyncio.sleep(0.012)
-                    else:
-                        messages, sources, evidence_text = await rag_service.prepare_rag_request(
-                            effective_q, rag_context, chunks, precomputed_embedding=query_embedding
+                        correction_messages = messages + [
+                            {"role": "assistant", "content": answer},
+                            {"role": "user", "content": correction_instruction},
+                        ]
+                        corrected = await llm_provider.generate(correction_messages, temperature=0.1)
+                        second_check, still_unsupported = verify_numeric_faithfulness(
+                            corrected, evidence_text, rag_context, effective_q
                         )
-                        streamed_tokens = []
-                        async for token in llm_provider.stream(messages, temperature=0.3):
-                            streamed_tokens.append(token)
-                            yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
-
-                        answer = "".join(streamed_tokens)
-
-                        # Check runtime hallucination guardrails
-                        is_faithful, unsupported = verify_numeric_faithfulness(
-                            answer=answer,
-                            evidence_text=evidence_text,
-                            conversation_context=rag_context,
-                            question=effective_q,
+                        if second_check or len(still_unsupported) < len(unsupported):
+                            answer = corrected
+                    elif not is_faithful and len(unsupported) < 2:
+                        logger.warning(
+                            "Single unsupported numeric claim '%s' in streamed answer — skipping correction LLM call",
+                            unsupported,
                         )
-                        if not is_faithful and len(unsupported) >= 2:
-                            logger.warning("Stream correction triggered for unsupported numbers %s", unsupported)
-                            correction_instruction = (
-                                f"CORRECTION: Your previous draft stated number(s) or percentage(s) that are NOT present "
-                                f"in the evidence or conversation: {', '.join(unsupported)}. "
-                                f"Rewrite your response using strictly verified numbers from the evidence."
-                            )
-                            correction_messages = messages + [
-                                {"role": "assistant", "content": answer},
-                                {"role": "user", "content": correction_instruction},
-                            ]
-                            corrected = await llm_provider.generate(correction_messages, temperature=0.1)
-                            second_check, still_unsupported = verify_numeric_faithfulness(
-                                corrected, evidence_text, rag_context, effective_q
-                            )
-                            if second_check or len(still_unsupported) < len(unsupported):
-                                answer = corrected
-                        elif not is_faithful and len(unsupported) < 2:
-                            logger.warning(
-                                "Single unsupported numeric claim '%s' in streamed answer — skipping correction LLM call",
-                                unsupported,
-                            )
 
-                        is_url_faithful, unverified_urls = verify_url_faithfulness(answer, evidence_text)
-                        if not is_url_faithful:
-                            answer = sanitize_hallucinated_urls(answer, unverified_urls)
-
-                        # Cache verified RAG response
-                        await set_cached_answer(redis_client, search_query, answer, sources)
-
+                    is_url_faithful, unverified_urls = verify_url_faithfulness(answer, evidence_text)
+                    if not is_url_faithful:
+                        answer = sanitize_hallucinated_urls(answer, unverified_urls)
 
             else:
                 system_prompt = prompt_service.load_prompt("system")
@@ -634,7 +682,7 @@ async def handle_chat_stream(
 
             if query_embedding:
                 semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
-                if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+                if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
                     cat = semantic_videos[0].get("category", "our campus")
                     new_answer = format_video_offer_prompt(answer, cat)
                     if new_answer != answer:
@@ -657,7 +705,7 @@ async def handle_chat_stream(
                 profile=profile,
                 flow_state=flow_info,
             )
-            if semantic_videos and not explicit_video and intent == "UNIVERSITY":
+            if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
                 suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
 
             cards = generate_cards(
@@ -668,6 +716,9 @@ async def handle_chat_stream(
                 query_embedding=query_embedding,
                 is_video_confirmed=is_video_yes,
             )
+
+        # Sanitize any personal staff mobile numbers from output
+        answer = sanitize_staff_contact_numbers(answer)
 
         # Save to database
         assistant_msg = await conversation_service.add_message(
