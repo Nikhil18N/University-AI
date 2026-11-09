@@ -16,6 +16,16 @@ from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
 from app.services import conversation_service, prompt_service
 from app.services.cache_service import get_cached_part, set_cached_part
 from app.services.card_service import generate_cards
+from app.services.claims_service import (
+    detect_topic_gap_from_response,
+    format_highlights_for_prompt,
+    get_known_gaps,
+    get_relevant_highlights,
+    get_turn_fallback,
+    record_known_gap,
+    verify_persuasive_output,
+    verify_qualitative_claims,
+)
 from app.services.flow_service import (
     detect_flow_trigger,
     execute_wizard_step,
@@ -252,6 +262,7 @@ async def execute_prompt_pack_pipeline(
     llm: LLMProvider,
     rag_service: RAGService | None,
     redis_client: object | None = None,
+    session_id: str | None = None,
 ) -> tuple[str, list[dict]]:
     """Execute Prompt Pack Router -> Parallel Handlers -> Validator -> Merge."""
     routed = await route_and_decompose_message(llm, message, conversation_context)
@@ -315,6 +326,11 @@ async def execute_prompt_pack_pipeline(
         if ptype == "chitchat":
             prompt = render_prompt("chitchat", student_profile=profile_text, part_text=ptext)
             ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.6, max_tokens=250)
+            # T15: Ensure no unverified facilities or hardware claims are hallucinated in chitchat
+            is_qual_valid, unsupported_terms = verify_qualitative_claims(ans, "")
+            if not is_qual_valid:
+                clean_lines = [l for l in ans.split("\n") if not any(term in l.lower() for term in unsupported_terms)]
+                ans = "\n".join(clean_lines).strip() or "Hey there! I'm here to help you explore programs at SR University. What are you looking to study?"
             return ans.strip()
 
         elif ptype == "sensitive":
@@ -328,20 +344,54 @@ async def execute_prompt_pack_pipeline(
             return ans.strip()
 
         elif ptype == "persuasive":
-            highlights_text = ""
+            # T15: Constrained persuasive generation against verified highlights store
+            known_gaps = await get_known_gaps(session_id or "", redis_client=redis_client)
+            hl_list = get_relevant_highlights(ptext, profile_interests=profile.get("interests", []), limit=3)
+            available_ids = [h["id"] for h in hl_list]
+            formatted_hl = format_highlights_for_prompt(hl_list)
+
+            rag_hl_text = ""
             if rag_service:
                 chunks, _ = await rag_service.retrieve_with_embedding(ptext, scope="highlights", top_k=4)
-                highlights_text = "\n\n".join(c["content"] for c in chunks)
+                rag_hl_text = "\n\n".join(c["content"] for c in chunks)
                 for c in chunks:
                     meta = c.get("metadata", {})
                     if meta.get("document_id") and meta not in all_sources:
                         all_sources.append(meta)
-            if not highlights_text:
-                highlights_text = get_structured_facts_text(ptext, profile.get("branch"))
 
-            prompt = render_prompt("persuasive", retrieved_highlights=highlights_text, student_profile=profile_text, part_text=ptext)
+            combined_context = f"{formatted_hl}\n\n{rag_hl_text}".strip()
+            if not combined_context:
+                combined_context = get_structured_facts_text(ptext, profile.get("branch"))
+
+            prompt = render_prompt("persuasive", retrieved_highlights=combined_context, student_profile=profile_text, part_text=ptext)
             ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.3, max_tokens=300)
-            return ans.strip()
+
+            # Validate highlight IDs cited by model
+            is_valid_hl, clean_reply, used_ids = verify_persuasive_output(ans, available_ids)
+            if not is_valid_hl:
+                logger.warning("Persuasive output contained invalid highlight IDs: %s. Retrying once.", used_ids)
+                retry_prompt = prompt + f"\n\nCRITICAL: You cited invalid highlight IDs {used_ids}. You may ONLY cite IDs from this list: {available_ids}. If none apply, set used_highlight_ids to [] and reply honestly."
+                retry_ans = await llm.generate([{"role": "user", "content": retry_prompt}], temperature=0.0, max_tokens=300)
+                is_valid_retry, clean_retry, _ = verify_persuasive_output(retry_ans, available_ids)
+                if is_valid_retry:
+                    clean_reply = clean_retry
+                else:
+                    return get_turn_fallback("unsupported_claim")
+
+            # Check for qualitative claims (e.g. gym, cricket, library) against combined context
+            is_qual_valid, unsupported_terms = verify_qualitative_claims(clean_reply, combined_context)
+            if not is_qual_valid:
+                logger.warning("Persuasive output mentioned unsupported facilities: %s. Retrying without them.", unsupported_terms)
+                retry_prompt = prompt + f"\n\nCRITICAL: Do not claim facilities not present in the highlights: {unsupported_terms}. State only what is verified."
+                retry_ans = await llm.generate([{"role": "user", "content": retry_prompt}], temperature=0.0, max_tokens=300)
+                _, clean_retry, _ = verify_persuasive_output(retry_ans, available_ids)
+                is_qual_valid_2, _ = verify_qualitative_claims(clean_retry, combined_context)
+                if is_qual_valid_2:
+                    clean_reply = clean_retry
+                else:
+                    return get_turn_fallback("unverified_facility")
+
+            return clean_reply.strip()
 
         else:  # factual
             # Check response cache if single factual part
@@ -378,6 +428,11 @@ async def execute_prompt_pack_pipeline(
             )
             raw_ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=350)
 
+            # T15: Check if factual answer admitted a knowledge gap on a topic
+            gap_topic = detect_topic_gap_from_response(ptext, raw_ans)
+            if gap_topic and session_id:
+                await record_known_gap(session_id, gap_topic, redis_client=redis_client)
+
             # Pure code deterministic numeric/date validator
             is_valid, ungrounded = validate_response_grounding(
                 raw_ans,
@@ -410,8 +465,18 @@ async def execute_prompt_pack_pipeline(
                             part_count=len(parts),
                         )
                     return final_ans
+
+                # Fallback specificity: use numeric fallback only if ungrounded numbers caused the failure
                 logger.error("Validator permanently blocked ungrounded numbers: %s. Returning fallback block.", retry_ungrounded)
-                return FALLBACK_VALIDATOR_BLOCK
+                if any(c in str(retry_ungrounded) for c in ["₹", "%", "LPA", "rank", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
+                    return get_turn_fallback("ungrounded_number")
+                return get_turn_fallback("unsupported_claim")
+
+            # T15: Check qualitative facility claims in factual output
+            is_qual_valid, unsupported = verify_qualitative_claims(raw_ans, chunks_text + " " + struct_text)
+            if not is_qual_valid:
+                logger.warning("Factual output mentioned unsupported facility terms: %s. Returning fallback.", unsupported)
+                return get_turn_fallback("unverified_facility")
 
             final_ans = raw_ans.strip()
             if len(parts) == 1 and redis_client:
@@ -566,6 +631,7 @@ async def handle_chat(
                 llm=llm_provider,
                 rag_service=rag_service,
                 redis_client=redis_client,
+                session_id=request.session_id,
             )
             logger.info("Handled via Prompt Pack Pipeline (answer length: %d)", len(answer))
 
@@ -817,6 +883,7 @@ async def handle_chat_stream(
                     llm=llm_provider,
                     rag_service=rag_service,
                     redis_client=redis_client,
+                    session_id=request.session_id,
                 )
                 for chunk in chunk_text_stream(answer):
                     yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"

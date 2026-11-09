@@ -1,0 +1,53 @@
+# Verified Campus Highlights Store (SRU Buddy — T15)
+# Grounded strictly in official university FAQ, Student Handbook, and admissions materials.
+# Do not invent highlights. Every highlight must map to an authoritative source document.
+
+highlights:
+  - id: "HL_CAMPUS_SPORTS"
+    short_text: "150-acre green campus in Warangal featuring outdoor sports facilities (cricket ground, football ground, basketball court, volleyball court, kabaddi, 400m running track, badminton court) and an indoor gymnasium with table tennis, chess, and carroms."
+    source_name: "SRU Student Handbook — Campus Life, Facilities & Contacts"
+    source_url: "https://sru.edu.in/campus-life"
+    last_updated: "2023-24"
+    tags: ["campus", "sports", "gym", "recreation", "athletics"]
+
+  - id: "HL_PLACEMENTS_STATS"
+    short_text: "Campus placement record with an average package of 6 LPA across graduating students and a top package of 51 LPA from Microsoft (for eligible students maintaining 7.5+ CGPA)."
+    source_name: "University FAQ — Placements"
+    source_url: "https://sru.edu.in/placement"
+    last_updated: "2023-24"
+    tags: ["placements", "careers", "salary", "microsoft", "btech"]
+
+  - id: "HL_INNOVATION_SRIX"
+    short_text: "SRiX (SR Innovation Exchange) is a DST-supported technology business incubator nurturing student and faculty startups with seed funding, mentorship, and hackathons."
+    source_name: "University FAQ — SRiX"
+    source_url: "https://www.srix.in/"
+    last_updated: "2023-24"
+    tags: ["entrepreneurship", "startups", "incubation", "srix", "innovation"]
+
+  - id: "HL_RANKINGS_NIRF"
+    short_text: "Ranked 91st in NIRF Engineering 2025, 801–1000 in Times Higher Education (THE) World University Rankings 2026, and 401–600 in THE Impact Rankings 2024."
+    source_name: "University FAQ — Rankings"
+    source_url: "https://sru.edu.in/rankings"
+    last_updated: "2025"
+    tags: ["rankings", "nirf", "accreditation", "the_rankings"]
+
+  - id: "HL_CAMPUS_WIFI_LABS"
+    short_text: "100% Wi-Fi enabled campus with modern hands-on laboratories across academic blocks and specialized learning facilities."
+    source_name: "SRU Student Handbook — Campus Life, Facilities & Contacts"
+    source_url: "https://sru.edu.in/campus-life"
+    last_updated: "2023-24"
+    tags: ["facilities", "labs", "wifi", "infrastructure", "academics"]
+
+  - id: "HL_CAMPUS_HOSTELS"
+    short_text: "On-campus hostel accommodation for both boys and girls with 24x7 security personnel, CCTV surveillance, 2-bed health centre, and ambulance on campus."
+    source_name: "SRU Student Handbook — Campus Life, Facilities & Contacts"
+    source_url: "https://sru.edu.in/hostels"
+    last_updated: "2023-24"
+    tags: ["hostels", "accommodation", "residential", "campus-life", "safety"]
+
+  - id: "HL_STUDENT_CLUBS"
+    short_text: "Vibrant student life with 37 active student clubs covering technology, robotics, culture, esports, Model United Nations (SRU-MUN), and community service."
+    source_name: "University FAQ — Clubs & Events"
+    source_url: "https://sru.edu.in/campus-life"
+    last_updated: "2023-24"
+    tags: ["clubs", "events", "culture", "campus-life", "activities"]

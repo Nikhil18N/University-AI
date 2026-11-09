@@ -1,5 +1,33 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T15] Claim-level grounding and known-gaps memory (P0)
+
+### Already there
+- Numeric and date validator (`validator_service.py`) checking currency, percentages, LPAs, and ranks.
+- Factual mode retrieving from `sru_facts` and persuasive mode retrieving from `sru_highlights`.
+- Hardcoded validator block fallback (`FALLBACK_VALIDATOR_BLOCK`) referencing "numbers I'm unsure about" for all blocked outputs.
+
+### Changed
+- `backend/app/services/chat_service.py`:
+  - Constrained persuasive generation to verified highlight IDs with one-shot retry and fallback.
+  - Added deterministic qualitative claim checking on facility and offering terms (`FACILITY_TERMS`) across persuasive, factual, and chitchat pipelines.
+  - Linked session `known_gaps` to prevent contradicting earlier admissions of missing data.
+  - Enhanced fallback generation to return specificity-based messages (`get_turn_fallback`): non-numeric queries no longer receive the numeric fallback message.
+- `prompts/persuasive.md`:
+  - Updated prompt to require valid structured JSON output (`{reply_text, used_highlight_ids[]}`).
+  - Prohibited inventing facilities, sports, or laboratories.
+- `prompts/chitchat.md`:
+  - Added explicit constraint barring qualitative campus/facility assertions.
+
+### Added
+- `backend/app/data/verified_highlights.yaml`:
+  - Authoritative store of verified campus highlights grounded directly in the Student Handbook and official university FAQs (sports, placements, SRiX incubator, NIRF rankings, Wi-Fi/labs, hostels, and student clubs).
+- `backend/app/services/claims_service.py`:
+  - Service implementing verified highlight loading, ID verification, qualitative facility term checking, session known-gaps recording, and reason-coded fallback selection.
+- `backend/tests/test_claims_service.py`:
+  - 9 unit tests covering highlight loading, relevance scoring, structured JSON ID validation, qualitative claim verification, session gap detection, and fallback message selection.
+- Test suite expanded from 315 to 324 tests passed.
+
 ## [T12] Report hygiene and CI (P2)
 
 ### Already there
