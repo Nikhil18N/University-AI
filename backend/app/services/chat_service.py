@@ -273,14 +273,22 @@ async def execute_prompt_pack_pipeline(
     parts = routed.get("parts", [{"text": message, "type": "factual"}])
     new_interests = routed.get("interests", [])
 
+    is_chip_click = any(message.strip().startswith(icon) for icon in ("📋", "💰", "🏠", "📊", "📚", "🎓", "💼", "🔬", "🌳", "🚀", "⚡", "🧮", "🤝", "🕒", "🍽️", "🔒", "🧑‍🏫", "🎯", "🎥", "❌", "🚌", "💳", "📍"))
+    interest_source = "chip" if is_chip_click else "stated"
+
     if new_interests:
         profile_interests = profile.get("interests", [])
+        interest_sources = profile.get("interest_sources", {})
         for i in new_interests:
             if i not in profile_interests:
                 profile_interests.append(i)
+            if interest_source == "stated" or i not in interest_sources:
+                interest_sources[i] = interest_source
         profile["interests"] = profile_interests
+        profile["interest_sources"] = interest_sources
 
     profile_parts = []
+    profile_parts.append(f"Stage: {profile.get('stage', 'prospective')}")
     if profile.get("degree"):
         profile_parts.append(f"Degree: {profile['degree']}")
     if profile.get("branch"):
@@ -288,8 +296,14 @@ async def execute_prompt_pack_pipeline(
     if profile.get("score"):
         profile_parts.append(f"Score: {profile['score']}")
     if profile.get("interests"):
-        profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
-    profile_text = ", ".join(profile_parts) if profile_parts else "Prospective applicant"
+        interest_sources = profile.get("interest_sources", {})
+        stated = [i for i in profile["interests"] if interest_sources.get(i) != "chip"]
+        chips = [i for i in profile["interests"] if interest_sources.get(i) == "chip"]
+        if stated:
+            profile_parts.append(f"Stated Interests: {', '.join(stated)}")
+        if chips:
+            profile_parts.append(f"Explored Chips: {', '.join(chips)} (Note: DO NOT say 'you mentioned')")
+    profile_text = ", ".join(profile_parts)
 
     # T8: If ANY sub-part is sensitive, or the raw message matches crisis/distress,
     # the sensitive handler takes over the ENTIRE turn immediately.

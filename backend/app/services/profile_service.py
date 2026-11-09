@@ -150,6 +150,26 @@ def extract_score_from_text(text: str) -> tuple[float, str] | None:
     return None
 
 
+CURRENT_STUDENT_REGEX = re.compile(
+    r"\b(?:i\s+am|i'm|i\s+am\s+currently)\s+(?:a\s+)?(?:current\s+student|enrolled\s+student|studying\s+at\s+sru|in\s+(?:my\s+)?(?:1st|2nd|3rd|4th|first|second|third|fourth)\s+year\s+at\s+sru)\b|"
+    r"\b(?:my\s+roll\s+number|current\s+sru\s+student|already\s+studying\s+here)\b",
+    re.I,
+)
+
+
+def add_profile_interest(profile: dict[str, Any], interest: str, source: str = "stated") -> None:
+    """Add an interest with its provenance ('stated' | 'chip')."""
+    if "interests" not in profile or not isinstance(profile["interests"], list):
+        profile["interests"] = []
+    if "interest_sources" not in profile or not isinstance(profile["interest_sources"], dict):
+        profile["interest_sources"] = {}
+    if interest not in profile["interests"]:
+        profile["interests"].append(interest)
+    # 'stated' always takes precedence over 'chip'
+    if source == "stated" or interest not in profile["interest_sources"]:
+        profile["interest_sources"][interest] = source
+
+
 def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
     """Scan user messages in chronological order and maintain verified student profile slots.
 
@@ -158,6 +178,7 @@ def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
     - Slot corrections (e.g. 'actually ece', 'not cse, change to ece', 'sorry typo my score is 75%')
     - Dialogue preservation across topic-switching interruptions (e.g. hostel inquiries mid-flow)
     - Comparative query discrimination (e.g. 'compare CSE vs ECE' does not overwrite existing branch)
+    - Profile stage inference (default: 'prospective'; 'current' only if explicitly stated)
     """
     profile = {
         "degree": None,
@@ -165,11 +186,18 @@ def extract_student_profile(messages: list[dict[str, Any]]) -> dict[str, Any]:
         "score_pct": None,
         "score_raw": None,
         "has_score": False,
+        "stage": "prospective",
+        "interests": [],
+        "interest_sources": {},
     }
 
     user_texts = [m["content"] for m in messages if m.get("role") == "user"]
 
     for text in user_texts:
+        # Check explicit current student status
+        if CURRENT_STUDENT_REGEX.search(text):
+            profile["stage"] = "current"
+
         is_comparison = bool(COMPARISON_QUERY_PATTERN.search(text))
         has_correction = bool(CORRECTION_SIGNAL_PATTERN.search(text))
 
@@ -226,6 +254,25 @@ def build_counsellor_guidance(profile: dict[str, Any], current_query: str = "") 
         return ""
 
     directives.append("VERIFIED STUDENT CONVERSATION CONTEXT:")
+    stage = profile.get("stage", "prospective")
+    if stage == "prospective":
+        directives.append(
+            "- Student Stage: PROSPECTIVE APPLICANT (exploring admission). "
+            "Never address the student as already enrolled or studying here (never say 'since you are already in B.Tech' or 'as an enrolled student')."
+        )
+    elif stage == "current":
+        directives.append(
+            "- Student Stage: CURRENT STUDENT (currently enrolled at SR University)."
+        )
+
+    interest_sources = profile.get("interest_sources", {})
+    stated = [k for k, src in interest_sources.items() if src == "stated"]
+    chips = [k for k, src in interest_sources.items() if src == "chip"]
+    if stated:
+        directives.append(f"- Stated Student Interests: {', '.join(stated)} (You may say 'you mentioned {stated[0]}' if relevant).")
+    if chips:
+        directives.append(f"- Explored Topics via Chips: {', '.join(chips)} (DO NOT say 'you mentioned' for these; weave them in naturally without claiming the student verbally stated them).")
+
     if degree:
         directives.append(f"- Intended Degree: {degree} (ALREADY specified by student — DO NOT ask what degree or level they want).")
     if branch:

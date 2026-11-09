@@ -1,5 +1,34 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T17] Chips, profile stage and video tagging (P1)
+
+### Already there
+- Suggestion service generating contextual quick-reply chips based on intent and dialogue topic.
+- Profile service extracting degree, branch, and test scores from message history.
+- YouTube video registry providing dense semantic video recommendations.
+
+### Changed
+- `backend/app/services/suggestion_service.py`:
+  - Replaced ungrounded suggestion chips (`"🔬 Specialized AI & Robotics Labs"`, `"🔬 Specialized AI Labs"`, `"⚽ Sports Arena"`) with verified highlight topics (`"🚀 Innovation & SRiX Incubator"`, `"🌳 150-Acre Green Campus"`).
+  - Added `filter_available_suggestions()` to proactively suppress candidate chips that refer to unanswerable topics (`"specialized ai"`, `"sports arena"`, `"international hostel"`), preventing turns that lead to missing-info fallbacks.
+- `backend/app/services/profile_service.py`:
+  - Added explicit student stage field (`stage: "prospective" | "current" | "unknown"`), defaulting to `"prospective"` for all admission conversations.
+  - Added `CURRENT_STUDENT_REGEX` to only classify a student as `"current"` if they explicitly state they are currently enrolled at SR University.
+  - Added `add_profile_interest()` tracking provenance (`interest_sources: dict[str, "stated" | "chip"]`).
+  - Added counsellor guidance directives instructing the model to treat prospective applicants as prospective (never saying "since you are already in B.Tech"), and prohibiting the phrase "you mentioned" for clicked suggestion chips.
+- `backend/app/services/card_service.py`:
+  - Renamed `"Sports & Recreation Arena"` in static campus highlights to `"Campus Sports & Recreation Facilities"` with verified descriptions aligned with `verified_highlights.yaml`.
+- `backend/app/services/chat_service.py`:
+  - Tagged chip-derived student interests with `interest_source: "chip"` versus `"stated"`.
+  - Injected `stage` and interest provenance distinctions into profile context.
+- `prompts/persona.md`:
+  - Added non-negotiable rules for student stage (default prospective) and interest citation (never claim "you mentioned" for clicked chips).
+
+### Added
+- `backend/tests/test_chips_and_profile_stage_t17.py`:
+  - 6 unit tests validating chip availability filtering, suggestion generation safety, prospective stage preservation, explicit current student detection, interest provenance tracking, and video keyword auditing.
+- Test suite expanded from 343 to 349 tests passed.
+
 ## [T14] Repetition and opener control (P1)
 
 ### Already there

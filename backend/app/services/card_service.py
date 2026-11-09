@@ -293,8 +293,8 @@ CAMPUS_TOUR_CARD = {
             "icon": "🏠",
         },
         {
-            "name": "Sports & Recreation Arena",
-            "desc": "Floodlit cricket stadium, football ground, basketball courts, badminton complex, and running tracks.",
+            "name": "Campus Sports & Recreation Facilities",
+            "desc": "150-acre green campus grounds with outdoor cricket, football, basketball courts, and indoor recreation center.",
             "icon": "⚽",
         },
         {

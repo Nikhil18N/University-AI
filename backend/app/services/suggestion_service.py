@@ -18,7 +18,7 @@ ELIGIBILITY_QUERY_SUGGESTIONS = [
 ]
 
 BRANCH_COMPARISON_SUGGESTIONS = [
-    "🔬 Specialized AI & Robotics Labs",
+    "🚀 Innovation & SRiX Incubator",
     "📊 B.Tech CSE Placement Records",
     "🆚 Compare CSE with ECE",
     "📋 Admission Eligibility Criteria",
@@ -85,8 +85,8 @@ HOSTEL_VIDEO_OFFER_SUGGESTIONS = [
 CAMPUS_VIDEO_OFFER_SUGGESTIONS = [
     "🎥 Yes, watch video",
     "❌ No, thanks",
-    "🔬 Specialized AI Labs",
-    "⚽ Sports Arena",
+    "🌳 150-Acre Green Campus",
+    "🚀 SRiX Startup Incubator",
 ]
 
 SRIX_VIDEO_OFFER_SUGGESTIONS = [
@@ -104,7 +104,7 @@ TRANSPORT_SUGGESTIONS = [
 ]
 
 CURRICULUM_SUGGESTIONS = [
-    "🔬 Hands-on AI & Machine Learning Labs",
+    "💻 Practical Project Curriculum",
     "📊 Average & Highest Placement CTC",
     "🧑‍🏫 Faculty Guidance & Mentorship",
     "📋 How to Register for Courses",
@@ -132,6 +132,26 @@ DEFAULT_UNIVERSITY_SUGGESTIONS = [
 ]
 
 
+UNAVAILABLE_CHIP_KEYWORDS = (
+    "specialized ai",
+    "sports arena",
+    "international hostel",
+)
+
+
+def filter_available_suggestions(chips: list[str]) -> list[str]:
+    """Filter out candidate chips that refer to unanswerable topics or known information gaps."""
+    clean = []
+    for chip in chips:
+        c_lower = chip.lower()
+        if any(bad in c_lower for bad in UNAVAILABLE_CHIP_KEYWORDS):
+            continue
+        clean.append(chip)
+    if len(clean) < 2:
+        return DEFAULT_UNIVERSITY_SUGGESTIONS[:4]
+    return clean
+
+
 def generate_suggestions(
     intent: str,
     user_message: str,
@@ -143,7 +163,7 @@ def generate_suggestions(
     """Generate 3-4 contextual suggestion chips based on intent, topic, and dialogue state."""
     # 1. If guided flow has explicit choices, prioritize them
     if flow_state and flow_state.get("options"):
-        return flow_state["options"][:4]
+        return filter_available_suggestions(flow_state["options"][:4])
 
     msg_lower = user_message.lower()
     ans_lower = answer.lower()
@@ -271,4 +291,5 @@ def generate_suggestions(
         s for s in raw_suggestions
         if not any(word in msg_lower for word in s.lower().replace("📋", "").replace("💰", "").replace("🏠", "").replace("📊", "").replace("📚", "").replace("🎓", "").replace("💼", "").split() if len(word) > 4)
     ]
-    return filtered[:4] if len(filtered) >= 2 else raw_suggestions[:4]
+    res = filtered[:4] if len(filtered) >= 2 else raw_suggestions[:4]
+    return filter_available_suggestions(res)
