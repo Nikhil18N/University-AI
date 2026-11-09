@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     RAG_MAX_DISTANCE: float = 0.60
     RAG_TOP_K: int = 8
     RAG_RERANK: bool = True
+    HYBRID_RETRIEVAL_ENABLED: bool = True
 
     # ---- Admin ----
     ADMIN_API_KEY: str = "change-me-in-production"

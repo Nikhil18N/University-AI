@@ -1,5 +1,28 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T9] BM25 + RRF hybrid retrieval (P2)
+
+### Already there
+- ChromaDB dense vector retrieval with cosine distance thresholding (`RAG_MAX_DISTANCE`) and LLM reranking.
+
+### Changed
+- `backend/app/config.py`:
+  - Added `HYBRID_RETRIEVAL_ENABLED: bool = True`.
+- `backend/app/services/rag_service.py`:
+  - Integrated BM25 sparse keyword search alongside dense ChromaDB vector search.
+  - Fuses dense and sparse rankings using Reciprocal Rank Fusion (RRF, $k=60$) before downstream boost application and reranking.
+- `backend/app/services/cache_service.py`:
+  - Hooked `bump_index_version()` to call `invalidate_bm25_index()` so index version changes automatically rebuild the in-memory sparse index.
+
+### Added
+- `backend/app/services/bm25_service.py`:
+  - Zero-dependency in-memory Okapi BM25 engine with title-weighted tokenization, length normalization ($k_1=1.5, b=0.75$), and standard IDF calculations.
+  - `reciprocal_rank_fusion()` function combining multi-ranker outputs ($1 / (k + rank_i)$).
+  - Version-aware cached index management with lazy instantiation and invalidation.
+- `backend/tests/test_hybrid_retrieval.py`:
+  - 4 unit tests validating exact keyword ranking ("Dr. Sumanth", "CSE-AIML-401"), RRF score boosting over dense-only results, and index invalidation lifecycle.
+- Test suite expanded from 306 to 310 tests passed.
+
 ## [T8] Crisis detection second layer (P1)
 
 ### Already there

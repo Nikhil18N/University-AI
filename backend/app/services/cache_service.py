@@ -132,7 +132,13 @@ async def get_facts_version(redis_client: Any) -> str:
 
 
 async def bump_index_version(redis_client: Any) -> int:
-    """Increment index_version counter in Redis to invalidate all current document RAG cache entries."""
+    """Increment index_version counter in Redis to invalidate all current document RAG cache entries and BM25 index."""
+    try:
+        from app.services.bm25_service import invalidate_bm25_index
+        invalidate_bm25_index()
+    except Exception:
+        pass
+
     if redis_client is None:
         return 1
     try:

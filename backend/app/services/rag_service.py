@@ -149,6 +149,24 @@ class RAGService:
             or chunk["distance"] <= max_dist
         ]
 
+        # Hybrid Sparse BM25 + Dense RRF Fusion (T9)
+        if getattr(settings, "HYBRID_RETRIEVAL_ENABLED", True):
+            try:
+                from app.services.bm25_service import get_or_build_bm25_index, reciprocal_rank_fusion
+                bm25_index = get_or_build_bm25_index(collection)
+                sparse_hits = bm25_index.search(query, top_k=top_k)
+                sparse_chunks = [hit[0] for hit in sparse_hits]
+
+                if sparse_chunks:
+                    chunks = reciprocal_rank_fusion(
+                        dense_results=chunks,
+                        sparse_results=sparse_chunks,
+                        k=60,
+                        top_k=top_k,
+                    )
+            except Exception as e:
+                logger.warning("BM25 hybrid retrieval pass failed, continuing with dense: %s", e)
+
         # Prioritize verified registry and domain-specific terms from retrieval_boosts.yaml (T7)
         boosts = load_retrieval_boosts()
         title_boosts = boosts.get("title_boosts", [])
