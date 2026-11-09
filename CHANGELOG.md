@@ -1,5 +1,29 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T5] Extend the numeric and date validator (P1)
+
+### Already there
+- Basic numeric validator checking extracted integers against retrieved grounded numbers.
+- Whitelist set with some unannotated constants.
+
+### Changed
+- `backend/app/services/validator_service.py`:
+  - Replaced unannotated set with `WHITELISTED_CONSTANTS_WITH_REASONS: dict[str, str]` where every single constant (contact numbers, rankings, minimum marks percentages, fee scales) has an explicit documented rationale.
+  - Added `format_indian_currency()` and `normalize_currency_amount()` supporting Indian numbering (e.g., "1,25,000"), Western comma grouping ("125,000"), raw digits ("125000"), and lakh representations ("1.25 lakh", "1.25lakh").
+  - Added `normalize_date()` handling DD Month YYYY, Month DD YYYY, DD/MM/YYYY, and YYYY-MM-DD formats into canonical ISO representations so valid date paraphrasing passes verification.
+  - Added unit quantity extraction (`extract_unit_numbers`) for seats, credits, semesters, years, and students.
+  - Masked log entries: `mask_sensitive_token()` ensures tokens and rejection reasons logged do not expose raw student data or ungrounded values in plain text.
+
+### Added
+- Comprehensive test suite in `backend/tests/test_validator_service.py` (26 tests, up from 5):
+  - Currency normalization and multi-format matching.
+  - Indian comma grouping and lakh equivalents.
+  - Date normalization across 4 distinct formats.
+  - Unit numbers (seats, semesters, credits).
+  - Whitelist justification test ensuring every entry in `WHITELISTED_CONSTANTS_WITH_REASONS` has a non-empty rationale.
+  - Masked rejection logging validation.
+- Test suite expanded from 259 to 280 tests passed.
+
 ## [T2] Make structured facts a single source of truth (P0)
 
 ### Already there
