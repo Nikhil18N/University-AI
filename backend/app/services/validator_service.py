@@ -363,6 +363,11 @@ def validate_response_grounding(
                 if year not in whitelist and year not in allowed_corpus:
                     ungrounded.append(dt)
 
+    # 5. Verify statistics scoping (T16)
+    is_scoped, unscoped_stats = verify_statistics_scoping(answer)
+    if not is_scoped:
+        ungrounded.extend(unscoped_stats)
+
     if ungrounded:
         masked_reasons = [mask_sensitive_token(t) for t in ungrounded]
         logger.warning(
@@ -371,3 +376,33 @@ def validate_response_grounding(
         return False, ungrounded
 
     return True, []
+
+
+def verify_statistics_scoping(reply_text: str) -> tuple[bool, list[str]]:
+    """Validate that placement and ranking statistics are output with their scope and year (T16)."""
+    text_lower = reply_text.lower()
+    unscoped = []
+
+    # Average placement (6 LPA)
+    if "6 lpa" in text_lower:
+        has_scope = any(k in text_lower for k in ["university-wide", "overall", "across graduating", "across all", "graduating"])
+        has_year = any(k in text_lower for k in ["batch", "2023", "2024", "2025", "2026"])
+        if not (has_scope and has_year):
+            unscoped.append("6 LPA placement average mentioned without both scope and batch year")
+
+    # Highest package (51 LPA)
+    if "51 lpa" in text_lower:
+        has_recruiter = any(k in text_lower for k in ["microsoft", "recruiter", "7.5", "cgpa"])
+        has_year = any(k in text_lower for k in ["batch", "2023", "2024", "2025", "2026"])
+        if not (has_recruiter and has_year):
+            unscoped.append("51 LPA highest package mentioned without recruiter (Microsoft) and batch year")
+
+    # NIRF Ranking (91st)
+    if "91st" in text_lower or ("91" in text_lower and "nirf" in text_lower):
+        if "2025" not in text_lower:
+            unscoped.append("NIRF 91st ranking mentioned without framework year (2025)")
+
+    if unscoped:
+        return False, unscoped
+    return True, []
+

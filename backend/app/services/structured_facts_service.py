@@ -299,6 +299,32 @@ def get_active_facts() -> list[dict[str, Any]]:
     return _FALLBACK_SEED_FACTS
 
 
+# Canonical statistics with mandatory scope, year, and single canonical wording (T16)
+CANONICAL_STATISTICS: dict[str, dict[str, str]] = {
+    "average_package": {
+        "value": "6 LPA",
+        "scope": "university-wide across all graduating disciplines",
+        "academic_year": "2023–24 graduating batch",
+        "basis": "average CTC",
+        "canonical": "For the 2023–24 graduating batch university-wide, the average placement package was 6 LPA.",
+    },
+    "highest_package": {
+        "value": "51 LPA",
+        "scope": "university-wide top recruiter drive (Microsoft)",
+        "academic_year": "2023–24 batch",
+        "basis": "highest CTC (7.5+ CGPA required)",
+        "canonical": "The highest package was 51 LPA from Microsoft (eligible for students maintaining a 7.5+ CGPA) for the 2023–24 batch.",
+    },
+    "nirf_ranking": {
+        "value": "91st",
+        "scope": "National Institutional Ranking Framework (Engineering)",
+        "academic_year": "2025",
+        "basis": "Engineering Category rank",
+        "canonical": "SR University is ranked 91st in NIRF Engineering (2025).",
+    },
+}
+
+
 def get_structured_facts_text(
     query: str,
     program_hint: str | None = None,
@@ -311,7 +337,7 @@ def get_structured_facts_text(
     # Category matching
     want_fees = any(k in q_lower for k in ["fee", "fees", "cost", "tuition", "instalment", "installment", "hidden"])
     want_cutoff = any(k in q_lower for k in ["cutoff", "cut-off", "eligibility", "eligible", "minimum", "percent", "marks", "pcm"])
-    want_placement = any(k in q_lower for k in ["placement", "package", "lpa", "salary", "recruiter", "company", "companies"])
+    want_placement = any(k in q_lower for k in ["placement", "package", "lpa", "salary", "recruiter", "company", "companies", "fact check", "compare", "better"])
     want_scholarship = any(k in q_lower for k in ["scholarship", "waiver", "discount"])
     want_ranking = any(k in q_lower for k in ["nirf", "naac", "nba", "rank", "ranking", "accredit"])
 
@@ -358,7 +384,16 @@ def get_structured_facts_text(
 
     lines = []
     for f in selected:
-        lines.append(f"- [{f['program']}] {f['key_attribute']}: {f['formatted_value']} (Source: {f['source_doc']})")
+        key = f.get("key_attribute", "")
+        if key in CANONICAL_STATISTICS:
+            cstat = CANONICAL_STATISTICS[key]
+            lines.append(
+                f"- [{f['program']}] {key}: {f['formatted_value']} "
+                f"[Scope: {cstat['scope']} | Batch/Year: {cstat['academic_year']} | Basis: {cstat['basis']} | Canonical: \"{cstat['canonical']}\"] "
+                f"(Source: {f['source_doc']})"
+            )
+        else:
+            lines.append(f"- [{f['program']}] {f['key_attribute']}: {f['formatted_value']} (Source: {f['source_doc']})")
 
     return "\n".join(lines)
 

@@ -48,6 +48,7 @@ from app.services.validator_service import (
     FALLBACK_LOW_CONFIDENCE,
     FALLBACK_VALIDATOR_BLOCK,
     validate_response_grounding,
+    verify_statistics_scoping,
 )
 from app.services.video_service import (
     check_video_affirmative_or_negative,
@@ -392,6 +393,43 @@ async def execute_prompt_pack_pipeline(
                     return get_turn_fallback("unverified_facility")
 
             return clean_reply.strip()
+
+        elif ptype in ("fact_check", "comparison", "social_proof_doubt"):
+            struct_text = get_structured_facts_text(ptext, profile.get("branch"))
+            hl_list = get_relevant_highlights(ptext, profile_interests=profile.get("interests", []), limit=3)
+            formatted_hl = format_highlights_for_prompt(hl_list)
+
+            rag_ctx = ""
+            if rag_service:
+                chunks, _ = await rag_service.retrieve_with_embedding(ptext, scope="all", top_k=3)
+                rag_ctx = "\n\n".join(c["content"] for c in chunks)
+                for c in chunks:
+                    meta = c.get("metadata", {})
+                    if meta.get("document_id") and meta not in all_sources:
+                        all_sources.append(meta)
+
+            combined_context = f"Structured Verified Facts:\n{struct_text}\n\nCampus Highlights:\n{formatted_hl}\n\nContext Notes:\n{rag_ctx}".strip()
+
+            prompt = render_prompt(
+                "fact_check",
+                intent_type=ptype,
+                part_text=ptext,
+                student_profile=profile_text,
+                retrieved_context=combined_context,
+            )
+            raw_ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=300)
+
+            # Validate statistics scoping
+            is_stat_scoped, unscoped_reasons = verify_statistics_scoping(raw_ans)
+            if not is_stat_scoped:
+                logger.warning("Fact check output contained unscoped statistics: %s. Retrying with scope instruction.", unscoped_reasons)
+                retry_prompt = prompt + f"\n\nCRITICAL: You mentioned statistics without scope and year. Always output statistics with their scope and batch year (e.g. 'For the 2023–24 graduating batch university-wide, the average package was 6 LPA')."
+                retry_ans = await llm.generate([{"role": "user", "content": retry_prompt}], temperature=0.0, max_tokens=300)
+                is_scoped_2, _ = verify_statistics_scoping(retry_ans)
+                if is_scoped_2:
+                    raw_ans = retry_ans
+
+            return raw_ans.strip()
 
         else:  # factual
             # Check response cache if single factual part

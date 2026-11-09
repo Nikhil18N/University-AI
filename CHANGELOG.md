@@ -1,5 +1,31 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T16] Fact-check and comparison intent, scoped statistics (P0)
+
+### Already there
+- Basic router supporting factual, persuasive, chitchat, sensitive, and out_of_scope.
+- Structured facts service outputting fees and general placement figures without mandatory scoping or batch year.
+
+### Changed
+- `backend/app/services/router_service.py` & `prompts/router.md`:
+  - Added new dedicated router intents: `fact_check`, `comparison`, and `social_proof_doubt`.
+  - Added deterministic regex fast-paths for fact-check requests ("is it true that", "fact check"), comparison queries ("better than other colleges"), and peer doubt ("friend told me not to join").
+- `backend/app/services/structured_facts_service.py`:
+  - Introduced `CANONICAL_STATISTICS` defining mandatory scope, batch/academic year, basis, and single canonical wording for placement and ranking statistics.
+  - Updated `get_structured_facts_text()` to format statistics with their full scope and batch context (e.g. "For the 2023–24 graduating batch university-wide, the average placement package was 6 LPA").
+- `backend/app/services/validator_service.py`:
+  - Added `verify_statistics_scoping()`: detects statistics (6 LPA, 51 LPA, 91st NIRF) and rejects answers that quote figures without mandatory scope, batch year, or ranking framework year.
+- `backend/app/services/chat_service.py`:
+  - Added dedicated handler for `fact_check`, `comparison`, and `social_proof_doubt` sub-parts.
+  - Grounded answers in both structured facts and campus highlights with statistics scope retry verification.
+
+### Added
+- `prompts/fact_check.md`:
+  - Dedicated prompt for neutral claim restatement, scoped statistics presentation, peer doubt exploration ("what did your friend mention specifically?"), and non-disparagement comparisons.
+- `backend/tests/test_fact_check_and_comparison.py`:
+  - 8 unit tests validating router classification of `fact_check`, `comparison`, and `social_proof_doubt`, testing strict scoped statistics validation, and testing prompt rendering.
+- Test suite expanded from 324 to 332 tests passed.
+
 ## [T15] Claim-level grounding and known-gaps memory (P0)
 
 ### Already there

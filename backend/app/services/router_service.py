@@ -10,7 +10,16 @@ from app.services.prompt_service import render_prompt
 
 logger = logging.getLogger(__name__)
 
-VALID_TYPES = {"factual", "persuasive", "chitchat", "sensitive", "out_of_scope"}
+VALID_TYPES = {
+    "factual",
+    "persuasive",
+    "chitchat",
+    "sensitive",
+    "out_of_scope",
+    "fact_check",
+    "comparison",
+    "social_proof_doubt",
+}
 
 # Comprehensive multi-lingual crisis, distress, self-harm and sensitive keywords (T8)
 CRISIS_DISTRESS_REGEX = re.compile(
@@ -46,6 +55,9 @@ FAST_ROUTER_PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)(\s+(there|buddy|friend|assistant|bot|sru|all))?[!.,\s]*$", re.I), "chitchat"),
     (re.compile(r"^\s*(ok|okay|k|cool|got\s+it|understood|great|awesome|sure|thanks|thank\s+you)(\s+(a\s+lot|so\s+much|buddy|bro))?[!.,\s]*$", re.I), "chitchat"),
     (re.compile(r"^\s*(who\s+won|weather|election|cricket\s+score|write\s+my\s+assignment|hack\b)[^?]*\??$", re.I), "out_of_scope"),
+    (re.compile(r"\b(friend|relative|senior|someone|people)\s+(told|said|warned|advised)\s*(me)?\s*(not\s+to\s+join|it'?s\s+bad|against\s+joining|to\s+avoid)\b", re.I), "social_proof_doubt"),
+    (re.compile(r"\b(fact\s*check|is\s+it\s+true\s+that|can\s+you\s+verify|verify\s+(whether|if|claim)|is\s+that\s+true)\b", re.I), "fact_check"),
+    (re.compile(r"\b(better\s+than\s+(other|all|colleges|universities)|compared\s+to\s+(other|all|colleges|universities)|how\s+does\s+it\s+compare)\b", re.I), "comparison"),
 ]
 
 
