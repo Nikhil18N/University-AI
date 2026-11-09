@@ -88,7 +88,8 @@ def is_cacheable(mode: str, answer: str, part_count: int = 1) -> bool:
     # Never cache validator fallback blocks or refusal text
     if "couldn't verify those details against our official sources" in answer.lower():
         return False
-    if "admissions office (0870-2818333" in answer.lower() and "verify" in answer.lower():
+    admissions_phone = getattr(settings, "ADMISSIONS_PHONE", "")
+    if (f"admissions office ({admissions_phone}" in answer.lower() or "admissions office" in answer.lower()) and "verify" in answer.lower():
         return False
     # Never cache replies that ask a clarifying question back to the student
     if "?" in answer:

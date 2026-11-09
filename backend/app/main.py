@@ -63,6 +63,29 @@ async def lifespan(fastapi_app: FastAPI):
 
     asyncio.create_task(ensure_documents_seeded())
 
+    # Verify required contacts and retrieval boost configuration (T7)
+    missing_configs = []
+    if not getattr(settings, "ADMISSIONS_PHONE", None):
+        missing_configs.append("ADMISSIONS_PHONE")
+    if not getattr(settings, "ADMISSIONS_EMAIL", None):
+        missing_configs.append("ADMISSIONS_EMAIL")
+    if not getattr(settings, "ADMISSIONS_PORTAL_URL", None):
+        missing_configs.append("ADMISSIONS_PORTAL_URL")
+    if not getattr(settings, "CRISIS_HELPLINES", None):
+        missing_configs.append("CRISIS_HELPLINES")
+
+    boost_yaml = Path(__file__).resolve().parent / "data" / "retrieval_boosts.yaml"
+    if not boost_yaml.exists():
+        missing_configs.append(f"retrieval_boosts.yaml at {boost_yaml}")
+
+    if missing_configs:
+        logger.warning(
+            "Startup configuration warning: missing required contacts/boost items: %s",
+            ", ".join(missing_configs),
+        )
+    else:
+        logger.info("Centralized university contacts, helplines, and retrieval boosts verified.")
+
     # Initialize optional Redis client for response caching
     fastapi_app.state.redis = None
     if settings.REDIS_URL:

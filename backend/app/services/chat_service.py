@@ -115,21 +115,35 @@ def sanitize_staff_contact_numbers(text: str) -> str:
         return text
 
     # Never sanitize crisis helplines or mental health support responses
-    crisis_keywords = ["tele-manas", "aasra", "vandrevala", "kiran", "14416", "9820466726", "1800-599-0019", "helpline", "counselor", "self-harm", "mental health", "distress"]
+    crisis_keywords = ["tele-manas", "aasra", "vandrevala", "kiran", "helpline", "counselor", "self-harm", "mental health", "distress"]
+    for helpline in getattr(settings, "CRISIS_HELPLINES", []):
+        name = helpline.get("name", "").lower()
+        num = helpline.get("number", "")
+        alt = helpline.get("alt_number", "")
+        if name:
+            crisis_keywords.append(name)
+        if num:
+            crisis_keywords.append(num.lower())
+        if alt:
+            crisis_keywords.append(alt.lower())
+
     if any(k in text.lower() for k in crisis_keywords):
         return text
+
+    admissions_phone = getattr(settings, "ADMISSIONS_PHONE", "")
+    helpdesk_email = getattr(settings, "HELPDESK_EMAIL", "")
 
     # 1. Staff names followed by mobile numbers:
     cleaned = re.sub(
         r"(?:Mr\.|Ms\.|Dr\.)\s+[A-Za-z\.\s]+\s*(?:at|on|:|-)?\s*(?:\+91[\s-]?)?[6-9]\d{9}\b",
-        "the IT & Campus Helpdesk (helpdesk@sru.edu.in / 0870-2818333)",
+        f"the IT & Campus Helpdesk ({helpdesk_email} / {admissions_phone})",
         text,
         flags=re.IGNORECASE,
     )
     # 2. Known individual staff mobiles if mentioned standalone:
     known_staff_mobiles = ["8886522500", "8008917297"]
     for num in known_staff_mobiles:
-        cleaned = cleaned.replace(num, "0870-2818333 (Ext. Helpdesk)")
+        cleaned = cleaned.replace(num, f"{admissions_phone} (Ext. Helpdesk)")
     return cleaned
 
 

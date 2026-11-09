@@ -1,0 +1,22 @@
+# Retrieval boost configuration for RAG engine
+# Staff can adjust match terms and score bonuses without editing Python code.
+
+title_boosts:
+  - match_terms:
+      - "verified knowledge registry"
+      - "09_verified_sru_facts"
+    bonus: 0.06
+    description: "Prioritize official verified university fact sheet and registry"
+
+keyword_boosts:
+  - match_terms:
+      - "51 lpa"
+      - "50%"
+      - "60%"
+      - "triple sharing"
+      - "curfew"
+      - "deepak garg"
+      - "varada reddy"
+    bonus: 0.04
+    description: "Domain-specific cutoffs, placement packages, hostel rules, leadership figures"
+

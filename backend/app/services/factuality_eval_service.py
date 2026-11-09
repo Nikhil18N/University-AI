@@ -10,6 +10,7 @@ import logging
 import re
 from typing import Any
 
+from app.config import settings
 from app.services.guardrail_service import (
     PERCENT_PATTERN,
     URL_PATTERN,
@@ -70,7 +71,11 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
                 "Hallucination: Marks below 500/1000 claimed as unconditionally eligible",
             ),
         ],
-        allowed_numbers=["50%", "500", "58%", "52%", "1000", "10+2", "12th", "0870-2818333", "0870-2818311"],
+        allowed_numbers=[
+            "50%", "500", "58%", "52%", "1000", "10+2", "12th",
+            getattr(settings, "ADMISSIONS_PHONE", ""),
+            getattr(settings, "ADMISSIONS_PHONE_ALT", ""),
+        ],
     ),
     "direct_admission_entrance_exam": FactualityBenchmarkItem(
         policy_id="direct_admission_entrance_exam",

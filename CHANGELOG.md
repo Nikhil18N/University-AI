@@ -1,5 +1,36 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T7] Move contacts, helplines and boost terms to config/data (P1)
+
+### Already there
+- Contact numbers (`0870-2818333`), emails (`info@sru.edu.in`), and crisis helplines (`14416`) hardcoded across multiple prompt templates and Python service files.
+- Hardcoded retrieval bonus values in `rag_service.py` for specific titles and keywords.
+
+### Changed
+- `backend/app/config.py`:
+  - Added centralized university contacts: `ADMISSIONS_PHONE`, `ADMISSIONS_PHONE_ALT`, `ADMISSIONS_EMAIL`, `HELPDESK_EMAIL`, `ADMISSIONS_PORTAL_URL`, and `CAMPUS_LOCATION`.
+  - Added structured crisis helpline registry `CRISIS_HELPLINES` (Tele-MANAS, AASRA, Kiran) with 24/7 hours, phone, alt_number, and language coverage.
+- `prompts/*.md`:
+  - Replaced all hardcoded phone, email, portal URLs, and helpline literals across `sensitive.md`, `factual.md`, `persona.md`, `rag.md`, and `system.md` with centralized placeholders (`{admissions_phone}`, `{admissions_email}`, `{admissions_portal_url}`, `{crisis_helplines}`).
+- `backend/app/services/prompt_service.py`:
+  - Added `interpolate_config_placeholders()` and `get_default_prompt_variables()` to interpolate centralized config variables at prompt load time.
+- `backend/app/services/validator_service.py`:
+  - Dynamically populates phone numbers and crisis helplines from config into the validator's grounding whitelist via `get_dynamic_allowed_numbers()`.
+  - Dynamic fallback responses via `get_fallback_validator_block()` and `get_fallback_low_confidence()`.
+- `backend/app/services/rag_service.py`:
+  - Replaced hardcoded title/keyword boost bonuses with YAML-driven retrieval tuning via `load_retrieval_boosts()`.
+- `backend/app/services/chat_service.py`:
+  - Replaced hardcoded crisis keywords and staff fallback desks with config-derived contact entries.
+- `backend/app/main.py`:
+  - Added application startup verification checking that all required contacts, helplines, and `retrieval_boosts.yaml` exist.
+
+### Added
+- `backend/app/data/retrieval_boosts.yaml`:
+  - Centralized retrieval boost configuration allowing staff to tune score bonuses and match keywords without Python code modifications.
+- `backend/tests/test_config_centralization.py`:
+  - 5 unit tests validating dynamic prompt propagation, validator whitelist synchronization, custom crisis helpline acceptance, YAML boost loading, and zero hardcoded literals in prompts.
+- Test suite expanded from 286 to 291 tests passed.
+
 ## [T6] Log masking, DPDP notice, retention (P1)
 
 ### Already there

@@ -1,6 +1,8 @@
 import json
 import logging
+from pathlib import Path
 import re
+import yaml
 
 import chromadb
 
@@ -19,6 +21,21 @@ from app.services.prompt_service import render_prompt
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "university_documents"
+
+
+def load_retrieval_boosts() -> dict:
+    """Load retrieval boosts configuration from backend/app/data/retrieval_boosts.yaml (T7)."""
+    yaml_path = Path(__file__).resolve().parent.parent / "data" / "retrieval_boosts.yaml"
+    if not yaml_path.exists():
+        logger.warning("Retrieval boost config not found at %s; returning empty boosts", yaml_path)
+        return {"title_boosts": [], "keyword_boosts": []}
+    try:
+        with open(yaml_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+            return data
+    except Exception as e:
+        logger.error("Failed to load retrieval boosts from %s: %s", yaml_path, e)
+        return {"title_boosts": [], "keyword_boosts": []}
 
 
 class RAGService:
@@ -132,16 +149,27 @@ class RAGService:
             or chunk["distance"] <= max_dist
         ]
 
-        # Prioritize verified registry and domain-specific terms
+        # Prioritize verified registry and domain-specific terms from retrieval_boosts.yaml (T7)
+        boosts = load_retrieval_boosts()
+        title_boosts = boosts.get("title_boosts", [])
+        keyword_boosts = boosts.get("keyword_boosts", [])
+
         for chunk in chunks:
             meta = chunk.get("metadata", {})
             title = meta.get("title", "").lower()
             content = chunk.get("content", "").lower()
             bonus = 0.0
-            if "verified knowledge registry" in title or "09_verified_sru_facts" in title:
-                bonus += 0.06
-            if any(term in content for term in ["51 lpa", "50%", "60%", "triple sharing", "curfew", "deepak garg", "varada reddy"]):
-                bonus += 0.04
+
+            for tb in title_boosts:
+                terms = tb.get("match_terms", [])
+                if any(t.lower() in title for t in terms):
+                    bonus += float(tb.get("bonus", 0.0))
+
+            for kb in keyword_boosts:
+                terms = kb.get("match_terms", [])
+                if any(t.lower() in content for t in terms):
+                    bonus += float(kb.get("bonus", 0.0))
+
             if chunk.get("distance") is not None and bonus > 0:
                 chunk["distance"] = max(0.0, chunk["distance"] - bonus)
 

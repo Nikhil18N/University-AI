@@ -14,6 +14,7 @@ import logging
 import re
 from typing import Any
 
+from app.config import settings
 from app.services.structured_facts_service import get_all_grounded_numbers
 
 logger = logging.getLogger(__name__)
@@ -60,22 +61,47 @@ WHITELISTED_CONSTANTS_WITH_REASONS: dict[str, str] = {
     "160": "Standard AICTE credits for 4-year B.Tech completion",
     "500": "Standard Telangana Inter MPC passing mark denominator (500/1000)",
     "1000": "Total maximum aggregate marks in Intermediate MPC",
-    # Official university landlines & national crisis helplines
-    "0870": "Warangal telecom district STD dialing code",
-    "2818333": "Official university general admissions desk landline",
-    "2818311": "Official university campus administration landline",
-    "14416": "Government of India Tele-MANAS national mental health helpline",
-    "9820466726": "AASRA national suicide prevention helpline",
-    "1800": "National toll-free telephone prefix",
-    "599": "Kiran mental health helpline prefix (1800-599-0019)",
-    "0019": "Kiran mental health helpline suffix (1800-599-0019)",
-    "1800-599-0019": "Kiran national mental health helpline",
     # Standard academic calendar years
     "2024": "Recent historical academic and NIRF reference year",
     "2025": "Current NIRF / NBA ranking evaluation cycle",
     "2026": "Current academic intake calendar year",
     "2027": "Upcoming academic cycle completion year",
 }
+
+
+def get_dynamic_allowed_numbers() -> set[str]:
+    """Return whitelisted numbers combining base constants and configured contacts/helplines from config (T7)."""
+    allowed = set(WHITELISTED_CONSTANTS_WITH_REASONS.keys())
+
+    # Add configured admissions contacts
+    for phone in [
+        getattr(settings, "ADMISSIONS_PHONE", ""),
+        getattr(settings, "ADMISSIONS_PHONE_ALT", ""),
+    ]:
+        if phone:
+            allowed.add(phone)
+            digits = re.sub(r"[^\d]", "", phone)
+            if digits:
+                allowed.add(digits)
+            for part in re.split(r"[^\d]+", phone):
+                if part:
+                    allowed.add(part)
+
+    # Add configured crisis helplines
+    for helpline in getattr(settings, "CRISIS_HELPLINES", []):
+        for field in ("number", "alt_number"):
+            num_val = helpline.get(field)
+            if num_val:
+                allowed.add(num_val)
+                digits = re.sub(r"[^\d]", "", num_val)
+                if digits:
+                    allowed.add(digits)
+                for part in re.split(r"[^\d]+", num_val):
+                    if part:
+                        allowed.add(part)
+
+    return allowed
+
 
 STANDARD_ALLOWED_NUMBERS: set[str] = set(WHITELISTED_CONSTANTS_WITH_REASONS.keys())
 
@@ -105,17 +131,29 @@ MONTH_MAP = {
     "nov": 11, "november": 11, "dec": 12, "december": 12,
 }
 
-FALLBACK_VALIDATOR_BLOCK = (
-    "I couldn't verify those details against our official sources, so I'd rather not "
-    "give you numbers I'm unsure about. Please check https://apply.sru.edu.in or "
-    "contact the Admissions Office at 0870-2818333 / info@sru.edu.in."
-)
+def get_fallback_validator_block() -> str:
+    portal = getattr(settings, "ADMISSIONS_PORTAL_URL", "")
+    phone = getattr(settings, "ADMISSIONS_PHONE", "")
+    email = getattr(settings, "ADMISSIONS_EMAIL", "")
+    return (
+        "I couldn't verify those details against our official sources, so I'd rather not "
+        f"give you numbers I'm unsure about. Please check {portal} or "
+        f"contact the Admissions Office at {phone} / {email}."
+    )
 
-FALLBACK_LOW_CONFIDENCE = (
-    "I don't want to guess on this one and risk giving you the wrong info. "
-    "The admissions team can confirm it directly: 0870-2818333 / info@sru.edu.in. "
-    "Meanwhile, want me to help with something else?"
-)
+
+def get_fallback_low_confidence() -> str:
+    phone = getattr(settings, "ADMISSIONS_PHONE", "")
+    email = getattr(settings, "ADMISSIONS_EMAIL", "")
+    return (
+        "I don't want to guess on this one and risk giving you the wrong info. "
+        f"The admissions team can confirm it directly: {phone} / {email}. "
+        "Meanwhile, want me to help with something else?"
+    )
+
+
+FALLBACK_VALIDATOR_BLOCK = get_fallback_validator_block()
+FALLBACK_LOW_CONFIDENCE = get_fallback_low_confidence()
 
 
 def format_indian_currency(n: int) -> str:
@@ -296,7 +334,7 @@ def validate_response_grounding(
 
     # Pre-compiled verified ground truth whitelist
     whitelist = get_all_grounded_numbers()
-    whitelist.update(STANDARD_ALLOWED_NUMBERS)
+    whitelist.update(get_dynamic_allowed_numbers())
 
     ungrounded = []
 

@@ -46,6 +46,38 @@ class Settings(BaseSettings):
     SHOW_SOURCES: bool = False
     CONVERSATION_RETENTION_DAYS: int = 90
 
+    # ---- University Contacts & Helplines (T7) ----
+    ADMISSIONS_PHONE: str = "0870-2818333"
+    ADMISSIONS_PHONE_ALT: str = "0870-2818311"
+    ADMISSIONS_EMAIL: str = "info@sru.edu.in"
+    HELPDESK_EMAIL: str = "helpdesk@sru.edu.in"
+    ADMISSIONS_PORTAL_URL: str = "https://apply.sru.edu.in"
+    CAMPUS_LOCATION: str = "Ananthasagar, Hasanparthy, Warangal, Telangana 506371"
+
+    CRISIS_HELPLINES: list[dict[str, str]] = [
+        {
+            "name": "Tele-MANAS",
+            "number": "14416",
+            "alt_number": "1800-891-4416",
+            "hours": "24/7",
+            "languages": "English, Telugu, Hindi, and 20+ regional languages",
+        },
+        {
+            "name": "AASRA",
+            "number": "+91-9820466726",
+            "alt_number": "9820466726",
+            "hours": "24/7",
+            "languages": "English, Hindi",
+        },
+        {
+            "name": "Kiran Mental Health Helpline",
+            "number": "1800-599-0019",
+            "alt_number": "18005990019",
+            "hours": "24/7",
+            "languages": "English, Hindi, Telugu, and 10+ languages",
+        },
+    ]
+
     # ---- Paths ----
     PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent
     PROMPTS_DIR: Path = PROJECT_ROOT / "prompts"
