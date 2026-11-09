@@ -93,13 +93,22 @@
 
 .step-icon-bounce {
   font-size: 1.15rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   animation: stepIconBounce 2s ease infinite;
 }
 
-@keyframes stepIconBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+.step-sru-badge-svg {
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.28));
+  transition: transform 0.25s ease;
+}
+
+.step-sru-badge-svg:hover {
+  transform: scale(1.08) rotate(3deg);
 }
 
 .step-title-animated {

@@ -217,11 +217,198 @@ export const RefreshIcon: React.FC<IconProps> = ({ size = 18, className = "", co
 );
 
 /**
+ * SR University Custom University Badges / Emojis
+ * Designed specifically for SR University AI Companion workflows
+ */
+
+export const SruLensBadge: React.FC<IconProps> = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`sru-badge-icon ${className}`}
+  >
+    <defs>
+      <linearGradient id="sruLensGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#0284c7" />
+        <stop offset="100%" stopColor="#1e3a8a" />
+      </linearGradient>
+      <linearGradient id="sruGoldGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#fbbf24" />
+        <stop offset="100%" stopColor="#d97706" />
+      </linearGradient>
+    </defs>
+    <rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="url(#sruLensGrad)" />
+    <rect x="1.5" y="1.5" width="21" height="21" rx="6" stroke="#38bdf8" strokeWidth="1" strokeOpacity="0.4" />
+    <circle cx="10.5" cy="10.5" r="5" stroke="#ffffff" strokeWidth="1.8" />
+    <path d="M14.5 14.5L19 19" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+    <path d="M10.5 7.5L11.3 9.7L13.5 10.5L11.3 11.3L10.5 13.5L9.7 11.3L7.5 10.5L9.7 9.7Z" fill="url(#sruGoldGrad)" />
+  </svg>
+);
+
+export const SruHandbookBadge: React.FC<IconProps> = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`sru-badge-icon ${className}`}
+  >
+    <defs>
+      <linearGradient id="sruBookCover" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#1e40af" />
+        <stop offset="100%" stopColor="#0f172a" />
+      </linearGradient>
+      <linearGradient id="sruGoldBook" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#fde047" />
+        <stop offset="100%" stopColor="#d97706" />
+      </linearGradient>
+    </defs>
+    <rect x="4" y="2.5" width="16" height="19" rx="2.5" fill="url(#sruBookCover)" stroke="#3b82f6" strokeWidth="1" />
+    <path d="M4 2.5H7.5V21.5H4C2.89543 21.5 2 20.6046 2 19.5V4.5C2 3.39543 2.89543 2.5 4 2.5Z" fill="url(#sruGoldBook)" />
+    <path d="M7.5 19H19.5V21.5H7.5V19Z" fill="#e2e8f0" />
+    <circle cx="13.5" cy="10.5" r="3.2" stroke="url(#sruGoldBook)" strokeWidth="1.2" fill="#1e3a8a" fillOpacity="0.6" />
+    <path d="M12.5 9.5H14.5M12.5 10.5H14.5M12.5 11.5H13.8" stroke="url(#sruGoldBook)" strokeWidth="1" strokeLinecap="round" />
+    <path d="M11 2.5V7L12.5 5.8L14 7V2.5" fill="#ef4444" />
+  </svg>
+);
+
+export const SruEvaluationBadge: React.FC<IconProps> = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`sru-badge-icon ${className}`}
+  >
+    <defs>
+      <linearGradient id="sruScaleBg" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#0f172a" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </linearGradient>
+      <linearGradient id="sruGoldScale" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#fef08a" />
+        <stop offset="100%" stopColor="#f59e0b" />
+      </linearGradient>
+    </defs>
+    <rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="url(#sruScaleBg)" stroke="#f59e0b" strokeWidth="1" strokeOpacity="0.4" />
+    <path d="M12 4V19M8 19H16" stroke="url(#sruGoldScale)" strokeWidth="1.8" strokeLinecap="round" />
+    <path d="M5 8H19" stroke="url(#sruGoldScale)" strokeWidth="1.8" strokeLinecap="round" />
+    <path d="M10 4L12 2.5L14 4L12 5L10 4Z" fill="url(#sruGoldScale)" />
+    <path d="M5 8L3.5 13H6.5L5 8Z" stroke="#38bdf8" strokeWidth="1" fill="#0284c7" fillOpacity="0.3" />
+    <path d="M3 13C3 14.1 3.9 15 5 15C6.1 15 7 14.1 7 13H3Z" fill="url(#sruGoldScale)" />
+    <path d="M19 8L17.5 13H20.5L19 8Z" stroke="#38bdf8" strokeWidth="1" fill="#0284c7" fillOpacity="0.3" />
+    <path d="M17 13C17 14.1 17.9 15 19 15C20.1 15 21 14.1 21 13H17Z" fill="url(#sruGoldScale)" />
+  </svg>
+);
+
+export const SruPolicyBadge: React.FC<IconProps> = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`sru-badge-icon ${className}`}
+  >
+    <defs>
+      <linearGradient id="sruShieldGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#047857" />
+        <stop offset="100%" stopColor="#064e3b" />
+      </linearGradient>
+      <linearGradient id="sruGoldTrim" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#fbbf24" />
+        <stop offset="100%" stopColor="#d97706" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M12 2L4 5.5V11.5C4 16.5 7.4 21.1 12 22.5C16.6 21.1 20 16.5 20 11.5V5.5L12 2Z"
+      fill="url(#sruShieldGrad)"
+      stroke="url(#sruGoldTrim)"
+      strokeWidth="1.5"
+    />
+    <rect x="8" y="8" width="8" height="1.5" rx="0.75" fill="#a7f3d0" />
+    <rect x="8" y="11" width="5.5" height="1.5" rx="0.75" fill="#a7f3d0" />
+    <circle cx="15" cy="15" r="4.5" fill="#f59e0b" />
+    <path d="M13.2 15L14.4 16.2L16.8 13.8" stroke="#064e3b" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export const SruSparkleBadge: React.FC<IconProps> = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`sru-badge-icon ${className}`}
+  >
+    <defs>
+      <linearGradient id="sruSparkGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#38bdf8" />
+        <stop offset="50%" stopColor="#818cf8" />
+        <stop offset="100%" stopColor="#f59e0b" />
+      </linearGradient>
+      <linearGradient id="sruGoldCore" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#fef08a" />
+        <stop offset="100%" stopColor="#f59e0b" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="9.5" stroke="url(#sruSparkGrad)" strokeWidth="1.2" strokeDasharray="3 2" opacity="0.6" />
+    <path
+      d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2Z"
+      fill="url(#sruGoldCore)"
+    />
+    <path
+      d="M16.5 4.5L17.2 6.8L19.5 7.5L17.2 8.2L16.5 10.5L15.8 8.2L13.5 7.5L15.8 6.8Z"
+      fill="#38bdf8"
+    />
+    <circle cx="6" cy="17" r="1.5" fill="#f59e0b" />
+    <circle cx="18" cy="17" r="1.2" fill="#38bdf8" />
+  </svg>
+);
+
+/**
  * Universal resolver to match legacy or dynamic emoji keys to vector SVG icons.
  */
 export function renderUniIcon(keyOrEmoji: string, size = 16, className = ""): React.ReactNode {
-  const clean = keyOrEmoji.trim();
+  const clean = keyOrEmoji.replace(/[\uFE0E\uFE0F]/g, "").trim().toLowerCase();
   switch (clean) {
+    case "🔍":
+    case "🔎":
+    case "search":
+    case "query":
+    case "enquiry":
+    case "reviewing":
+      return <SruLensBadge size={size} className={className} />;
+    case "📘":
+    case "book-blue":
+    case "handbook":
+    case "regulations":
+      return <SruHandbookBadge size={size} className={className} />;
+    case "⚖":
+    case "⚖️":
+    case "scale":
+    case "criteria":
+    case "evaluating":
+    case "compare":
+      return <SruEvaluationBadge size={size} className={className} />;
+    case "📋":
+    case "document":
+    case "policy":
+    case "policies":
+    case "verifying":
+    case "apply":
+      return <SruPolicyBadge size={size} className={className} />;
+    case "✨":
+    case "sparkle":
+    case "sparkles":
+    case "preparing":
+      return <SruSparkleBadge size={size} className={className} />;
     case "🎓":
     case "cap":
     case "degree":
@@ -256,8 +443,12 @@ export function renderUniIcon(keyOrEmoji: string, size = 16, className = ""): Re
     case "hostel":
       return <BedIcon size={size} className={className} />;
     case "🏢":
+    case "🏫":
+    case "🏛":
     case "building":
     case "campus":
+    case "university":
+    case "sru":
       return <BuildingIcon size={size} className={className} />;
     case "🔬":
     case "flask":
@@ -282,9 +473,6 @@ export function renderUniIcon(keyOrEmoji: string, size = 16, className = ""): Re
     case "award":
     case "trophy":
       return <AwardIcon size={size} className={className} />;
-    case "✨":
-    case "sparkle":
-      return <SparklesIcon size={size} className={className} />;
     case "❤️":
     case "heart":
     case "care":
@@ -292,10 +480,6 @@ export function renderUniIcon(keyOrEmoji: string, size = 16, className = ""): Re
     case "📌":
     case "pin":
       return <PinIcon size={size} className={className} />;
-    case "📋":
-    case "document":
-    case "apply":
-      return <FileTextIcon size={size} className={className} />;
     case "⚠️":
     case "warning":
     case "alert":
@@ -306,10 +490,6 @@ export function renderUniIcon(keyOrEmoji: string, size = 16, className = ""): Re
     case "🛡️":
     case "shield":
       return <ShieldCheckIcon size={size} className={className} />;
-    case "⚖️":
-    case "scale":
-    case "compare":
-      return <ScaleIcon size={size} className={className} />;
     case "🎯":
     case "target":
       return <TargetIcon size={size} className={className} />;

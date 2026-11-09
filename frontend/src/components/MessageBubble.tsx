@@ -7,7 +7,7 @@ import { renderUniIcon } from "./Icons";
 import "./MessageBubble.css";
 
 function parseSuggestionChip(text: string): { icon: React.ReactNode; label: string } {
-  const emojiRegex = /^(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u;
+  const emojiRegex = /^(\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u;
   const match = text.match(emojiRegex);
   if (match) {
     const emoji = match[1];

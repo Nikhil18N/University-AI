@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import { renderUniIcon } from "./Icons";
 import "./ThinkingIndicator.css";
 
-const THINKING_STEPS = [
-  { icon: "🔍", label: "Analyzing student inquiry..." },
-  { icon: "📚", label: "Searching SR University regulations & handbook..." },
-  { icon: "⚖️", label: "Verifying eligibility & course criteria..." },
-  { icon: "✨", label: "Synthesizing answer & recommendations..." },
+export const THINKING_STEPS = [
+  { icon: "🔍", label: "Reviewing your enquiry..." },
+  { icon: "📘", label: "Assessing university regulations..." },
+  { icon: "⚖️", label: "Evaluating academic criteria..." },
+  { icon: "📋", label: "Verifying applicable policies..." },
+  { icon: "✨", label: "Preparing your response..." },
 ];
 
 export default function ThinkingIndicator() {
@@ -48,7 +50,9 @@ export default function ThinkingIndicator() {
       </div>
 
       <div className="thinking-active-step-row">
-        <span className="step-icon-bounce">{activeStep.icon}</span>
+        <span className="step-icon-bounce">
+          {renderUniIcon(activeStep.icon, 22, "step-sru-badge-svg") || activeStep.icon}
+        </span>
         <span className="step-title-animated">{activeStep.label}</span>
       </div>
 

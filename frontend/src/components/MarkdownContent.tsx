@@ -85,7 +85,7 @@ function CodeBlock({ code, language }: CodeBlockProps) {
 export default function MarkdownContent({ content, isStreaming }: Props) {
   // Helper to convert inline emojis into uniform SVG icons
   const renderTextWithEmojiIcons = (rawStr: string, keyPrefix: string | number): React.ReactNode => {
-    const emojiRegex = /(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/u;
+    const emojiRegex = /(\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/u;
     if (!emojiRegex.test(rawStr)) return rawStr;
 
     const tokens = rawStr.split(emojiRegex);
