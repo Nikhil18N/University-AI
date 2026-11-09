@@ -99,3 +99,4 @@ def test_render_fact_check_prompt():
     assert "fact_check" in prompt
     assert "placements are best" in prompt
     assert "Superlatives" in prompt or "superlatives" in prompt or "Rules" in prompt
+

@@ -677,10 +677,15 @@ async def execute_prompt_pack_pipeline(
         recent_openers = await get_recent_openers(session_id, redis_client=redis_client)
         if is_opener_repeating(final_reply, recent_openers):
             logger.info("Detected repeating opener pattern '%s'; regenerating with fresh opening variation", recent_openers[-1])
-            regen_prompt = f"Rewrite this reply with a fresh, natural opening sentence. Do NOT start with '{recent_openers[-1]}':\n\n{final_reply}"
-            regen_ans = await llm.generate([{"role": "user", "content": regen_prompt}], temperature=0.3, max_tokens=350)
-            if regen_ans.strip():
-                final_reply = regen_ans.strip()
+            regen_prompt = (
+                f"Rewrite this message with a fresh, natural opening sentence. "
+                f"Do NOT start with '{recent_openers[-1]}'. "
+                f"Return ONLY the rewritten message text directly with no meta-commentary, no introductory options, and no explanation:\n\n{final_reply}"
+            )
+            regen_ans = await llm.generate([{"role": "user", "content": regen_prompt}], temperature=0.2, max_tokens=350)
+            clean_regen = regen_ans.strip()
+            if clean_regen and not any(clean_regen.lower().startswith(p) for p in ["here are", "option 1", "rewritten"]):
+                final_reply = clean_regen
 
         await record_opener(session_id, final_reply, redis_client=redis_client)
 

@@ -121,3 +121,4 @@ def test_slot_filling_guidance_for_scholarship_board():
     # Guidance must prompt to check board instead of assuming CBSE
     assert "Slot Filling for Scholarships" in guidance
     assert "CBSE vs State Board" in guidance
+

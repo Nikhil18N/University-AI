@@ -1,5 +1,32 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [Section 8] Scripted Transcript Replay Regression Harness
+
+### Already there
+- Standalone live evaluation script (`backend/scripts/eval_live.py`) covering offline and adversarial prompt injection safety cases.
+
+### Changed
+- `backend/app/services/validator_service.py`:
+  - Upgraded numeric grounding verification: extracts normalized currency tokens (`f"{num:g}"`, `f"{lakh_equiv:g}"`) across `evidence_text`, `structured_data_text`, and `user_message`, eliminating false-positive validator blocks when numbers are reformatted into equivalent Indian currency forms (e.g. ₹2,95,000 -> ₹2.95 lakh).
+- `backend/app/services/chat_service.py`:
+  - Enforced strict prompt instructions on opener regeneration to prevent conversational rewrite options or meta-commentary from bleeding into client responses.
+
+### Added
+- `backend/scripts/eval_transcript_replay.py`:
+  - Standalone, automated multi-turn regression harness reproducing the full real-session transcript (01:35 to 01:57) across 13 consecutive dialogue turns.
+  - Formulates and programmatically verifies all 10 Section 8 behavioral assertions:
+    1. `A1_sports_grounding`: No sports-facility claim unless sourced.
+    2. `A2_yes_resolves_offer`: Affirmative `"yes"` resolves to active pending offer.
+    3. `A3_scholarship_board_slot`: Examination board (CBSE vs State Board) prompted before quoting slabs.
+    4. `A4_multi_part_coverage`: Multi-part coverage ensuring both sub-questions are answered or noted.
+    5. `A5_claim_rotation`: Repeated highlight questions produce rotating highlights without identical repetition.
+    6. `A6_post_distress_cooldown`: 3-turn distress cooldown suppressing sales calls-to-action and numeric fallbacks.
+    7. `A7_fact_check_and_scoping`: Unverified competitor comparisons declined, with mandatory batch and recruiter context.
+    8. `A8_social_proof_doubt`: Proactively explores peer skepticism.
+    9. `A9_variety_and_outcome_guardrail`: Opener patterns used <= 2 times, and zero outcome-implying phrases.
+    10. `A10_number_grounding`: All numeric figures grounded against verified facts.
+  - Verified live test result: **10/10 Passed (100.0%)**. Report saved to `backend/evals/results/transcript_replay_20261109_215636.md`.
+
 ## [T18] Transcript export disclaimer and naming cleanup (P2)
 
 ### Already there

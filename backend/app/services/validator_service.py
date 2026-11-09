@@ -188,6 +188,7 @@ def normalize_currency_amount(val_str: str) -> list[str]:
             forms.append(format_indian_currency(val_int))
             forms.append(f"{num:g} lakh")
             forms.append(f"{num:g}lakh")
+            forms.append(f"{num:g}")
         except ValueError:
             pass
 
@@ -209,6 +210,7 @@ def normalize_currency_amount(val_str: str) -> list[str]:
                     lakh_equiv = i_val / 100000.0
                     forms.append(f"{lakh_equiv:g} lakh")
                     forms.append(f"{lakh_equiv:g}lakh")
+                    forms.append(f"{lakh_equiv:g}")
         except ValueError:
             pass
 
@@ -321,7 +323,7 @@ def validate_response_grounding(
     if not answer_tokens and not answer_dates:
         return True, []
 
-    # 2. Build the full allowed corpus
+    # 2. Build the full allowed corpus and extracted normalized tokens
     allowed_corpus = (
         evidence_text
         + " "
@@ -331,6 +333,14 @@ def validate_response_grounding(
         + " "
         + student_profile_text
     ).lower()
+
+    allowed_tokens = (
+        extract_numeric_tokens(evidence_text)
+        | extract_numeric_tokens(structured_data_text)
+        | extract_numeric_tokens(user_message)
+        | extract_numeric_tokens(student_profile_text)
+    )
+    allowed_tokens_lower = {t.lower().strip() for t in allowed_tokens}
 
     # Pre-compiled verified ground truth whitelist
     whitelist = get_all_grounded_numbers()
@@ -345,6 +355,10 @@ def validate_response_grounding(
 
         # Check exact token in whitelist
         if token in whitelist or token_clean in whitelist or raw_digits in whitelist:
+            continue
+
+        # Check in extracted normalized tokens from evidence/structured data
+        if token in allowed_tokens or token_clean in allowed_tokens_lower:
             continue
 
         # Check in allowed corpus

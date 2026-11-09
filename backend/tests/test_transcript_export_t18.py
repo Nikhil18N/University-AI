@@ -45,3 +45,4 @@ def test_persona_prompt_identity_rule():
     persona_path = Path(__file__).resolve().parent.parent.parent / "prompts" / "persona.md"
     content = persona_path.read_text()
     assert 'Your name is "SRU Buddy". Never call yourself "SR Buddy".' in content
+

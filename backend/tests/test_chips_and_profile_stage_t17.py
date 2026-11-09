@@ -117,3 +117,4 @@ def test_video_tags_accuracy_audit():
         if "sports day" in title:
             assert "sports" in keywords
             assert "athletics" in keywords
+
