@@ -480,7 +480,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   ...m,
                   id: data.message_id,
                   content: data.answer || accumulatedContent,
-                  sources: data.sources?.length ? data.sources : undefined,
+                  sources: undefined,
                   suggestions: data.suggestions?.length ? data.suggestions : undefined,
                   cards: data.cards?.length ? data.cards : undefined,
                   flow: data.flow,
@@ -861,7 +861,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   key={msg.id}
                   role={msg.role}
                   content={msg.content}
-                  sources={msg.sources}
+                  sources={undefined}
                   suggestions={msg.suggestions}
                   cards={msg.cards}
                   flow={msg.flow}

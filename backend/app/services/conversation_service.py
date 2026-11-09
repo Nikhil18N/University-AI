@@ -72,7 +72,7 @@ async def get_conversation(
                 id=m.id,
                 role=m.role,
                 content=m.content,
-                sources=_parse_sources(m.sources),
+                sources=None,  # Do not show sources in responses
                 suggestions=(m.metadata_ or {}).get("suggestions", []),
                 cards=(m.metadata_ or {}).get("cards", []),
                 flow=(m.metadata_ or {}).get("flow"),
@@ -108,7 +108,7 @@ async def get_shared_conversation(
                 id=m.id,
                 role=m.role,
                 content=m.content,
-                sources=_parse_sources(m.sources),
+                sources=None,  # Do not show sources in responses
                 suggestions=(m.metadata_ or {}).get("suggestions", []),
                 cards=(m.metadata_ or {}).get("cards", []),
                 flow=(m.metadata_ or {}).get("flow"),

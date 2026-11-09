@@ -132,6 +132,26 @@ def sanitize_staff_contact_numbers(text: str) -> str:
     return cleaned
 
 
+def strip_source_citations(text: str) -> str:
+    """Scrub inline or trailing source citations and references from response text."""
+    if not text:
+        return text
+    # Remove bracketed/parenthesized source mentions like (Source: ...), [Source: ...]
+    cleaned = re.sub(
+        r"\s*[\(\[](?:sources?|reference|references|doc|document)\s*:[^\]\)]*[\)\]]",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    # Remove trailing source lines like "Sources cited: ..." or "Source: ..."
+    cleaned = re.sub(
+        r"(?im)^\s*(?:sources?|references?|sources cited)\s*:.*$",
+        "",
+        cleaned,
+    )
+    return cleaned.strip()
+
+
 GREETING_RESPONSES_INITIAL: list[str] = [
     "{time_salutation} I'm SRU Buddy, your university companion! Feel free to ask about admissions, programs, hostels, or campus life.",
     "{time_salutation} SRU Buddy here! What can I help you explore at SR University today?",
@@ -507,8 +527,9 @@ async def handle_chat(
             is_video_confirmed=is_video_yes,
         )
 
-    # Sanitize any personal staff mobile numbers from output
+    # Sanitize any personal staff mobile numbers and strip citations from output
     answer = sanitize_staff_contact_numbers(answer)
+    answer = strip_source_citations(answer)
 
     # 7. Save assistant message with metadata
     assistant_msg = await conversation_service.add_message(
@@ -541,7 +562,7 @@ async def handle_chat(
         conversation_id=conversation.id,
         message_id=assistant_msg.id,
         answer=answer,
-        sources=[SourceReference(**s) for s in sources] if sources else [],
+        sources=[],  # Do not show sources in responses
         suggestions=suggestions,
         cards=cards,
         flow=flow_info,
@@ -775,8 +796,9 @@ async def handle_chat_stream(
                 is_video_confirmed=is_video_yes,
             )
 
-        # Sanitize any personal staff mobile numbers from output
+        # Sanitize any personal staff mobile numbers and strip citations from output
         answer = sanitize_staff_contact_numbers(answer)
+        answer = strip_source_citations(answer)
 
         # Save to database
         assistant_msg = await conversation_service.add_message(
@@ -803,8 +825,8 @@ async def handle_chat_stream(
                 db, conversation.id, title
             )
 
-        # Final completion event
-        yield f"data: {json.dumps({'type': 'done', 'conversation_id': str(conversation.id), 'message_id': str(assistant_msg.id), 'answer': answer, 'sources': sources, 'suggestions': suggestions, 'cards': cards, 'flow': flow_info, 'model': settings.LLM_MODEL})}\n\n"
+        # Final completion event (do not show sources in responses)
+        yield f"data: {json.dumps({'type': 'done', 'conversation_id': str(conversation.id), 'message_id': str(assistant_msg.id), 'answer': answer, 'sources': [], 'suggestions': suggestions, 'cards': cards, 'flow': flow_info, 'model': settings.LLM_MODEL})}\n\n"
 
     except Exception as e:
         logger.error("Chat stream error: %s", e, exc_info=True)
