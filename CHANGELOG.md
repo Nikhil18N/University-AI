@@ -1,5 +1,35 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T6] Log masking, DPDP notice, retention (P1)
+
+### Already there
+- PostgreSQL `evaluation_records` table and `record_evaluation` service logging queries and answers.
+- Single conversation deletion endpoint `DELETE /api/v1/conversations/{conversation_id}`.
+
+### Changed
+- `backend/app/config.py`:
+  - Added `CONVERSATION_RETENTION_DAYS: int = 90`.
+- `backend/app/services/evaluation_service.py`:
+  - Integrated PII masking: all user questions, assistant answers, expected answers, and metadata are sanitized through `mask_pii()` before saving to `evaluation_records`.
+- `backend/app/main.py`:
+  - Registered `privacy_router` for DPDP erasure operations.
+- `frontend/src/pages/ChatPage.tsx` & `frontend/src/components/PrivacyModal.tsx`:
+  - Added non-blocking DPDP privacy notice below the chat input: "Chats may be recorded to improve admission assistance. See privacy policy."
+  - Added modal explaining data handling, masking under the DPDP Act, 90-day retention schedule, and one-click right to erasure ("Delete My Data").
+- `frontend/src/services/api.ts`:
+  - Added `deleteMyData` client function.
+
+### Added
+- `backend/app/utils/privacy.py`:
+  - PII masking utilities for phone numbers (e.g. `98765*****`, `+91 98765*****`, `+91-98765-*****`) and emails (`s***@domain.edu`).
+- `backend/app/schemas/privacy.py` & `backend/app/api/v1/privacy.py`:
+  - `POST /api/v1/privacy/delete-my-data`: student and admin right-to-erasure endpoint that hard-deletes conversations, messages, evaluation records, and prospective leads given a `session_id` or `phone`.
+- `backend/scripts/purge_old_conversations.py`:
+  - Retention purge script supporting `--days`, `--dry-run` (default True), and `--yes` for safely purging records older than retention period without accidental deletions.
+- `backend/tests/test_privacy_dpdp.py`:
+  - 6 unit and integration tests covering phone/email masking, PII scrubbing in evaluation records, dry-run & live retention purge, and `delete-my-data` API endpoint.
+- Test suite expanded from 280 to 286 tests passed.
+
 ## [T5] Extend the numeric and date validator (P1)
 
 ### Already there

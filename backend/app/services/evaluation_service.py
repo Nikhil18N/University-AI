@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.evaluation import EvaluationRecord
 from app.providers.base import LLMProvider
 from app.services.rag_service import RAGService
+from app.utils.privacy import mask_pii
 
 logger = logging.getLogger(__name__)
 
@@ -32,21 +33,36 @@ async def record_evaluation(
     sources: list[dict] | None = None,
     metadata: dict | None = None,
 ) -> EvaluationRecord:
-    """Save an evaluation record to the database."""
+    """Save an evaluation record to the database with PII masked for DPDP compliance."""
+    # Mask PII in inputs
+    clean_question = mask_pii(question)
+    clean_actual_answer = mask_pii(actual_answer)
+    clean_expected_answer = mask_pii(expected_answer) if expected_answer else None
+
+    # Mask string values inside metadata if present
+    clean_metadata = None
+    if metadata:
+        clean_metadata = {}
+        for k, v in metadata.items():
+            if isinstance(v, str):
+                clean_metadata[k] = mask_pii(v)
+            else:
+                clean_metadata[k] = v
+
     record = EvaluationRecord(
         test_id=test_id,
         conversation_id=conversation_id,
         message_id=message_id,
         category=category,
-        question=question,
-        expected_answer=expected_answer,
-        actual_answer=actual_answer,
+        question=clean_question,
+        expected_answer=clean_expected_answer,
+        actual_answer=clean_actual_answer,
         groundedness_score=groundedness_score,
         retrieval_confidence=retrieval_confidence,
         latency_ms=latency_ms,
         passed=passed,
         sources=sources,
-        metadata_=metadata,
+        metadata_=clean_metadata,
     )
     db.add(record)
     await db.commit()

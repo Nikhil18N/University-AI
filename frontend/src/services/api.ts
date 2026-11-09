@@ -659,6 +659,24 @@ export async function exportAdminLeads(adminKey: string): Promise<void> {
   window.URL.revokeObjectURL(url);
 }
 
+export async function deleteMyData(payload: { session_id?: string; phone?: string }): Promise<{
+  status: string;
+  deleted_conversations: number;
+  deleted_messages: number;
+  deleted_leads: number;
+  deleted_evaluations: number;
+  message: string;
+}> {
+  const res = await fetch(`${API_BASE}/api/v1/privacy/delete-my-data`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to delete user data");
+  return res.json();
+}
+
+
 
 
 

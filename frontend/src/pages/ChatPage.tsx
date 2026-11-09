@@ -6,6 +6,7 @@ import ThinkingIndicator from "../components/ThinkingIndicator";
 import ShareModal from "../components/ShareModal";
 import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
 import LeadAuthModal from "../components/LeadAuthModal";
+import PrivacyModal from "../components/PrivacyModal";
 import { CalculatorIcon } from "../components/Icons";
 import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
@@ -66,6 +67,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showLeadAuthModal, setShowLeadAuthModal] = useState<boolean>(false);
   const [pendingAuthMessage, setPendingAuthMessage] = useState<string | null>(null);
   const [authReason, setAuthReason] = useState<string | undefined>(undefined);
@@ -950,6 +952,18 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             onStop={handleStopStreaming}
             disabled={false}
           />
+
+          {/* DPDP Privacy Notice Banner */}
+          <div className="chat-dpdp-notice">
+            <span>Chats may be recorded to improve admission assistance.</span>
+            <button
+              type="button"
+              className="chat-dpdp-link"
+              onClick={() => setShowPrivacyModal(true)}
+            >
+              See privacy policy
+            </button>
+          </div>
         </main>
       </div>
 
@@ -993,6 +1007,19 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         }}
         reasonText={authReason}
       />
+
+      {/* DPDP Privacy Policy & Right to Erasure Modal */}
+      {showPrivacyModal && (
+        <PrivacyModal
+          sessionId={sessionId}
+          onClose={() => setShowPrivacyModal(false)}
+          onDataPurged={() => {
+            setMessages([]);
+            setActiveConvId(null);
+            setConversations([]);
+          }}
+        />
+      )}
     </div>
   );
 }
