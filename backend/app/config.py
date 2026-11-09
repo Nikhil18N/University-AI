@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # ---- LLM ----
     LLM_PROVIDER: str = "gemini"
     LLM_BASE_URL: str = "http://localhost:11434"
-    LLM_MODEL: str = "gemini-3.5-flash-lite"
+    LLM_MODEL: str = "gemini-3.1-flash-lite"
     LLM_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     GEMINI_API_KEYS: str = ""  # Comma-separated list of Gemini API keys for pooling/rotation
@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     CHROMA_PORT: int = 8000
     CHROMA_PERSIST_DIR: str | None = "./chroma_data"
     RAG_MAX_DISTANCE: float = 0.60
-    RAG_TOP_K: int = 8
-    RAG_RERANK: bool = True
+    RAG_TOP_K: int = 5
+    RAG_RERANK: bool = False
 
     # ---- Admin ----
     ADMIN_API_KEY: str = "change-me-in-production"

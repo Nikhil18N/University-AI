@@ -43,39 +43,38 @@ class RAGService:
             metadata={"hnsw:space": "cosine"},
         )
 
-    async def _rerank_chunks(self, query: str, chunks: list[dict], keep_top: int = 4) -> list[dict]:
-        """Rerank retrieved candidate chunks using a lightweight LLM scoring prompt."""
+    def _fast_lexical_rerank(self, query: str, chunks: list[dict], keep_top: int = 4) -> list[dict]:
+        """Rerank candidate chunks using zero-network lexical overlap fused with vector distance."""
         if len(chunks) <= keep_top:
             return chunks
 
-        try:
-            candidates_text = "\n\n".join(
-                f"[{i}] Title: {c.get('metadata', {}).get('title', 'Document')}\n{c['content'][:250]}..."
-                for i, c in enumerate(chunks, 1)
-            )
-            prompt = (
-                f"You are a relevance scoring engine for SR University.\n"
-                f"User Question: {query}\n\n"
-                f"Candidate Chunks:\n{candidates_text}\n\n"
-                f"Score each candidate chunk from 0 (irrelevant) to 10 (directly answers the question).\n"
-                f"Respond with JSON map only: {{\"1\": score, \"2\": score, ...}}"
-            )
-            res = await self.llm.generate([{"role": "user", "content": prompt}], temperature=0.0)
-            clean_res = re.search(r"\{[^{}]*\}", res, re.DOTALL)
-            if clean_res:
-                scores = json.loads(clean_res.group(0))
-                scored_chunks = []
-                for i, c in enumerate(chunks, 1):
-                    score = float(scores.get(str(i), 5.0))
-                    dist = c.get("distance") or 0.5
-                    effective_score = score - (dist * 4.0)
-                    scored_chunks.append((effective_score, c))
-                scored_chunks.sort(key=lambda x: x[0], reverse=True)
-                return [c for _, c in scored_chunks[:keep_top]]
-        except Exception as e:
-            logger.warning("Reranking fallback to distance sorting: %s", e)
+        query_terms = set(re.findall(r"\w+", query.lower()))
+        query_terms -= {
+            "what", "is", "are", "the", "for", "in", "of", "to", "and", "a", "an",
+            "how", "can", "tell", "me", "about", "sru", "university", "please", "do",
+        }
 
-        return sorted(chunks, key=lambda c: (c.get("distance") or 1.0))[:keep_top]
+        scored_chunks = []
+        for c in chunks:
+            content_lower = c.get("content", "").lower()
+            meta = c.get("metadata", {})
+            title_lower = meta.get("title", "").lower()
+            section_lower = meta.get("section", "").lower()
+
+            content_hits = sum(1 for term in query_terms if term in content_lower)
+            title_hits = sum(2.5 for term in query_terms if term in title_lower or term in section_lower)
+            lexical_score = content_hits + title_hits
+
+            dist = c.get("distance") if c.get("distance") is not None else 0.5
+            composite_score = lexical_score * 0.4 + (1.0 - dist) * 2.0
+            scored_chunks.append((composite_score, c))
+
+        scored_chunks.sort(key=lambda x: x[0], reverse=True)
+        return [c for _, c in scored_chunks[:keep_top]]
+
+    async def _rerank_chunks(self, query: str, chunks: list[dict], keep_top: int = 4) -> list[dict]:
+        """Rerank candidate chunks quickly using zero-network lexical and distance fusion."""
+        return self._fast_lexical_rerank(query, chunks, keep_top=keep_top)
 
     async def retrieve(
         self, query: str, top_k: int | None = None

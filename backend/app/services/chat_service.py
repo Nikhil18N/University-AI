@@ -28,7 +28,7 @@ from app.services.guardrail_service import (
 from app.services.intent_service import classify_intent
 from app.services.profile_service import build_counsellor_guidance, extract_student_profile
 from app.services.rag_service import RAGService
-from app.services.reformulation_service import needs_reformulation, reformulate_query
+from app.services.reformulation_service import canonicalize_query, needs_reformulation, reformulate_query
 from app.services.suggestion_service import generate_suggestions
 from app.services.video_service import (
     check_video_affirmative_or_negative,
@@ -318,7 +318,7 @@ async def handle_chat(
             logger.info("Handled via fast conversational response (%s)", intent)
 
         elif intent == "UNIVERSITY" and rag_service:
-            search_query = request.message
+            search_query = canonicalize_query(request.message)
             if needs_reformulation(request.message, conversation_context):
                 search_query = await reformulate_query(
                     request.message,
@@ -576,7 +576,7 @@ async def handle_chat_stream(
                     await asyncio.sleep(0.012)
 
             elif intent == "UNIVERSITY" and rag_service:
-                search_query = request.message
+                search_query = canonicalize_query(request.message)
                 if needs_reformulation(request.message, conversation_context):
                     search_query = await reformulate_query(
                         request.message,

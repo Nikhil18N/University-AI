@@ -18,7 +18,7 @@ class GeminiProvider(LLMProvider):
     def __init__(
         self,
         api_key: str | list[str] = "",
-        model: str = "gemini-3.5-flash-lite",
+        model: str = "gemini-3.1-flash-lite",
         api_keys: list[str] | str | None = None,
     ):
         raw_keys = api_keys if api_keys is not None else api_key
@@ -110,7 +110,7 @@ class GeminiProvider(LLMProvider):
         # Only use high-quota Flash-Lite models (15 RPM / 500 RPD).
         # NEVER fall back to 3.6-flash or 3.8-flash (5 RPM / 20 RPD) which burn the daily 20-call cap.
         models_to_try = [self.model]
-        for fallback in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite"):
+        for fallback in ("gemini-3.1-flash-lite", "gemini-3.5-flash-lite"):
             if fallback not in models_to_try:
                 models_to_try.append(fallback)
 
@@ -187,7 +187,7 @@ class GeminiProvider(LLMProvider):
         # Only use high-quota Flash-Lite models (15 RPM / 500 RPD).
         # NEVER fall back to 3.6-flash or 3.8-flash (5 RPM / 20 RPD) which burn the daily 20-call cap.
         models_to_try = [self.model]
-        for fallback in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite"):
+        for fallback in ("gemini-3.1-flash-lite", "gemini-3.5-flash-lite"):
             if fallback not in models_to_try:
                 models_to_try.append(fallback)
 

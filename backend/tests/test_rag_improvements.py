@@ -139,3 +139,31 @@ def test_btech_fee_suggestions():
     )
     assert "🧮 Scholarship Calculator" in chips
     assert any("Scholarship" in c for c in chips)
+
+
+@pytest.mark.asyncio
+async def test_fast_lexical_rerank():
+    """Verify that _fast_lexical_rerank boosts chunks with keyword matches without LLM network calls."""
+    mock_llm = MagicMock()
+    mock_embed = MagicMock()
+
+    with patch("app.services.rag_service.chromadb.PersistentClient"):
+        rag = RAGService(llm_provider=mock_llm, embedding_provider=mock_embed)
+        chunks = [
+            {"content": "General sports and playground facilities.", "metadata": {"title": "Sports"}, "distance": 0.2},
+            {"content": "Hostel curfew timing is 9:00 PM for all residential students.", "metadata": {"title": "Hostel Regulations"}, "distance": 0.3},
+            {"content": "Library timing is 8:00 AM to 8:00 PM on weekdays.", "metadata": {"title": "Library Rules"}, "distance": 0.25},
+            {"content": "Hostel fee details: AC room is 1,25,000 per year.", "metadata": {"title": "Hostel Fees"}, "distance": 0.35},
+            {"content": "Campus security guidelines.", "metadata": {"title": "Security"}, "distance": 0.4},
+        ]
+
+        # Query for hostel curfew
+        reranked = rag._fast_lexical_rerank("what is hostel curfew timing?", chunks, keep_top=2)
+        assert len(reranked) == 2
+        assert "curfew timing is 9:00 PM" in reranked[0]["content"]
+
+        # Test async wrapper
+        async_reranked = await rag._rerank_chunks("hostel curfew", chunks, keep_top=3)
+        assert len(async_reranked) == 3
+        assert "curfew" in async_reranked[0]["content"].lower() or "hostel" in async_reranked[0]["content"].lower()
+
