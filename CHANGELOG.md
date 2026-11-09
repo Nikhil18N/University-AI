@@ -1,5 +1,23 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T11] Embedding model migration decision (P2)
+
+### Already there
+- `models/embedding-001` (3072 dimensions) configured as the default vector embedder in `config.py` and `embedding_gemini.py`.
+
+### Changed
+- Analyzed Google API deprecation status and token economics for moving to `text-embedding-004` (768 dimensions).
+- Prepared non-destructive shadow collection deployment strategy preserving existing 3072-dim production vectors.
+
+### Added
+- `docs/decisions/2026-11-embedding-migration.md`:
+  - Full Architectural Decision Record documenting model deprecation timelines, 4x vector memory reduction, cost analysis (48.6k tokens = < $0.001), latency improvements (~50%), and zero-downtime shadow collection verification.
+- `backend/scripts/shadow_reembed_text_embedding_004.py`:
+  - Production-ready shadow re-embedding script that embeds the 162 chunks into `sru_facts_v4` and `sru_highlights_v4` using `text-embedding-004` with smooth rate-limit pacing and `--dry-run` safety flag.
+- `backend/tests/test_shadow_embedding.py`:
+  - 2 unit tests verifying dry-run reporting and 768-dim shadow collection creation.
+- Test suite expanded from 313 to 315 tests passed.
+
 ## [T10] Enforce facts / why_us separation (P2)
 
 ### Already there
