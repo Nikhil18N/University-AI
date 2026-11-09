@@ -31,7 +31,7 @@ from app.services.profile_service import build_counsellor_guidance, extract_stud
 from app.services.prompt_service import render_prompt
 from app.services.rag_service import RAGService
 from app.services.reformulation_service import needs_reformulation, reformulate_query
-from app.services.router_service import route_and_decompose_message
+from app.services.router_service import is_crisis_or_distress, route_and_decompose_message
 from app.services.structured_facts_service import get_structured_facts_text
 from app.services.suggestion_service import generate_suggestions
 from app.services.validator_service import (
@@ -275,6 +275,36 @@ async def execute_prompt_pack_pipeline(
     if profile.get("interests"):
         profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
     profile_text = ", ".join(profile_parts) if profile_parts else "Prospective applicant"
+
+    # T8: If ANY sub-part is sensitive, or the raw message matches crisis/distress,
+    # the sensitive handler takes over the ENTIRE turn immediately.
+    is_turn_sensitive = any(p.get("type") == "sensitive" for p in parts) or is_crisis_or_distress(message)
+    if is_turn_sensitive:
+        logger.info("Sensitive distress/crisis turn detected; dedicating entire turn to sensitive handler: %s", message[:60])
+        prompt = render_prompt("sensitive", part_text=message)
+        raw_ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=300)
+        ans = raw_ans.strip()
+
+        # If distress is detected, scrub any admissions marketing, fees, or promotional text
+        if is_crisis_or_distress(message) or is_crisis_or_distress(ans):
+            cleaned_lines = []
+            for line in ans.split("\n"):
+                line_lower = line.lower()
+                if any(pitch in line_lower for pitch in ["tuition", "fee structure", "apply.sru.edu.in", "scholarship calculator", "admission process", "highest package"]):
+                    continue
+                cleaned_lines.append(line)
+            ans = "\n".join(cleaned_lines).strip()
+
+            # Ensure helplines are surfaced
+            configured_helplines = getattr(settings, "CRISIS_HELPLINES", [])
+            if not any(h.get("number", "") in ans for h in configured_helplines):
+                helpline_info = "\n\nNational Student Support Helplines:\n" + "\n".join(
+                    f"• {h['name']}: {h['number']} ({h.get('hours', '24/7')})"
+                    for h in configured_helplines
+                )
+                ans = ans + helpline_info
+
+        return ans, []
 
     all_sources: list[dict] = []
 

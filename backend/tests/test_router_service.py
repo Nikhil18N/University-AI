@@ -68,3 +68,73 @@ async def test_router_fallback_on_invalid_json():
     assert len(res["parts"]) == 1
     assert res["parts"][0]["type"] == "factual"
     assert res["parts"][0]["text"] == "Tell me about CSE eligibility"
+
+
+@pytest.mark.parametrize(
+    "phrase, language_flavor",
+    [
+        ("I feel like ending it all", "English"),
+        ("suicide feels like my only option", "English"),
+        ("I am feeling hopeless about my future", "English"),
+        ("lost all hope and don't want to live", "English"),
+        ("jeevitham meeda asha poindi", "Telugu-English"),
+        ("inka nenu chasthe bagunnu", "Telugu-English"),
+        ("pranam theesukunta", "Telugu-English"),
+        ("jeevitham meeda virakthi vachindi", "Telugu-English"),
+        ("bathakali ani ledu inka", "Telugu-English"),
+        ("koi umeed nahi bachi mere paas", "Hinglish"),
+        ("marne ka mann kar raha hai", "Hinglish"),
+        ("sab khatam ho gaya sab khatam karna chahta hu", "Hinglish"),
+        ("zindagi se tang aa gaya hu", "Hinglish"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_multilingual_distress_fast_path_zero_llm_calls(phrase, language_flavor):
+    """10+ multilingual distress phrases must route to sensitive in pure regex with 0 LLM calls (T8)."""
+    mock_llm = AsyncMock()
+    res = await route_and_decompose_message(mock_llm, phrase)
+
+    assert len(res["parts"]) == 1
+    assert res["parts"][0]["type"] == "sensitive", f"Failed for {language_flavor}: {phrase}"
+    assert mock_llm.generate.call_count == 0, f"LLM was called unexpectedly for fast-path {phrase}"
+
+
+@pytest.mark.asyncio
+async def test_router_fallback_detects_distress_on_broken_json():
+    """If LLM router returns broken JSON, fallback must check distress regex rather than blind factual default."""
+    mock_llm = AsyncMock()
+    mock_llm.generate.return_value = "Garbage router response {broken"
+
+    res = await route_and_decompose_message(mock_llm, "sab khatam ho gaya")
+    assert len(res["parts"]) == 1
+    assert res["parts"][0]["type"] == "sensitive"
+
+
+@pytest.mark.asyncio
+async def test_combined_query_sensitive_takeover_no_fees():
+    """A combined query like 'fees for CSE and I feel like ending it all' must yield ONLY sensitive assistance."""
+    from app.services.chat_service import execute_prompt_pack_pipeline
+
+    mock_llm = AsyncMock()
+    # Mock LLM generating compassionate distress reply without marketing
+    mock_llm.generate.return_value = (
+        "I hear how much pain you are in right now. Please talk to someone who can help. "
+        "National Student Support Helplines: Tele-MANAS (14416 / 1800-891-4416), AASRA (+91-9820466726)."
+    )
+
+    combined_msg = "What is the fees for B.Tech CSE and I feel like ending it all"
+    ans, sources = await execute_prompt_pack_pipeline(
+        message=combined_msg,
+        conversation_context="",
+        profile={},
+        llm=mock_llm,
+        rag_service=None,
+    )
+
+    assert sources == []
+    assert "Tele-MANAS" in ans or "14416" in ans
+    assert "₹" not in ans
+    assert "1,25,000" not in ans
+    assert "per year" not in ans.lower()
+
+

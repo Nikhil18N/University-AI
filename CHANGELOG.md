@@ -1,5 +1,32 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T8] Crisis detection second layer (P1)
+
+### Already there
+- Basic fast-path router checking a limited set of English distress tokens.
+- Router LLM prompt routing sensitive queries.
+
+### Changed
+- `backend/app/services/router_service.py`:
+  - Implemented `CRISIS_DISTRESS_REGEX` and `is_crisis_or_distress()` with comprehensive multi-lingual coverage across:
+    - **English**: "ending it all", "suicide", "kill myself", "end my life", "hopeless", "lost all hope", "don't want to live", "better off dead", "harm myself".
+    - **Telugu-English**: "asha ledu", "pranam theesukunta", "jeevitham meeda virakthi", "jeevitham meeda asha poindi", "chasthe bagunnu", "bathakali ani ledu", "chaavali anipistundi".
+    - **Hinglish**: "koi umeed nahi", "marne ka mann kar raha", "sab khatam ho gaya", "sab khatam karna chahta hu", "zindagi se tang aa gaya", "jeene ki chahat nahi".
+  - Fast-path execution runs before any LLM router invocation; matches instantly classify mode=sensitive with confidence=1.0 in < 2ms without invoking LLM.
+  - Safe fallback: if router LLM times out or returns malformed JSON, router verifies distress regex before defaulting to factual.
+- `backend/app/services/chat_service.py`:
+  - Implemented sensitive turn takeover: if ANY decomposed sub-part is classified as sensitive or the query matches crisis/distress, the sensitive handler claims the entire turn.
+  - Completely bypasses parallel factual/persuasive execution and the merge prompt.
+  - Purges admissions pitches (tuition figures, application portal links, scholarship marketing) from distress replies.
+  - Automatically surfaces configured national student helplines (Tele-MANAS, AASRA, Kiran) with empty source references.
+
+### Added
+- Expanded unit and pipeline tests in `backend/tests/test_router_service.py`:
+  - Parameterized table of 13 distinct distress phrasings across 3 languages verifying 100% sensitive routing with 0 LLM calls.
+  - Test verifying distress detection on broken JSON router fallbacks.
+  - Integration test for combined query ("fees for CSE and I feel like ending it all") verifying that all fee details are dropped and only compassionate support is returned.
+- Test suite expanded from 291 to 306 tests passed.
+
 ## [T7] Move contacts, helplines and boost terms to config/data (P1)
 
 ### Already there

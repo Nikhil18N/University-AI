@@ -12,13 +12,40 @@ logger = logging.getLogger(__name__)
 
 VALID_TYPES = {"factual", "persuasive", "chitchat", "sensitive", "out_of_scope"}
 
+# Comprehensive multi-lingual crisis, distress, self-harm and sensitive keywords (T8)
+CRISIS_DISTRESS_REGEX = re.compile(
+    r"\b("
+    # English
+    r"suicide|kill\s+myself|end\s+my\s+life|ending\s+it\s+all|don't\s+want\s+to\s+live|"
+    r"want\s+to\s+die|feel(?:ing)?\s+hopeless|hopeless|lost\s+all\s+hope|no\s+reason\s+to\s+live|"
+    r"give\s+up\s+on\s+life|hate\s+my\s+life|better\s+off\s+dead|harm\s+myself|cut\s+myself|"
+    # Telugu-English
+    r"asha\s+ledu|aasha\s+ledu|pranam\s+theesukunta|praanam\s+theesukunta|jeevitham\s+meeda\s+virakthi|"
+    r"jeevitham\s+meeda\s+asha\s+poindi|chasthe\s+bagunnu|chaavali\s+anipistundi|bathakali\s+ani\s+ledu|"
+    r"inka\s+bathakadam\s+enduku|chachi\s+pothanu|"
+    # Hinglish
+    r"koi\s+umeed\s+nahi|koyi\s+ummeed\s+nahi|marne\s+ka\s+mann\s+kar\s+raha|mar\s+jana\s+chahta\s+hu|"
+    r"sab\s+khatam\s+ho\s+gaya|sab\s+khatam\s+karna\s+chahta\s+hu|zindagi\s+se\s+tang\s+aa\s+gaya|"
+    r"jeene\s+ki\s+chahat\s+nahi|khudkhushi|jaan\s+de\s+dunga|"
+    # High-risk sensitive admissions traps
+    r"guarantee\b.*?\b(admission|placement|job|seat|scholarship|20\s+lpa)|my\s+otp\s+is\b"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def is_crisis_or_distress(text: str) -> bool:
+    """Fast-path deterministic check for mental health distress, crisis, or high-risk sensitive turns."""
+    if not text:
+        return False
+    return bool(CRISIS_DISTRESS_REGEX.search(text))
+
+
 # Fast pre-classification patterns for instantaneous sub-10ms routing on common conversational openers
 FAST_ROUTER_PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)(\s+(there|buddy|friend|assistant|bot|sru|all))?[!.,\s]*$", re.I), "chitchat"),
     (re.compile(r"^\s*(ok|okay|k|cool|got\s+it|understood|great|awesome|sure|thanks|thank\s+you)(\s+(a\s+lot|so\s+much|buddy|bro))?[!.,\s]*$", re.I), "chitchat"),
     (re.compile(r"^\s*(who\s+won|weather|election|cricket\s+score|write\s+my\s+assignment|hack\b)[^?]*\??$", re.I), "out_of_scope"),
-    (re.compile(r"\b(suicide|kill\s+myself|end\s+my\s+life|don't\s+want\s+to\s+live|want\s+to\s+die|sab\s+khatam\s+karna\s+chahta\s+hu|jeevitham\s+meeda\s+asha\s+poindi|hopeless|lost\s+all\s+hope|feel(?:ing)?\s+hopeless)\b", re.I), "sensitive"),
-    (re.compile(r"\b(guarantee\b.*?\b(admission|placement|job|seat|scholarship)|my\s+otp\s+is\b)", re.I), "sensitive"),
 ]
 
 
@@ -50,6 +77,11 @@ async def route_and_decompose_message(
     clean_msg = message.strip()
     if not clean_msg:
         return {"parts": [{"text": message, "type": "chitchat"}], "interests": []}
+
+    # Fast-path Layer 1: Instant deterministic crisis/distress routing (< 2ms)
+    if is_crisis_or_distress(clean_msg):
+        logger.info("Fast-path crisis/distress detected; immediate sensitive routing: %s", clean_msg[:60])
+        return {"parts": [{"text": clean_msg, "type": "sensitive"}], "interests": []}
 
     # Fast pattern match for short obvious queries
     for pattern, part_type in FAST_ROUTER_PATTERNS:
@@ -98,8 +130,9 @@ async def route_and_decompose_message(
             logger.warning("Router attempt %d failed: %s. Retrying...", attempt + 1, e)
 
     # Safe fallback if JSON parsing fails after retry
-    logger.info("Router falling back to single factual part for: %s", clean_msg[:60])
+    fallback_type = "sensitive" if is_crisis_or_distress(clean_msg) else "factual"
+    logger.info("Router falling back to single %s part for: %s", fallback_type, clean_msg[:60])
     return {
-        "parts": [{"text": clean_msg, "type": "factual"}],
+        "parts": [{"text": clean_msg, "type": fallback_type}],
         "interests": [],
     }
