@@ -10,10 +10,8 @@ Types:
   facilities, hostel, contact details
 - persuasive: why join, is it good, what's special, how it
   compares, career outcomes, campus life
-- chitchat: greetings, thanks, feelings, undecided or anxious
-  messages
-- sensitive: complaints, mental health distress, legal or visa
-  advice, requests for admission or scholarship guarantees
+- chitchat: greetings, thanks, casual small talk, undecided feelings
+- sensitive: complaints, mental health distress, feeling hopeless or overwhelmed, despair, legal or visa advice, requests for admission or scholarship guarantees
 - out_of_scope: unrelated to the university or admissions
 
 Rules:
@@ -22,4 +20,7 @@ Rules:
   "what are the fees for <program from history>?").
 - "interests" lists only new, explicit facts the student shared
   (subjects, goals, budget worries, location). Do not guess.
+- If the student expresses severe distress, despair, or hopelessness, always classify as sensitive.
+- If the student shares a personal passion or hobby and asks what to study (e.g. "I love robotics, what should I study?"), classify as persuasive and extract the interest.
 - If unsure between factual and persuasive, choose factual.
+

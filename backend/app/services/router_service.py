@@ -17,7 +17,7 @@ FAST_ROUTER_PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r"^\s*(hi|hello|hey|good\s+(morning|afternoon|evening)|howdy)(\s+(there|buddy|friend|assistant|bot|sru|all))?[!.,\s]*$", re.I), "chitchat"),
     (re.compile(r"^\s*(ok|okay|k|cool|got\s+it|understood|great|awesome|sure|thanks|thank\s+you)(\s+(a\s+lot|so\s+much|buddy|bro))?[!.,\s]*$", re.I), "chitchat"),
     (re.compile(r"^\s*(who\s+won|weather|election|cricket\s+score|write\s+my\s+assignment|hack\b)[^?]*\??$", re.I), "out_of_scope"),
-    (re.compile(r"\b(suicide|kill\s+myself|end\s+my\s+life|don't\s+want\s+to\s+live|sab\s+khatam\s+karna\s+chahta\s+hu)\b", re.I), "sensitive"),
+    (re.compile(r"\b(suicide|kill\s+myself|end\s+my\s+life|don't\s+want\s+to\s+live|want\s+to\s+die|sab\s+khatam\s+karna\s+chahta\s+hu|jeevitham\s+meeda\s+asha\s+poindi|hopeless|lost\s+all\s+hope|feel(?:ing)?\s+hopeless)\b", re.I), "sensitive"),
     (re.compile(r"\b(guarantee\b.*?\b(admission|placement|job|seat|scholarship)|my\s+otp\s+is\b)", re.I), "sensitive"),
 ]
 

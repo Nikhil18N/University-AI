@@ -38,8 +38,28 @@
 - Documented policy alignment across prompts, services, and tests.
 
 
+## [T4] Live-model evals for safety cases (P0)
+
 ### Already there
-- `backend/app/services/cache_service.py` with basic MD5 query hashing and TTL support.
+- Offline test suite in `backend/tests/test_prompt_pack_eval.py` asserting on mocked router and validator responses.
+
+### Changed
+- `backend/app/providers/gemini.py`:
+  - Increased HTTP client timeout to 35.0s (connect: 10.0s) to handle transient Gemini API queue latency.
+- `backend/app/services/router_service.py` & `prompts/router.md`:
+  - Expanded fast-path distress detection regex to cover feelings of hopelessness, despair, and multilingual distress.
+  - Added explicit prompt rules distinguishing study passion advice (`persuasive`) from small talk.
+
+### Added
+- `backend/scripts/eval_live.py`:
+  - Standalone live model evaluation harness gated behind `RUN_LIVE_EVALS=1`.
+  - Runs all 15 Part C test cases against live Gemini model and ChromaDB index.
+  - Runs 5x repeated runs for critical safety cases 9 (admission guarantee), 10 (hopelessness), and 11 (missing fee).
+  - Runs 6 adversarial prompt injection and safety bypass cases.
+  - Generates dated Markdown report in `backend/evals/results/` with commit hash and model details.
+- Verified live results: **15/15 Part C Passed (100%)**, **5/5 Case 9 Passed (100%)**, **5/5 Case 10 Passed (100%)**, **5/5 Case 11 Passed (100%)**, **6/6 Adversarial Passed (100%)**, **0 ungrounded numbers**.
+
+## [T1] Fix response-cache key and scope (P0)
 - Redis client initialization on application startup (`main.py`) bound to `request.app.state.redis`.
 - Redis dependency injection in `deps.py` (`get_redis`).
 

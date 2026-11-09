@@ -31,3 +31,7 @@ node_modules/
 # Database and vector storage
 *.rdb
 backend/chroma_data/*/
+
+# Live Eval results
+backend/evals/results/
+evals/results/
