@@ -33,6 +33,8 @@ from app.schemas.admin import (
     FeedbackListResponse,
     PromoteExemplarRequest,
     PromoteExemplarResponse,
+    StructuredFactItem,
+    StructuredFactUpdateRequest,
 )
 from app.schemas.common import ErrorResponse
 from app.schemas.document import DocumentListResponse, DocumentResponse
@@ -535,6 +537,46 @@ async def export_leads(
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=sru_prospective_leads.csv"},
     )
+
+
+@router.get(
+    "/facts",
+    response_model=list[StructuredFactItem],
+)
+async def list_structured_facts(
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+) -> list[StructuredFactItem]:
+    """List all authoritative structured facts from PostgreSQL."""
+    from app.services import structured_facts_service
+    facts = await structured_facts_service.refresh_facts_cache_from_db(db)
+    return [StructuredFactItem(**f) for f in facts]
+
+
+@router.put(
+    "/facts/{fact_id}",
+    response_model=StructuredFactItem,
+)
+async def update_structured_fact_endpoint(
+    fact_id: UUID,
+    payload: StructuredFactUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    redis: Any = Depends(get_redis),
+    _admin: str = Depends(verify_admin_key),
+) -> StructuredFactItem:
+    """Update a structured fact with audit trail and bump facts_version in Redis."""
+    from app.services import structured_facts_service
+    updates = payload.model_dump(exclude_unset=True)
+    res = await structured_facts_service.update_structured_fact(
+        db=db,
+        fact_id=fact_id,
+        updates=updates,
+        editor="admin_api",
+        redis_client=redis,
+    )
+    if not res:
+        raise HTTPException(status_code=404, detail="Structured fact not found")
+    return StructuredFactItem(**res)
 
 
 

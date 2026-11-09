@@ -48,6 +48,15 @@ async def lifespan(fastapi_app: FastAPI):
     except Exception as e:
         logger.warning("Database schema check skipped or deferred: %s", e)
 
+    # Preload authoritative structured facts from PostgreSQL into memory
+    try:
+        from app.db.session import async_session_factory
+        from app.services.structured_facts_service import refresh_facts_cache_from_db
+        async with async_session_factory() as session:
+            await refresh_facts_cache_from_db(session)
+    except Exception as e:
+        logger.warning("Structured facts startup cache preload deferred: %s", e)
+
     # Verify or auto-seed ChromaDB documents in background
     import asyncio
     from app.services.auto_seed import ensure_documents_seeded

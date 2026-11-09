@@ -1,6 +1,42 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
-## [T1] Fix response-cache key and scope (P0)
+## [T2] Make structured facts a single source of truth (P0)
+
+### Already there
+- PostgreSQL `structured_facts` table schema created via Alembic migration `d4e5f6789012`.
+- Initial `VERIFIED_FACTS_REGISTRY` in `structured_facts_service.py` containing 22 ground-truth verified figures.
+
+### Changed
+- `backend/app/services/structured_facts_service.py`:
+  - Made PostgreSQL table `structured_facts` the single authoritative ground truth.
+  - Added `refresh_facts_cache_from_db()` to load rows into an in-memory cache on startup and whenever `facts_version` changes.
+  - Refactored `get_structured_facts_text()` and `get_all_grounded_numbers()` to read exclusively from the authoritative active facts.
+  - Added `update_structured_fact()` with full audit trail (`last_updated`, `updated_by`, `source_url`) and automatic `facts_version` bumping in Redis.
+- `backend/app/main.py`:
+  - Added startup hook to preload structured facts from PostgreSQL into memory.
+- `backend/app/api/v1/admin.py`:
+  - Added `GET /api/v1/admin/facts` and `PUT /api/v1/admin/facts/{fact_id}` endpoints for administrative facts management.
+- `backend/app/schemas/admin.py`:
+  - Added `StructuredFactItem` and `StructuredFactUpdateRequest` Pydantic models.
+
+### Added
+- `backend/scripts/seed_structured_facts.py`: Idempotent seed script that loaded 22 verified university facts into PostgreSQL.
+- `backend/tests/test_structured_facts_service.py`: 5 service-level unit tests verifying DB loading, validator synchronization, facts update, and audit tracking.
+
+## [T3] Citation policy (P0)
+
+### Already there
+- `Message.sources` stored in PostgreSQL for admin audits, transcript inspector, and QA evaluation.
+- Regex sanitizers in `chat_service.py` stripping inline/trailing source mentions.
+
+### Changed
+- Deliberate policy enforcement based on owner decision: citations are kept hidden from student-facing responses while source references remain preserved in PostgreSQL for auditing.
+- Added `SHOW_SOURCES: bool = False` to `backend/app/config.py`.
+- `chat_service.py` gates response `sources` list on `SHOW_SOURCES`.
+
+### Added
+- Documented policy alignment across prompts, services, and tests.
+
 
 ### Already there
 - `backend/app/services/cache_service.py` with basic MD5 query hashing and TTL support.
@@ -35,3 +71,4 @@
   - Validator block fallback exclusion.
   - `index_version` and `facts_version` bump invalidation.
   - Global `RESPONSE_CACHE_ENABLED` disable toggle verification.
+

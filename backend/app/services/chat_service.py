@@ -602,7 +602,7 @@ async def handle_chat(
         conversation_id=conversation.id,
         message_id=assistant_msg.id,
         answer=answer,
-        sources=[],  # Do not show sources in responses
+        sources=[SourceReference(**s) for s in sources] if (getattr(settings, "SHOW_SOURCES", False) and sources) else [],
         suggestions=suggestions,
         cards=cards,
         flow=flow_info,
@@ -866,8 +866,9 @@ async def handle_chat_stream(
                 db, conversation.id, title
             )
 
-        # Final completion event (do not show sources in responses)
-        yield f"data: {json.dumps({'type': 'done', 'conversation_id': str(conversation.id), 'message_id': str(assistant_msg.id), 'answer': answer, 'sources': [], 'suggestions': suggestions, 'cards': cards, 'flow': flow_info, 'model': settings.LLM_MODEL})}\n\n"
+        # Final completion event (sources gated by SHOW_SOURCES setting)
+        client_sources = sources if getattr(settings, "SHOW_SOURCES", False) else []
+        yield f"data: {json.dumps({'type': 'done', 'conversation_id': str(conversation.id), 'message_id': str(assistant_msg.id), 'answer': answer, 'sources': client_sources, 'suggestions': suggestions, 'cards': cards, 'flow': flow_info, 'model': settings.LLM_MODEL})}\n\n"
 
     except Exception as e:
         logger.error("Chat stream error: %s", e, exc_info=True)

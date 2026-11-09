@@ -89,3 +89,30 @@ class PromoteExemplarResponse(BaseModel):
     success: bool
     message: str
 
+
+class StructuredFactItem(BaseModel):
+    id: str
+    category: str
+    program: str
+    key_attribute: str
+    numeric_value: float | None = None
+    currency: str | None = None
+    formatted_value: str
+    frequency: str | None = None
+    academic_year: str
+    source_doc: str
+    notes: str | None = None
+    source_url: str | None = None
+    last_updated: str | None = None
+    updated_by: str | None = None
+
+
+class StructuredFactUpdateRequest(BaseModel):
+    formatted_value: str | None = None
+    numeric_value: float | None = None
+    currency: str | None = None
+    frequency: str | None = None
+    source_doc: str | None = None
+    source_url: str | None = None
+    notes: str | None = None
+

@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     APP_DEBUG: bool = True
     CORS_ORIGINS: str = "http://localhost:5173"
+    SHOW_SOURCES: bool = False
 
     # ---- Paths ----
     PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent

@@ -1,19 +1,31 @@
-"""Structured facts service — fetches ground-truth university figures from DB or verified registry."""
+"""Structured facts service — authoritative ground-truth university figures from PostgreSQL database.
 
+Enforces:
+1. PostgreSQL table `structured_facts` as the single authoritative source of truth.
+2. Fast in-memory cached registry updated at startup and refreshed whenever `facts_version` changes.
+3. Full audit trail (`source_url`, `last_updated`, `updated_by`).
+4. Validator grounding set synchronization.
+"""
+
+from datetime import datetime, timezone
 import logging
 import re
 from typing import Any
+import uuid
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.structured_fact import StructuredFact
+from app.services.cache_service import bump_facts_version
 
 logger = logging.getLogger(__name__)
 
-# Fallback verified structured ground truth (2026-27)
-# Used when DB is starting or for instantaneous lookups
-VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
-    # ---- FEES: B.Tech CSE ----
+# In-memory runtime cache for sub-millisecond query access without DB overhead
+_runtime_facts_cache: list[dict[str, Any]] = []
+
+# Fallback seed facts used ONLY if DB connection fails on cold boot or before initial seed
+_FALLBACK_SEED_FACTS: list[dict[str, Any]] = [
     {
         "category": "fee",
         "program": "B.Tech CSE",
@@ -54,7 +66,6 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "frequency": "4_years",
         "source_doc": "SRU Official Fee Schedule 2026-27",
     },
-    # ---- FEES: B.Tech ECE ----
     {
         "category": "fee",
         "program": "B.Tech ECE",
@@ -65,7 +76,6 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "frequency": "per_semester",
         "source_doc": "SRU Official Fee Schedule 2026-27",
     },
-    # ---- FEES: B.Tech Mechanical / Civil / EEE ----
     {
         "category": "fee",
         "program": "B.Tech Mechanical",
@@ -96,7 +106,6 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "frequency": "per_semester",
         "source_doc": "SRU Official Fee Schedule 2026-27",
     },
-    # ---- FEES: Management ----
     {
         "category": "fee",
         "program": "BBA",
@@ -117,7 +126,6 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "frequency": "per_semester",
         "source_doc": "SRU Official Fee Schedule 2026-27",
     },
-    # ---- FEES: Hostels & Transport ----
     {
         "category": "fee",
         "program": "Hostel Girls AC",
@@ -156,9 +164,8 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "currency": "INR",
         "formatted_value": "₹22,000 to ₹30,000 per year (tri-cities bus routes)",
         "frequency": "per_year",
-        "source_doc": "SRU Transport Department 2026-27",
+        "source_doc": "SRU Transport Circular 2026-27",
     },
-    # ---- CUTOFFS & ELIGIBILITY ----
     {
         "category": "cutoff",
         "program": "B.Tech",
@@ -166,8 +173,8 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "numeric_value": 50.0,
         "currency": None,
         "formatted_value": "50% aggregate marks in 10+2 / Intermediate MPC (500 out of 1000 marks)",
-        "frequency": "minimum_cutoff",
-        "source_doc": "SRU Admissions Regulations 2026-27",
+        "frequency": "admission_cutoff",
+        "source_doc": "SRU Admissions Eligibility Policy 2026-27",
     },
     {
         "category": "cutoff",
@@ -176,8 +183,8 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "numeric_value": 50.0,
         "currency": None,
         "formatted_value": "50% aggregate marks in 10+2 / Intermediate in any stream",
-        "frequency": "minimum_cutoff",
-        "source_doc": "SRU Admissions Regulations 2026-27",
+        "frequency": "admission_cutoff",
+        "source_doc": "SRU Admissions Eligibility Policy 2026-27",
     },
     {
         "category": "cutoff",
@@ -186,10 +193,9 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "numeric_value": 50.0,
         "currency": None,
         "formatted_value": "50% aggregate marks in Bachelor's Degree",
-        "frequency": "minimum_cutoff",
-        "source_doc": "SRU Admissions Regulations 2026-27",
+        "frequency": "admission_cutoff",
+        "source_doc": "SRU Admissions Eligibility Policy 2026-27",
     },
-    # ---- SCHOLARSHIPS ----
     {
         "category": "scholarship",
         "program": "B.Tech",
@@ -197,10 +203,9 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "numeric_value": 50.0,
         "currency": None,
         "formatted_value": "10% to 50% tuition fee waiver based on 12th/Inter board marks or entrance ranks",
-        "frequency": "merit_waiver",
+        "frequency": "merit_slabs",
         "source_doc": "SRU Merit Scholarship Scheme 2026-27",
     },
-    # ---- PLACEMENTS ----
     {
         "category": "placement",
         "program": "University Overall",
@@ -221,7 +226,6 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
         "frequency": "highest_ctc",
         "source_doc": "Centre for Student Services & Placements (CSSP) Report 2025-26",
     },
-    # ---- RANKINGS & ACCREDITATION ----
     {
         "category": "ranking",
         "program": "Engineering",
@@ -244,6 +248,56 @@ VERIFIED_FACTS_REGISTRY: list[dict[str, Any]] = [
     },
 ]
 
+# Aliased for backward compatibility with scripts/seeds
+VERIFIED_FACTS_REGISTRY = _FALLBACK_SEED_FACTS
+
+
+def _row_to_dict(row: StructuredFact) -> dict[str, Any]:
+    meta = row.metadata_ or {}
+    return {
+        "id": str(row.id),
+        "category": row.category,
+        "program": row.program,
+        "key_attribute": row.key_attribute,
+        "numeric_value": row.numeric_value,
+        "currency": row.currency,
+        "formatted_value": row.formatted_value,
+        "frequency": row.frequency,
+        "academic_year": row.academic_year,
+        "source_doc": row.source_doc,
+        "notes": row.notes,
+        "source_url": meta.get("source_url", "https://sru.edu.in/admissions"),
+        "last_updated": meta.get("last_updated"),
+        "updated_by": meta.get("updated_by", "system"),
+    }
+
+
+async def refresh_facts_cache_from_db(db: AsyncSession) -> list[dict[str, Any]]:
+    """Query PostgreSQL structured_facts table and update the in-memory cache."""
+    global _runtime_facts_cache
+    try:
+        stmt = select(StructuredFact).order_by(StructuredFact.category, StructuredFact.program)
+        result = await db.execute(stmt)
+        rows = result.scalars().all()
+        if rows:
+            _runtime_facts_cache = [_row_to_dict(r) for r in rows]
+            logger.info("Loaded %d authoritative structured facts from PostgreSQL", len(_runtime_facts_cache))
+        else:
+            _runtime_facts_cache = list(_FALLBACK_SEED_FACTS)
+            logger.warning("PostgreSQL structured_facts table empty; using fallback registry (%d items)", len(_runtime_facts_cache))
+    except Exception as exc:
+        logger.error("Failed to load structured facts from DB (using fallback): %s", exc)
+        if not _runtime_facts_cache:
+            _runtime_facts_cache = list(_FALLBACK_SEED_FACTS)
+    return _runtime_facts_cache
+
+
+def get_active_facts() -> list[dict[str, Any]]:
+    """Return authoritative structured facts: in-memory DB cache, falling back to seed list."""
+    if _runtime_facts_cache:
+        return _runtime_facts_cache
+    return _FALLBACK_SEED_FACTS
+
 
 def get_structured_facts_text(
     query: str,
@@ -252,6 +306,7 @@ def get_structured_facts_text(
     """Format matching structured facts as clean text for insertion into prompt B3."""
     q_lower = query.lower()
     selected: list[dict[str, Any]] = []
+    active_facts = get_active_facts()
 
     # Category matching
     want_fees = any(k in q_lower for k in ["fee", "fees", "cost", "tuition", "instalment", "installment", "hidden"])
@@ -268,11 +323,10 @@ def get_structured_facts_text(
     is_hostel = "hostel" in q_lower or "room" in q_lower or "mess" in q_lower
     is_transport = "transport" in q_lower or "bus" in q_lower
 
-    for fact in VERIFIED_FACTS_REGISTRY:
+    for fact in active_facts:
         cat = fact["category"]
         prog = fact["program"].lower()
 
-        # If user asks for fees, filter by relevant program if identifiable
         if want_fees and cat == "fee":
             if is_cse and "cse" in prog:
                 selected.append(fact)
@@ -287,7 +341,6 @@ def get_structured_facts_text(
             elif is_transport and "transport" in prog:
                 selected.append(fact)
             elif not (is_cse or is_mech or is_bba or is_mba or is_hostel or is_transport):
-                # Provide benchmark B.Tech CSE & BBA fees
                 if "cse" in prog or "bba" in prog:
                     selected.append(fact)
 
@@ -301,8 +354,7 @@ def get_structured_facts_text(
             selected.append(fact)
 
     if not selected:
-        # Default fallback facts if generic
-        selected = [f for f in VERIFIED_FACTS_REGISTRY if f["key_attribute"] in ("tuition_fee_sem", "minimum_eligibility_pcm", "average_package")]
+        selected = [f for f in active_facts if f["key_attribute"] in ("tuition_fee_sem", "minimum_eligibility_pcm", "average_package")]
 
     lines = []
     for f in selected:
@@ -312,9 +364,11 @@ def get_structured_facts_text(
 
 
 def get_all_grounded_numbers() -> set[str]:
-    """Return all verified numbers, amounts, and percentages from the registry for validator whitelisting."""
+    """Return all verified numbers, amounts, and percentages from the active facts for validator whitelisting."""
     whitelist = set()
-    for f in VERIFIED_FACTS_REGISTRY:
+    active_facts = get_active_facts()
+
+    for f in active_facts:
         val = f.get("formatted_value", "")
         # Extract currency amounts
         for m in re.finditer(r"₹[\d,]+", val):
@@ -346,3 +400,42 @@ def get_all_grounded_numbers() -> set[str]:
         "6 LPA", "51 LPA",
     })
     return whitelist
+
+
+async def update_structured_fact(
+    db: AsyncSession,
+    fact_id: uuid.UUID,
+    updates: dict[str, Any],
+    editor: str = "admin",
+    redis_client: Any = None,
+) -> dict[str, Any] | None:
+    """Update a structured fact row in PostgreSQL, maintain audit trail, and bump facts_version in Redis."""
+    stmt = select(StructuredFact).where(StructuredFact.id == fact_id)
+    result = await db.execute(stmt)
+    fact = result.scalar_one_or_none()
+    if not fact:
+        return None
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    meta = dict(fact.metadata_ or {})
+    meta["last_updated"] = now_iso
+    meta["updated_by"] = editor
+    if "source_url" in updates:
+        meta["source_url"] = updates["source_url"]
+    fact.metadata_ = meta
+
+    for field in ("formatted_value", "numeric_value", "currency", "frequency", "source_doc", "notes"):
+        if field in updates and updates[field] is not None:
+            setattr(fact, field, updates[field])
+
+    await db.commit()
+    await db.refresh(fact)
+
+    # Invalidate cache
+    if redis_client:
+        await bump_facts_version(redis_client)
+
+    # Refresh in-memory cache
+    await refresh_facts_cache_from_db(db)
+
+    return _row_to_dict(fact)
