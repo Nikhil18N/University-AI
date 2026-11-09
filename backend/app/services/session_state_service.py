@@ -176,3 +176,62 @@ async def is_in_distress_cooldown(session_id: str, redis_client=None) -> bool:
     """Check if session is currently under distress cooldown."""
     state = await get_session_state(session_id, redis_client=redis_client)
     return state.get("distress_cooldown_turns", 0) > 0
+
+
+def extract_opener_pattern(text: str) -> str:
+    """Extract normalized first five words from a message."""
+    words = re.findall(r"\w+", text.lower())
+    return " ".join(words[:5]) if words else ""
+
+
+async def record_opener(session_id: str, reply_text: str, redis_client=None) -> None:
+    """Record the opener pattern of a response to avoid repetitive greetings."""
+    if not session_id or not reply_text:
+        return
+    pattern = extract_opener_pattern(reply_text)
+    if not pattern:
+        return
+
+    state = await get_session_state(session_id, redis_client=redis_client)
+    openers = list(state.get("last_openers", []))
+    openers.append(pattern)
+    if len(openers) > 6:
+        openers = openers[-6:]
+
+    await update_session_state(session_id, {"last_openers": openers}, redis_client=redis_client)
+
+
+async def get_recent_openers(session_id: str, redis_client=None) -> list[str]:
+    """Retrieve recent opener patterns for this session."""
+    state = await get_session_state(session_id, redis_client=redis_client)
+    return list(state.get("last_openers", []))
+
+
+def is_opener_repeating(reply_text: str, recent_openers: list[str]) -> bool:
+    """Check if the first five words repeat any of the last two openers."""
+    if not recent_openers:
+        return False
+    current = extract_opener_pattern(reply_text)
+    if not current:
+        return False
+    # Check against the last two openers
+    return current in recent_openers[-2:]
+
+
+async def record_told_claims(session_id: str, highlight_ids: list[str], redis_client=None) -> None:
+    """Record highlight IDs presented to the student to ensure variety."""
+    if not session_id or not highlight_ids:
+        return
+    state = await get_session_state(session_id, redis_client=redis_client)
+    told = list(state.get("told_claims", []))
+    for hid in highlight_ids:
+        if hid and hid not in told:
+            told.append(hid)
+    await update_session_state(session_id, {"told_claims": told}, redis_client=redis_client)
+
+
+async def get_told_claims(session_id: str, redis_client=None) -> set[str]:
+    """Retrieve all highlight IDs presented so far in this session."""
+    state = await get_session_state(session_id, redis_client=redis_client)
+    return set(state.get("told_claims", []))
+

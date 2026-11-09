@@ -2,7 +2,8 @@ Classify the student's latest message, using the chat history for context. Retur
 
 {"parts":[{"text":"<sub-question>",
   "type":"factual|persuasive|chitchat|sensitive|out_of_scope|fact_check|comparison|social_proof_doubt"}],
- "interests":["<anything new learned about the student>"]}
+ "interests":["<anything new learned about the student>"],
+ "emotion":"none|mild|strong"}
 
 Types:
 - factual: eligibility, fees, deadlines, programs, cutoffs,
@@ -16,6 +17,11 @@ Types:
 - sensitive: complaints, mental health distress, feeling hopeless or overwhelmed, despair, legal/visa advice, guarantees
 - out_of_scope: unrelated to the university or admissions
 
+Emotion:
+- none: student asks a direct, factual, or neutral question (e.g. "what are the fees", "how to apply", "hi", "how are you"). Direct answer required, zero sympathy boilerplate.
+- mild: student mentions feeling confused, uncertain, or hesitant (e.g. "confused between CS and DS", "not sure what to choose").
+- strong: student expresses fear, despair, heavy anxiety, or hopelessness.
+
 Rules:
 - Split mixed messages into separate parts, in the order asked.
 - Resolve pronouns using history ("what about its fees?" becomes
@@ -25,5 +31,5 @@ Rules:
 - If the student asks to fact-check a claim or asks if something is true, classify as fact_check.
 - If the student mentions a friend/peer advised them not to join, classify as social_proof_doubt.
 - If the student asks whether SR University is better than other institutions, classify as comparison.
-- If the student expresses severe distress, despair, or hopelessness, always classify as sensitive.
+- If the student expresses severe distress, despair, or hopelessness, always classify as sensitive with emotion: strong.
 - If unsure between factual and persuasive, choose factual.

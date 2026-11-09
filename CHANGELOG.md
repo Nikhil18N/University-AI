@@ -1,5 +1,33 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T14] Repetition and opener control (P1)
+
+### Already there
+- Persona prompt setting SRU Buddy counselor identity and conversational guidelines.
+- Router service decomposing queries into sub-parts with fast-path and LLM classification.
+
+### Changed
+- `prompts/persona.md`:
+  - Stripped stock opening phrase "it can feel a bit overwhelming".
+  - Enforced emotion gating: sympathy openers are strictly reserved for students who voice anxiety or distress. Neutral or factual questions must receive direct answers.
+  - Barred ending every turn with questions; plain informational answers now conclude with direct statements.
+  - Added CTA topic rotation rules (campus tour, hostel life, clubs, application steps) prohibiting duplicate next-step prompts in the same session.
+- `prompts/router.md` & `backend/app/services/router_service.py`:
+  - Added `emotion: none | mild | strong` classification to router schema.
+  - Emitted `emotion` field in both LLM classification and deterministic fast-paths (e.g. `strong` for crisis/distress, `none` for factual questions).
+- `backend/app/services/session_state_service.py`:
+  - Added `extract_opener_pattern`, `record_opener`, `get_recent_openers`, and `is_opener_repeating` (tracking first 5 words of recent turns).
+  - Added `record_told_claims` and `get_told_claims` to remember highlight IDs presented to the student.
+- `backend/app/services/chat_service.py`:
+  - Integrated emotion gating directive into counselor prompt.
+  - Implemented claim rotation using `told_claims`: prioritized untold highlights in persuasive turns; when all campus highlights on record have been shared, cleanly and honestly explains so without hallucination.
+  - Added opener pattern check and regeneration: automatically detects repeating opening patterns and rewrites them with fresh natural openings.
+
+### Added
+- `backend/tests/test_repetition_control_t14.py`:
+  - 6 unit tests verifying opener extraction, duplicate opener detection, session state opener and told claims persistence, router emotion classification, and persona prompt rules.
+- Test suite expanded from 337 to 343 tests passed.
+
 ## [T13] Conversation state: pending offers, slot filling, post-distress cooldown (P1)
 
 ### Already there

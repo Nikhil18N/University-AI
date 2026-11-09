@@ -105,12 +105,12 @@ async def route_and_decompose_message(
     # Fast-path Layer 1: Instant deterministic crisis/distress routing (< 2ms)
     if is_crisis_or_distress(clean_msg):
         logger.info("Fast-path crisis/distress detected; immediate sensitive routing: %s", clean_msg[:60])
-        return {"parts": [{"text": clean_msg, "type": "sensitive"}], "interests": []}
+        return {"parts": [{"text": clean_msg, "type": "sensitive"}], "interests": [], "emotion": "strong"}
 
     # Fast pattern match for short obvious queries
     for pattern, part_type in FAST_ROUTER_PATTERNS:
         if pattern.search(clean_msg):
-            return {"parts": [{"text": clean_msg, "type": part_type}], "interests": []}
+            return {"parts": [{"text": clean_msg, "type": part_type}], "interests": [], "emotion": "none"}
 
     # Check for simple compound questions ("and", "?")
     system_instruction = render_prompt("router")
@@ -146,9 +146,13 @@ async def route_and_decompose_message(
                     interests = data.get("interests", [])
                     if not isinstance(interests, list):
                         interests = []
+                    emotion = str(data.get("emotion", "none")).lower().strip()
+                    if emotion not in ("none", "mild", "strong"):
+                        emotion = "none"
                     return {
                         "parts": validated_parts,
                         "interests": [str(i).strip() for i in interests if str(i).strip()],
+                        "emotion": emotion,
                     }
         except Exception as e:
             logger.warning("Router attempt %d failed: %s. Retrying...", attempt + 1, e)
@@ -159,4 +163,5 @@ async def route_and_decompose_message(
     return {
         "parts": [{"text": clean_msg, "type": fallback_type}],
         "interests": [],
+        "emotion": "strong" if fallback_type == "sensitive" else "none",
     }

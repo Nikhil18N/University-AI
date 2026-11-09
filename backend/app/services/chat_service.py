@@ -22,6 +22,7 @@ from app.services.claims_service import (
     get_known_gaps,
     get_relevant_highlights,
     get_turn_fallback,
+    load_verified_highlights,
     record_known_gap,
     verify_persuasive_output,
     verify_qualitative_claims,
@@ -337,6 +338,13 @@ async def execute_prompt_pack_pipeline(
                 if p.get("type") == "persuasive":
                     p["type"] = "chitchat"
 
+    # T14: Emotion gating & Opener control
+    emotion = routed.get("emotion", "none")
+    if emotion == "none":
+        profile_text += " | Directive: Answer directly first. Zero boilerplate sympathy openers."
+    elif emotion in ("mild", "strong"):
+        profile_text += f" | Emotion: {emotion} (Acknowledge student feeling warmly first)"
+
     all_sources: list[dict] = []
 
     async def handle_sub_part(part: dict) -> str:
@@ -364,11 +372,32 @@ async def execute_prompt_pack_pipeline(
             return ans.strip()
 
         elif ptype == "persuasive":
-            # T15: Constrained persuasive generation against verified highlights store
-            known_gaps = await get_known_gaps(session_id or "", redis_client=redis_client)
+            # T14 & T15: Claim memory and rotation using told_claims
+            told_claims = set()
+            if session_id:
+                from app.services.session_state_service import get_told_claims, record_told_claims
+                told_claims = await get_told_claims(session_id, redis_client=redis_client)
+
+            all_hl = load_verified_highlights()
+            untold_hl = [h for h in all_hl if h["id"] not in told_claims]
+
+            # If all highlights on record have been told and user asks again, be completely honest
+            if not untold_hl and len(told_claims) >= 4:
+                return (
+                    "I've shared the main campus highlights we have on record (including our 150-acre green campus, "
+                    "NIRF 91st ranking, Microsoft 51 LPA placement, and SRiX startup incubator). "
+                    "Is there a specific department or detail you'd like to dig into, or would you like to speak directly with an academic counsellor?"
+                )
+
             hl_list = get_relevant_highlights(ptext, profile_interests=profile.get("interests", []), limit=3)
-            available_ids = [h["id"] for h in hl_list]
-            formatted_hl = format_highlights_for_prompt(hl_list)
+            prioritized = [h for h in hl_list if h["id"] not in told_claims]
+            if not prioritized and untold_hl:
+                prioritized = untold_hl[:3]
+            elif not prioritized:
+                prioritized = hl_list
+
+            available_ids = [h["id"] for h in prioritized]
+            formatted_hl = format_highlights_for_prompt(prioritized)
 
             rag_hl_text = ""
             if rag_service:
@@ -410,6 +439,10 @@ async def execute_prompt_pack_pipeline(
                     clean_reply = clean_retry
                 else:
                     return get_turn_fallback("unverified_facility")
+
+            if session_id and used_ids:
+                from app.services.session_state_service import record_told_claims
+                await record_told_claims(session_id, used_ids, redis_client=redis_client)
 
             return clean_reply.strip()
 
@@ -602,6 +635,19 @@ async def execute_prompt_pack_pipeline(
             await set_pending_offer(session_id, "hostel_info", "hostels", program=profile.get("branch") or "B.Tech", text="hostel accommodation options", redis_client=redis_client)
         elif "scholarship" in fr_lower and ("slab" in fr_lower or "waiver" in fr_lower):
             await set_pending_offer(session_id, "scholarship_info", "scholarships", program=profile.get("branch") or "B.Tech", text="scholarship slabs", redis_client=redis_client)
+
+    # T14: Opener pattern variety check and recording
+    if session_id:
+        from app.services.session_state_service import get_recent_openers, is_opener_repeating, record_opener
+        recent_openers = await get_recent_openers(session_id, redis_client=redis_client)
+        if is_opener_repeating(final_reply, recent_openers):
+            logger.info("Detected repeating opener pattern '%s'; regenerating with fresh opening variation", recent_openers[-1])
+            regen_prompt = f"Rewrite this reply with a fresh, natural opening sentence. Do NOT start with '{recent_openers[-1]}':\n\n{final_reply}"
+            regen_ans = await llm.generate([{"role": "user", "content": regen_prompt}], temperature=0.3, max_tokens=350)
+            if regen_ans.strip():
+                final_reply = regen_ans.strip()
+
+        await record_opener(session_id, final_reply, redis_client=redis_client)
 
     return final_reply, all_sources
 
