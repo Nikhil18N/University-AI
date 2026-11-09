@@ -237,7 +237,11 @@ def build_counsellor_guidance(profile: dict[str, Any], current_query: str = "") 
         if score_pct >= cutoff:
             directives.append(
                 f"- Cutoff Evaluation: The student's score of {score_raw} is >= {cutoff:.0f}% cutoff. "
-                "CONFIRM DIRECTLY THAT THEY ARE ELIGIBLE! Never say they fall short. Share program highlights and next steps."
+                "CONFIRM DIRECTLY THAT THEY ARE ELIGIBLE! Never say they fall short. Do not use outcome-implying phrases ('you're in a great spot', 'you've got this', 'guaranteed admission'). Share program details neutrally."
+            )
+            directives.append(
+                "- Slot Filling for Scholarships: If the student asks for scholarship slabs or waivers, check if their examination board (CBSE vs State Board) is specified. "
+                "Never assume CBSE. If the board is unknown, ask which board they studied under before quoting specific slabs."
             )
         else:
             directives.append(

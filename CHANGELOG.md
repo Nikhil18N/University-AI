@@ -1,5 +1,31 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T13] Conversation state: pending offers, slot filling, post-distress cooldown (P1)
+
+### Already there
+- Turn-level crisis interceptor surfacing helplines.
+- Basic student profile extraction for degree, branch, score, and interests.
+
+### Changed
+- `backend/app/services/router_service.py`:
+  - Added pending offer resolution hook: short affirmatives ("yes", "sure", "ok", "haan", "avunu") resolve directly to the pending call-to-action offer rather than being classified as generic chitchat.
+- `backend/app/services/chat_service.py`:
+  - Integrated 3-turn post-distress cooldown (`trigger_distress_cooldown`): suppresses all sales calls to action and persuasive marketing pitches following a distress disclosure.
+  - Added multi-part coverage verification: detects when sub-questions are dropped during merge synthesis and triggers a constrained re-merge.
+  - Registered calls-to-action into `pending_offer` so student follow-ups retain context.
+- `backend/app/services/profile_service.py`:
+  - Added slot filling directive for scholarships requiring examination board (CBSE vs State Board) before quoting slabs.
+  - Eliminated outcome-implying counselor guidance.
+- `backend/app/services/guardrail_service.py`:
+  - Added `verify_outcome_language()` to detect and scrub forbidden admission/outcome phrases ("you're in a great spot", "you've got this", "guaranteed admission").
+
+### Added
+- `backend/app/services/session_state_service.py`:
+  - Session state manager tracking `pending_offer`, `offered_topics`, `completed_topics`, and `distress_cooldown_turns`.
+- `backend/tests/test_conversation_state_t13.py`:
+  - 5 unit tests validating pending offer resolution, ignoring unrelated turns, 3-turn distress cooldown lifecycle, outcome language guardrail blocks, and scholarship slot filling guidance.
+- Test suite expanded from 332 to 337 tests passed.
+
 ## [T16] Fact-check and comparison intent, scoped statistics (P0)
 
 ### Already there

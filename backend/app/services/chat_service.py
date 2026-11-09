@@ -266,7 +266,9 @@ async def execute_prompt_pack_pipeline(
     session_id: str | None = None,
 ) -> tuple[str, list[dict]]:
     """Execute Prompt Pack Router -> Parallel Handlers -> Validator -> Merge."""
-    routed = await route_and_decompose_message(llm, message, conversation_context)
+    routed = await route_and_decompose_message(
+        llm, message, conversation_context, session_id=session_id, redis_client=redis_client
+    )
     parts = routed.get("parts", [{"text": message, "type": "factual"}])
     new_interests = routed.get("interests", [])
 
@@ -293,6 +295,11 @@ async def execute_prompt_pack_pipeline(
     is_turn_sensitive = any(p.get("type") == "sensitive" for p in parts) or is_crisis_or_distress(message)
     if is_turn_sensitive:
         logger.info("Sensitive distress/crisis turn detected; dedicating entire turn to sensitive handler: %s", message[:60])
+        # T13: Trigger 3-turn distress cooldown on mental health / crisis disclosure
+        if session_id:
+            from app.services.session_state_service import trigger_distress_cooldown
+            await trigger_distress_cooldown(session_id, turns=3, redis_client=redis_client)
+
         prompt = render_prompt("sensitive", part_text=message)
         raw_ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=300)
         ans = raw_ans.strip()
@@ -317,6 +324,18 @@ async def execute_prompt_pack_pipeline(
                 ans = ans + helpline_info
 
         return ans, []
+
+    # T13: Check post-distress cooldown
+    in_cooldown = False
+    if session_id:
+        from app.services.session_state_service import is_in_distress_cooldown, step_distress_cooldown
+        if await is_in_distress_cooldown(session_id, redis_client=redis_client):
+            await step_distress_cooldown(session_id, redis_client=redis_client)
+            in_cooldown = True
+            logger.info("Session %s in post-distress cooldown; suppressing promotional pitch and calls to action", session_id)
+            for p in parts:
+                if p.get("type") == "persuasive":
+                    p["type"] = "chitchat"
 
     all_sources: list[dict] = []
 
@@ -533,12 +552,58 @@ async def execute_prompt_pack_pipeline(
     part_results = await asyncio.gather(*part_tasks)
 
     if len(part_results) == 1:
-        return part_results[0], all_sources
+        final_reply = part_results[0]
+    else:
+        formatted_parts = "\n\n".join(f"Part {idx+1} ({parts[idx]['type']}): {res}" for idx, res in enumerate(part_results))
+        merge_prompt = render_prompt("merge", part_answers=formatted_parts)
+        merged = await llm.generate([{"role": "user", "content": merge_prompt}], temperature=0.0, max_tokens=400)
+        final_reply = merged.strip()
 
-    formatted_parts = "\n\n".join(f"Part {idx+1} ({parts[idx]['type']}): {res}" for idx, res in enumerate(part_results))
-    merge_prompt = render_prompt("merge", part_answers=formatted_parts)
-    merged = await llm.generate([{"role": "user", "content": merge_prompt}], temperature=0.0, max_tokens=400)
-    return merged.strip(), all_sources
+        # Multi-part coverage check (T13): ensure each sub-part is covered in merged output
+        missing_parts = []
+        final_lower = final_reply.lower()
+        for idx, p in enumerate(parts):
+            ptext = p.get("text", "")
+            kw = [w.lower() for w in re.findall(r"\w+", ptext) if len(w) > 3]
+            if kw and not any(w in final_lower for w in kw[:3]) and not any(phrase in final_lower for phrase in ["don't have", "cannot confirm", "notes do not"]):
+                missing_parts.append(ptext)
+
+        if missing_parts:
+            logger.warning("Multi-part merge missed sub-questions: %s. Retrying with coverage constraint.", missing_parts)
+            strict_merge = merge_prompt + f"\n\nCRITICAL: The previous merge missed these questions: {missing_parts}. You MUST cover all sub-questions in your reply."
+            retry_merged = await llm.generate([{"role": "user", "content": strict_merge}], temperature=0.0, max_tokens=450)
+            if retry_merged.strip():
+                final_reply = retry_merged.strip()
+
+    # Outcome language check (T13)
+    from app.services.guardrail_service import verify_outcome_language
+    is_clean, forbidden = verify_outcome_language(final_reply)
+    if not is_clean:
+        for phrase in forbidden:
+            final_reply = re.sub(re.escape(phrase), "you meet the academic criteria", final_reply, flags=re.I)
+
+    # Post-distress cooldown cleanup (T13)
+    if in_cooldown:
+        clean_lines = []
+        for line in final_reply.split("\n"):
+            line_l = line.lower()
+            if any(pitch in line_l for pitch in ["walk you through", "apply now", "fee structure", "application steps", "click here"]):
+                continue
+            clean_lines.append(line)
+        final_reply = "\n".join(clean_lines).strip() or "Take all the time you need. Whenever you feel ready, I'm here to help."
+
+    # CTA registration for pending_offer (T13)
+    if not in_cooldown and session_id:
+        from app.services.session_state_service import set_pending_offer
+        fr_lower = final_reply.lower()
+        if "walk you through the application" in fr_lower or "walk you through the steps" in fr_lower or "application steps" in fr_lower:
+            await set_pending_offer(session_id, "application_steps", "application", program=profile.get("branch") or "B.Tech", text="walk you through application steps", redis_client=redis_client)
+        elif "hostel options" in fr_lower or "hostel facilities" in fr_lower or "hostel accommodation" in fr_lower:
+            await set_pending_offer(session_id, "hostel_info", "hostels", program=profile.get("branch") or "B.Tech", text="hostel accommodation options", redis_client=redis_client)
+        elif "scholarship" in fr_lower and ("slab" in fr_lower or "waiver" in fr_lower):
+            await set_pending_offer(session_id, "scholarship_info", "scholarships", program=profile.get("branch") or "B.Tech", text="scholarship slabs", redis_client=redis_client)
+
+    return final_reply, all_sources
 
 
 async def handle_chat(

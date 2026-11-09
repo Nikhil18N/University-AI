@@ -77,6 +77,8 @@ async def route_and_decompose_message(
     llm: LLMProvider,
     message: str,
     conversation_context: str = "",
+    session_id: str | None = None,
+    redis_client: object | None = None,
 ) -> dict[str, Any]:
     """Decompose message into typed parts and extract student interests.
 
@@ -89,6 +91,16 @@ async def route_and_decompose_message(
     clean_msg = message.strip()
     if not clean_msg:
         return {"parts": [{"text": message, "type": "chitchat"}], "interests": []}
+
+    # T13: Check if message is a short affirmative accepting a pending offer
+    if session_id:
+        from app.services.session_state_service import resolve_pending_offer_if_affirmative
+        is_resolved, resolved_text, offer = await resolve_pending_offer_if_affirmative(
+            session_id, clean_msg, redis_client=redis_client
+        )
+        if is_resolved and resolved_text:
+            logger.info("Resolved short affirmative '%s' to pending offer (%s): %s", clean_msg, offer.get("type"), resolved_text)
+            return {"parts": [{"text": resolved_text, "type": "factual"}], "interests": []}
 
     # Fast-path Layer 1: Instant deterministic crisis/distress routing (< 2ms)
     if is_crisis_or_distress(clean_msg):

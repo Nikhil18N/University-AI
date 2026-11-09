@@ -107,3 +107,27 @@ def sanitize_hallucinated_urls(answer: str, unsupported_urls: list[str]) -> str:
     sanitized = re.sub(r"\bvisit (?:at|to) (?:the )?", "contact the ", sanitized, flags=re.I)
     return sanitized
 
+
+# Forbidden outcome-implying and admission-guaranteeing phrases (T13)
+FORBIDDEN_OUTCOME_PATTERNS = [
+    re.compile(r"\b(you're\s+in\s+a\s+great\s+spot|you\s+are\s+in\s+a\s+great\s+spot)\b", re.I),
+    re.compile(r"\b(you've\s+got\s+this|you\s+have\s+got\s+this)\b", re.I),
+    re.compile(r"\b(you\s+will\s+(easily\s+)?get\s+admission|admission\s+is\s+guaranteed)\b", re.I),
+    re.compile(r"\b(guaranteed\s+(seat|admission|placement|job))\b", re.I),
+    re.compile(r"\b(your\s+seat\s+is\s+confirmed|sure\s+shot\s+admission)\b", re.I),
+]
+
+
+def verify_outcome_language(text: str) -> tuple[bool, list[str]]:
+    """Verify that reply contains zero outcome-implying or admission-guaranteeing language (T13)."""
+    detected = []
+    for pattern in FORBIDDEN_OUTCOME_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            detected.append(match.group(0))
+    if detected:
+        logger.warning("Guardrail blocked forbidden outcome language: %s", detected)
+        return False, detected
+    return True, []
+
+
