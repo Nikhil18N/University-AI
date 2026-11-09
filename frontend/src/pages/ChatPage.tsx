@@ -367,7 +367,11 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    if (trimmed === "🧮 Scholarship Calculator" || trimmed === "🧮 Open Scholarship Calculator") {
+    const isCalcTrigger =
+      /^\s*(🧮\s*)?(scholarship\s*calculator|calculate\s*(?:my\s*)?scholarship|fee\s*calculator|calculate\s*(?:my\s*)?fee|open\s*(?:scholarship\s*)?calculator|calculator)\s*$/i.test(
+        trimmed
+      );
+    if (isCalcTrigger) {
       setIsCalculatorOpen(true);
       return;
     }

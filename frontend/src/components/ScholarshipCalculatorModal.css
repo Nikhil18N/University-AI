@@ -1,12 +1,13 @@
 /* ==========================================================================
    ScholarshipCalculatorModal.css
    Executive Minimalist Styling for SR University Scholarship & Fee Portal
+   Strictly adheres to SR University branding (#0055a4, #2979e2, #10b981, #f59e0b)
    ========================================================================== */
 
 .scholarship-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.68);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -32,14 +33,14 @@
   border: 1px solid var(--border, #27272a);
   border-radius: 16px;
   width: 100%;
-  max-width: 650px;
-  max-height: 90vh;
+  max-width: 680px;
+  max-height: 92vh;
   overflow-y: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
   display: flex;
   flex-direction: column;
   padding: 22px 24px;
-  gap: 18px;
+  gap: 16px;
   animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -71,18 +72,18 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(99, 102, 241, 0.12);
-  color: #818cf8;
+  background: rgba(0, 85, 164, 0.12);
+  color: var(--sru-blue, #0055a4);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(0, 85, 164, 0.22);
 }
 
 .calc-title {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.18rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text-1, #ffffff);
@@ -115,27 +116,123 @@
   border-color: var(--border, #3f3f46);
 }
 
-/* Form controls */
-.calc-form {
+/* 1. Verified Student Profile Bar */
+.calc-verified-strip {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 8px;
 }
 
-.calc-grid-controls {
+.calc-verified-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text, #ffffff);
+}
+
+.calc-verified-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.calc-verified-phone {
+  color: var(--text-muted, #a1a1aa);
+  font-size: 0.8rem;
+}
+
+.calc-verified-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(16, 185, 129, 0.16);
+  color: #10b981;
+}
+
+/* 2. Program Selector Strip (Compact) */
+.calc-program-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--surface-2, #27272a);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 8px;
+}
+
+.calc-program-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.calc-program-name {
+  font-size: 0.86rem;
+  color: var(--text, #ffffff);
+}
+
+.calc-exam-tag {
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(0, 85, 164, 0.12);
+  color: var(--sru-blue, #0055a4);
+  border: 1px solid rgba(0, 85, 164, 0.2);
+  font-weight: 600;
+}
+
+.calc-toggle-prog-btn {
+  background: transparent;
+  border: none;
+  color: var(--sru-blue, #0055a4);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: opacity 0.15s ease;
+}
+
+.calc-toggle-prog-btn:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+.calc-picker-dropdowns {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+  background: var(--surface-2, #27272a);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 8px;
+  animation: fadeIn 0.2s ease;
 }
 
-.calc-field {
+.calc-picker-field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
-.calc-field label {
-  font-size: 0.78rem;
+.calc-picker-field label {
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--text-muted, #a1a1aa);
   text-transform: uppercase;
@@ -143,434 +240,111 @@
 }
 
 .calc-select {
-  padding: 9px 12px;
-  border-radius: 8px;
-  background: var(--surface-2, #27272a);
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--surface-1, #18181b);
   color: var(--text, #ffffff);
   border: 1px solid var(--border, #3f3f46);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   cursor: pointer;
 }
 
 .calc-select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+  border-color: var(--sru-blue, #0055a4);
 }
 
-.calc-submit-btn {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 11px 18px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 2px;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
-}
-
-.calc-submit-btn:hover {
-  background: linear-gradient(135deg, #4338ca, #4f46e5);
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
-  transform: translateY(-1px);
-}
-
-.calc-submit-btn:active {
-  transform: translateY(0);
-}
-
-/* Stale Banner */
-.calc-stale-banner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  color: #fbbf24;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-}
-
-/* Placeholder Empty State */
-.calc-placeholder-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: var(--surface-2, #212124);
-  border: 1px dashed var(--border, #3f3f46);
-  border-radius: 12px;
-  padding: 18px 20px;
-}
-
-.calc-placeholder-icon {
-  color: var(--text-muted, #71717a);
-  flex-shrink: 0;
-}
-
-.calc-placeholder-text h4 {
-  margin: 0 0 4px 0;
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--text-1, #e4e4e7);
-}
-
-.calc-placeholder-text p {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--text-muted, #a1a1aa);
-  line-height: 1.45;
-}
-
-/* Result Box */
-.calc-result-box {
-  background: var(--surface-2, #1f1f23);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 12px;
-  padding: 16px;
+/* 3. Primary "Marks Only" Input Form & Card */
+.calc-marks-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  animation: modalFadeIn 0.22s ease;
+  gap: 12px;
 }
 
-.result-top-badge {
+.calc-marks-card {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 10px;
-}
-
-.award-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.86rem;
-}
-
-.award-badge.standard-fee {
-  background: rgba(148, 163, 184, 0.15);
-  color: #94a3b8;
-  border-color: rgba(148, 163, 184, 0.3);
-}
-
-.exam-tag {
-  font-size: 0.78rem;
-  color: var(--text-muted, #a1a1aa);
-}
-
-.exam-tag strong {
-  color: var(--text-1, #f4f4f5);
-}
-
-/* 3-Column Financial Summary */
-.fee-comparison-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  flex-direction: column;
   gap: 10px;
-  background: var(--surface-1, #121214);
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border, #27272a);
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.05) 0%, rgba(41, 121, 226, 0.04) 100%);
+  border: 1px solid rgba(0, 85, 164, 0.2);
+  border-radius: 12px;
 }
 
-.fee-stat {
+.calc-marks-label-row {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.stat-label {
-  font-size: 0.72rem;
-  color: var(--text-muted, #71717a);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 600;
-}
-
-.stat-val {
-  font-size: 1.15rem;
+.calc-marks-label {
+  font-size: 0.94rem;
   font-weight: 700;
-  color: var(--text, #ffffff);
-  font-variant-numeric: tabular-nums;
+  color: var(--text-1, #ffffff);
 }
 
-.stat-sub {
-  font-size: 0.72rem;
-  color: var(--text-muted, #71717a);
-}
-
-.stat-val.strikethrough {
-  text-decoration: line-through;
-  color: var(--text-muted, #71717a);
-  font-weight: 500;
-}
-
-.stat-val.savings {
-  color: #34d399;
-}
-
-.stat-val.payable {
-  color: #818cf8;
-  font-size: 1.25rem;
-}
-
-/* 4-Year Progression */
-.progression-table-wrap {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border, #27272a);
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-
-.progression-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.calc-marks-instruction {
   font-size: 0.78rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text-muted, #d4d4d8);
-}
-
-.progression-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.prog-col {
-  background: var(--surface-2, #27272a);
-  padding: 8px;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  border: 1px solid var(--border, #3f3f46);
-}
-
-.prog-yr {
-  font-size: 0.72rem;
   color: var(--text-muted, #a1a1aa);
-  text-transform: uppercase;
 }
 
-.prog-val {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #a5b4fc;
-  font-variant-numeric: tabular-nums;
-}
-
-.prog-unit {
-  font-size: 0.68rem;
-  color: var(--text-muted, #71717a);
-}
-
-/* Institutional Notes */
-.calc-notes {
+.calc-input-button-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.78rem;
-  color: var(--text-muted, #d4d4d8);
-  background: rgba(0, 0, 0, 0.15);
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border, #27272a);
-}
-
-.note-item {
-  display: flex;
+  gap: 10px;
   align-items: flex-start;
-  gap: 8px;
-  line-height: 1.4;
-}
-
-.note-item svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: #818cf8;
-}
-
-.note-item.special-scholarship svg {
-  color: #f472b6;
-}
-
-/* Footer Action */
-.calc-footer-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 2px;
-}
-
-.btn-ask-buddy {
-  background: var(--surface-2, #27272a);
-  color: var(--text, #ffffff);
-  border: 1px solid var(--border, #3f3f46);
-  border-radius: 8px;
-  padding: 9px 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-ask-buddy:hover {
-  background: #4f46e5;
-  border-color: #6366f1;
-  color: #ffffff;
-}
-
-/* Light Mode Overrides */
-[data-theme="light"] .scholarship-modal-card {
-  background: #ffffff;
-  color: #18181b;
-  border-color: #e4e4e7;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-}
-
-[data-theme="light"] .calc-header {
-  border-bottom-color: #f4f4f5;
-}
-
-[data-theme="light"] .calc-title {
-  color: #09090b;
-}
-
-[data-theme="light"] .calc-icon-badge {
-  background: #eef2ff;
-  color: #4f46e5;
-  border-color: #c7d2fe;
-}
-
-[data-theme="light"] .calc-select {
-  background: #fbfbfb;
-  color: #18181b;
-  border-color: #e4e4e7;
-}
-
-[data-theme="light"] .calc-placeholder-box {
-  background: #f9fafb;
-  border-color: #e5e7eb;
-}
-
-[data-theme="light"] .calc-placeholder-text h4 {
-  color: #111827;
-}
-
-[data-theme="light"] .calc-result-box {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-}
-
-[data-theme="light"] .fee-comparison-row {
-  background: #ffffff;
-  border-color: #e2e8f0;
-}
-
-[data-theme="light"] .progression-table-wrap {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
-}
-
-[data-theme="light"] .prog-col {
-  background: #ffffff;
-  border-color: #cbd5e1;
-}
-
-[data-theme="light"] .prog-val {
-  color: #4338ca;
-}
-
-[data-theme="light"] .calc-notes {
-  background: #ffffff;
-  border-color: #e2e8f0;
-  color: #4b5563;
-}
-
-[data-theme="light"] .btn-ask-buddy {
-  background: #f3f4f6;
-  color: #1f2937;
-  border-color: #e5e7eb;
-}
-
-[data-theme="light"] .btn-ask-buddy:hover {
-  background: #4f46e5;
-  color: #ffffff;
-  border-color: #4f46e5;
-}
-
-/* Score Input & Toggle */
-.calc-score-label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.calc-toggle-btn {
-  background: transparent;
-  border: none;
-  color: #818cf8;
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 2px 4px;
-  text-decoration: underline;
-  transition: color 0.15s ease;
-}
-
-.calc-toggle-btn:hover {
-  color: #a5b4fc;
 }
 
 .calc-score-input-wrap {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .calc-input {
-  padding: 9px 12px;
-  border-radius: 8px;
-  background: var(--surface-2, #27272a);
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 9px;
+  background: var(--surface-1, #18181b);
   color: var(--text, #ffffff);
-  border: 1px solid var(--border, #3f3f46);
-  font-size: 0.9rem;
+  border: 1.5px solid var(--border, #3f3f46);
+  font-size: 0.95rem;
+  font-weight: 600;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.18s ease;
+  box-sizing: border-box;
 }
 
 .calc-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+  border-color: var(--sru-blue, #0055a4);
+  box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.2);
+}
+
+.calc-eval-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #0055a4, #003e7a);
+  color: #ffffff;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 85, 164, 0.3);
+}
+
+.calc-eval-btn:hover {
+  background: linear-gradient(135deg, #0066c4, #004d96);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 85, 164, 0.4);
 }
 
 .calc-matched-badge {
@@ -579,19 +353,69 @@
   gap: 6px;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.25);
-  color: #34d399;
-  padding: 4px 8px;
+  color: #10b981;
+  padding: 4px 10px;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 }
 
 .calc-matched-badge.below-cutoff {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
 }
 
-/* Student Verification Box */
+/* Quick Presets Bar */
+.calc-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.calc-presets-title {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.calc-presets-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.calc-preset-chip {
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid var(--border, #3f3f46);
+  color: var(--text-2, #a1a1aa);
+  font-size: 0.76rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calc-preset-chip:hover {
+  background: var(--surface-2, #27272a);
+  border-color: var(--sru-blue, #0055a4);
+  color: var(--sru-blue, #0055a4);
+}
+
+.calc-preset-chip.active {
+  background: rgba(0, 85, 164, 0.15);
+  border-color: var(--sru-blue, #0055a4);
+  color: var(--sru-blue, #0055a4);
+  font-weight: 700;
+}
+
+/* Authentication Box (Only for unverified visitors) */
 .calc-auth-box {
   background: var(--surface-2, #27272a);
   border: 1px solid var(--border, #3f3f46);
@@ -608,13 +432,25 @@
   gap: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #818cf8;
+  color: var(--sru-blue, #0055a4);
 }
 
 .calc-auth-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calc-field label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted, #a1a1aa);
 }
 
 .calc-error-banner {
@@ -626,48 +462,551 @@
   border-radius: 6px;
 }
 
-.calc-verified-banner {
+/* 4. Calculation Result Box & Fee Structure */
+.calc-result-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--surface-2, #27272a);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 12px;
+  padding: 16px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border, #3f3f46);
+  padding-bottom: 10px;
+}
+
+.result-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sru-blue, #0055a4);
+}
+
+.result-header-title h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-1, #ffffff);
+}
+
+.result-program-badge {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(0, 85, 164, 0.1);
+  color: var(--sru-blue, #0055a4);
+  border: 1px solid rgba(0, 85, 164, 0.18);
+}
+
+/* Fee Comparison Row */
+.fee-comparison-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.fee-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 10px;
+  border-radius: 10px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid var(--border, #3f3f46);
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.stat-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-1, #ffffff);
+  font-family: var(--font-mono, monospace);
+}
+
+.stat-val.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.55;
+  font-size: 1rem;
+}
+
+.stat-val.savings {
+  color: #10b981;
+}
+
+.fee-stat.highlight-green {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.fee-stat.primary-payable {
+  border-color: rgba(0, 85, 164, 0.4);
+  background: rgba(0, 85, 164, 0.08);
+}
+
+.stat-val.payable {
+  color: var(--sru-blue, #0055a4);
+  font-size: 1.25rem;
+}
+
+.stat-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted, #a1a1aa);
+  margin-top: 3px;
+}
+
+/* Joining Breakdown Table */
+.calc-joining-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.joining-header {
+  font-size: 0.8rem;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border, #3f3f46);
+  padding-bottom: 5px;
+  margin-bottom: 2px;
+}
+
+.joining-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.joining-item {
+  color: var(--text-2, #d4d4d8);
+}
+
+.joining-val {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--text-1, #ffffff);
+}
+
+.joining-row.total-joining {
+  border-top: 1px dashed var(--border, #3f3f46);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.bold-emerald {
+  color: #10b981 !important;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+/* 4-Year Progression Table */
+.progression-table-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 8px;
+}
+
+.progression-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-  font-size: 0.8rem;
-  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.progression-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.prog-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 6px;
+  background: var(--surface-2, #27272a);
+  border: 1px solid var(--border, #3f3f46);
   border-radius: 6px;
 }
 
+.prog-yr {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.prog-val {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--sru-blue, #0055a4);
+  font-family: var(--font-mono, monospace);
+  margin-top: 2px;
+}
+
+.prog-unit {
+  font-size: 0.65rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+/* 5. "How Scholarship Is Possible" (Full Ladder & Upgrade Roadmap) */
+.calc-roadmap-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid rgba(0, 85, 164, 0.22);
+  border-radius: 10px;
+}
+
+.roadmap-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border, #3f3f46);
+  padding-bottom: 8px;
+}
+
+.roadmap-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #f59e0b;
+}
+
+.roadmap-title h4 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-1, #ffffff);
+}
+
+.roadmap-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.roadmap-ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.roadmap-slab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--surface-2, #27272a);
+  border: 1px solid var(--border, #3f3f46);
+  font-size: 0.82rem;
+  transition: all 0.15s ease;
+}
+
+.roadmap-slab-row.matched-active {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+}
+
+.slab-pct-col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 130px;
+}
+
+.slab-pct-badge {
+  font-weight: 700;
+  color: #f59e0b;
+  font-size: 0.82rem;
+}
+
+.matched-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #10b981;
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.slab-criteria-col {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.slab-exam-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.slab-criteria-text {
+  font-size: 0.82rem;
+  color: var(--text-1, #ffffff);
+}
+
+.slab-payable-col {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.slab-payable-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.slab-payable-amt {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: var(--sru-blue, #0055a4);
+}
+
+.roadmap-upgrade-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-1, #ffffff);
+  line-height: 1.4;
+}
+
+.upgrade-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Institutional Notes */
+.calc-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.note-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.4;
+}
+
+.note-item.special-scholarship {
+  color: #f59e0b;
+}
+
+/* Footer Action */
+.calc-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.btn-ask-buddy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: var(--surface-1, #18181b);
+  border: 1px solid var(--sru-blue, #0055a4);
+  color: var(--sru-blue, #0055a4);
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  width: 100%;
+}
+
+.btn-ask-buddy:hover {
+  background: var(--sru-blue, #0055a4);
+  color: #ffffff;
+}
+
 /* Light Theme Additions */
+[data-theme="light"] .scholarship-modal-card {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .calc-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .calc-subtitle {
+  color: #64748b;
+}
+
+[data-theme="light"] .calc-program-strip {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .calc-program-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .calc-marks-card {
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.04) 0%, rgba(41, 121, 226, 0.03) 100%);
+  border-color: rgba(0, 85, 164, 0.18);
+}
+
+[data-theme="light"] .calc-marks-label {
+  color: #0f172a;
+}
+
+[data-theme="light"] .calc-marks-instruction {
+  color: #64748b;
+}
+
 [data-theme="light"] .calc-input {
-  background: #fbfbfb;
-  color: #18181b;
-  border-color: #e4e4e7;
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
 }
 
-[data-theme="light"] .calc-toggle-btn {
-  color: #4f46e5;
+[data-theme="light"] .calc-preset-chip {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
 }
 
-[data-theme="light"] .calc-matched-badge {
-  background: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #059669;
+[data-theme="light"] .calc-result-box {
+  background: #f8fafc;
+  border-color: #e2e8f0;
 }
 
-[data-theme="light"] .calc-auth-box {
-  background: #f9fafb;
-  border-color: #e5e7eb;
+[data-theme="light"] .result-header-title h4 {
+  color: #0f172a;
 }
 
-[data-theme="light"] .calc-auth-header {
-  color: #4338ca;
+[data-theme="light"] .fee-stat {
+  background: #ffffff;
+  border-color: #e2e8f0;
 }
 
-[data-theme="light"] .calc-verified-banner {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #4338ca;
+[data-theme="light"] .stat-val {
+  color: #0f172a;
+}
+
+[data-theme="light"] .calc-joining-breakdown {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .joining-item {
+  color: #334155;
+}
+
+[data-theme="light"] .joining-val {
+  color: #0f172a;
+}
+
+[data-theme="light"] .progression-table-wrap {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .prog-col {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .calc-roadmap-section {
+  background: #ffffff;
+  border-color: rgba(0, 85, 164, 0.2);
+}
+
+[data-theme="light"] .roadmap-title h4 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .roadmap-slab-row {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .slab-criteria-text {
+  color: #0f172a;
+}
+
+[data-theme="light"] .roadmap-upgrade-banner {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+[data-theme="light"] .calc-notes {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+[data-theme="light"] .btn-ask-buddy {
+  background: #ffffff;
 }
 
 /* Mobile Responsiveness */
@@ -681,7 +1020,7 @@
     padding: 16px 14px;
     max-height: 94vh;
     border-radius: 16px 16px 0 0;
-    gap: 14px;
+    gap: 12px;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -693,20 +1032,18 @@
     font-size: 0.72rem;
   }
 
-  .calc-icon-badge {
-    width: 34px;
-    height: 34px;
-  }
-
-  .calc-auth-grid {
-    grid-template-columns: 1fr;
+  .calc-input-button-row {
+    flex-direction: column;
     gap: 8px;
   }
 
-  .calc-submit-btn {
+  .calc-eval-btn {
+    width: 100%;
     min-height: 44px;
-    padding: 12px 14px;
-    font-size: 0.92rem;
+  }
+
+  .calc-picker-dropdowns {
+    grid-template-columns: 1fr;
   }
 
   .fee-comparison-row {
@@ -719,10 +1056,22 @@
     gap: 6px;
   }
 
-  .btn-ask-buddy {
-    min-height: 44px;
-    padding: 10px 12px;
-    font-size: 0.85rem;
+  .roadmap-slab-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .slab-pct-col {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .slab-payable-col {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px dashed var(--border, #3f3f46);
+    padding-top: 4px;
   }
 }
 
@@ -731,4 +1080,3 @@
     grid-template-columns: 1fr;
   }
 }
-
