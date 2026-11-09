@@ -17,15 +17,17 @@ class LeadCreate(BaseModel):
     score: str | None = Field(None, max_length=100, description="Marks, percentage, or rank")
     exam_type: str | None = Field(None, max_length=100, description="Board or qualifying exam (Inter, CBSE, JEE, etc.)")
     source: str = Field("chat_inquiry", max_length=50, description="Lead source: chat_inquiry or scholarship_calculator")
+    consent: bool = Field(True, description="Student consent to be contacted for admissions assistance")
     conversation_id: UUID | None = Field(None, description="Associated chat conversation ID")
     metadata: dict | None = Field(None, description="Optional additional context")
 
     @field_validator("name")
     @classmethod
     def validate_name(cls, v: str) -> str:
-        cleaned = v.strip()
+        # Strip HTML tags to prevent stored XSS injection
+        cleaned = re.sub(r"<[^>]*>", "", v).strip()
         if len(cleaned) < 2:
-            raise ValueError("Student name must be at least 2 characters")
+            raise ValueError("Student name must be at least 2 characters (excluding HTML tags)")
         return cleaned
 
     @field_validator("phone")

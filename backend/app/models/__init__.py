@@ -6,6 +6,7 @@ from app.models.evaluation import EvaluationRecord
 from app.models.feedback import Feedback
 from app.models.lead import ProspectiveLead
 from app.models.message import Message
+from app.models.structured_fact import StructuredFact
 
 __all__ = [
     "Conversation",
@@ -15,4 +16,5 @@ __all__ = [
     "Feedback",
     "Message",
     "ProspectiveLead",
+    "StructuredFact",
 ]

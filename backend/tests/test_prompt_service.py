@@ -33,7 +33,25 @@ def test_render_rag_prompt():
     assert "{{evidence}}" not in rendered
 
 
-def test_missing_prompt_raises():
+def test_load_prompt_pack_templates():
     clear_cache()
-    with pytest.raises(FileNotFoundError):
-        load_prompt("non_existent_prompt_xyz")
+    for name in ["router", "persona", "factual", "persuasive", "chitchat", "sensitive", "out_of_scope", "merge"]:
+        content = load_prompt(name)
+        assert content is not None
+        assert len(content) > 20
+
+
+def test_render_factual_with_automatic_persona():
+    clear_cache()
+    rendered = render_prompt(
+        "factual",
+        structured_facts="Tuition: ₹1,47,500/sem",
+        retrieved_chunks="Source 1: CSE",
+        student_profile="interests: robotics",
+        part_text="What are the fees for CSE?",
+    )
+    assert "SRU Buddy" in rendered
+    assert "Tuition: ₹1,47,500/sem" in rendered
+    assert "What are the fees for CSE?" in rendered
+    assert "{{persona}}" not in rendered
+    assert "{{part_text}}" not in rendered

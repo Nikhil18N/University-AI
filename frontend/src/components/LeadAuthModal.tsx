@@ -36,6 +36,7 @@ export default function LeadAuthModal({
     }
   });
 
+  const [consent, setConsent] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -43,7 +44,7 @@ export default function LeadAuthModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanName = name.trim();
+    const cleanName = name.replace(/<[^>]*>/g, "").trim();
     const cleanDigits = phone.replace(/\D/g, "");
 
     if (!cleanName) {
@@ -52,6 +53,10 @@ export default function LeadAuthModal({
     }
     if (cleanDigits.length < 10) {
       setError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    if (!consent) {
+      setError("Please check the consent box to proceed.");
       return;
     }
 
@@ -136,6 +141,23 @@ export default function LeadAuthModal({
               maxLength={15}
               required
             />
+          </div>
+
+          <div className="lead-consent-wrapper" style={{ display: "flex", alignItems: "flex-start", gap: "8px", margin: "12px 0 6px 0", fontSize: "0.80rem", color: "var(--text-muted, #64748b)" }}>
+            <input
+              id="lead-consent-checkbox"
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => {
+                setConsent(e.target.checked);
+                if (error) setError(null);
+              }}
+              style={{ marginTop: "2px", cursor: "pointer" }}
+              required
+            />
+            <label htmlFor="lead-consent-checkbox" style={{ cursor: "pointer", lineHeight: 1.35 }}>
+              I consent to SR University contacting me via WhatsApp/Call for verified fee structures, scholarships, and admission guidance.
+            </label>
           </div>
 
           {error && <div className="lead-error-text">{error}</div>}

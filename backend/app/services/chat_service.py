@@ -27,9 +27,17 @@ from app.services.guardrail_service import (
 )
 from app.services.intent_service import classify_intent
 from app.services.profile_service import build_counsellor_guidance, extract_student_profile
+from app.services.prompt_service import render_prompt
 from app.services.rag_service import RAGService
 from app.services.reformulation_service import needs_reformulation, reformulate_query
+from app.services.router_service import route_and_decompose_message
+from app.services.structured_facts_service import get_structured_facts_text
 from app.services.suggestion_service import generate_suggestions
+from app.services.validator_service import (
+    FALLBACK_LOW_CONFIDENCE,
+    FALLBACK_VALIDATOR_BLOCK,
+    validate_response_grounding,
+)
 from app.services.video_service import (
     check_video_affirmative_or_negative,
     create_video_card,
@@ -100,12 +108,17 @@ def should_offer_video_tour(message: str) -> bool:
 
 def sanitize_staff_contact_numbers(text: str) -> str:
     """Scrub personal mobile phone numbers of internal staff members from student-facing output.
-    Keeps official university helpline numbers (0870-2818333, 0870-2818311, etc.).
+    Keeps official university helpline numbers and national crisis support helplines.
     """
     if not text:
         return text
 
-    # 1. Staff names followed by mobile numbers (e.g. 'Mr. A. Bala Krishna at 8886522500'):
+    # Never sanitize crisis helplines or mental health support responses
+    crisis_keywords = ["tele-manas", "aasra", "vandrevala", "kiran", "14416", "9820466726", "1800-599-0019", "helpline", "counselor", "self-harm", "mental health", "distress"]
+    if any(k in text.lower() for k in crisis_keywords):
+        return text
+
+    # 1. Staff names followed by mobile numbers:
     cleaned = re.sub(
         r"(?:Mr\.|Ms\.|Dr\.)\s+[A-Za-z\.\s]+\s*(?:at|on|:|-)?\s*(?:\+91[\s-]?)?[6-9]\d{9}\b",
         "the IT & Campus Helpdesk (helpdesk@sru.edu.in / 0870-2818333)",
@@ -195,6 +208,131 @@ def get_conversational_response(intent: str, has_context: bool = False) -> str:
         return random.choice(options)
 
     return f"{time_salutation} I'm SRU Buddy. How can I help you today?"
+
+
+async def execute_prompt_pack_pipeline(
+    message: str,
+    conversation_context: str,
+    profile: dict,
+    llm: LLMProvider,
+    rag_service: RAGService | None,
+) -> tuple[str, list[dict]]:
+    """Execute Prompt Pack Router -> Parallel Handlers -> Validator -> Merge."""
+    routed = await route_and_decompose_message(llm, message, conversation_context)
+    parts = routed.get("parts", [{"text": message, "type": "factual"}])
+    new_interests = routed.get("interests", [])
+
+    if new_interests:
+        profile_interests = profile.get("interests", [])
+        for i in new_interests:
+            if i not in profile_interests:
+                profile_interests.append(i)
+        profile["interests"] = profile_interests
+
+    profile_parts = []
+    if profile.get("degree"):
+        profile_parts.append(f"Degree: {profile['degree']}")
+    if profile.get("branch"):
+        profile_parts.append(f"Branch: {profile['branch']}")
+    if profile.get("score"):
+        profile_parts.append(f"Score: {profile['score']}")
+    if profile.get("interests"):
+        profile_parts.append(f"Interests: {', '.join(profile['interests'])}")
+    profile_text = ", ".join(profile_parts) if profile_parts else "Prospective applicant"
+
+    all_sources: list[dict] = []
+
+    async def handle_sub_part(part: dict) -> str:
+        ptype = part.get("type", "factual")
+        ptext = part.get("text", message)
+
+        if ptype == "chitchat":
+            prompt = render_prompt("chitchat", student_profile=profile_text, part_text=ptext)
+            ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.6, max_tokens=250)
+            return ans.strip()
+
+        elif ptype == "sensitive":
+            prompt = render_prompt("sensitive", part_text=ptext)
+            ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=250)
+            return ans.strip()
+
+        elif ptype == "out_of_scope":
+            prompt = render_prompt("out_of_scope", part_text=ptext)
+            ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=200)
+            return ans.strip()
+
+        elif ptype == "persuasive":
+            highlights_text = ""
+            if rag_service:
+                chunks, _ = await rag_service.retrieve_with_embedding(ptext, top_k=4)
+                highlights_text = "\n\n".join(c["content"] for c in chunks)
+                for c in chunks:
+                    meta = c.get("metadata", {})
+                    if meta.get("document_id") and meta not in all_sources:
+                        all_sources.append(meta)
+            if not highlights_text:
+                highlights_text = get_structured_facts_text(ptext, profile.get("branch"))
+
+            prompt = render_prompt("persuasive", retrieved_highlights=highlights_text, student_profile=profile_text, part_text=ptext)
+            ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.3, max_tokens=300)
+            return ans.strip()
+
+        else:  # factual
+            struct_text = get_structured_facts_text(ptext, profile.get("branch"))
+            chunks_text = ""
+            if rag_service:
+                chunks, _ = await rag_service.retrieve_with_embedding(ptext, top_k=5)
+                chunks_text = "\n\n".join(f"[{c.get('metadata', {}).get('title', 'Document')}]\n{c['content']}" for c in chunks)
+                for c in chunks:
+                    meta = c.get("metadata", {})
+                    if meta.get("document_id") and meta not in all_sources:
+                        all_sources.append(meta)
+
+            prompt = render_prompt(
+                "factual",
+                structured_facts=struct_text,
+                retrieved_chunks=chunks_text,
+                student_profile=profile_text,
+                part_text=ptext,
+            )
+            raw_ans = await llm.generate([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=350)
+
+            # Pure code deterministic numeric/date validator
+            is_valid, ungrounded = validate_response_grounding(
+                raw_ans,
+                evidence_text=chunks_text,
+                structured_data_text=struct_text,
+                user_message=ptext,
+                student_profile_text=profile_text,
+            )
+            if not is_valid:
+                logger.warning("Validator detected ungrounded claims: %s. Retrying with strict instruction.", ungrounded)
+                retry_prompt = prompt + f"\n\nCRITICAL: Your previous response contained unverified claims {ungrounded}. Use ONLY figures stated in Structured data or Context. Never round or infer numbers."
+                retry_ans = await llm.generate([{"role": "user", "content": retry_prompt}], temperature=0.0, max_tokens=350)
+                is_retry_valid, retry_ungrounded = validate_response_grounding(
+                    retry_ans,
+                    evidence_text=chunks_text,
+                    structured_data_text=struct_text,
+                    user_message=ptext,
+                    student_profile_text=profile_text,
+                )
+                if is_retry_valid:
+                    return retry_ans.strip()
+                logger.error("Validator permanently blocked ungrounded numbers: %s. Returning fallback block.", retry_ungrounded)
+                return FALLBACK_VALIDATOR_BLOCK
+
+            return raw_ans.strip()
+
+    part_tasks = [handle_sub_part(p) for p in parts]
+    part_results = await asyncio.gather(*part_tasks)
+
+    if len(part_results) == 1:
+        return part_results[0], all_sources
+
+    formatted_parts = "\n\n".join(f"Part {idx+1} ({parts[idx]['type']}): {res}" for idx, res in enumerate(part_results))
+    merge_prompt = render_prompt("merge", part_answers=formatted_parts)
+    merged = await llm.generate([{"role": "user", "content": merge_prompt}], temperature=0.0, max_tokens=400)
+    return merged.strip(), all_sources
 
 
 async def handle_chat(
@@ -317,26 +455,15 @@ async def handle_chat(
             answer = get_conversational_response(intent, has_context=has_context)
             logger.info("Handled via fast conversational response (%s)", intent)
 
-        elif intent == "UNIVERSITY" and rag_service:
-            search_query = request.message
-            if needs_reformulation(request.message, conversation_context):
-                search_query = await reformulate_query(
-                    request.message,
-                    conversation_context=conversation_context,
-                    llm_provider=llm_provider,
-                )
-
-            guidance = build_counsellor_guidance(profile, current_query=request.message)
-            rag_context = conversation_context
-            if guidance:
-                rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
-
-            answer, sources = await rag_service.query(
-                question=request.message,
-                search_query=search_query,
-                conversation_context=rag_context,
+        elif intent in ("UNIVERSITY", "GENERAL_CONVERSATION", "UNKNOWN"):
+            answer, sources = await execute_prompt_pack_pipeline(
+                message=request.message,
+                conversation_context=conversation_context,
+                profile=profile,
+                llm=llm_provider,
+                rag_service=rag_service,
             )
-            logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
+            logger.info("Handled via Prompt Pack Pipeline (answer length: %d)", len(answer))
 
         else:
             system_prompt = prompt_service.load_prompt("system")
@@ -575,88 +702,19 @@ async def handle_chat_stream(
                     yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                     await asyncio.sleep(0.012)
 
-            elif intent == "UNIVERSITY" and rag_service:
-                search_query = request.message
-                if needs_reformulation(request.message, conversation_context):
-                    search_query = await reformulate_query(
-                        request.message,
-                        conversation_context=conversation_context,
-                        llm_provider=llm_provider,
-                    )
-
-                # Run embedding/retrieval and user-message fetch in parallel — no dependency between them
-                (chunks, query_embedding), all_user_messages = await asyncio.gather(
-                    rag_service.retrieve_with_embedding(search_query),
-                    conversation_service.get_all_user_messages(db, conversation.id),
-                )
+            elif intent in ("UNIVERSITY", "GENERAL_CONVERSATION", "UNKNOWN"):
+                all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
                 profile = extract_student_profile(all_user_messages)
-
-                clean_q = request.message.lower().strip(" .!?,")
-                effective_q = request.message
-                if search_query and (
-                    clean_q in ("yes", "yeah", "yep", "sure", "ok", "tell me more", "more details", "go ahead", "definitely", "yes please", "why not")
-                    or len(clean_q.split()) <= 2
-                ):
-                    effective_q = f"{request.message} ({search_query})"
-
-                guidance = build_counsellor_guidance(profile, current_query=request.message)
-                rag_context = conversation_context
-                if guidance:
-                    rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
-
-                if not chunks:
-                    answer = (
-                        "I couldn't find relevant information in the university documents "
-                        "to answer that question. You may want to check with the university "
-                        "office directly."
-                    )
-                    for chunk in chunk_text_stream(answer):
-                        yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
-                        await asyncio.sleep(0.012)
-                else:
-                    messages, sources, evidence_text = await rag_service.prepare_rag_request(
-                        effective_q, rag_context, chunks, precomputed_embedding=query_embedding
-                    )
-                    streamed_tokens = []
-                    async for token in llm_provider.stream(messages, temperature=0.3):
-                        streamed_tokens.append(token)
-                        yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
-
-                    answer = "".join(streamed_tokens)
-
-                    # Check runtime hallucination guardrails
-                    is_faithful, unsupported = verify_numeric_faithfulness(
-                        answer=answer,
-                        evidence_text=evidence_text,
-                        conversation_context=rag_context,
-                        question=effective_q,
-                    )
-                    if not is_faithful and len(unsupported) >= 2:
-                        logger.warning("Stream correction triggered for unsupported numbers %s", unsupported)
-                        correction_instruction = (
-                            f"CORRECTION: Your previous draft stated number(s) or percentage(s) that are NOT present "
-                            f"in the evidence or conversation: {', '.join(unsupported)}. "
-                            f"Rewrite your response using strictly verified numbers from the evidence."
-                        )
-                        correction_messages = messages + [
-                            {"role": "assistant", "content": answer},
-                            {"role": "user", "content": correction_instruction},
-                        ]
-                        corrected = await llm_provider.generate(correction_messages, temperature=0.1)
-                        second_check, still_unsupported = verify_numeric_faithfulness(
-                            corrected, evidence_text, rag_context, effective_q
-                        )
-                        if second_check or len(still_unsupported) < len(unsupported):
-                            answer = corrected
-                    elif not is_faithful and len(unsupported) < 2:
-                        logger.warning(
-                            "Single unsupported numeric claim '%s' in streamed answer — skipping correction LLM call",
-                            unsupported,
-                        )
-
-                    is_url_faithful, unverified_urls = verify_url_faithfulness(answer, evidence_text)
-                    if not is_url_faithful:
-                        answer = sanitize_hallucinated_urls(answer, unverified_urls)
+                answer, sources = await execute_prompt_pack_pipeline(
+                    message=request.message,
+                    conversation_context=conversation_context,
+                    profile=profile,
+                    llm=llm_provider,
+                    rag_service=rag_service,
+                )
+                for chunk in chunk_text_stream(answer):
+                    yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                    await asyncio.sleep(0.012)
 
             else:
                 system_prompt = prompt_service.load_prompt("system")

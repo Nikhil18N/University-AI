@@ -14,10 +14,37 @@ logger = logging.getLogger(__name__)
 
 
 async def create_lead(db: AsyncSession, data: LeadCreate) -> ProspectiveLead:
-    """Register a new prospective student lead into the database."""
+    """Register or update a prospective student lead with deduplication by phone number."""
+    clean_phone = data.phone.strip()
+    clean_name = data.name.strip()
+
+    # Deduplication check: if lead with identical phone exists, update it gracefully
+    existing_stmt = select(ProspectiveLead).where(ProspectiveLead.phone == clean_phone).order_by(ProspectiveLead.created_at.desc())
+    res = await db.execute(existing_stmt)
+    existing_lead = res.scalars().first()
+
+    if existing_lead:
+        existing_lead.name = clean_name
+        if data.email:
+            existing_lead.email = data.email.strip()
+        if data.program_interest:
+            existing_lead.program_interest = data.program_interest.strip()
+        if data.score:
+            existing_lead.score = data.score.strip()
+        if data.exam_type:
+            existing_lead.exam_type = data.exam_type.strip()
+        if data.metadata:
+            existing_meta = existing_lead.metadata_ or {}
+            existing_meta.update(data.metadata)
+            existing_lead.metadata_ = existing_meta
+        await db.commit()
+        await db.refresh(existing_lead)
+        logger.info("Updated existing prospective lead: %s (%s)", existing_lead.name, existing_lead.phone)
+        return existing_lead
+
     lead = ProspectiveLead(
-        name=data.name.strip(),
-        phone=data.phone.strip(),
+        name=clean_name,
+        phone=clean_phone,
         email=data.email.strip() if data.email else None,
         program_interest=data.program_interest.strip() if data.program_interest else None,
         score=data.score.strip() if data.score else None,

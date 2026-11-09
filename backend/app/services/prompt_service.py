@@ -37,10 +37,14 @@ def load_prompt(name: str) -> str:
 
 
 def render_prompt(name: str, **variables: str) -> str:
-    """Load a prompt and fill in {{variable}} placeholders."""
+    """Load a prompt and fill in {{variable}} placeholders.
+    Automatically substitutes {{persona}} with prompts/persona.md if not provided.
+    """
     template = load_prompt(name)
+    if "{{persona}}" in template and "persona" not in variables:
+        variables["persona"] = load_prompt("persona")
     for key, value in variables.items():
-        template = template.replace(f"{{{{{key}}}}}", value)
+        template = template.replace(f"{{{{{key}}}}}", str(value))
     return template
 
 
