@@ -87,3 +87,4 @@ def test_no_hardcoded_contact_literals_in_prompts():
                 f"Found hardcoded literal '{literal}' in {prompt_file.name}. "
                 "Must use centralized placeholder (e.g. {admissions_phone})."
             )
+

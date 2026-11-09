@@ -35,3 +35,4 @@ class StructuredFact(Base):
 
     def __repr__(self) -> str:
         return f"<StructuredFact {self.id} category={self.category} program={self.program} key={self.key_attribute} value={self.formatted_value}>"
+

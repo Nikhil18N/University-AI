@@ -142,3 +142,4 @@ async def test_part_c_case_15_interest_extraction():
     routed = await route_and_decompose_message(mock_llm, "I love robotics, what should I study?")
     assert routed["parts"][0]["type"] == "persuasive"
     assert "robotics" in routed["interests"]
+

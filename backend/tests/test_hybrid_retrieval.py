@@ -96,3 +96,4 @@ def test_bm25_index_invalidation():
     index3 = get_or_build_bm25_index(mock_collection, current_index_version=2)
     assert index3.corpus_size == 3
     assert index3 is not index1
+

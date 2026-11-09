@@ -21,3 +21,4 @@ class DeleteMyDataResponse(BaseModel):
     deleted_leads: int = 0
     deleted_evaluations: int = 0
     message: str = "Associated user data has been purged."
+

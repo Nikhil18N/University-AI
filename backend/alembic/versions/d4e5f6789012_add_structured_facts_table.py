@@ -49,3 +49,4 @@ def downgrade() -> None:
     op.drop_index('ix_structured_facts_program', table_name='structured_facts')
     op.drop_index('ix_structured_facts_category', table_name='structured_facts')
     op.drop_table('structured_facts')
+

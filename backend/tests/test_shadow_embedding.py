@@ -42,3 +42,4 @@ async def test_shadow_reembed_mock_execution():
             assert res["facts"] == 2
             assert res["highlights"] == 2
             assert mock_target.add.called
+

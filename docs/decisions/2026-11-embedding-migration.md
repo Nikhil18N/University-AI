@@ -80,3 +80,4 @@ Per Rule 4 of the Hardening Brief, **the existing 3072-dim collections (`sru_fac
 ## 6. Recommendation
 
 **Execute the shadow re-embedding into `sru_facts_v4` and `sru_highlights_v4` using `backend/scripts/shadow_reembed_text_embedding_004.py`**. Verify side-by-side with Part C evaluations, then switch production settings with zero downtime and zero risk of regression.
+
