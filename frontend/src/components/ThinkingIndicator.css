@@ -1,12 +1,17 @@
-/* Thinking Indicator Card & Animated Step Labels */
+/* Thinking Indicator Card & Animated Step Labels — SR University Theme */
 
 .thinking-indicator-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.05) 0%, rgba(245, 158, 11, 0.04) 100%);
+  border: 1px solid rgba(0, 85, 164, 0.14);
+  box-shadow: 0 4px 18px rgba(0, 33, 71, 0.06);
 }
 
 .thinking-top-row {
@@ -19,19 +24,19 @@
 .thinking-badge-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
 }
 
 .thinking-badge-step {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: var(--surface-3, rgba(2, 132, 199, 0.12));
-  color: var(--accent, #0284c7);
-  border: 1px solid rgba(2, 132, 199, 0.2);
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.12), rgba(0, 62, 122, 0.08));
+  color: var(--sru-blue, #0055a4);
+  border: 1px solid rgba(0, 85, 164, 0.22);
 }
 
 .thinking-badge-timer {
@@ -39,6 +44,9 @@
   font-weight: 600;
   color: var(--text-muted, #64748b);
   font-family: var(--font-mono, monospace);
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .typing-dots-animated {
@@ -50,7 +58,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--accent, #0284c7);
+  background: var(--sru-blue, #0055a4);
   animation: dotPulse 1.2s ease-in-out infinite;
 }
 
@@ -76,7 +84,7 @@
 .thinking-active-step-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   animation: fadeInStep 0.3s ease;
 }
 
@@ -92,23 +100,38 @@
 }
 
 .step-icon-bounce {
-  font-size: 1.15rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  animation: stepIconBounce 2s ease infinite;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.12), rgba(245, 158, 11, 0.08));
+  border: 1px solid rgba(0, 85, 164, 0.2);
+  box-shadow: 0 3px 10px rgba(0, 85, 164, 0.15);
+  animation: sruFloat 2.4s ease-in-out infinite;
+}
+
+@keyframes sruFloat {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 85, 164, 0.15);
+  }
+  50% {
+    transform: translateY(-2.5px);
+    box-shadow: 0 6px 14px rgba(0, 85, 164, 0.24);
+  }
 }
 
 .step-sru-badge-svg {
-  display: inline-block;
-  vertical-align: middle;
-  filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.28));
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 33, 71, 0.25));
   transition: transform 0.25s ease;
 }
 
 .step-sru-badge-svg:hover {
-  transform: scale(1.08) rotate(3deg);
+  transform: scale(1.08) rotate(2deg);
 }
 
 .step-title-animated {
@@ -121,7 +144,7 @@
 /* Step Progress Track */
 .thinking-progress-track {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   width: 100%;
   margin-top: 2px;
 }
@@ -129,16 +152,16 @@
 .thinking-step-segment {
   height: 4px;
   flex: 1;
-  background: var(--surface-3, rgba(0, 0, 0, 0.1));
-  border-radius: 2px;
-  transition: all 0.3s ease;
+  background: rgba(0, 85, 164, 0.1);
+  border-radius: 3px;
+  transition: all 0.35s ease;
 }
 
 .thinking-step-segment.active {
-  background: var(--accent, #0284c7);
-  box-shadow: 0 0 6px var(--accent, #0284c7);
+  background: linear-gradient(90deg, #0055a4, #2979e2);
+  box-shadow: 0 0 8px rgba(0, 85, 164, 0.4);
 }
 
 .thinking-step-segment.completed {
-  background: #22c55e;
+  background: linear-gradient(90deg, #10b981, #059669);
 }

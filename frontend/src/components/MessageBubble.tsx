@@ -12,11 +12,11 @@ function parseSuggestionChip(text: string): { icon: React.ReactNode; label: stri
   if (match) {
     const emoji = match[1];
     const textLabel = text.slice(match[0].length).trim();
-    const icon = renderUniIcon(emoji, 13, "chip-vector-icon");
+    const icon = renderUniIcon(emoji, 15, "chip-vector-icon");
     return { icon, label: textLabel || text };
   }
   if (text.includes("%") || text.includes("< 60%") || text.includes(">")) {
-    return { icon: renderUniIcon("🎯", 13, "chip-vector-icon"), label: text };
+    return { icon: renderUniIcon("🎯", 15, "chip-vector-icon"), label: text };
   }
   return { icon: null, label: text };
 }

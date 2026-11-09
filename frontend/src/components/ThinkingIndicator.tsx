@@ -51,7 +51,7 @@ export default function ThinkingIndicator() {
 
       <div className="thinking-active-step-row">
         <span className="step-icon-bounce">
-          {renderUniIcon(activeStep.icon, 22, "step-sru-badge-svg") || activeStep.icon}
+          {renderUniIcon(activeStep.icon, 26, "step-sru-badge-svg") || activeStep.icon}
         </span>
         <span className="step-title-animated">{activeStep.label}</span>
       </div>

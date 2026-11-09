@@ -432,13 +432,23 @@
   }
 }
 
-/* Inline Vector Icon Replacements */
+/* Inline Vector Icon Replacements — SR University Theme */
 .inline-icon-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  vertical-align: -0.16em;
-  margin: 0 2px;
-  color: var(--sru-blue, #6366f1);
+  vertical-align: -0.22em;
+  margin: 0 3px;
+  filter: drop-shadow(0 1px 3px rgba(0, 33, 71, 0.22));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.inline-icon-wrapper:hover {
+  transform: translateY(-1.5px) scale(1.12);
+  filter: drop-shadow(0 3px 6px rgba(0, 85, 164, 0.35));
+}
+
+.inline-uni-icon {
+  display: block;
 }
 
