@@ -53,14 +53,14 @@ def test_cards_comparison():
     assert len(cards[0]["columns"]) == 2
 
 
-def test_cards_fee_breakdown():
+def test_cards_fee_breakdown_disabled_for_grounded_handbook():
+    """Fee cards are omitted so responses rely solely on grounded handbook RAG answers."""
     cards = generate_cards(
         user_message="How much is the fee for B.Tech?",
-        answer="The tuition fee is 1,40,000 per year.",
+        answer="Tuition fee details are retrieved from the official handbook.",
     )
-    assert len(cards) >= 1
-    assert cards[0]["type"] == "fee_breakdown"
-    assert len(cards[0]["items"]) >= 3
+    # Fee breakdown cards should not be injected to prevent hardcoded discrepancy
+    assert not any(c.get("type") == "fee_breakdown" for c in cards)
 
 
 def test_cards_curriculum():

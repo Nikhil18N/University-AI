@@ -325,51 +325,8 @@ def generate_cards(
     ):
         cards.append(COMPARISON_CSE_AIML)
 
-    # 2. Fee breakdown card (Strict Category Scoping — show only what the user asks for)
-    is_transport_fee_query = any(k in msg_lower for k in ("bus", "transport", "commute", "van")) and any(
-        k in msg_lower for k in ("fee", "fees", "cost", "charge", "price", "how much", "rate", "pass", "ticket")
-    )
-    is_hostel_fee_query = any(k in msg_lower for k in ("hostel", "mess", "boarding", "room rent")) and any(
-        k in msg_lower for k in ("fee", "fees", "cost", "charge", "price", "how much", "rate", "package")
-    )
-    is_exam_fee_query = any(k in msg_lower for k in ("exam", "examination", "supply", "supplementary", "revaluation")) and any(
-        k in msg_lower for k in ("fee", "fees", "cost", "charge", "how much")
-    )
-    is_admission_fee_query = any(
-        k in msg_lower for k in ("admission fee", "enrollment fee", "one-time fee", "onetime fee", "registration fee")
-    )
-    is_scholarship_only_query = any(
-        k in msg_lower for k in ("scholarship slab", "scholarship slabs", "merit scholarship details", "scholarship percentage", "scholarship criteria", "scholarship %", "merit scholarship")
-    ) and not any(k in msg_lower for k in ("tuition fee", "fee structure", "how much fee", "complete fee"))
-
-    is_cse_fee_query = any(k in msg_lower for k in ("cse", "computer science")) and any(
-        k in msg_lower for k in ("fee", "fees", "tuition", "cost", "charge", "how much")
-    ) and not any(k in msg_lower for k in ("all branches", "complete fee", "other branches", "overall", "fee structure"))
-
-    is_btech_fee_query = any(k in msg_lower for k in ("btech", "b.tech", "engineering fee", "btech fee", "b.tech fee")) or (
-        any(k in msg_lower for k in ("btech", "b.tech")) and any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "scholarship"))
-    )
-
-    if is_transport_fee_query:
-        cards.append(TRANSPORT_FEE_CARD)
-    elif is_hostel_fee_query:
-        cards.append(HOSTEL_FEE_CARD)
-    elif is_exam_fee_query:
-        cards.append(EXAM_FEE_CARD)
-    elif is_admission_fee_query:
-        cards.append(ADMISSION_FEE_CARD)
-    elif is_scholarship_only_query:
-        cards.append(MERIT_SCHOLARSHIP_CARD)
-    elif is_cse_fee_query:
-        cards.append(BTECH_CSE_FEE_CARD)
-    elif is_btech_fee_query:
-        cards.append(BTECH_ACADEMIC_FEE_CARD)
-    elif any(k in msg_lower for k in ("fee", "fees", "tuition", "cost of study", "how much is the fee")):
-        # Only attach general breakdown if user explicitly asked for program fee structure / breakdown
-        if any(k in msg_lower for k in ("structure", "complete fee", "breakdown", "all fees", "details", "academic", "tuition")):
-            if not any(k in msg_lower for k in ("transport", "bus", "hostel", "mess", "exam")):
-                cards.append(BTECH_ACADEMIC_FEE_CARD)
-
+    # 2. Fee breakdown cards removed in favor of direct handbook retrieval (Option 1)
+    # Fee queries are grounded purely in handbook markdown documents via RAG.
 
     # 3. Curriculum card
     if any(k in msg_lower for k in ("curriculum", "syllabus", "subjects", "course structure", "credits")) and (
