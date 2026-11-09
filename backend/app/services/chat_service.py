@@ -179,6 +179,27 @@ def strip_source_citations(text: str) -> str:
     return cleaned.strip()
 
 
+def clean_backticks_and_naming(text: str, user_query: str = "") -> str:
+    """Normalize bot naming to 'SRU Buddy' and strip inline backticks around plain prose, acronyms, and domain names (T18)."""
+    if not text:
+        return text
+
+    # 1. Normalize SR Buddy -> SRU Buddy
+    text = re.sub(r"\bSR\s+Buddy\b", "SRU Buddy", text, flags=re.I)
+
+    # 2. Backtick stripper for plain prose (unless user asked a coding question)
+    coding_cues = ("code", "python", "java", "c++", "script", "program", "syntax", "function", "algorithm", "sql", "def ", "class ")
+    is_coding = any(k in user_query.lower() for k in coding_cues) or "```" in text
+
+    if not is_coding:
+        # Unwrap domain names in backticks: `example.com`, `leadingindia.ai`
+        text = re.sub(r"`([a-zA-Z0-9._-]+\.[a-zA-Z]{2,}(?:/[^\s`]*)?)`", r"\1", text)
+        # Unwrap acronyms and standalone words in backticks: `SRiX`, `NIRF`, `CSE`, `B.Tech`
+        text = re.sub(r"`([A-Za-z0-9_.-]+)`", r"\1", text)
+
+    return text
+
+
 GREETING_RESPONSES_INITIAL: list[str] = [
     "{time_salutation} I'm SRU Buddy, your university companion! Feel free to ask about admissions, programs, hostels, or campus life.",
     "{time_salutation} SRU Buddy here! What can I help you explore at SR University today?",
@@ -663,6 +684,9 @@ async def execute_prompt_pack_pipeline(
 
         await record_opener(session_id, final_reply, redis_client=redis_client)
 
+    # T18: Backtick stripper and bot name cleanup
+    final_reply = clean_backticks_and_naming(final_reply, user_query=message)
+
     return final_reply, all_sources
 
 
@@ -843,6 +867,7 @@ async def handle_chat(
     # Sanitize any personal staff mobile numbers and strip citations from output
     answer = sanitize_staff_contact_numbers(answer)
     answer = strip_source_citations(answer)
+    answer = clean_backticks_and_naming(answer, user_query=request.message)
 
     # 7. Save assistant message with metadata
     assistant_msg = await conversation_service.add_message(
@@ -1114,6 +1139,7 @@ async def handle_chat_stream(
         # Sanitize any personal staff mobile numbers and strip citations from output
         answer = sanitize_staff_contact_numbers(answer)
         answer = strip_source_citations(answer)
+        answer = clean_backticks_and_naming(answer, user_query=request.message)
 
         # Save to database
         assistant_msg = await conversation_service.add_message(
