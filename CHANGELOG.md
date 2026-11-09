@@ -1,5 +1,31 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T10] Enforce facts / why_us separation (P2)
+
+### Already there
+- Single unpartitioned ChromaDB collection `university_documents` holding 162 mixed chunks of both regulatory policies and campus highlights.
+
+### Changed
+- `backend/app/config.py`:
+  - Added `CHROMA_FACTS_COLLECTION: str = "sru_facts"` and `CHROMA_HIGHLIGHTS_COLLECTION: str = "sru_highlights"`.
+- `backend/app/services/rag_service.py`:
+  - Added `scope: Literal["facts", "highlights", "all"] = "all"` to `retrieve()` and `retrieve_with_embedding()`.
+  - Directs vector queries to `sru_facts` (facts scope) or `sru_highlights` (highlights scope).
+- `backend/app/services/bm25_service.py`:
+  - Upgraded BM25 index caching to cache separate sparse indices per scope (`_cached_bm25_indices[scope]`).
+- `backend/app/services/chat_service.py`:
+  - Enforced factual mode pipeline retrieving strictly with `scope="facts"`.
+  - Enforced persuasive mode pipeline retrieving strictly with `scope="highlights"`.
+- `backend/app/services/auto_seed.py`:
+  - Added startup check auto-verifying and partitioning ChromaDB into `sru_facts` and `sru_highlights` if unpopulated.
+
+### Added
+- `backend/scripts/split_chroma_collections.py`:
+  - Vector migration script partitioning the 162 chunks into 95 facts chunks and 67 highlights chunks preserving 100% vector embeddings with zero re-embedding cost.
+- `backend/tests/test_collection_separation.py`:
+  - 3 unit tests validating facts chunk count (95) and highlights count (67), verifying zero highlights in factual queries, and verifying zero regulatory facts in persuasive queries.
+- Test suite expanded from 310 to 313 tests passed.
+
 ## [T9] BM25 + RRF hybrid retrieval (P2)
 
 ### Already there

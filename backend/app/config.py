@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8000
     CHROMA_PERSIST_DIR: str | None = "./chroma_data"
+    CHROMA_FACTS_COLLECTION: str = "sru_facts"
+    CHROMA_HIGHLIGHTS_COLLECTION: str = "sru_highlights"
     RAG_MAX_DISTANCE: float = 0.60
     RAG_TOP_K: int = 8
     RAG_RERANK: bool = True

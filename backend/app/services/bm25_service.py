@@ -134,27 +134,28 @@ def reciprocal_rank_fusion(
     return fused_docs
 
 
-# Global cached BM25 instance and version tracker
-_cached_bm25_index: BM25Index | None = None
-_cached_index_version: int = -1
+# Global cached BM25 instances keyed by scope ("all", "facts", "highlights")
+_cached_bm25_indices: dict[str, tuple[BM25Index, int]] = {}
 
 
 def invalidate_bm25_index() -> None:
-    """Invalidate cached in-memory BM25 index on re-index or document change."""
-    global _cached_bm25_index, _cached_index_version
-    _cached_bm25_index = None
-    _cached_index_version = -1
-    logger.info("BM25 in-memory index invalidated.")
+    """Invalidate cached in-memory BM25 indices on re-index or document change."""
+    _cached_bm25_indices.clear()
+    logger.info("BM25 in-memory indices invalidated.")
 
 
-def get_or_build_bm25_index(collection: Any, current_index_version: int = 0) -> BM25Index:
-    """Get or lazily construct the in-memory BM25 index from ChromaDB."""
-    global _cached_bm25_index, _cached_index_version
+def get_or_build_bm25_index(
+    collection: Any,
+    current_index_version: int = 0,
+    scope: str = "all",
+) -> BM25Index:
+    """Get or lazily construct the in-memory BM25 index from ChromaDB for the given scope."""
+    if scope in _cached_bm25_indices:
+        idx, ver = _cached_bm25_indices[scope]
+        if ver == current_index_version:
+            return idx
 
-    if _cached_bm25_index is not None and _cached_index_version == current_index_version:
-        return _cached_bm25_index
-
-    # Fetch all document chunks from ChromaDB
+    # Fetch all document chunks from ChromaDB collection
     try:
         all_docs = collection.get(include=["documents", "metadatas"])
         documents = []
@@ -165,14 +166,16 @@ def get_or_build_bm25_index(collection: Any, current_index_version: int = 0) -> 
                 meta = raw_metas[i] if i < len(raw_metas) and isinstance(raw_metas[i], dict) else {}
                 documents.append({"content": content, "metadata": meta, "distance": None})
 
-        _cached_bm25_index = BM25Index(documents)
-        _cached_index_version = current_index_version
+        bm25_idx = BM25Index(documents)
+        _cached_bm25_indices[scope] = (bm25_idx, current_index_version)
         logger.info(
-            "Built BM25 in-memory index over %d document chunks (version=%d)",
+            "Built BM25 in-memory index for scope '%s' over %d document chunks (version=%d)",
+            scope,
             len(documents),
             current_index_version,
         )
-        return _cached_bm25_index
+        return bm25_idx
     except Exception as e:
-        logger.warning("Could not build BM25 index from ChromaDB: %s", e)
+        logger.warning("Could not build BM25 index from ChromaDB for scope '%s': %s", scope, e)
         return BM25Index([])
+

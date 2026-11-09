@@ -330,7 +330,7 @@ async def execute_prompt_pack_pipeline(
         elif ptype == "persuasive":
             highlights_text = ""
             if rag_service:
-                chunks, _ = await rag_service.retrieve_with_embedding(ptext, top_k=4)
+                chunks, _ = await rag_service.retrieve_with_embedding(ptext, scope="highlights", top_k=4)
                 highlights_text = "\n\n".join(c["content"] for c in chunks)
                 for c in chunks:
                     meta = c.get("metadata", {})
@@ -362,7 +362,7 @@ async def execute_prompt_pack_pipeline(
             struct_text = get_structured_facts_text(ptext, profile.get("branch"))
             chunks_text = ""
             if rag_service:
-                chunks, _ = await rag_service.retrieve_with_embedding(ptext, top_k=5)
+                chunks, _ = await rag_service.retrieve_with_embedding(ptext, scope="facts", top_k=5)
                 chunks_text = "\n\n".join(f"[{c.get('metadata', {}).get('title', 'Document')}]\n{c['content']}" for c in chunks)
                 for c in chunks:
                     meta = c.get("metadata", {})

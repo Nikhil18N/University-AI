@@ -46,6 +46,24 @@ async def ensure_documents_seeded() -> int:
         count = collection.count()
         if count > 0:
             logger.info("ChromaDB '%s' collection has %d documents. No seeding needed.", COLLECTION_NAME, count)
+
+            # Ensure partitioned collections sru_facts and sru_highlights exist (T10)
+            try:
+                facts_coll = client.get_or_create_collection(
+                    name=getattr(settings, "CHROMA_FACTS_COLLECTION", "sru_facts"),
+                    metadata={"hnsw:space": "cosine"},
+                )
+                high_coll = client.get_or_create_collection(
+                    name=getattr(settings, "CHROMA_HIGHLIGHTS_COLLECTION", "sru_highlights"),
+                    metadata={"hnsw:space": "cosine"},
+                )
+                if facts_coll.count() == 0 or high_coll.count() == 0:
+                    logger.info("Partitioned collections sru_facts/sru_highlights are empty; running split...")
+                    from scripts.split_chroma_collections import split_collections
+                    split_collections()
+            except Exception as se:
+                logger.warning("Could not auto-verify partitioned collections: %s", se)
+
             try:
                 from app.services.video_service import sync_video_vectors
                 await sync_video_vectors()

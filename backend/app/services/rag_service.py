@@ -53,10 +53,17 @@ class RAGService:
         self.exemplars = ExemplarService(embedding_provider)
         self._chroma_client = get_chroma_client()
 
-    def _get_collection(self) -> chromadb.Collection:
-        """Get or create the university documents collection."""
+    def _get_collection(self, scope: str = "all") -> chromadb.Collection:
+        """Get or create the scoped Chroma collection (sru_facts, sru_highlights, or university_documents)."""
+        if scope == "facts":
+            coll_name = getattr(settings, "CHROMA_FACTS_COLLECTION", "sru_facts")
+        elif scope == "highlights":
+            coll_name = getattr(settings, "CHROMA_HIGHLIGHTS_COLLECTION", "sru_highlights")
+        else:
+            coll_name = COLLECTION_NAME
+
         return self._chroma_client.get_or_create_collection(
-            name=COLLECTION_NAME,
+            name=coll_name,
             metadata={"hnsw:space": "cosine"},
         )
 
@@ -95,19 +102,19 @@ class RAGService:
         return sorted(chunks, key=lambda c: (c.get("distance") or 1.0))[:keep_top]
 
     async def retrieve(
-        self, query: str, top_k: int | None = None
+        self, query: str, top_k: int | None = None, scope: str = "all"
     ) -> list[dict]:
-        """Retrieve the most relevant document chunks for a query.
+        """Retrieve the most relevant document chunks for a query within a scope (facts, highlights, or all).
 
         Uses vector similarity, verified knowledge boosts, and optional LLM reranking.
         """
-        chunks, _ = await self.retrieve_with_embedding(query, top_k=top_k)
+        chunks, _ = await self.retrieve_with_embedding(query, top_k=top_k, scope=scope)
         return chunks
 
     async def retrieve_with_embedding(
-        self, query: str, top_k: int | None = None
+        self, query: str, top_k: int | None = None, scope: str = "all"
     ) -> tuple[list[dict], list[float]]:
-        """Retrieve chunks and also return the query embedding vector.
+        """Retrieve chunks and also return the query embedding vector within a scope.
 
         Returns ``(chunks, query_embedding)`` so callers can reuse the
         embedding (e.g. to skip a second ``embed_single()`` call in
@@ -117,7 +124,7 @@ class RAGService:
             top_k = getattr(settings, "RAG_TOP_K", 8)
 
         query_embedding = await self.embeddings.embed_single(query)
-        collection = self._get_collection()
+        collection = self._get_collection(scope=scope)
 
         results = collection.query(
             query_embeddings=[query_embedding],
@@ -153,7 +160,7 @@ class RAGService:
         if getattr(settings, "HYBRID_RETRIEVAL_ENABLED", True):
             try:
                 from app.services.bm25_service import get_or_build_bm25_index, reciprocal_rank_fusion
-                bm25_index = get_or_build_bm25_index(collection)
+                bm25_index = get_or_build_bm25_index(collection, scope=scope)
                 sparse_hits = bm25_index.search(query, top_k=top_k)
                 sparse_chunks = [hit[0] for hit in sparse_hits]
 
