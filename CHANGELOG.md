@@ -1,5 +1,28 @@
 # Running CHANGELOG — SRU Buddy Hardening
 
+## [T12] Report hygiene and CI (P2)
+
+### Already there
+- Separate test commands across backend pytest and frontend TypeScript.
+- Pre-hardening audit reports (`AUDIT_REPORT.md` and `FULL_PROJECT_AUDIT_REPORT.md`) citing pre-hardening test counts (247 tests) and earlier commit hashes.
+
+### Changed
+- `AUDIT_REPORT.md`:
+  - Updated all 18 architecture audit items to reflect hardened status (items 2 and 3 updated from PARTIAL to DONE).
+  - Updated test count to 315 passing tests.
+  - Linked all evidence directly to hardened source code lines.
+- `FULL_PROJECT_AUDIT_REPORT.md`:
+  - Reconciled comprehensive audit report across all 12 hardening tasks (T1 through T12).
+  - Documented scorecards, CI verification runner, and operational readiness.
+- `backend/tests/test_api_endpoints.py`:
+  - Added `get_embedding_provider` dependency override to ensure API feedback endpoint test runs offline without external Gemini API keys.
+
+### Added
+- `scripts/run_all_checks.sh`:
+  - Single executable script running prompt hygiene checks (grep for contact leaks), frontend TypeScript compilation (`tsc --noEmit`), backend pytest suite (all 315 tests), and configuration integrity verification.
+  - Returns exit code 0 on complete pass, 1 on any failure.
+- Test suite verified: 315 tests passing in 3.00s.
+
 ## [T11] Embedding model migration decision (P2)
 
 ### Already there

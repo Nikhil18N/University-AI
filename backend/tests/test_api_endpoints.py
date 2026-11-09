@@ -5,6 +5,9 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
+from unittest.mock import AsyncMock
+
+from app.api.v1.deps import get_embedding_provider
 from app.config import settings
 from app.db.session import get_db
 from app.main import app
@@ -27,6 +30,8 @@ async def override_get_db():
 
 
 app.dependency_overrides[get_db] = override_get_db
+app.dependency_overrides[get_embedding_provider] = lambda: AsyncMock()
+
 
 
 @pytest.mark.asyncio
