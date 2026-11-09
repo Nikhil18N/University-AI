@@ -2,7 +2,7 @@
 
 ## 1. University Overview & Location
 * **Institution**: SR University (SRU), a State Private University established under Telangana State Act, spread across 150 acres of lush green campus in Warangal, Telangana.
-* **Student & Faculty Strength**: ~9000 students, ~900 staff, 140+ Programs across five Schools (Computer Science and Artificial Intelligence, Engineering, Business, Agriculture, Sciences and Humanities).
+* **Student & Faculty Strength**: Currently ~9000 students, ~900 staff, 140+ Programs across five Schools (Computer Science and Artificial Intelligence, Engineering, Business, Agriculture, Sciences and Humanities) it may increase in future for accurate information reach admission office.
 * **Leadership at SR University**:
   - **Chancellor**: **Sri A. Varada Reddy** — A pioneer in quality education serving since 1976; leading 185 educational institutions across South India under SR Educational Society with over 1 lakh students and 5 lakh alumni.
   - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science with specialization in Efficient Algorithm Design. Distinguished Professor in Artificial Intelligence, former Director of NVIDIA-BU Research Center on AI, leading the national `leadingindia.ai` ecosystem. CAC ABET Commissioner from India. Regular columnist/blogger in *The Times of India* under the nickname **"Breaking Shackles"**.
@@ -27,14 +27,14 @@
 
 ## 2. Institutional Timings & Daily Schedule
 * **Academic Class Timings**:
-  - For all UG and PG courses: **9:00 AM to 5:00 PM** (Monday to Friday).
+  - For all UG and PG courses: **8:30 to 4:30 and 9:30AM to 5:30 PM** (Monday to Friday).
 * **College Bus Timings (Day-Scholars)**:
-  - Arrival at Campus: **8:50 AM**.
-  - Departure from Campus: **5:00 PM**.
+  - Arrival at Campus: **8:20 AM and 9:20 AM**.
+  - Departure from Campus: **4:40 PM and 5:40 PM**.
 * **Administrative & Student Support Office Hours**:
   - Functions till **5:30 PM** at the main office.
 * **Campus Facilities Timings**:
-  - Health & Wellness Centre: **9:00 AM to 5:00 PM** (Ambulance available 24x7).
+  - Health & Wellness Centre: **8:30 AM to 5:30 PM** (Ambulance available 24x7).
   - Central Library: Monday to Friday **8:30 AM to 8:30 PM**; Saturday & Sunday **10:00 AM to 4:00 PM**.
   - Reprographic & Printing Centre (Beside Block-I): **9:00 AM to 5:30 PM**.
   - Stationery Store (Adjacent to Block-I): **9:00 AM to 5:30 PM**.
@@ -55,16 +55,14 @@
 ## 4. Internet & Wi-Fi Facilities
 * The campus, academic blocks, labs, library, and hostels are 100% Wi-Fi enabled.
 * **Student Credentials**: Every student is provided an official university email and network login in the format: `rollno@sru.edu.in`.
-* **Technical Support Contacts**:
-  - Mr. A. Bala Krishna: **8886522500**
-  - Mr. E. Manikanta: **8008917297**
+* **Technical issue and Technical support don't hesistate to reach out to them.**:
 
 ---
 
 ## 5. University Central Library
 * **Infrastructure**: Spread over 1,000 sq. meters, featuring reading rooms, reference section, and a digital library section.
 * **Catalog Access**: Fully computerized with OPAC terminals at circulation counters and intranet **WEBOPAC**: `http://192.168.30.100/webopac/default.aspx`.
-* **Library Incharge**: Mr. Sammi Reddy (Contact: **0870-2818384**).
+* **Library Incharge**: Mr. Sammi Reddy.
 * **Borrowing Privileges**:
   | Category | Number of Books | Loan Period |
   | :--- | :--- | :--- |
@@ -76,17 +74,16 @@
 
 ## 6. Transportation Services
 * **Routes**: Operates Monday through Friday covering all areas of the tri-cities (Kazipet, Hanamkonda, Warangal) and neighboring towns: Karimnagar, Husnabad, Jammikunta, and Huzurabad.
-* **Schedule**: Buses depart starting points at **7:30 AM** and depart the university campus at **5:00 PM**.
+* **Schedule**: Buses depart starting points at **7:30 AM** and depart the university campus at **5:40 PM**.
 * **Policy**: Available on a chargeable annual basis. No refund for unused portions if opting out mid-year. Day-scholars must board and deboard only at designated points.
-* **Transport Incharge / Complaints**:
-  - Mr. T. Surendar: **9177302052**
-  - Mr. A. Keerthi Reddy: **9640606408** (`transport@sru.edu.in`)
+* **Transport Complaints reach out them through (`transport@sru.edu.in`)**
+  - Mr. T. Surendar : **9177302052**
 
 ---
 
 ## 7. Campus Security & Personal Vehicles
 * **Security**: 24x7 security personnel and CCTV surveillance across blocks, hostels, and gates.
-* **Security Incharge**: Mr. K. Venkateshwar Rao (**9618503127**).
+* **Security Incharge**: Mr. K. Venkateshwar Rao
 * **Student Vehicles Policy**:
   - **Motorized vehicles (bikes, cars, scooters) of students are strictly prohibited inside the campus.**
   - Students must park motorized vehicles outside the second gate at designated parking at their own risk. The university is not responsible for damage or theft.
@@ -97,11 +94,11 @@
 ## 8. Health, Wellness & Psychological Counselling
 * **Health Centre**: 2-bed medical facility with on-duty nurse and doctor from 9:00 AM to 5:00 PM.
 * **Emergency Care**: Tie-up with **Aaditya Hospital**; 24x7 ambulance stationed on campus.
-  - On-duty Nurse: Ms. Pavani (**8712615910**)
+  - On-duty Nurse: Ms. Pavani  (**8712615910**)
   - Ambulance Driver: Mr. Sai Kumar (**7989738242**)
 * **Psychological Counselling**: Free, confidential clinical psychological counseling services:
   - Boys Helpline: Mr. Benson (**7893525257** / **+91 8341581850**)
-  - Girls Helpline: Ms. Swapna (**7207672300** / **+91 8341581850**)
+  - Girls Helpline: Ms. Swapna  (**7207672300** / **+91 8341581850**)
 
 ---
 
@@ -110,26 +107,24 @@
   - Online student portal to update student profiles, verify parent contacts, review academic regulations, check academic calendars and holiday lists.
   - Course enrollment, tracking Continuous Internal Evaluation (CIE), End-Term Examination (ETE) marks, and final results.
   - Daily attendance and mid-term marks are automatically sent to parents via SMS.
-  - Technical assistance helpline: **8074253480**.
 * **Student Central Help Desk**:
   - Located at the Main Administrative Office, functions till **5:30 PM**.
   - Handles certificates, fee receipts, bonafide letters, medical assistance, and general student queries.
-  - Coordinator: Mr. J. Sambamurthy (**9989899611**).
+  - Coordinator: Mr. J. Sambamurthy .
 
 ---
 
 ## 10. Sports & Recreation Facilities
 * **Outdoor Facilities**: Cricket ground, football ground, basketball court, volleyball court, kabaddi court, throwball court, kho-kho court, 400m running track, cricket practice nets, and dedicated badminton court beside SRiX Block.
 * **Indoor Facilities**: Table tennis, chess, carroms, and a fully equipped modern gymnasium located in sheds behind Block-1.
-* **Physical Education Director**: Dr. P. Srinivas Goud (**9949279800** / `stu.sports@sru.edu.in`).
+* **Physical Education Director**: Dr. P. Srinivas Goud ( `stu.sports@sru.edu.in`).
 
 ---
 
 ## 11. National Service Scheme (NSS) & NCC
-* **NSS**: Focuses on community service, road safety, blood donation drives, tree plantation, and civic responsibility. Incharge: Dr. K. Ravinder (**9912782872**).
+* **NSS**: Focuses on community service, road safety, blood donation drives, tree plantation, and civic responsibility.
 * **NCC**: Established September 2020 under 1(T) Compo (Tech) Regt. NCC, Warangal Group, with authorized strength of 160 cadets (Company).
   - Senior Division (SD) for male cadets and Senior Wing (SW) for female cadets.
-  - Associate NCC Officer: Mr. T. Haribabu (**8810415979**).
 
 ---
 
@@ -147,29 +142,29 @@ SR University hosts 37 active student clubs categorized by scope:
 ---
 
 ## 13. Official University Directory & Help Numbers
-| Department / Cell | Coordinator / Head | Official Email | Phone Number |
+| Department / Cell | Coordinator / Head | Official Email 
 | :--- | :--- | :--- | :--- |
-| **Student Help Desk** | Ms. Divya | `helpdesk@sru.edu.in` | **9701177036** |
-| **Examination Cell** | Mr. K. Kiran Babu | `examcell@sru.edu.in` | **9908336336** |
-| **Placement Cell (CSSP)** | Mr. D. Sridhar | `stu.cssp@sru.edu.in` | **9000966994** |
-| **Placement Operations** | Mr. Gurcharan | — | **8520954128** (SRiX 1st Floor) |
-| **Student Grievance Cell** | Dr. D. Rajababu | `stu.grievance@sru.edu.in` | **9949501190** |
-| **Counselling (Girls)** | Ms. Swapna | `stu.counseling@sru.edu.in` | **7207672300** |
-| **Counselling (Boys)** | Mr. Benson | `stu.counseling@sru.edu.in` | **7207362300** |
-| **Anti-Ragging Cell** | Mr. A. Rajeshwar Rao | `stu.antiraggingcell@sru.edu.in` | **9948533654** |
-| **Dean Student Affairs** | Dr. A.V.V. Sudhakar | `dean.sa@sru.edu.in` | **9000708123** |
-| **Transport Services** | Mr. A. Keerthi Reddy | `transport@sru.edu.in` | **9640606408** |
-| **Sports & Physical Ed.** | Dr. P. Srinivas Goud | `stu.sports@sru.edu.in` | **9949279800** |
-| **Finance Office** | Ms. Sunitha | `stu.finance@sru.edu.in` | **9912654505** |
-| **Administration** | Mr. T. Surender | — | **9177302052** |
-| **Girls Hostel Warden** | Ms. Anitha GP | `stu.girlshostel@sru.edu.in` | **9599042878** |
-| **Boys Hostel Warden** | Dr. Rupesh Mishra | `stu.boyshostel@sru.edu.in` | **9716935695** |
-| **Boys Hostel Warden** | Dr. Anshu Kumar | — | **6394355001** |
-| **School of Agriculture** | Program Coordinator | `pc.soa@sru.edu.in` | **9515980884** |
-| **School of Business** | Program Coordinator | `pc.sob@sru.edu.in` | — |
-| **School of CS & AI** | Program Coordinator | `pc.csai@sru.edu.in` | **9100208378** |
-| **School of Engineering** | Program Coordinator | `pc.soe@sru.edu.in` | **8106156408** |
-| **Office of Research** | Program Coordinator | `pc.research@sru.edu.in` | **9949445275** |
-| **Alumni Affairs** | Mr. G. Sunil Reddy | `assocdean.alumni@sru.edu.in` | **9676561828** |
-| **International Affairs**| Ms. Pritha Chakrabarty| — | **9354395227** |
-| **SRiX Incubation** | Mr. Prashanth | — | **8008025400** |
+| **Student Help Desk** | Ms. Divya | `helpdesk@sru.edu.in` |
+| **Examination Cell** | Mr. K. Kiran Babu | `examcell@sru.edu.in` |
+| **Placement Cell (CSSP)** | Mr. D. Sridhar | `stu.cssp@sru.edu.in` |
+| **Placement Operations** | Mr. Gurcharan | — | (SRiX 1st Floor) |
+| **Student Grievance Cell** | Dr. D. Rajababu | `stu.grievance@sru.edu.in` |
+| **Counselling (Girls)** | Ms. Swapna | `stu.counseling@sru.edu.in` |
+| **Counselling (Boys)** | Mr. Benson | `stu.counseling@sru.edu.in` |
+| **Anti-Ragging Cell** | Mr. A. Rajeshwar Rao | `stu.antiraggingcell@sru.edu.in` |
+| **Dean Student Affairs** | Dr. A.V.V. Sudhakar | `dean.sa@sru.edu.in` |
+| **Transport Services** | Mr. A. Keerthi Reddy | `transport@sru.edu.in` |
+| **Sports & Physical Ed.** | Dr. P. Srinivas Goud | `stu.sports@sru.edu.in` |
+| **Finance Office** | Ms. Sunitha | `stu.finance@sru.edu.in` |
+| **Administration** | Mr. T. Surender | — |
+| **Girls Hostel Warden** | Ms. Anitha GP | `stu.girlshostel@sru.edu.in` |
+| **Boys Hostel Warden** | Dr. Rupesh Mishra | `stu.boyshostel@sru.edu.in` |
+| **Boys Hostel Warden** | Dr. Anshu Kumar | — |
+| **School of Agriculture** | Program Coordinator | `pc.soa@sru.edu.in` |
+| **School of Business** | Program Coordinator | `pc.sob@sru.edu.in` | 
+| **School of CS & AI** | Program Coordinator | `pc.csai@sru.edu.in` |
+| **School of Engineering** | Program Coordinator | `pc.soe@sru.edu.in` |
+| **Office of Research** | Program Coordinator | `pc.research@sru.edu.in` |
+| **Alumni Affairs** | Mr. G. Sunil Reddy | `assocdean.alumni@sru.edu.in` |
+| **International Affairs**| Ms. Pritha Chakrabarty| — |
+| **SRiX Incubation** | Mr. Prashanth | — | 

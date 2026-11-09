@@ -25,10 +25,8 @@
 
 ## 2. Hostel Management & Contacts
 * **Dean Student Welfare**: Overall oversight of campus residential life.
-* **Girls Hostel Warden**: Ms. Anitha GP (Phone: **9599042878** / `stu.girlshostel@sru.edu.in`).
-* **Boys Hostel Wardens**:
-  - Dr. Rupesh Mishra (Phone: **9716935695** / `stu.boyshostel@sru.edu.in`)
-  - Dr. Anshu Kumar (Phone: **6394355001**)
+* **Girls Hostel Mail Id**: (Mail id :`stu.girlshostel@sru.edu.in`).
+* **Boys Hostel Mail Id**:(Mail : `stu.boyshostel@sru.edu.in`)
 * **Resident Psychological Counsellors**:
   - Boys Hostel: Mr. Benson (**7893525257**)
   - Girls Hostel: Ms. Swapna (**7207672300**)
@@ -122,4 +120,4 @@ Ragging is a criminal, non-bailable offense under Supreme Court of India directi
 * **Penalties**: Debarring from examinations, withholding results, suspension from classes, cancellation of admission, expulsion from hostels, rustication up to 4 semesters, fines ranging from **₹25,000 to ₹1,00,000**, and police prosecution leading to imprisonment up to 2 years.
 * **Reporting**:
   - Anti-Ragging Helpline Email: `stu.antiraggingcell@sru.edu.in`
-  - Incharge: Mr. A. Rajeshwar Rao (**9948533654**) / Dr. A.V.V. Sudhakar (**9000708123**).
+  - Incharge: Mr. A. Rajeshwar Rao / Dr. A.V.V. Sudhakar .

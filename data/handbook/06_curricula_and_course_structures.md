@@ -21,7 +21,7 @@ All undergraduate and postgraduate programs at SR University follow the **Fully 
 
 ## 2. B.Tech Computer Science & Artificial Intelligence (CS&AI) — R23
 * **Degree Requirements**: Total **160 Credits** over 8 semesters.
-* **Semester-Wise Summary**:
+* **Semester-Wise Summary**: For example it way vary by subjects and semesters.
   - **Semester I (22 Credits)**: Language Skills (`23EN301HS102`), Smart Product Design (`23EC102ES101`), Problem Solving Using Programming Elective-I (`23CS303ES101`, Python/C/Java), Basic Science Elective-I, Mathematics Elective-I.
   - **Semester II (22 Credits)**: Discrete Mathematical Structures (`23CS310BS103`), Digital Logic (`23EC301ES103`), Environment and Sustainability (`23CH300BS102`), Life Skills (`23EN100HS101`), Problem Solving Elective-II, Mathematics Elective-II, Entrepreneurship & Startup (`23BM100HS101`), HCE-I.
   - **Semester III (23 Credits)**: Data Structures (`23CS313PC203`, 7 credits), Operating Systems (`23CS301PC204`), Computer Networks (`23CS311PC205`), Artificial Intelligence & Machine Learning (`23CS301PC206`), Specialization Core-I.

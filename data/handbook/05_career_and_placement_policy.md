@@ -4,8 +4,8 @@
 The **Centre for Student Services and Placements (CSSP)** and the **Career and Job Placement Assistance Center (CJAC)** coordinate all campus recruitment drives, skill development trainings, industry internships, and career counselling at SR University.
 * **Placement Cell Location**: SRiX Block, 1st Floor.
 * **Key Contacts**:
-  - Mr. D. Sridhar (Head CSSP): `stu.cssp@sru.edu.in` / **9000966994**
-  - Mr. Gurcharan (Placement Operations): **8520954128** (SRiX 1st Floor)
+  - Mr. D. Sridhar (Head CSSP): `stu.cssp@sru.edu.in`
+  - Mr. Gurcharan (Placement Operations): (SRiX 1st Floor)
 
 ---
 
@@ -58,3 +58,13 @@ A student will be debarred / blacklisted from campus placement assistance in any
 4. Unprofessional behavior, misconduct, or rudeness reported by visiting HR representatives, company interviewers, or student volunteers.
 5. Directly contacting visiting HR executives or recruiters without official CJAC authorization.
 6. **Failure to Apply**: If a student is eligible as per the job description and company criteria but fails to apply for **three (3) consecutive eligible campus job postings**, they will be deemed disinterested and disqualified from the placement process.
+
+
+## 7. Campus Placement Highlights & Top Recruiter Cutoffs
+* **Highest Placement Package**:
+  - **51 LPA (Lakhs Per Annum)**, secured by students at **Microsoft**.
+* **Average Placement Package**:
+  - **6 LPA** overall average across graduating B.Tech batches.
+* **Eligibility Criteria for Top Recruiters**:
+  - Students must maintain a minimum **CGPA of 7.5 and above**.
+  - Must have **no active backlogs** at the time of the recruitment drive.
