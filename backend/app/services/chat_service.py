@@ -14,6 +14,7 @@ from app.config import settings
 from app.providers.base import LLMProvider
 from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
 from app.services import conversation_service, prompt_service
+from app.services.cache_service import get_cached_part, set_cached_part
 from app.services.card_service import generate_cards
 from app.services.flow_service import (
     detect_flow_trigger,
@@ -236,6 +237,7 @@ async def execute_prompt_pack_pipeline(
     profile: dict,
     llm: LLMProvider,
     rag_service: RAGService | None,
+    redis_client: object | None = None,
 ) -> tuple[str, list[dict]]:
     """Execute Prompt Pack Router -> Parallel Handlers -> Validator -> Merge."""
     routed = await route_and_decompose_message(llm, message, conversation_context)
@@ -298,6 +300,21 @@ async def execute_prompt_pack_pipeline(
             return ans.strip()
 
         else:  # factual
+            # Check response cache if single factual part
+            if len(parts) == 1 and redis_client:
+                cached = await get_cached_part(
+                    redis_client=redis_client,
+                    mode="factual",
+                    resolved_question=ptext,
+                    profile=profile,
+                )
+                if cached:
+                    cached_ans, cached_src = cached
+                    for s in cached_src:
+                        if s not in all_sources:
+                            all_sources.append(s)
+                    return cached_ans
+
             struct_text = get_structured_facts_text(ptext, profile.get("branch"))
             chunks_text = ""
             if rag_service:
@@ -337,11 +354,33 @@ async def execute_prompt_pack_pipeline(
                     student_profile_text=profile_text,
                 )
                 if is_retry_valid:
-                    return retry_ans.strip()
+                    final_ans = retry_ans.strip()
+                    if len(parts) == 1 and redis_client:
+                        await set_cached_part(
+                            redis_client=redis_client,
+                            mode="factual",
+                            resolved_question=ptext,
+                            answer=final_ans,
+                            sources=all_sources,
+                            profile=profile,
+                            part_count=len(parts),
+                        )
+                    return final_ans
                 logger.error("Validator permanently blocked ungrounded numbers: %s. Returning fallback block.", retry_ungrounded)
                 return FALLBACK_VALIDATOR_BLOCK
 
-            return raw_ans.strip()
+            final_ans = raw_ans.strip()
+            if len(parts) == 1 and redis_client:
+                await set_cached_part(
+                    redis_client=redis_client,
+                    mode="factual",
+                    resolved_question=ptext,
+                    answer=final_ans,
+                    sources=all_sources,
+                    profile=profile,
+                    part_count=len(parts),
+                )
+            return final_ans
 
     part_tasks = [handle_sub_part(p) for p in parts]
     part_results = await asyncio.gather(*part_tasks)
@@ -482,6 +521,7 @@ async def handle_chat(
                 profile=profile,
                 llm=llm_provider,
                 rag_service=rag_service,
+                redis_client=redis_client,
             )
             logger.info("Handled via Prompt Pack Pipeline (answer length: %d)", len(answer))
 
@@ -732,6 +772,7 @@ async def handle_chat_stream(
                     profile=profile,
                     llm=llm_provider,
                     rag_service=rag_service,
+                    redis_client=redis_client,
                 )
                 for chunk in chunk_text_stream(answer):
                     yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"

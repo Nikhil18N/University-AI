@@ -1,6 +1,7 @@
 """Admin API routes — protected by ADMIN_API_KEY."""
 
 import logging
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
@@ -11,8 +12,10 @@ from app.api.v1.deps import (
     get_embedding_provider,
     get_llm_provider,
     get_rag_service,
+    get_redis,
     verify_admin_key,
 )
+from app.services.cache_service import bump_index_version
 from app.db.session import get_db
 from app.models.conversation import Conversation
 from app.models.document import Document, DocumentVersion
@@ -57,6 +60,7 @@ async def upload_document(
     publication_date: str | None = Form(None),
     db: AsyncSession = Depends(get_db),
     embeddings: EmbeddingProvider = Depends(get_embedding_provider),
+    redis: Any = Depends(get_redis),
     _admin: str = Depends(verify_admin_key),
 ) -> DocumentResponse:
     """Upload and ingest a document into the knowledge base.
@@ -107,6 +111,9 @@ async def upload_document(
         logger.error("Ingestion error: %s", e, exc_info=True)
         raise HTTPException(500, "Document ingestion failed. Check logs.")
 
+    # Invalidate RAG response cache by bumping index_version counter
+    await bump_index_version(redis)
+
     return DocumentResponse(
         id=doc.id,
         title=doc.title,
@@ -155,6 +162,7 @@ async def list_documents(
 async def deactivate_document(
     document_id: UUID,
     db: AsyncSession = Depends(get_db),
+    redis: Any = Depends(get_redis),
     _admin: str = Depends(verify_admin_key),
 ) -> None:
     """Deactivate a document (soft delete)."""
@@ -174,6 +182,9 @@ async def deactivate_document(
     ver_result = await db.execute(ver_stmt)
     for version in ver_result.scalars().all():
         version.active = False
+
+    await db.commit()
+    await bump_index_version(redis)
 
 
 @router.get(

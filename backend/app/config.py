@@ -26,6 +26,7 @@ class Settings(BaseSettings):
 
     # ---- Redis ----
     REDIS_URL: str = "redis://localhost:6379/0"
+    RESPONSE_CACHE_ENABLED: bool = True
 
     # ---- ChromaDB ----
     CHROMA_HOST: str = "localhost"
