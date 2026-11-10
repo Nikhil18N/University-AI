@@ -7,6 +7,7 @@ from typing import Literal
 
 from app.providers.base import LLMProvider
 from app.services.prompt_service import render_prompt
+from app.services.video_service import is_explicit_video_query
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +153,16 @@ UNIVERSITY_KEYWORDS = {
     "cheppandi", "cheppu", "undaa", "undi", "ledu", "kaadu", "anna", "bhai",
 }
 
+UNIVERSITY_VIDEO_AND_EVENT_KEYWORDS = {
+    "video", "videos", "youtube", "watch", "tour", "tours", "walkthrough", "drone",
+    "sparkrill", "sparkill", "navadhara", "bathukamma", "lumina", "swagatam",
+    "pragathi", "yantra", "freshers", "fest", "fests", "astra", "ibap", "iep",
+    "agriculture", "agri", "icar", "syngenta", "flipkart", "jpmorgan", "paypal",
+    "cisco", "oasis", "kotak", "bizlabs", "robotics", "mechatronics",
+    "bangladesh", "myanmar", "zimbabwe", "international", "testimonial", "testimonials",
+}
+UNIVERSITY_KEYWORDS = UNIVERSITY_KEYWORDS | UNIVERSITY_VIDEO_AND_EVENT_KEYWORDS
+
 
 _QUESTION_STARTERS = {"what", "when", "where", "why", "who", "which", "can", "could", "is", "are", "do", "does", "recommend", "tell"}
 
@@ -252,6 +263,10 @@ def fast_classify(message: str, conversation_context: str = "") -> IntentType | 
     # 3. Student-specific individual record lookup requests
     if STUDENT_SPECIFIC_PATTERN.search(text):
         return "STUDENT_SPECIFIC"
+
+    # 3.5 Explicit video or campus tour requests are always UNIVERSITY intent
+    if is_explicit_video_query(text):
+        return "UNIVERSITY"
 
     # 4. University keyword check & common conversational phrases
     #    (e.g., "Hi, how to apply for admission?" or "how do I apply")

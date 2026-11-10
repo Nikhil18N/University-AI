@@ -54,7 +54,10 @@ def test_semantic_vector_search_matching(monkeypatch):
         def query(self, **kwargs):
             return mock_results
 
-    monkeypatch.setattr("app.services.video_service._get_video_collection", lambda: MockCollection())
+    monkeypatch.setattr(
+        "app.services.video_service._get_video_collection",
+        lambda name="university_videos_semantic": MockCollection() if name == "university_videos_semantic" else None,
+    )
 
     fake_embedding = [0.01] * 768
     results = get_relevant_videos(
@@ -93,7 +96,10 @@ def test_unrelated_queries_filtered_by_distance_threshold(monkeypatch):
         def query(self, **kwargs):
             return mock_unrelated
 
-    monkeypatch.setattr("app.services.video_service._get_video_collection", lambda: MockCollection())
+    monkeypatch.setattr(
+        "app.services.video_service._get_video_collection",
+        lambda name="university_videos_semantic": MockCollection() if name == "university_videos_semantic" else None,
+    )
 
     fake_embedding = [0.01] * 768
     # Bus facilities query -> distance 0.284 > 0.25 threshold -> returns []
@@ -185,7 +191,10 @@ def test_cards_not_shown_for_implicit_queries_until_confirmed(monkeypatch):
         def query(self, **kwargs):
             return mock_results
 
-    monkeypatch.setattr("app.services.video_service._get_video_collection", lambda: MockCollection())
+    monkeypatch.setattr(
+        "app.services.video_service._get_video_collection",
+        lambda name="university_videos_semantic": MockCollection() if name == "university_videos_semantic" else None,
+    )
     fake_embedding = [0.01] * 768
 
     # 1. Standard question about hostels -> NO video card in response!

@@ -36,9 +36,9 @@ from app.services.video_service import (
     format_video_offer_prompt,
     get_post_video_suggestions,
     get_relevant_videos,
-    get_semantic_videos,
     is_explicit_video_query,
     sanitize_answer_video_prompts,
+    should_offer_video_tour,
 )
 
 logger = logging.getLogger(__name__)
@@ -73,29 +73,7 @@ def get_time_aware_greeting() -> str:
     return "Hello! ✨"
 
 
-def should_offer_video_tour(message: str) -> bool:
-    """Return True only if the user query naturally welcomes a visual or campus tour."""
-    msg = message.lower()
-    tour_keywords = (
-        "campus tour", "hostel tour", "see the campus", "see the hostel",
-        "how does it look", "how does the campus look", "look like", "drone",
-        "walkthrough", "virtual tour", "campus video", "hostel video", "watch video",
-        "video tour", "show video"
-    )
-    if any(k in msg for k in tour_keywords):
-        return True
 
-    # If the user is asking about admissions, fees, ranks, marks, scholarships, or general evaluation, do NOT offer video
-    disallowed_keywords = (
-        "fee", "fees", "cost", "scholarship", "cutoff", "percentage", "marks", "rank",
-        "eligibility", "eligible", "syllabus", "curriculum", "apply", "good",
-        "why", "ad", "instagram", "rule", "regulations", "attendance", "mistake", "wrong"
-    )
-    if any(k in msg for k in disallowed_keywords):
-        return False
-
-    facility_keywords = ("campus life", "hostel rooms", "srix", "incubator", "sports facilities")
-    return any(k in msg for k in facility_keywords)
 
 
 def sanitize_staff_contact_numbers(text: str) -> str:
@@ -344,18 +322,38 @@ async def handle_chat(
             answer = await llm_provider.generate(messages)
             logger.info("Handled via conversational LLM (%s)", intent)
 
-    # Pure Semantic Vector Search for Video Recommendations (Zero Keywords)
+    # Contrastive dense semantic vector search for video recommendations
+    semantic_videos = []
     explicit_video = is_explicit_video_query(request.message)
     query_embedding = getattr(rag_service, "last_query_embedding", None)
+    offer_passive_tour = (
+        not explicit_video
+        and intent == "UNIVERSITY"
+        and should_offer_video_tour(request.message)
+    )
 
     if not is_video_yes and not is_video_no:
-        if query_embedding:
-            semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
-            if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
-                cat = semantic_videos[0].get("category", "our campus")
-                answer = format_video_offer_prompt(answer, cat)
-            else:
-                answer = sanitize_answer_video_prompts(answer)
+        # Ensure we have a fresh query embedding for current turn if video matching is needed
+        if not query_embedding and rag_service and (explicit_video or offer_passive_tour):
+            try:
+                embs = await rag_service.embeddings.embed([request.message])
+                query_embedding = embs[0] if embs else None
+            except Exception:
+                query_embedding = None
+
+        if query_embedding and (explicit_video or offer_passive_tour):
+            semantic_videos = get_relevant_videos(
+                user_message=request.message,
+                answer=answer,
+                sources=sources,
+                limit=2,
+                query_embedding=query_embedding,
+                is_explicit=explicit_video,
+            )
+
+        if semantic_videos and offer_passive_tour:
+            cat = semantic_videos[0].get("category", "our campus")
+            answer = format_video_offer_prompt(answer, cat)
         else:
             answer = sanitize_answer_video_prompts(answer)
 
@@ -368,8 +366,10 @@ async def handle_chat(
             profile=profile,
             flow_state=flow_info,
         )
-        if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
-            suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
+        if semantic_videos and offer_passive_tour:
+            suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [
+                s for s in suggestions if "video" not in s.lower()
+            ][:2]
 
         cards = generate_cards(
             user_message=request.message,
@@ -378,6 +378,7 @@ async def handle_chat(
             sources=sources,
             query_embedding=query_embedding,
             is_video_confirmed=is_video_yes,
+            precomputed_videos=semantic_videos if explicit_video else None,
         )
 
     # Sanitize any personal staff mobile numbers from output
@@ -672,27 +673,39 @@ async def handle_chat_stream(
 
         semantic_videos = []
         explicit_video = is_explicit_video_query(request.message)
+        offer_passive_tour = (
+            not explicit_video
+            and intent == "UNIVERSITY"
+            and should_offer_video_tour(request.message)
+        )
 
         if not is_video_yes and not is_video_no:
-            if not query_embedding and rag_service:
+            # Ensure fresh query embedding for the current turn if video matching is needed
+            if not query_embedding and rag_service and (explicit_video or offer_passive_tour):
                 try:
                     query_embedding = await rag_service.embeddings.embed_single(request.message)
                 except Exception:
                     query_embedding = None
 
-            if query_embedding:
-                semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
-                if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
-                    cat = semantic_videos[0].get("category", "our campus")
-                    new_answer = format_video_offer_prompt(answer, cat)
-                    if new_answer != answer:
-                        delta_prompt = new_answer[len(answer):]
-                        if delta_prompt:
-                            for chunk in chunk_text_stream(delta_prompt):
-                                yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
-                        answer = new_answer
-                else:
-                    answer = sanitize_answer_video_prompts(answer)
+            if query_embedding and (explicit_video or offer_passive_tour):
+                semantic_videos = get_relevant_videos(
+                    user_message=request.message,
+                    answer=answer,
+                    sources=sources,
+                    limit=2,
+                    query_embedding=query_embedding,
+                    is_explicit=explicit_video,
+                )
+
+            if semantic_videos and offer_passive_tour:
+                cat = semantic_videos[0].get("category", "our campus")
+                new_answer = format_video_offer_prompt(answer, cat)
+                if new_answer != answer:
+                    delta_prompt = new_answer[len(answer):]
+                    if delta_prompt:
+                        for chunk in chunk_text_stream(delta_prompt):
+                            yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                    answer = new_answer
             else:
                 answer = sanitize_answer_video_prompts(answer)
 
@@ -705,8 +718,10 @@ async def handle_chat_stream(
                 profile=profile,
                 flow_state=flow_info,
             )
-            if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
-                suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
+            if semantic_videos and offer_passive_tour:
+                suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [
+                    s for s in suggestions if "video" not in s.lower()
+                ][:2]
 
             cards = generate_cards(
                 user_message=request.message,
@@ -715,6 +730,7 @@ async def handle_chat_stream(
                 sources=sources,
                 query_embedding=query_embedding,
                 is_video_confirmed=is_video_yes,
+                precomputed_videos=semantic_videos if explicit_video else None,
             )
 
         # Sanitize any personal staff mobile numbers from output

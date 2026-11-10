@@ -16,8 +16,15 @@
       "management",
       "future in business",
       "placements",
-      "curriculum",
+      "mba program overview",
       "case study"
+    ],
+    "positive_intents": [
+      "watch video about MBA at SR University and Astra School of Business",
+      "how is the MBA program at SR University"
+    ],
+    "negative_intents": [
+      "what is the MBA fee structure and ICET scholarship cutoff"
     ]
   },
   {
@@ -422,6 +429,13 @@
       "meals",
       "menu",
       "eating"
+    ],
+    "positive_intents": [
+      "show me hostel mess food quality and dining hall video",
+      "what does the hostel food look like at SR University"
+    ],
+    "negative_intents": [
+      "what is the annual mess fee and hostel charges"
     ]
   },
   {
@@ -462,7 +476,14 @@
       "student stay",
       "hostel experience",
       "roommate",
-      "curfew"
+      "hostel stay"
+    ],
+    "positive_intents": [
+      "show me hostel life and student rooms at SR University",
+      "what is it like living in SRU campus hostels"
+    ],
+    "negative_intents": [
+      "what is the hostel curfew timing outpass rule and annual hostel fee"
     ]
   },
   {
@@ -525,7 +546,15 @@
       "faculty",
       "academics",
       "teaching",
-      "curriculum"
+      "cs ai department overview"
+    ],
+    "positive_intents": [
+      "watch video about School of Computer Science and AI faculty and student growth",
+      "how is the CSE and AI department at SR University"
+    ],
+    "negative_intents": [
+      "what is the B.Tech CSE syllabus credit structure and subjects per semester",
+      "what is the B.Tech CSE tuition fee and scholarship criteria"
     ]
   },
   {
