@@ -59,7 +59,7 @@ FAST_PATTERNS: list[tuple[re.Pattern, IntentType]] = [
         "ACKNOWLEDGMENT",
     ),
     (
-        re.compile(r"^\s*(help|what\s+can\s+you\s+do|how\s+can\s+you\s+help|commands)[?!.,\s]*$", re.IGNORECASE),
+        re.compile(r"^\s*(help|what\s+can\s+you\s+do|what\s+can\s+you\s+help(\s+me)?(\s+with)?|how\s+can\s+you\s+help|commands)[?!.,\s]*$", re.IGNORECASE),
         "HELP",
     ),
 ]
@@ -108,7 +108,7 @@ UNIVERSITY_KEYWORDS = {
     "timetable", "result", "results", "grade", "grades", "marks", "regulation", "regulations",
     "calendar", "admission", "admissions", "registration", "register", "certificate", "certificates",
     "document", "documents", "documentation", "marksheet", "marksheets", "memo", "memos",
-    "requirement", "requirements", "eligibility", "criteria", "qualification", "qualifications",
+    "requirement", "requirements", "eligibility", "eligible", "criteria", "qualification", "qualifications",
     "apply", "applying", "application", "enroll", "enrollment", "procedure", "process",
     "convocation", "placement", "placements", "internship", "internships", "laboratory",
     "lab", "labs", "campus", "notice", "notices", "circular", "deadline", "deadlines",
@@ -116,7 +116,7 @@ UNIVERSITY_KEYWORDS = {
     "tuition", "refund", "re-evaluation", "penalty", "penalties", "late fee", "late registration",
     "fine", "fines", "due", "dues", "rule", "rules", "policy", "policies",
     "srix", "club", "clubs", "event", "events", "canteen", "cafeteria", "sports", "gym",
-    "accommodation", "program", "programs", "btech", "mtech", "mba", "phd",
+    "accommodation", "program", "programs", "btech", "mtech", "mba", "phd", "tech", "engineering",
     "chancellor", "ranking", "rankings", "nirf", "accreditation",
     "curriculum", "subjects", "subject", "teacher", "teachers", "professor", "professors", "mentor", "mentors",
     "wifi", "internet", "food", "laundry", "room", "rooms", "sharing", "ac", "non-ac",
@@ -207,6 +207,7 @@ PERSONAL_RECORD_LOOKUP = re.compile(
 COMMON_UNIVERSITY_PHRASES = re.compile(
     r"\b("
     # Application/admission phrases
+    r"(?:i\s+)?(?:want|wish|like|plan|looking)\s+to\s+(?:join|apply|enroll|take\s+admission)|"
     r"how\s+(?:do|can|to)\s+(?:i\s+)?(?:apply|get\s+admission|enroll|register|join)|"
     r"what\s+(?:are\s+the\s+)?(?:steps?|process|procedure|requirements?|documents?)\s+(?:for|to)\s+(?:apply|admission|enrollment)|"
     r"when\s+(?:does?|do|can)\s+(?:i\s+)?(?:apply|register|enroll|join)|"

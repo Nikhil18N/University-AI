@@ -53,14 +53,14 @@ def test_cards_comparison():
     assert len(cards[0]["columns"]) == 2
 
 
-def test_cards_fee_breakdown_disabled_for_grounded_handbook():
-    """Fee cards are omitted so responses rely solely on grounded handbook RAG answers."""
+def test_cards_fee_breakdown():
+    """Verify that fee breakdown cards are attached for general fee queries."""
     cards = generate_cards(
-        user_message="How much is the fee for B.Tech?",
-        answer="Tuition fee details are retrieved from the official handbook.",
+        user_message="What is the complete fee structure and merit scholarship details for B.Tech?",
+        answer="The tuition fee is ₹1,47,500 per semester.",
     )
-    # Fee breakdown cards should not be injected to prevent hardcoded discrepancy
-    assert not any(c.get("type") == "fee_breakdown" for c in cards)
+    assert len(cards) >= 1
+    assert any(c.get("type") == "fee_breakdown" for c in cards)
 
 
 def test_cards_curriculum():

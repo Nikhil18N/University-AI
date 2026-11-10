@@ -82,11 +82,25 @@ HOSTEL_VIDEO_OFFER_SUGGESTIONS = [
     "🕒 Hostel Timings & Rules",
 ]
 
+CAMPUS_SUGGESTIONS = [
+    "🎥 Watch Campus Virtual Tour",
+    "🔬 Specialized AI Labs",
+    "⚽ Sports Arena",
+    "🏠 Hostel Facilities",
+]
+
 CAMPUS_VIDEO_OFFER_SUGGESTIONS = [
     "🎥 Yes, watch video",
     "❌ No, thanks",
     "🔬 Specialized AI Labs",
     "⚽ Sports Arena",
+]
+
+SRIX_SUGGESTIONS = [
+    "🚀 Student Startups",
+    "🤝 Seed Funding & Grants",
+    "🔬 Innovation Labs",
+    "💼 Industry Mentorship",
 ]
 
 SRIX_VIDEO_OFFER_SUGGESTIONS = [
@@ -226,7 +240,7 @@ def generate_suggestions(
     if any(k in msg_lower for k in ("srix", "startup", "incubator", "entrepreneur")):
         if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
             return SRIX_VIDEO_OFFER_SUGGESTIONS
-        raw_suggestions = SRIX_VIDEO_OFFER_SUGGESTIONS
+        raw_suggestions = SRIX_SUGGESTIONS
 
     # 8. Hostels, Mess & Living
     elif any(k in msg_lower for k in ("hostel", "mess", "food", "room", "curfew", "timing", "warden")):
@@ -238,7 +252,7 @@ def generate_suggestions(
     elif any(k in msg_lower for k in ("campus", "infrastructure", "library", "blocks", "sports")):
         if "watch a short video" in ans_lower or "(yes / no)" in ans_lower:
             return CAMPUS_VIDEO_OFFER_SUGGESTIONS
-        raw_suggestions = CAMPUS_VIDEO_OFFER_SUGGESTIONS
+        raw_suggestions = CAMPUS_SUGGESTIONS
 
     # 10. Academics, Attendance & Condonation
     elif any(k in msg_lower for k in ("attendance", "detention", "condon", "exam", "gpa", "cgpa", "credit", "ffcs")):
@@ -262,7 +276,7 @@ def generate_suggestions(
     elif "attendance" in ans_lower:
         raw_suggestions = ACADEMIC_SUGGESTIONS
     elif "campus" in ans_lower:
-        raw_suggestions = CAMPUS_VIDEO_OFFER_SUGGESTIONS
+        raw_suggestions = CAMPUS_SUGGESTIONS
     else:
         raw_suggestions = DEFAULT_UNIVERSITY_SUGGESTIONS
 
