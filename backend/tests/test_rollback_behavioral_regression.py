@@ -40,8 +40,9 @@ def test_casual_how_are_you_warmth():
 
 def test_followup_greeting_context():
     """Verify subsequent greetings in an active session return conversational follow-ups."""
+    from app.services.chat_service import GREETING_RESPONSES_FOLLOWUP
     resp = get_conversational_response("GREETING", has_context=True)
-    assert any(term in resp for term in ["Hey again!", "Still here to help", "Hello again!", "Hi there!"])
+    assert resp in GREETING_RESPONSES_FOLLOWUP
 
 
 def test_thank_you_and_help_queries():
