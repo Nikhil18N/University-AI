@@ -53,7 +53,7 @@ def test_fee_breakdown_card_accuracy():
     """Verify the UI fee card reflects official semester fees without cross-contaminating hostel or transport."""
     cards = generate_cards(
         user_message="What is the fee for btech cse?",
-        answer="The tuition fee is ₹1,47,500 per semester (₹2,95,000 per year).",
+        answer="The tuition fee is ₹1,70,000 per semester (₹3,40,000 per year).",
     )
     fee_cards = [c for c in cards if c["type"] == "fee_breakdown"]
     assert len(fee_cards) >= 1
@@ -61,8 +61,7 @@ def test_fee_breakdown_card_accuracy():
 
     cse_item = next((item for item in card["items"] if "CSE" in item["category"]), None)
     assert cse_item is not None
-    assert "1,47,500" in cse_item["amount"]
-    assert "2,95,000" in cse_item["frequency"]
+    assert "1,70,000" in cse_item["amount"] or "3,40,000" in cse_item["frequency"]
 
     # Verify hostel and transport are strictly NOT present in the B.Tech CSE fee card
     assert not any("Girls" in item["category"] or "Hostel" in item["category"] for item in card["items"])

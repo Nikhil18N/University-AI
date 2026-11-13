@@ -101,7 +101,7 @@ def test_btech_cse_fee_query_shows_cse_only():
     from app.services.card_service import BTECH_CSE_FEE_CARD
     cards = generate_cards(
         user_message="What is the fee for btech cse?",
-        answer="The tuition fee is ₹1,47,500 per semester (₹2,95,000 per year).",
+        answer="The tuition fee is ₹3,40,000 per year (₹1,70,000 per semester).",
     )
     assert len(cards) == 1
     assert cards[0] == BTECH_CSE_FEE_CARD
@@ -117,7 +117,7 @@ def test_btech_complete_fee_structure_shows_pure_academic_fees():
     from app.services.card_service import BTECH_ACADEMIC_FEE_CARD
     cards = generate_cards(
         user_message="What is the complete fee structure and merit scholarship details for B.Tech?",
-        answer="B.Tech tuition fees vary by branch: CSE is ₹1,47,500/sem, ECE is ₹1,20,000/sem, and Core is ₹1,00,000/sem.",
+        answer="B.Tech tuition fees vary by branch: CSE is ₹3,40,000/yr, ECE is ₹2,70,000/yr, and Core is ₹2,00,000/yr.",
     )
     assert len(cards) == 1
     assert cards[0] == BTECH_ACADEMIC_FEE_CARD

@@ -28,41 +28,53 @@ COMPARISON_CSE_AIML = {
 
 BTECH_ACADEMIC_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "SR University B.Tech Tuition Fee Breakdown (2026-27 / 2027-28)",
+    "title": "SR University B.Tech Tuition Fee Breakdown (Official 2026-27)",
     "currency": "INR",
     "items": [
         {
-            "category": "Tuition Fee (B.Tech CSE)",
-            "amount": "₹1,47,500 / Sem",
-            "frequency": "₹2,95,000 / Year",
-            "note": "Semester-wise billing; 40% scholarship for 92%+ in Inter",
+            "category": "Tuition Fee (B.Tech CSE & Allied)",
+            "amount": "₹1,70,000 / Sem",
+            "frequency": "₹3,40,000 / Year",
+            "note": "Annual base tuition ₹3,40,000 (+₹9k/yr increase); up to 40% merit scholarship",
+        },
+        {
+            "category": "Tuition Fee (B.Tech AI & Robotics)",
+            "amount": "₹2,00,000 / Sem",
+            "frequency": "₹4,00,000 / Year",
+            "note": "Annual base tuition ₹4,00,000 (+₹12k/yr increase)",
         },
         {
             "category": "Tuition Fee (B.Tech ECE)",
-            "amount": "₹1,20,000 / Sem",
-            "frequency": "₹2,40,000 / Year",
-            "note": "Semester-wise billing; merit scholarships up to 50%",
+            "amount": "₹1,35,000 / Sem",
+            "frequency": "₹2,70,000 / Year",
+            "note": "Annual base tuition ₹2,70,000 (+₹8k/yr increase)",
         },
         {
-            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE)",
+            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE / Biotech)",
             "amount": "₹1,00,000 / Sem",
             "frequency": "₹2,00,000 / Year",
-            "note": "Semester-wise billing; merit scholarships up to 50%",
+            "note": "Annual base tuition ₹2,00,000 (+₹6k/yr increase)",
         },
         {
-            "category": "Admission & Enrollment (One-time)",
-            "amount": "₹30,000",
+            "category": "Enrollment & Admission Fee (One-time)",
+            "amount": "₹5,000",
             "frequency": "One-time (Year 1)",
-            "note": "₹5,000 enrollment + ₹25,000 admission fee",
+            "note": "Mandatory enrollment component",
+        },
+        {
+            "category": "Other & Exam Fees",
+            "amount": "₹20,000 / Year",
+            "frequency": "Annual",
+            "note": "₹15,000 other fee + ₹5,000 exam fee",
         },
         {
             "category": "CSE Specialization Fee (Year 2+)",
             "amount": "₹30,000 / Year",
             "frequency": "From 2nd Year Onwards",
-            "note": "Applicable for AI&ML, Cyber Security, Data Science, AR/VR",
+            "note": "Applicable for AIML, Data Science, Cyber Security, AR/VR, Robotics",
         },
     ],
-    "scholarship_note": "Merit scholarships offer 10% to 50% tuition reduction based on board marks, JEE Main, or EAMCET ranks.",
+    "scholarship_note": "Merit scholarships offer 10% to 40% tuition reduction based on board marks, JEE Main, or TG EAPCET ranks.",
 }
 
 # Alias for backwards compatibility
@@ -75,24 +87,30 @@ BTECH_CSE_FEE_CARD = {
     "items": [
         {
             "category": "Tuition Fee (B.Tech CSE)",
-            "amount": "₹1,47,500 / Sem",
-            "frequency": "₹2,95,000 / Year",
-            "note": "Semester-wise billing; 40% scholarship for 92%+ in Inter",
+            "amount": "₹1,70,000 / Sem",
+            "frequency": "₹3,40,000 / Year",
+            "note": "Annual base tuition ₹3,40,000 (+₹9k/yr increase); up to 40% merit scholarship",
         },
         {
-            "category": "Admission & Enrollment (One-time)",
-            "amount": "₹30,000",
+            "category": "Enrollment Fee (One-time)",
+            "amount": "₹5,000",
             "frequency": "One-time (Year 1)",
-            "note": "₹5,000 enrollment + ₹25,000 admission fee",
+            "note": "Mandatory enrollment component",
+        },
+        {
+            "category": "Other & Exam Fees",
+            "amount": "₹20,000 / Year",
+            "frequency": "Annual",
+            "note": "₹15,000 other fee + ₹5,000 exam fee",
         },
         {
             "category": "Specialization Fee (Year 2+)",
             "amount": "₹30,000 / Year",
             "frequency": "From 2nd Year Onwards",
-            "note": "For AI&ML, Cyber Security, Data Science, AR/VR",
+            "note": "For AIML, Cyber Security, Data Science, AR/VR, Robotics",
         },
     ],
-    "scholarship_note": "40% tuition scholarship for 92%–97.99% in 10+2 MPC for CSE; up to 100% for top rankers.",
+    "scholarship_note": "Up to 40% tuition scholarship (₹1,36,000 waiver/yr, net ₹2,04,000/yr) based on Inter/CBSE/JEE/EAPCET scores.",
 }
 
 MERIT_SCHOLARSHIP_CARD = {
@@ -102,36 +120,42 @@ MERIT_SCHOLARSHIP_CARD = {
     "items": [
         {
             "category": "40% Tuition Waiver Slab",
-            "amount": "₹88,500 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "92%–97.99% State Board | CBSE 90%+ | JEE Main 90%+ | TG EAPCET < 10k",
+            "amount": "₹2,04,000 / Year (CSE)",
+            "frequency": "Save ₹1,36,000 / Year",
+            "note": "Inter ≥ 98% | CBSE ≥ 95% | JEE ≥ 95%ile | TG EAPCET 1–2000",
         },
         {
             "category": "30% Tuition Waiver Slab",
-            "amount": "₹1,03,250 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "85%–91.99% State Board | CBSE 80%+ | JEE Main 80%+ | TG EAPCET 10k–20k",
+            "amount": "₹2,38,000 / Year (CSE)",
+            "frequency": "Save ₹1,02,000 / Year",
+            "note": "Inter 92–97.9% | CBSE 90–94.9% | JEE 90–94.5%ile | TG EAPCET 2001–8000",
+        },
+        {
+            "category": "25% Tuition Waiver Slab",
+            "amount": "₹2,55,000 / Year (CSE)",
+            "frequency": "Save ₹85,000 / Year",
+            "note": "Inter 80–91.9% | CBSE 80–89.9% | JEE 80–89.9%ile | TG EAPCET 8001–20000",
         },
         {
             "category": "20% Tuition Waiver Slab",
-            "amount": "₹1,18,000 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "75%–84.99% State Board | CBSE 70%+ | JEE Main 70%+ | TG EAPCET 20k–30k",
+            "amount": "₹2,72,000 / Year (CSE)",
+            "frequency": "Save ₹68,000 / Year",
+            "note": "Inter 70–79.9% | CBSE 70–79.9% | JEE 70–79.9%ile",
+        },
+        {
+            "category": "15% Tuition Waiver Slab",
+            "amount": "₹2,89,000 / Year (CSE)",
+            "frequency": "Save ₹51,000 / Year",
+            "note": "Inter 65–69.9% | CBSE 65–69.9% | JEE 60–69.9%ile",
         },
         {
             "category": "10% Tuition Waiver Slab",
-            "amount": "₹1,32,750 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "65%–74.99% State Board | CBSE 60%+ | JEE Main 60%+ | TG EAPCET 30k–40k",
-        },
-        {
-            "category": "50%–100% Top Ranker Slab",
-            "amount": "₹0 – ₹73,750 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "98%+ State Board | State Top 1000 / National Top Rankers",
+            "amount": "₹3,06,000 / Year (CSE)",
+            "frequency": "Save ₹34,000 / Year",
+            "note": "Inter 60–64.9% | CBSE 60–64.9% | JEE 50–59.9%ile",
         },
     ],
-    "scholarship_note": "Calculated on standard CSE tuition (₹1,47,500/sem). Slabs apply similarly to ECE and core engineering.",
+    "scholarship_note": "Calculated on standard B.Tech CSE base tuition (₹3,40,000/yr). Slabs apply similarly across all UG disciplines.",
 }
 
 
@@ -305,6 +329,41 @@ CAMPUS_TOUR_CARD = {
     ],
 }
 
+PLACEMENT_EXCELLENCE_CARD = {
+    "type": "placement_highlights",
+    "title": "Three Consecutive Years of Excellence in Highest Packages & Internships",
+    "subtitle": "SR University Campus Recruitment & Corporate Placement Highlights",
+    "stats": [
+        {"label": "Record Highest Package", "value": "51 LPA", "note": "Microsoft (Batch 2025)"},
+        {"label": "ServiceNow Marquee Offer", "value": "49.30 LPA", "note": "ServiceNow (Batch 2027)"},
+        {"label": "Amazon SDE Package", "value": "46.38 LPA", "note": "Amazon (Batch 2026)"},
+        {"label": "Total Job Offers", "value": "1,300+", "note": "Till April and counting"},
+        {"label": "Paid Internships", "value": "3,500+", "note": "Stipends up to ₹1.25L/month"},
+        {"label": "Average Package", "value": "6 LPA", "note": "Across graduating cohorts"},
+    ],
+    "top_mnc_offers": [
+        {"company": "Accenture", "offers": 254},
+        {"company": "Cognizant", "offers": 165},
+        {"company": "Brakes India", "offers": 66},
+        {"company": "Capgemini", "offers": 57},
+        {"company": "Virtusa", "offers": 48},
+        {"company": "TCS", "offers": 45},
+        {"company": "Savantis", "offers": 43},
+        {"company": "Edufyi Tech", "offers": 38},
+        {"company": "Infosys", "offers": 22},
+    ],
+    "marquee_offers": [
+        {"student": "Thangallapally Nithal", "batch": "CSE 2025", "package": "44 LPA", "company": "Salesforce"},
+        {"student": "Bijigiri Vignesh", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
+        {"student": "Ambati Krishna Sai", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
+        {"student": "Jonnadula Sahith", "batch": "CSE 2025", "package": "34.5 LPA", "company": "PayPal"},
+        {"student": "Harsha Vardhan", "batch": "CSE 2025", "package": "34.5 LPA", "company": "PayPal"},
+        {"student": "Repala Vignesh", "batch": "CSE 2025", "package": "25 LPA", "company": "Cisco"},
+        {"student": "Suraram Hari Charan", "batch": "CSE 2026", "package": "19.75 LPA", "company": "JPMorgan Chase"},
+        {"student": "Nadimadla Sanvitha", "batch": "ECE 2026", "package": "14.5 LPA", "company": "Flipkart"},
+    ],
+}
+
 
 def generate_cards(
     user_message: str,
@@ -376,13 +435,17 @@ def generate_cards(
     ):
         cards.append(CURRICULUM_CARD)
 
-    # 4. Campus tour card (render static spot highlights if explicitly asking for campus walkthrough/tour)
+    # 4. Placement Highlights card ("Three Consecutive Years of Excellence")
+    if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer")):
+        cards.append(PLACEMENT_EXCELLENCE_CARD)
+
+    # 5. Campus tour card (render static spot highlights if explicitly asking for campus walkthrough/tour)
     is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "tour", "shorts"))
     if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
 
-    # 5. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
+    # 6. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
     # Zero keyword matching: relevance is governed purely by ChromaDB semantic cosine distance.
     # Attached only when explicitly requested or confirmed via affirmative Yes/No response.
     if (is_video_query or is_video_confirmed) and query_embedding:
@@ -396,18 +459,18 @@ def generate_cards(
         if relevant_videos:
             cards.append(create_video_card(relevant_videos, is_explicit=True))
 
-    # 5. Student profile card (if board_score is known and user asked about eligibility or admission)
+    # 7. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):
         score = profile.get("board_score")
         branch = profile.get("branch_interest") or "B.Tech CSE"
         is_eligible = False
         try:
             num = float(re.sub(r"[^\d.]", "", score))
-            is_eligible = num >= 60.0
+            is_eligible = num >= 50.0
         except ValueError:
             is_eligible = True
 
-        status_text = "Eligible (Minimum Cutoff: 60%)" if is_eligible else "Cutoff Requirement: 60%"
+        status_text = "Eligible (Minimum Cutoff: 50%)" if is_eligible else "Cutoff Requirement: 50%"
         status_color = "success" if is_eligible else "warning"
 
         profile_card = {

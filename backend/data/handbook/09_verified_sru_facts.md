@@ -1,0 +1,223 @@
+# Central Verified Knowledge Base — SR University (SRU)
+
+> **Document Status**: Authoritative Knowledge Registry  
+> **Effective Academic Year**: 2025–2026 / 2026–2027  
+> **Verification Protocol**: Each fact is tagged with a unique Fact ID, Verification Status, and Official Source Document.
+
+---
+
+## 1. General University Identity & Leadership
+
+- **[FACT-ID: GEN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md]**
+  - **Institution Full Name**: SR University (SRU)
+  - **Type**: State Private University established under the Telangana State Private Universities Act.
+  - **Campus Size**: 150-acre lush green residential campus.
+  - **Location & Address**: Ananthasagar, Hasanparthy Mandal, Warangal, Telangana 506371, India (on the Warangal–Karimnagar Highway).
+  - **Distance**: 14 km from Hanumakonda, 16 km from Kazipet Junction (KZJ), 29 km from Warangal Railway Station.
+  - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary leading SR Educational Society since 1976 (over 185 institutions, 1 lakh+ students).
+  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science (Efficient Algorithm Design), AI pioneer, former Director of NVIDIA-BU Research Center on AI, CAC ABET Commissioner, Times of India columnist (*"Breaking Shackles"*).
+  - **Parent Society**: SR Educational Society (established 1976).
+
+---
+
+## 2. Undergraduate (B.Tech) Admissions & Eligibility Criteria
+
+- **[FACT-ID: ADM-001] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
+  - **Minimum Eligibility Threshold**: Minimum **50% aggregate marks** in 10+2 / Intermediate PCM (Physics, Chemistry, Mathematics).
+  - **State Board Marks Equivalent**: In 1000-mark systems (TS BIE / AP BIE), minimum **500 marks out of 1000** is required.
+  - **Strict Cutoff Rule**:
+    - 50% (500 marks), 52%, 58%, 60%, 61%: **Fully Eligible** (the cutoff is 50%, NOT 60%; never state that 58% or 61% is "shy of" or "short of" the cutoff).
+    - Under 50% (e.g. under 500 marks): Falls below the published cutoff; applicants are encouraged to contact the admissions desk for alternative academic options.
+  - **Branch Uniformity**: Applies uniformly to B.Tech CSE, AI&ML, Data Science, Cyber Security, ECE, EEE, and Mechanical Engineering.
+  - **Direct / Management Quota**: Admission is based on 10+2 marks and seat availability. Entrance ranks determine merit scholarship slabs.
+  - **Official Admissions Contacts**: Phone: **0870-2818333** / **0870-2818311** (Mobile: **833 100 3030** / **833 100 4040**), Email: `admissions@sru.edu.in` / `info@sru.edu.in`, Portal: `https://apply.sru.edu.in`.
+
+---
+
+## 3. Tuition Fee Structure & Payment Policies
+
+- **[FACT-ID: FEE-001] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
+  - **Program-Specific Scoping Rule**: When asked about fees, ONLY state the fee for the specific program or branch requested (e.g. B.Tech CSE, ECE, Core, MBA, MCA, Hostel). Never dump all unrelated degrees together. If the user asks generally ("what is the fee?"), ask them which program they are interested in.
+  - **B.Tech Computer Science & Engineering (CSE) & CSE Allied (AIML, Data Science, Cyber Security, Robotics, Quantum AI)**:
+    - Base Tuition Fee: **₹3,40,000 / year** (Payable as ₹1,70,000 per semester or ₹3,40,000 annually).
+    - Yearly Fee Increase: **₹9,000 per year** (Year 1: ₹3,40,000 | Year 2: ₹3,49,000 | Year 3: ₹3,58,000 | Year 4: ₹3,67,000).
+  - **B.Tech in Artificial Intelligence & Robotics**:
+    - Base Tuition Fee: **₹4,00,000 / year** (+₹12,000 yearly increase).
+  - **B.Tech in Electronics & Communication Engineering (ECE)**:
+    - Base Tuition Fee: **₹2,70,000 / year** (+₹8,000 yearly increase).
+  - **B.Tech Core Engineering (Biotechnology, Mechanical, Civil, EEE, Food Technology)**:
+    - Base Tuition Fee: **₹2,00,000 / year** (+₹6,000 yearly increase).
+  - **B.Tech International Engineering Program (IEP)**:
+    - Base Tuition Fee: **₹3,40,000 / year** (+₹10,000 yearly increase).
+  - **B.Des (Interior & Fashion Design)**: **₹2,10,000 / year** (+₹6,000 yearly increase).
+  - **B.Sc. (Hons) Agriculture**: **₹2,00,000 / year** (+₹6,000 yearly increase).
+  - **BBA / B.Sc. Hospitality & Hotel Administration**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+  - **BBA (Business Analytics, FinTech, Digital Marketing)**: **₹2,00,000 / year** (+₹6,000 yearly increase).
+  - **BCA (Hons) / B.Sc. Computer Science (Hons)**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+  - **B.Com / B.Sc. (Physics, Chemistry, Maths)**: **₹1,00,000 / year** (+₹3,000 yearly increase).
+  - **Postgraduate Programs (Per Year)**:
+    - **MBA**: **₹3,00,000 / year** (+₹10,000 yearly increase).
+    - **MCA**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+    - **M.Tech**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+    - **M.Sc. Agriculture**: **₹2,00,000 / year** (+₹6,000 yearly increase).
+    - **M.Sc. Programs (General/Others)**: **₹80,000 / year** (+₹2,000 yearly increase).
+  - **Additional Annual Components & One-Time Fees**:
+    - Enrollment Fee: **₹5,000** (one-time admission component).
+    - Other Fee (Wi-Fi, cultural, placements, ERP): **₹15,000 / year**.
+    - Exam Fee: **₹5,000 / year**.
+    - Bus Transport Fee: **₹30,000 / year** for tri-cities bus routes (Warangal, Hanamkonda, Kazipet).
+    - Specialization Fee (from Year 2 onwards for specialized domains): **₹30,000 / year**.
+    - Application Processing Fee: **₹1,100**.
+    - Electricity Deposit (Hostel): Non-AC: **₹5,000** | AC: **₹10,000**.
+  - **Strict Fee Category Scoping Rule**: When asked about a specific fee (transport, hostel, tuition, exam, or admission), return ONLY that specific fee. Never cross-contaminate or dump unrequested fees.
+
+---
+
+## 4. Merit Scholarships & Special Category Concessions
+
+- **[FACT-ID: FEE-002] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
+  - **Undergraduate Merit Scholarship Slabs**:
+    - **10% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **60% – 64.9%** | CBSE/ICSE: **60% – 64.9%** | JEE Mains: **50 – 59.9 Percentile**.
+      - B.Tech CSE Annual Fee after waiver: **₹3,06,000 / year** (Save ₹34,000).
+    - **15% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **65% – 69.9%** | CBSE/ICSE: **65% – 69.9%** | JEE Mains: **60 – 69.9 Percentile**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,89,000 / year** (Save ₹51,000).
+    - **20% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **70% – 79.9%** | CBSE/ICSE: **70% – 79.9%** | IB Diploma: **24 – 29** | JEE Mains: **70 – 79.9 Percentile**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,72,000 / year** (Save ₹68,000).
+    - **25% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **80% – 91.9%** | CBSE/ICSE: **80% – 89.9%** | IB Diploma: **30 – 33** | JEE Mains: **80 – 89.9 Percentile** | TG/AP EAPCET Rank: **8,001 – 20,000**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,55,000 / year** (Save ₹85,000).
+    - **30% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **92% – 97.9%** | CBSE/ICSE: **90% – 94.9%** | IB Diploma: **34 – 37** | JEE Mains: **90 – 94.5 Percentile** | TG/AP EAPCET Rank: **2,001 – 8,000**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,38,000 / year** (Save ₹1,02,000).
+    - **40% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **≥ 98%** | CBSE/ICSE: **≥ 95%** | IB Diploma: **≥ 38/45** | JEE Mains: **≥ 95 Percentile** | TG/AP EAPCET Rank: **1 – 2,000**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,04,000 / year** (Save ₹1,36,000).
+  - **PG Merit Scholarship Slabs (M.Tech, MBA, MCA, M.Sc)**:
+    - 10% (UG 60–69.9% / CAT/MAT 60–69.9) | 15% (UG 70–79.9% / CAT/MAT 70–79.9) | 20% (UG 80–89.9% / CAT/MAT 80–89.9) | 25% (UG ≥ 90% / CAT/MAT ≥ 90).
+  - **20 Special Category Concessions (Flat Annual Tuition Waivers)**:
+    - **₹50,000 / year Waiver**:
+      1. Sports International Representation.
+      2. Orphan Students (Both parents deceased).
+      3. Regular SRU Staff Children.
+    - **₹20,000 / year Waiver**:
+      4. Differently Abled Students (More than 50% physical disability).
+    - **₹15,000 / year Waiver**:
+      5. Girl Child (All female students).
+      6. Single Parent Child.
+      7. Children of Defence / Armed Forces & Police Personnel.
+      8. SR Junior College Alumni.
+      9. SRU Alumni / Real Sibling studying concurrently at SRU.
+      10. NCC 'C' Certificate Holders.
+      11. Non-Local / Out-of-State Students (Outside Telangana).
+      12. Sports National Representation.
+      13. Lateral Entry Diploma Students.
+      14. Padma / J&K / Gallantry Awardees or Children.
+      15. Andhra Pradesh Students.
+      16. International Students.
+      17. North East Domicile Students.
+      18. Teachers/Educators Children.
+      19. COVID Affected Bereaved Students.
+      20. Wards of University Partner Organizations.
+
+---
+
+## 5. Campus Placements & Recruitment Records
+
+- **[FACT-ID: PLC-001] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md & University Official Placement Registry]**
+  - **Core Benchmark**: **"Three Consecutive Years of Excellence in Highest Packages & Internships"**
+  - **Three Consecutive Record Highest Packages**:
+    1. **Batch 2025**: **51 LPA** — B. Shiva Krishna (Software Engineer at **Microsoft**), with **₹1.25 Lakh / month** internship stipend.
+    2. **Batch 2026**: **46.38 LPA** — Kencha Bhavana (Software Development Engineer at **Amazon**), with **₹1.10 Lakh / month** internship stipend.
+    3. **Batch 2027**: **49.30 LPA** — Mohammed Akramuddin (Associate Software Engineer at **ServiceNow**), with **₹0.80 Lakh / month** internship stipend.
+  - **Overall Average Package**: **6 LPA** across graduating B.Tech batches.
+  - **Placement & Internship Scale**: **1,300+ total placement offers**, **3,500+ internships**.
+  - **Top MNC Offers Volume**:
+    - Accenture: **254 offers**
+    - Cognizant: **165 offers**
+    - Brakes India: **66 offers**
+    - Capgemini: **57 offers**
+    - Virtusa: **48 offers**
+    - TCS: **45 offers**
+    - Savantis: **43 offers**
+    - Edufyi Tech Solutions: **38 offers**
+    - Infosys: **22 offers**
+  - **Marquee Superstar Packages**:
+    - **44 LPA** @ Salesforce (Thangallapally Nithal, CSE 2025)
+    - **44 LPA** @ ServiceNow (Bijigiri Vignesh & Ambati Krishna Sai, CSE 2025)
+    - **34.5 LPA** @ PayPal (Jonnadula Sahith & Harsha Vardhan, CSE 2025)
+    - **25 LPA** @ Cisco (Repala Vignesh, CSE 2025)
+    - **19.75 LPA** @ JPMorgan Chase (Suraram Hari Charan, CSE 2026)
+    - **16.75 LPA** @ Cisco (Garrepalli Anjali, CSE 2026)
+    - **14.5 LPA** @ Flipkart (Nadimadla Sanvitha, ECE 2026)
+    - **14.53 LPA** @ Flipkart (Sindhu Domakuntla, ECE 2027)
+  - **Top Recruiters Cutoff**: Minimum **CGPA of 7.5 or above** with **zero active backlogs** at the time of recruitment drive.
+  - **Authoritative Accreditations & Global Rankings**:
+    - **THE (Times Higher Education) World University Rankings**: **7th Rank Among Private Universities in India** (801–1000 Band), **1st in Telangana**.
+    - **QS World University Rankings Asia**: **19th Rank Among Private Universities in India** (701–710 Band).
+    - **NIRF (National Institutional Ranking Framework)**: **91st Rank** in Engineering Category (101–150 University Category).
+    - **ICAR Accreditation**: **1st Private University** to achieve ICAR accreditation in Telangana & Andhra Pradesh.
+    - **NBA Tier-1 Accredited** B.Tech Programs & **NAAC 'A' Grade**.
+  - **Placement Department**: Centre for Student Services and Placements (CSSP).
+- **[FACT-ID: PLC-002] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md]**
+  - **Placement Job Policy**: Follows strict **"One Student–One Job"** policy.
+  - **Dream Company Exception**: A placed student may sit for **ONE additional Dream company drive** if the Dream offer provides at least **2X the current CTC**.
+  - **Core Engineering Exception**: Non-CSE students (Mechanical, Civil, EEE, ECE) placed in an IT/software firm are explicitly permitted to sit for core companies in their own engineering discipline.
+
+---
+
+## 6. Hostel Living & Residential Rules
+
+- **[FACT-ID: HST-001] [STATUS: VERIFIED] [SOURCE: 04_hostels_rules_and_discipline_code.md & 08_admissions_fees_scholarships_and_eligibility.md]**
+  - **Accommodations**: Dedicated separate hostel blocks for male and female students.
+  - **Hostel Fee Structure (Annual Room & Mess)**:
+    - **4 Person Occupancy (Non-AC)**: **₹1,15,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
+    - **3 Person Occupancy (Non-AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
+    - **4 Person Occupancy (AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Electricity Deposit: ₹5,000, Laundry: ₹5,000).
+    - **3 Person Occupancy (AC)**: **₹1,35,000 / year** (Caution: ₹5,000, Electricity Deposit: ₹5,000, Laundry: ₹5,000).
+    - *Caution deposit is one-time refundable.* AC electricity is metered through prepaid meters.
+  - **Furniture Allotted**: Individual bed, mattress, study desk, chair, and wardrobe.
+  - **Hot Water Hours**: 7:00 AM – 9:00 AM and 7:00 PM – 9:00 PM daily.
+  - **Drinking Water**: RO-purified water dispensers on every floor.
+  - **Wi-Fi**: 24x7 high-speed internet across all blocks and rooms.
+  - **Mess Timings**:
+    - Breakfast: 7:30 AM – 8:30 AM
+    - Lunch: 12:00 PM – 2:00 PM
+    - Snacks: 5:00 PM – 6:00 PM
+    - Dinner: 7:30 PM – 8:30 PM
+- **[FACT-ID: HST-002] [STATUS: VERIFIED] [SOURCE: 04_hostels_rules_and_discipline_code.md]**
+  - **Curfew & In-Time**: First-year students must return to the hostel by **8:30 PM** (or official curfew designated by chief warden).
+  - **Out-Pass Policy**: Digital out-pass request required via hostel portal/warden approval with parental consent for overnight stays.
+  - **Cross-Gender Entry Prohibition (STRICT)**:
+    - Male students are strictly prohibited from entering female hostel buildings, floors, or rooms.
+    - Female students are strictly prohibited from entering male hostel buildings, floors, or rooms.
+    - Group study must take place in common academic areas (library, cafeteria) during daylight hours.
+  - **Vehicles Prohibition**: Student motor vehicles (cars, two-wheelers) are not permitted for day-to-day hostel-to-class transit on campus.
+  - **Cooking Prohibition**: Electric stoves, induction cooktops, and personal cooking in hostel rooms are strictly prohibited.
+- **[FACT-ID: HST-003] [STATUS: VERIFIED] [SOURCE: 04_hostels_rules_and_discipline_code.md]**
+  - **Girls Hostel Warden**: Ms. Anitha GP (**9599042878** / `stu.girlshostel@sru.edu.in`).
+  - **Boys Hostel Wardens**: Dr. Rupesh Mishra (**9716935695**) / Dr. Anshu Kumar (**6394355001**).
+  - **Psychological Counsellors**: Mr. Benson (**7893525257**, Boys) / Ms. Swapna (**7207672300**, Girls).
+
+---
+
+## 7. Academic Regulations, Attendance & Detention
+
+- **[FACT-ID: ACD-001] [STATUS: VERIFIED] [SOURCE: 02_academic_regulations_and_examinations.md & 07_attendance_and_detention_policy.md]**
+  - **Mandatory Attendance Minimum**: Minimum **75% attendance** across all registered courses to appear for End Semester Examinations (ESE).
+  - **Medical Condonation**: Attendance between **65% and 74.9%** may be condoned by the Dean on valid medical grounds (with verified doctor certificate) subject to prescribed condonation fee.
+  - **Detention**: Students with less than **65% attendance** are unequivocally **detained** in that semester and cannot write final exams; they must re-register when the course is next offered.
+  - **Curriculum Model**: Fully Flexible Credit System (FFCS) under Outcome-Based Education (OBE).
+  - **Grading**: 10-point scale CGPA system. Minimum passing grade in each course is Grade D (Grade Point 4.0).
+
+---
+
+## 8. Innovation, Startups & Incubation (SRiX)
+
+- **[FACT-ID: INN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md & University Presentation Deck]**
+  - **Incubator**: **SRiX (SR Innovation Exchange)** — A Technology Business Incubator supported by the Department of Science and Technology (DST), Government of India.
+  - **Impact**: **171+ Startups Incubated**, **₹76+ Crores external funding raised**.
+  - **Focus Areas**: AI/ML, Internet of Things (IoT), Agritech, Medtech, Clean Energy.
+  - **Facilities**: 14+ maker spaces, rapid prototyping labs, IP facilitation, mentorship, seed funding access, and incubation support for students and faculty.

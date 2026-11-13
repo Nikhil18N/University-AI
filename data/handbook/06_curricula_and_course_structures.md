@@ -93,3 +93,94 @@ All undergraduate and postgraduate programs at SR University follow the **Fully 
   - **MCA R23**: Advanced Data Structures, DBMS, Software Engineering, AI, Cloud Computing, Full-Semester Major Project.
   - **M.Tech R23**: CSE, ECE (EDT, Embedded Systems, IoT, VLSI), Power Electronics, Advanced Manufacturing Systems, Construction Technology & Management.
   - **M.Sc Programs**: Statistics, Biochemistry, Agricultural Sciences (Agronomy, Entomology, Soil Science, Food Science, Genetics & Plant Breeding).
+
+---
+
+## 8. Complete School-Wise Academic Program Registry (UG, PG & Ph.D.)
+
+### A. School of Computer Science & Artificial Intelligence
+* **Undergraduate (UG)**:
+  - B.Tech. Computer Science & Engineering (Core)
+  - B.Tech. (CSE) – Artificial Intelligence & Machine Learning
+  - B.Tech. (CSE) – Cybersecurity
+  - B.Tech. (CSE) – Data Science
+  - B.Tech. (CSE) – Gaming & ARVR
+  - B.Tech. (CSE) – Robotics and Automation
+  - B.Tech. (CSE) – Quantum AI
+  - B.Tech. (CSE) – AI and Precision Agriculture
+  - B.Tech. in AI and Robotics
+  - BCA – Bachelor of Computer Applications
+  - B.Sc. Computer Science
+  - B.Sc. Mathematics
+  - B.Sc. (Hons) Mathematics and Artificial Intelligence
+* **Postgraduate (PG)**:
+  - M.Tech. (Computer Science and Engineering)
+  - M.Tech. (Artificial Intelligence & Machine Learning)
+  - M.Tech. (Data Science)
+  - M.Tech. (Cybersecurity)
+  - M.Sc. (Computer Science)
+  - M.Sc. (Statistics)
+  - MCA (Master of Computer Applications)
+
+### B. School of Engineering
+* **Undergraduate (UG)**:
+  - B.Tech. Electronics & Communication Engineering (ECE)
+  - B.Tech. (ECE) – Artificial Intelligence & Machine Learning
+  - B.Tech. (ECE) – VLSI Design
+  - B.Tech. (ECE) – Robotics and Automation
+  - B.Tech. Electrical and Electronics Engineering (EEE)
+  - B.Tech. (EEE) – Renewable Energy
+  - B.Tech. (EEE) – Robotics and Automation
+  - B.Tech. (EEE) – Electric Vehicle
+  - B.Tech. Mechanical Engineering (ME)
+  - B.Tech. (ME) – Robotics and Automation
+  - B.Tech. (ME) – Smart Manufacturing
+  - B.Tech. Civil Engineering
+* **Postgraduate (PG)**:
+  - M.Tech. (ECE) – Embedded Systems
+  - M.Tech. (ECE) – Electronic Design Technology
+  - M.Tech. (ECE) – VLSI
+  - M.Tech. (EEE) – Power Electronics
+  - M.Tech. (ME) – Advanced Manufacturing Systems
+  - M.Tech. (ME) – Thermal Engineering
+  - M.Tech. (CE) – Construction Technology and Management
+
+### C. Astra School of Business
+* **Undergraduate (UG)**:
+  - BBA – Bachelor of Business Administration (General)
+  - BBA – Finance
+  - BBA – Operations
+  - BBA – HR
+  - BBA – Business Analytics
+  - BBA – Marketing
+  - BBA – Hospitality and Event Management
+  - B.Com – Bachelor of Commerce
+* **Postgraduate (PG)**:
+  - MBA – Master of Business Administration (Finance | Operations | HR | Business Analytics | Marketing)
+
+### D. School of Agriculture
+* **Undergraduate (UG)**:
+  - B.Sc. (Hons.) Agriculture (ICAR Accredited)
+  - B.Tech. Food Technology
+* **Postgraduate (PG)**:
+  - M.Sc. Agriculture: Agronomy | Genetics & Plant Breeding | Horticulture | Plant Pathology | Agriculture Extension Education | Soil Science | Agriculture Economics
+  - MBA in Agri Business Management
+
+### E. School of Design
+* B.Des. Interior Design
+* B.Des. Fashion Design
+
+### F. School of Sciences and Humanities
+* **Undergraduate (UG)**:
+  - B.Sc. Physics
+  - B.Sc. Chemistry
+  - B.Sc. Biology
+  - B.Tech. Biotechnology with AI
+  - B.Tech. Engineering Physics in AI, Robotics & Space
+  - B.Tech. Applied Chemistry in AI, NanoRobotics & Drug Discovery
+* **Postgraduate (PG)**:
+  - M.Sc. Physics | Chemistry | Biotechnology & AI
+  - M.A. English
+
+### G. Doctoral Studies (Ph.D.)
+* Ph.D. Program (Full Time / Part Time) across all Engineering, Sciences, Agriculture, Management, and Humanities Specializations.

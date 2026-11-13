@@ -46,6 +46,7 @@ interface ProgramConfig {
   name: string;
   degreeType: "Bachelors" | "Masters";
   baseTuitionSem: number;
+  annualIncrease?: number;
   enrollmentFee: number;
   admissionFee: number;
   specializationFeeAnnual?: number;
@@ -57,136 +58,172 @@ interface ProgramConfig {
 const PROGRAMS: ProgramConfig[] = [
   {
     id: "btech_cse",
-    name: "B.Tech. Computer Science & Engineering (CSE)",
+    name: "B.Tech. Computer Science & Engineering (CSE & Allied)",
     degreeType: "Bachelors",
-    baseTuitionSem: 147500,
+    baseTuitionSem: 170000,
+    annualIncrease: 9000,
     enrollmentFee: 5000,
-    admissionFee: 25000,
+    admissionFee: 0,
     specializationFeeAnnual: 30000,
-    specializations: ["Artificial Intelligence & Machine Learning", "Cyber Security", "Data Science", "Gaming & ARVR", "Robotics and Automation"],
+    specializations: ["Artificial Intelligence & Machine Learning", "Cyber Security", "Data Science", "Robotics and Automation", "Quantum AI"],
     supportedExams: [
       { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE %" },
-      { key: "jeeMains", label: "JEE Mains %" },
-      { key: "eamcet", label: "EAMCET / EAPCET Rank" },
-      { key: "sat", label: "SAT Score" },
-      { key: "ib", label: "IB Score" },
+      { key: "cbse", label: "CBSE / ICSE %" },
+      { key: "jeeMains", label: "JEE Mains Percentile" },
+      { key: "eamcet", label: "TG/AP EAPCET Rank" },
+      { key: "ib", label: "IB Diploma Score" },
     ],
     slabs: [
       {
+        scholarshipPercent: 10,
+        ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" },
+        payableFeeSem: 153000,
+        cseYearlyPayable: { yr1: 306000, yr2: 315000, yr3: 324000, yr4: 333000 },
+      },
+      {
+        scholarshipPercent: 15,
+        ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" },
+        payableFeeSem: 144500,
+        cseYearlyPayable: { yr1: 289000, yr2: 298000, yr3: 307000, yr4: 316000 },
+      },
+      {
         scholarshipPercent: 20,
-        ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "75 – 85%", eamcet: "16001 – 18000", sat: "1151 – 1200", ib: "27 – 29" },
-        payableFeeSem: 118000,
-        cseYearlyPayable: { yr1: 118000, yr2: 124000, yr3: 130000, yr4: 136000 },
+        ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", ib: "24 – 29", jeeMains: "70 – 79.9 %ile" },
+        payableFeeSem: 136000,
+        cseYearlyPayable: { yr1: 272000, yr2: 281000, yr3: 290000, yr4: 299000 },
+      },
+      {
+        scholarshipPercent: 25,
+        ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", ib: "30 – 33", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" },
+        payableFeeSem: 127500,
+        cseYearlyPayable: { yr1: 255000, yr2: 264000, yr3: 273000, yr4: 282000 },
       },
       {
         scholarshipPercent: 30,
-        ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "85.1 – 90%", eamcet: "15001 – 16000", sat: "1201 – 1250", ib: "30 – 32" },
-        payableFeeSem: 104000,
-        cseYearlyPayable: { yr1: 104000, yr2: 109000, yr3: 114000, yr4: 119000 },
-      },
-      {
-        scholarshipPercent: 35,
-        ranges: { stateBoard: "80 – 91.99%", cbse: "75 – 89.99%", jeeMains: "90.1 – 93%", eamcet: "12001 – 15000", sat: "1251 – 1350", ib: "33 – 35" },
-        payableFeeSem: 96000,
-        cseYearlyPayable: { yr1: 96000, yr2: 101000, yr3: 106000, yr4: 111000 },
+        ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", ib: "34 – 37", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" },
+        payableFeeSem: 119000,
+        cseYearlyPayable: { yr1: 238000, yr2: 247000, yr3: 256000, yr4: 265000 },
       },
       {
         scholarshipPercent: 40,
-        ranges: { stateBoard: "92 – 97.99%", cbse: "90 – 97.99%", jeeMains: "93.1 – 95%", eamcet: "10001 – 12000", sat: "1351 – 1450", ib: "36 – 38" },
-        payableFeeSem: 89000,
-        cseYearlyPayable: { yr1: 89000, yr2: 94000, yr3: 99000, yr4: 104000 },
+        ranges: { stateBoard: "98% and above", cbse: "95% and above", ib: "35/45 and above", jeeMains: "95% and above", eamcet: "1 – 2000" },
+        payableFeeSem: 102000,
+        cseYearlyPayable: { yr1: 204000, yr2: 213000, yr3: 222000, yr4: 231000 },
       },
-      {
-        scholarshipPercent: 50,
-        ranges: { stateBoard: "98% and above", cbse: "98% and above", jeeMains: "95% and above", eamcet: "1 – 10000", sat: "1451 – 1600", ib: "39 and above" },
-        payableFeeSem: 74000,
-        cseYearlyPayable: { yr1: 74000, yr2: 78000, yr3: 82000, yr4: 86000 },
-      },
+    ],
+  },
+  {
+    id: "btech_ai_robotics",
+    name: "B.Tech. Artificial Intelligence & Robotics",
+    degreeType: "Bachelors",
+    baseTuitionSem: 200000,
+    annualIncrease: 12000,
+    enrollmentFee: 5000,
+    admissionFee: 0,
+    specializations: ["Autonomous Systems", "Industrial Robotics"],
+    supportedExams: [
+      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
+      { key: "cbse", label: "CBSE / ICSE %" },
+      { key: "jeeMains", label: "JEE Mains Percentile" },
+      { key: "eamcet", label: "TG/AP EAPCET Rank" },
+    ],
+    slabs: [
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" }, payableFeeSem: 180000 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 170000 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 160000 },
+      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 150000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 140000 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 120000 },
     ],
   },
   {
     id: "btech_ece",
     name: "B.Tech. Electronics & Communication Engineering (ECE)",
     degreeType: "Bachelors",
-    baseTuitionSem: 120000,
+    baseTuitionSem: 135000,
+    annualIncrease: 8000,
     enrollmentFee: 5000,
-    admissionFee: 25000,
-    specializations: ["Artificial Intelligence & Machine Learning", "VLSI Design"],
+    admissionFee: 0,
+    specializations: ["AIML", "VLSI Design", "Robotics and Automation"],
     supportedExams: [
       { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE %" },
-      { key: "jeeMains", label: "JEE Mains %" },
-      { key: "eamcet", label: "EAMCET / EAPCET Rank" },
-      { key: "sat", label: "SAT Score" },
-      { key: "ib", label: "IB Score" },
+      { key: "cbse", label: "CBSE / ICSE %" },
+      { key: "jeeMains", label: "JEE Mains Percentile" },
+      { key: "eamcet", label: "TG/AP EAPCET Rank" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "60 – 69.99%", eamcet: "16001 – 18000", sat: "1151 – 1200", ib: "27 – 29" }, payableFeeSem: 108000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "70 – 74.99%", eamcet: "15001 – 16000", sat: "1201 – 1250", ib: "30 – 32" }, payableFeeSem: 96000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "80 – 91.99%", cbse: "75 – 89.99%", jeeMains: "75 – 79.99%", eamcet: "12001 – 15000", sat: "1251 – 1350", ib: "33 – 35" }, payableFeeSem: 84000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "92 – 97.99%", cbse: "90 – 97.99%", jeeMains: "80 – 89.99%", eamcet: "10001 – 12000", sat: "1351 – 1450", ib: "36 – 38" }, payableFeeSem: 72000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "90% and above", cbse: "98% and above", jeeMains: "90% and above", eamcet: "1 – 10000", sat: "1451 – 1600", ib: "39 and above" }, payableFeeSem: 60000 },
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" }, payableFeeSem: 121500 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 114750 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 108000 },
+      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 101250 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 94500 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 81000 },
     ],
   },
   {
     id: "btech_core",
-    name: "B.Tech. Mechanical / Civil / EEE",
+    name: "B.Tech. Core (Biotech / Mech / Civil / EEE / Food Tech)",
     degreeType: "Bachelors",
     baseTuitionSem: 100000,
+    annualIncrease: 6000,
     enrollmentFee: 5000,
-    admissionFee: 25000,
-    specializations: ["Renewable Energy", "Robotics and Automation", "Electric Vehicles", "Smart Manufacturing"],
+    admissionFee: 0,
+    specializations: ["Biotechnology with AI", "Robotics and Automation", "Smart Manufacturing", "Electric Vehicles", "Renewable Energy"],
     supportedExams: [
       { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE %" },
-      { key: "jeeMains", label: "JEE Mains %" },
-      { key: "eamcet", label: "EAMCET / EAPCET Rank" },
+      { key: "cbse", label: "CBSE / ICSE %" },
+      { key: "jeeMains", label: "JEE Mains Percentile" },
+      { key: "eamcet", label: "TG/AP EAPCET Rank" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%", jeeMains: "60 – 69.99%", eamcet: "16001 – 18000" }, payableFeeSem: 90000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%", jeeMains: "70 – 74.99%", eamcet: "15001 – 16000" }, payableFeeSem: 80000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "80 – 91.99%", cbse: "75 – 89.99%", jeeMains: "75 – 79.99%", eamcet: "12001 – 15000" }, payableFeeSem: 70000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "92 – 97.99%", cbse: "90 – 97.99%", jeeMains: "80 – 89.99%", eamcet: "10001 – 12000" }, payableFeeSem: 60000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "90% and above", cbse: "98% and above", jeeMains: "90% and above", eamcet: "1 – 10000" }, payableFeeSem: 50000 },
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" }, payableFeeSem: 90000 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 85000 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 80000 },
+      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 75000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 70000 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 60000 },
     ],
   },
   {
     id: "bca",
     name: "BCA (Bachelor of Computer Applications)",
     degreeType: "Bachelors",
-    baseTuitionSem: 90000,
+    baseTuitionSem: 75000,
+    annualIncrease: 4000,
     enrollmentFee: 5000,
-    admissionFee: 25000,
+    admissionFee: 0,
     supportedExams: [
       { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE %" },
+      { key: "cbse", label: "CBSE / ICSE %" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%" }, payableFeeSem: 81000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%" }, payableFeeSem: 72000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "80 – 91.99%", cbse: "75 – 89.99%" }, payableFeeSem: 63000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "92 – 97.99%", cbse: "90 – 97.99%" }, payableFeeSem: 54000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "90% and above", cbse: "98% and above" }, payableFeeSem: 45000 },
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%" }, payableFeeSem: 67500 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%" }, payableFeeSem: 63750 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%" }, payableFeeSem: 60000 },
+      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%" }, payableFeeSem: 56250 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%" }, payableFeeSem: 52500 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above" }, payableFeeSem: 45000 },
     ],
   },
   {
     id: "bba",
     name: "BBA (Bachelor of Business Administration)",
     degreeType: "Bachelors",
-    baseTuitionSem: 90000,
+    baseTuitionSem: 75000,
+    annualIncrease: 4000,
     enrollmentFee: 5000,
-    admissionFee: 25000,
+    admissionFee: 0,
     supportedExams: [
       { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE %" },
+      { key: "cbse", label: "CBSE / ICSE %" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 69.99%", cbse: "60 – 64.99%" }, payableFeeSem: 81000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.99%", cbse: "65 – 74.99%" }, payableFeeSem: 72000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "80 – 91.99%", cbse: "75 – 89.99%" }, payableFeeSem: 63000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "92 – 97.99%", cbse: "90 – 97.99%" }, payableFeeSem: 54000 },
-      { scholarshipPercent: 50, ranges: { stateBoard: "90% and above", cbse: "98% and above" }, payableFeeSem: 45000 },
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%" }, payableFeeSem: 67500 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%" }, payableFeeSem: 63750 },
+      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%" }, payableFeeSem: 60000 },
+      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%" }, payableFeeSem: 56250 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%" }, payableFeeSem: 52500 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above" }, payableFeeSem: 45000 },
     ],
   },
   {
@@ -194,19 +231,40 @@ const PROGRAMS: ProgramConfig[] = [
     name: "MBA (Master of Business Administration)",
     degreeType: "Masters",
     baseTuitionSem: 150000,
+    annualIncrease: 9000,
     enrollmentFee: 5000,
-    admissionFee: 25000,
+    admissionFee: 0,
     supportedExams: [
-      { key: "degree", label: "Any Degree %" },
-      { key: "icet", label: "ICET Rank" },
-      { key: "catMat", label: "MAT/XAT/CAT %" },
+      { key: "degree", label: "Qualifying Degree %" },
+      { key: "catMat", label: "MAT / CAT / CMAT %" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { degree: "60 – 69.99%", icet: "1751 – 2000", catMat: "60 – 69.99%" }, payableFeeSem: 135000 },
-      { scholarshipPercent: 20, ranges: { degree: "70 – 79.99%", icet: "1501 – 1750", catMat: "70 – 74.99%" }, payableFeeSem: 120000 },
-      { scholarshipPercent: 30, ranges: { degree: "80 – 89.99%", icet: "1251 – 1500", catMat: "75 – 79.99%" }, payableFeeSem: 105000 },
-      { scholarshipPercent: 40, ranges: { degree: "90 – 94.99%", icet: "1001 – 1250", catMat: "80 – 84.99%" }, payableFeeSem: 90000 },
-      { scholarshipPercent: 50, ranges: { degree: "95% and above", icet: "1 – 1000", catMat: "85% and above" }, payableFeeSem: 75000 },
+      { scholarshipPercent: 10, ranges: { degree: "60 – 64.9%", catMat: "60 – 64.9%" }, payableFeeSem: 135000 },
+      { scholarshipPercent: 15, ranges: { degree: "65 – 69.9%", catMat: "65 – 69.9%" }, payableFeeSem: 127500 },
+      { scholarshipPercent: 20, ranges: { degree: "70 – 79.9%", catMat: "70 – 79.9%" }, payableFeeSem: 120000 },
+      { scholarshipPercent: 25, ranges: { degree: "80 – 91.9%", catMat: "80 – 91.9%" }, payableFeeSem: 112500 },
+      { scholarshipPercent: 30, ranges: { degree: "92 – 97.9%", catMat: "92 – 97.9%" }, payableFeeSem: 105000 },
+      { scholarshipPercent: 40, ranges: { degree: "98% and above", catMat: "98% and above" }, payableFeeSem: 90000 },
+    ],
+  },
+  {
+    id: "mca",
+    name: "MCA (Master of Computer Applications)",
+    degreeType: "Masters",
+    baseTuitionSem: 75000,
+    annualIncrease: 4000,
+    enrollmentFee: 5000,
+    admissionFee: 0,
+    supportedExams: [
+      { key: "degree", label: "Qualifying Degree %" },
+    ],
+    slabs: [
+      { scholarshipPercent: 10, ranges: { degree: "60 – 64.9%" }, payableFeeSem: 67500 },
+      { scholarshipPercent: 15, ranges: { degree: "65 – 69.9%" }, payableFeeSem: 63750 },
+      { scholarshipPercent: 20, ranges: { degree: "70 – 79.9%" }, payableFeeSem: 60000 },
+      { scholarshipPercent: 25, ranges: { degree: "80 – 91.9%" }, payableFeeSem: 56250 },
+      { scholarshipPercent: 30, ranges: { degree: "92 – 97.9%" }, payableFeeSem: 52500 },
+      { scholarshipPercent: 40, ranges: { degree: "98% and above" }, payableFeeSem: 45000 },
     ],
   },
 ];
@@ -221,11 +279,11 @@ const QUICK_PRESETS: QuickPreset[] = [
   { label: "780 / 1000 (Inter)", value: "780", examKey: "stateBoard" },
   { label: "850 / 1000 (Inter)", value: "850", examKey: "stateBoard" },
   { label: "920 / 1000 (Inter)", value: "920", examKey: "stateBoard" },
-  { label: "85% (10+2 MPC)", value: "85%", examKey: "stateBoard" },
-  { label: "Rank 4,500 (EAPCET)", value: "4500", examKey: "eamcet" },
-  { label: "Rank 8,500 (EAPCET)", value: "8500", examKey: "eamcet" },
-  { label: "Rank 12,500 (EAPCET)", value: "12500", examKey: "eamcet" },
-  { label: "CBSE 88%", value: "88%", examKey: "cbse" },
+  { label: "980 / 1000 (Inter)", value: "980", examKey: "stateBoard" },
+  { label: "Rank 1,500 (EAPCET)", value: "1500", examKey: "eamcet" },
+  { label: "Rank 5,000 (EAPCET)", value: "5000", examKey: "eamcet" },
+  { label: "Rank 15,000 (EAPCET)", value: "15000", examKey: "eamcet" },
+  { label: "CBSE 95%", value: "95%", examKey: "cbse" },
 ];
 
 /**
@@ -454,7 +512,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           ranges: { [exam.key]: "Standard Tuition (Below Cutoff)" },
           cseYearlyPayable:
             prog.id === "btech_cse"
-              ? { yr1: 147500, yr2: 155000, yr3: 163000, yr4: 171000 }
+              ? { yr1: 340000, yr2: 349000, yr3: 358000, yr4: 367000 }
               : undefined,
         }
       : prog.slabs[slabIdx] || prog.slabs[0];
@@ -927,58 +985,64 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </div>
             </div>
 
-            {/* Total 1st Semester Payable (Tuition + Enrollment + Admission) */}
+            {/* Total 1st Year Payable (Tuition + Enrollment) */}
             <div className="calc-joining-breakdown">
               <div className="joining-header">
-                <strong>Admission & First Semester Payable Breakdown:</strong>
+                <strong>First Year Payable Breakdown:</strong>
               </div>
               <div className="joining-row">
-                <span className="joining-item">Net 1st Semester Tuition:</span>
-                <span className="joining-val">₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}</span>
+                <span className="joining-item">Net 1st Year Tuition Fee:</span>
+                <span className="joining-val">₹{(calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN")}</span>
+              </div>
+              <div className="joining-row">
+                <span className="joining-item">Semester-wise Installment:</span>
+                <span className="joining-val">₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")} / semester</span>
               </div>
               <div className="joining-row">
                 <span className="joining-item">One-Time Enrollment Fee:</span>
                 <span className="joining-val">₹{calculatedSnapshot.program.enrollmentFee.toLocaleString("en-IN")}</span>
               </div>
-              <div className="joining-row">
-                <span className="joining-item">One-Time Admission Fee:</span>
-                <span className="joining-val">₹{calculatedSnapshot.program.admissionFee.toLocaleString("en-IN")}</span>
-              </div>
+              {calculatedSnapshot.program.annualIncrease && (
+                <div className="joining-row">
+                  <span className="joining-item">Annual Tuition Increase (from Year 2):</span>
+                  <span className="joining-val">+₹{calculatedSnapshot.program.annualIncrease.toLocaleString("en-IN")} / year</span>
+                </div>
+              )}
               <div className="joining-row total-joining">
-                <span className="joining-item">Total Payable at 1st Semester Joining:</span>
+                <span className="joining-item">Total 1st Year Tuition + Enrollment:</span>
                 <span className="joining-val bold-emerald">
-                  ₹{(calculatedSnapshot.slab.payableFeeSem + calculatedSnapshot.program.enrollmentFee + calculatedSnapshot.program.admissionFee).toLocaleString("en-IN")}
+                  ₹{((calculatedSnapshot.slab.payableFeeSem * 2) + calculatedSnapshot.program.enrollmentFee).toLocaleString("en-IN")}
                 </span>
               </div>
             </div>
 
-            {/* 4-Year Semester Progression for B.Tech CSE */}
+            {/* 4-Year Tuition Progression for B.Tech CSE */}
             {calculatedSnapshot.slab.cseYearlyPayable && (
               <div className="progression-table-wrap">
                 <div className="progression-title">
                   <CalendarIcon size={14} />
-                  <span>Year-by-Year Semester Tuition Progression (CSE):</span>
+                  <span>Year-by-Year Tuition Progression (Annual Base + ₹9,000 Yearly Increase):</span>
                 </div>
                 <div className="progression-grid">
                   <div className="prog-col">
                     <span className="prog-yr">Year 1</span>
                     <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr1.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per sem</span>
+                    <span className="prog-unit">per year</span>
                   </div>
                   <div className="prog-col">
                     <span className="prog-yr">Year 2</span>
                     <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr2.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per sem</span>
+                    <span className="prog-unit">per year</span>
                   </div>
                   <div className="prog-col">
                     <span className="prog-yr">Year 3</span>
                     <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr3.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per sem</span>
+                    <span className="prog-unit">per year</span>
                   </div>
                   <div className="prog-col">
                     <span className="prog-yr">Year 4</span>
                     <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr4.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per sem</span>
+                    <span className="prog-unit">per year</span>
                   </div>
                 </div>
               </div>
@@ -1036,21 +1100,21 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               <div className="note-item">
                 <PinIcon size={15} />
                 <div>
-                  <strong>One-Time Fees:</strong> Enrollment Fee ₹{calculatedSnapshot.program.enrollmentFee.toLocaleString("en-IN")} and Admission Fee ₹{calculatedSnapshot.program.admissionFee.toLocaleString("en-IN")} payable only once during admission.
+                  <strong>One-Time & Annual Charges:</strong> Enrollment Fee: ₹5,000 (one-time). Annual other fee: ₹15,000/yr | Exam fee: ₹5,000/yr | Tri-cities Bus transport: ₹30,000/yr.
                 </div>
               </div>
               {calculatedSnapshot.program.specializationFeeAnnual && (
                 <div className="note-item">
                   <FlaskIcon size={15} />
                   <div>
-                    <strong>Specialization Fee:</strong> ₹{calculatedSnapshot.program.specializationFeeAnnual.toLocaleString("en-IN")}/year applicable from 2nd year onwards for advanced tech tracks (AI&ML, Cyber Security, Data Science, etc.).
+                    <strong>Specialization Fee:</strong> ₹{calculatedSnapshot.program.specializationFeeAnnual.toLocaleString("en-IN")}/year applicable from 2nd year onwards for advanced tech tracks (AI&ML, Cyber Security, Data Science, Quantum AI, Robotics).
                   </div>
                 </div>
               )}
               <div className="note-item special-scholarship">
                 <HeartHandIcon size={15} />
                 <div>
-                  <strong>Special 15% Waiver:</strong> An additional 15% tuition concession is granted to students who lost their parents (Death certificate required; min 7.5 CGPA required for continuation).
+                  <strong>19 Special Category Concessions:</strong> Flat annual tuition waivers of ₹50,000/yr (orphans, international sports, SRU staff children), ₹20,000/yr (differently abled over 50% disability), and ₹15,000/yr (girl students, single parent, defence/police, NCC C, SR Junior College, AP/out-of-state students, alumni siblings).
                 </div>
               </div>
             </div>
