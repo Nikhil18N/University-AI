@@ -333,6 +333,37 @@ PLACEMENT_EXCELLENCE_CARD = {
     "type": "placement_highlights",
     "title": "Three Consecutive Years of Excellence in Highest Packages & Internships",
     "subtitle": "SR University Campus Recruitment & Corporate Placement Highlights",
+    "image_url": "/placements-three-years.png",
+    "image_alt": "Three Consecutive Years of Excellence in Highest Packages & Internships",
+    "superstars": [
+        {
+            "name": "B. Shiva Krishna",
+            "role": "Software Engineer",
+            "company": "Microsoft",
+            "package": "51 LPA",
+            "stipend": "₹1.25L / month",
+            "batch": "Batch 2025",
+            "badge_color": "#10b981",
+        },
+        {
+            "name": "Mohammed Akramuddin",
+            "role": "Associate Software Engineer",
+            "company": "ServiceNow",
+            "package": "49.30 LPA",
+            "stipend": "₹0.80L / month",
+            "batch": "Batch 2027",
+            "badge_color": "#6366f1",
+        },
+        {
+            "name": "Kencha Bhavana",
+            "role": "Software Development Engineer",
+            "company": "Amazon",
+            "package": "46.38 LPA",
+            "stipend": "₹1.10L / month",
+            "batch": "Batch 2026",
+            "badge_color": "#0284c7",
+        },
+    ],
     "stats": [
         {"label": "Record Highest Package", "value": "51 LPA", "note": "Microsoft (Batch 2025)"},
         {"label": "ServiceNow Marquee Offer", "value": "49.30 LPA", "note": "ServiceNow (Batch 2027)"},
@@ -436,7 +467,7 @@ def generate_cards(
         cards.append(CURRICULUM_CARD)
 
     # 4. Placement Highlights card ("Three Consecutive Years of Excellence")
-    if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer")):
+    if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):
         cards.append(PLACEMENT_EXCELLENCE_CARD)
 
     # 5. Campus tour card (render static spot highlights if explicitly asking for campus walkthrough/tour)

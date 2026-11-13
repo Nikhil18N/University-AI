@@ -931,6 +931,241 @@
   color: #e2e8f0;
 }
 
+/* ==========================================================================
+   Placement Highlights & Superstars Showcase Card
+   ========================================================================== */
+.placement-card {
+  border-top: 3px solid #0284c7;
+  background: var(--surface-1, #ffffff);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.placement-badge {
+  background: rgba(2, 132, 199, 0.1) !important;
+  color: #0284c7 !important;
+  border-color: rgba(2, 132, 199, 0.25) !important;
+}
+
+.card-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-2, #64748b);
+  margin: 2px 0 0 0;
+}
+
+/* Hero Banner Image */
+.placement-banner-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e2e8f0);
+  background: #ffffff;
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.placement-banner-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.placement-banner-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.placement-banner-hint {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Superstars Showcase Grid */
+.superstars-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.superstar-card {
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.superstar-card:hover {
+  border-color: #0284c7;
+  transform: translateY(-2px);
+}
+
+.superstar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.superstar-batch-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-2, #64748b);
+  background: var(--surface-3, #f1f5f9);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.superstar-package-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #047857;
+  background: #d1fae5;
+  padding: 2px 7px;
+  border-radius: 12px;
+}
+
+.superstar-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-1, #0f172a);
+  margin: 2px 0 0 0;
+}
+
+.superstar-role {
+  font-size: 0.75rem;
+  color: var(--text-2, #64748b);
+  margin: 0;
+}
+
+.superstar-company {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  color: var(--text-1, #0f172a);
+  margin-top: 2px;
+}
+
+.superstar-stipend {
+  font-size: 0.72rem;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+/* Placement Stats Grid */
+.placement-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.placement-stat-box {
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0284c7;
+}
+
+.stat-lbl {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-1, #0f172a);
+}
+
+.stat-sub {
+  font-size: 0.65rem;
+  color: var(--text-2, #64748b);
+}
+
+/* Top MNC Section */
+.placement-mnc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.placement-mnc-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-2, #64748b);
+  margin: 0;
+}
+
+.placement-mnc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mnc-offer-pill {
+  font-size: 0.74rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  color: var(--text-1, #0f172a);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .placement-card {
+  border-top-color: #38bdf8;
+  background: #181d27;
+}
+
+[data-theme="dark"] .superstar-card,
+[data-theme="dark"] .placement-stat-box,
+[data-theme="dark"] .mnc-offer-pill {
+  background: #212631;
+  border-color: #2d3340;
+}
+
+[data-theme="dark"] .superstar-batch-tag {
+  background: #2d3340;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .superstar-package-pill {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
 /* Mobile Optimizations */
 @media (max-width: 600px) {
   .rich-card {
@@ -941,6 +1176,15 @@
   .comparison-grid {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .superstars-showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .placement-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .yt-card-item {
@@ -962,3 +1206,4 @@
     font-size: 0.92rem;
   }
 }
+

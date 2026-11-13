@@ -157,3 +157,20 @@ def test_vague_fee_query_returns_no_card():
     # Should not attach an unprompted all-in-one card
     assert len(cards) == 0
 
+
+def test_placement_excellence_card_generation():
+    """Verify placement questions generate PLACEMENT_EXCELLENCE_CARD with image_url and 3 superstars."""
+    from app.services.card_service import PLACEMENT_EXCELLENCE_CARD
+    cards = generate_cards(
+        user_message="tell me about campus placements and highest packages",
+        answer="SR University achieved three consecutive years of excellence with highest package of 51 LPA at Microsoft.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == PLACEMENT_EXCELLENCE_CARD
+    assert cards[0]["image_url"] == "/placements-three-years.png"
+    assert len(cards[0]["superstars"]) == 3
+    companies = [star["company"] for star in cards[0]["superstars"]]
+    assert "Microsoft" in companies
+    assert "Amazon" in companies
+    assert "ServiceNow" in companies
+

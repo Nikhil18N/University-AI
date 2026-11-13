@@ -376,6 +376,123 @@ export function VideoRecommendationsCard({ card }: { card: any }) {
   );
 }
 
+export function PlacementHighlightsCard({ card }: CardProps) {
+  const superstars = card.superstars || [
+    {
+      name: "B. Shiva Krishna",
+      role: "Software Engineer",
+      company: "Microsoft",
+      package: "51 LPA",
+      stipend: "₹1.25L / month",
+      batch: "Batch 2025",
+      badge_color: "#10b981",
+    },
+    {
+      name: "Kencha Bhavana",
+      role: "Software Development Engineer",
+      company: "Amazon",
+      package: "46.38 LPA",
+      stipend: "₹1.10L / month",
+      batch: "Batch 2026",
+      badge_color: "#0284c7",
+    },
+    {
+      name: "Mohammed Akramuddin",
+      role: "Associate Software Engineer",
+      company: "ServiceNow",
+      package: "49.30 LPA",
+      stipend: "₹0.80L / month",
+      batch: "Batch 2027",
+      badge_color: "#6366f1",
+    },
+  ];
+
+  const stats = card.stats || [
+    { label: "Highest Package", value: "51 LPA", note: "Microsoft" },
+    { label: "Total Job Offers", value: "1,300+", note: "And counting" },
+    { label: "Internships", value: "3,500+", note: "Stipends to ₹1.25L/mo" },
+    { label: "Average CTC", value: "6 LPA", note: "Cohort Average" },
+  ];
+
+  const topMncs = card.top_mnc_offers || [];
+
+  return (
+    <div className="rich-card placement-card">
+      <div className="card-header">
+        <span className="card-badge placement-badge">
+          <AwardIcon size={14} /> Placement Excellence
+        </span>
+        <h4 className="card-title">{card.title}</h4>
+        {card.subtitle && <p className="card-subtitle">{card.subtitle}</p>}
+      </div>
+
+      {/* Official 3 Superstars Banner Image */}
+      <div className="placement-banner-wrapper">
+        <img
+          src={card.image_url || "/placements-three-years.png"}
+          alt={card.image_alt || card.title}
+          className="placement-banner-image"
+          loading="eager"
+          onClick={() => window.open(card.image_url || "/placements-three-years.png", "_blank")}
+        />
+        <div className="placement-banner-hint">
+          <span>Click to view full resolution banner ↗</span>
+        </div>
+      </div>
+
+      {/* 3 Consecutive Years Superstars Showcase */}
+      <div className="superstars-showcase-grid">
+        {superstars.map((star: any, idx: number) => (
+          <div key={idx} className="superstar-card">
+            <div className="superstar-top">
+              <span className="superstar-batch-tag">{star.batch}</span>
+              <span className="superstar-package-pill">{star.package}</span>
+            </div>
+            <h5 className="superstar-name">{star.name}</h5>
+            <p className="superstar-role">{star.role}</p>
+            <div className="superstar-company">
+              <BriefcaseIcon size={13} />
+              <span>Placed @ <strong>{star.company}</strong></span>
+            </div>
+            {star.stipend && (
+              <div className="superstar-stipend">
+                <span>Internship: <strong>{star.stipend}</strong></span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Key Milestone Stats */}
+      <div className="placement-stats-grid">
+        {stats.map((s: any, idx: number) => (
+          <div key={idx} className="placement-stat-box">
+            <span className="stat-val">{s.value}</span>
+            <span className="stat-lbl">{s.label}</span>
+            {s.note && <span className="stat-sub">{s.note}</span>}
+          </div>
+        ))}
+      </div>
+
+      {/* Top Recruiting MNCs Volume */}
+      {topMncs.length > 0 && (
+        <div className="placement-mnc-section">
+          <h6 className="placement-mnc-title">
+            <SparklesIcon size={13} /> Top MNC Offers
+          </h6>
+          <div className="placement-mnc-pills">
+            {topMncs.map((m: any, idx: number) => (
+              <span key={idx} className="mnc-offer-pill">
+                <strong>{m.company}</strong>: {m.offers} offers
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RenderCard({ card }: { card: any }) {
   if (!card || !card.type) return null;
 
@@ -392,7 +509,10 @@ export function RenderCard({ card }: { card: any }) {
       return <ProfileCard card={card} />;
     case "video_recommendations":
       return <VideoRecommendationsCard card={card} />;
+    case "placement_highlights":
+      return <PlacementHighlightsCard card={card} />;
     default:
       return null;
   }
 }
+
