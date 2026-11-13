@@ -11,7 +11,7 @@
 - **[FACT-ID: GEN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md]**
   - **Institution Full Name**: SR University (SRU)
   - **Type**: State Private University established under the Telangana State Private Universities Act.
-  - **Campus Size**: 150-acre lush green residential campus.
+  - **Campus Size**: 170+ acre lush green residential campus.
   - **Location & Address**: Ananthasagar, Hasanparthy Mandal, Warangal, Telangana 506371, India (on the Warangal–Karimnagar Highway).
   - **Distance**: 14 km from Hanumakonda, 16 km from Kazipet Junction (KZJ), 29 km from Warangal Railway Station.
   - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary leading SR Educational Society since 1976 (over 185 institutions, 1 lakh+ students).
@@ -87,8 +87,9 @@
 ## 5. Campus Placements & Recruitment Records
 
 - **[FACT-ID: PLC-001] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md & 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Highest Placement Package**: **51 LPA (Lakhs Per Annum)** offered by **Microsoft**.
-  - **Average Placement Package**: **6 LPA** across graduating B.Tech cohorts.
+  - **Highest Placement Package**: **51 LPA (Lakhs Per Annum)** offered by **Microsoft** (Batch 2025); **46.38 LPA** offered by **Amazon** (Batch 2026, CSE).
+  - **Average Placement Package**: **6 LPA** university-wide (earlier CSSP record); school-wise averages (Oct-2026 deck): ECE 5, EEE 4, Mechanical 4, Civil 6, Business 5 LPA.
+  - **Total Job Offers**: **1300+**; **Total Internships (Batch 2026)**: **2500+**; **Recruiters**: **150+**.
   - **Top Recruiters Cutoff**: Minimum **CGPA of 7.5 or above** with **zero active backlogs** at the time of recruitment drive.
   - **Placement Department**: Centre for Student Services and Placements (CSSP).
 - **[FACT-ID: PLC-002] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md]**
@@ -147,6 +148,24 @@
 ## 8. Innovation, Startups & Incubation (SRiX)
 
 - **[FACT-ID: INN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md]**
-  - **Incubator**: **SRiX (SR Innovation Exchange)** — A Technology Business Incubator supported by the Department of Science and Technology (DST), Government of India.
+  - **Incubator**: **SRiX (SR Innovation Exchange)** — A Technology Business Incubator supported by the Department of Science and Technology (DST), Government of India. **171 startups** registered, **₹76+ Cr** funding for startups.
   - **Focus Areas**: AI/ML, Internet of Things (IoT), Agritech, Medtech, Clean Energy.
   - **Facilities**: 14+ maker spaces, rapid prototyping labs, IP facilitation, mentorship, seed funding access, and incubation support for students and faculty.
+
+---
+
+## 9. Rankings, Accreditations & International Programs (Admissions Presentation, 30-Oct-2026)
+
+- **[FACT-ID: RNK-001] [STATUS: VERIFIED] [SOURCE: 10_admissions_presentation_oct2026.md]**
+  - **NIRF Engineering**: Rank **98** (2023), **98** (2024), **91** (2025); Top 100 for four years in a row.
+  - **THE World University Rankings 2026**: **801–1000** global band; **7th** among private universities in India; Asia rank band **351–400**.
+  - **THE Sustainability Impact Ratings 2026**: **24th** in India; global band **401–600**.
+  - **UI GreenMetric 2025**: **23rd** in India.
+- **[FACT-ID: ACC-001] [STATUS: VERIFIED] [SOURCE: 10_admissions_presentation_oct2026.md]**
+  - **ICAR Accreditation**: School of Agriculture and B.Sc. (Hons.) Agriculture; first private university in Telangana and Andhra Pradesh to achieve it.
+  - **NBA**: Tier-I accreditation for B.Tech CSE, ECE, EEE, ME and CE.
+- **[FACT-ID: INT-001] [STATUS: VERIFIED] [SOURCE: 10_admissions_presentation_oct2026.md]**
+  - **International Engineering Program (IEP)**: 3+1 or 2+2 with partner universities in the USA (UMass Lowell, University of New Haven, University of Missouri, University of Central Missouri); M.S. in the 5th year. T&C apply.
+  - **International Business Accelerated Program (IBAP)**: BBA + MBA/MS (Finance / Business Analytics), 3 years at SRU + 2 years at UMass Lowell, USA.
+  - **2+2 New Zealand**: Years 1–2 at SRU, Years 3–4 at University of Otago (B.Sc. Food Science) or Massey University (B.Sc. Agriculture).
+

@@ -5,14 +5,22 @@ The **Centre for Student Services and Placements (CSSP)** and the **Career and J
 * **Placement Cell Location**: SRiX Block, 1st Floor.
 * **Key Contacts**:
   - Mr. D. Sridhar (Head CSSP): `stu.cssp@sru.edu.in`
-  - Mr. Gurcharan (Placement Operations): (SRiX 1st Floor)
+  - Mr. Gurcharan (Placement Operations): `stu.cssp@sru.edu.in` (SRiX 1st Floor)
 
 ---
 
 ## 2. Placement Highlights & Statistics
-* **Highest Package**: **51 LPA** offered by **Microsoft**.
-* **Average Package**: **6 LPA** across graduating branches.
-* **Recruiting Companies**: 200+ top national and multinational recruiters, including Microsoft, Amazon, Cisco, IBM, PwC, Synopsys, S&P Global, Accenture, Infosys, Wipro, TCS, Cognizant, HCL, Tech Mahindra, and core engineering firms.
+* **Highest Package**: **51 LPA** offered by **Microsoft** (Software Engineer, Batch 2025). Highest package for Batch 2026: **46.38 LPA** offered by **Amazon** (CSE).
+* **Average Package**: **6 LPA** university-wide (earlier CSSP record). School-wise averages published in the Oct-2026 admissions presentation: ECE 5 LPA, EEE 4 LPA, Mechanical 4 LPA, Civil 6 LPA, Business 5 LPA.
+* **Total Job Offers**: **1300+** (as of April, and counting). **Total Internships (Batch 2026)**: **2500+**. **Highest internship stipend**: **1.25 lakh per month** at **Microsoft** (Batch 2025).
+* **Recruiting Companies**: **150+** national and multinational recruiters, including Microsoft, Amazon, PayPal, Flipkart, Cisco, IBM, Accenture, Cognizant, Infosys, TCS, Wipro, Capgemini, Virtusa, Tech Mahindra, HCLTech, HSBC, DBS, PwC, ADP, Genpact, Synopsys, S&P Global, Bosch, Schneider Electric, Larsen & Toubro, Hexaware, Cyient, opentext and core engineering firms.
+* **Offers from Top MNCs (as stated in the deck)**: Accenture 254, Cognizant 165, Brakes India 66, Capgemini 57, Virtusa 48, TCS 45, Savantis 43, Infosys 22.
+* **School-wise Placement Snapshot (Oct-2026 deck)**:
+  - Electronics & Communication Engineering: highest ₹13.5 LPA (Flipkart); highest internship ₹50K per month; 10 students placed at ₹9 LPA; 300+ internships; average 5 LPA.
+  - Electrical & Electronics Engineering: highest ₹12 LPA; average 4 LPA.
+  - Mechanical Engineering: highest 6 LPA; average 4 LPA; 200+ internships.
+  - Civil Engineering: average 6 LPA; 25+ companies visited.
+  - School of Business: highest ₹14 LPA (HCLTech); 10 students placed at ₹8 LPA; 150+ internships; average 5 LPA.
 
 ---
 
@@ -58,13 +66,3 @@ A student will be debarred / blacklisted from campus placement assistance in any
 4. Unprofessional behavior, misconduct, or rudeness reported by visiting HR representatives, company interviewers, or student volunteers.
 5. Directly contacting visiting HR executives or recruiters without official CJAC authorization.
 6. **Failure to Apply**: If a student is eligible as per the job description and company criteria but fails to apply for **three (3) consecutive eligible campus job postings**, they will be deemed disinterested and disqualified from the placement process.
-
-
-## 7. Campus Placement Highlights & Top Recruiter Cutoffs
-* **Highest Placement Package**:
-  - **51 LPA (Lakhs Per Annum)**, secured by students at **Microsoft**.
-* **Average Placement Package**:
-  - **6 LPA** overall average across graduating B.Tech batches.
-* **Eligibility Criteria for Top Recruiters**:
-  - Students must maintain a minimum **CGPA of 7.5 and above**.
-  - Must have **no active backlogs** at the time of the recruitment drive.

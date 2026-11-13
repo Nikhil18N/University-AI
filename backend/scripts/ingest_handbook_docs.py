@@ -84,7 +84,14 @@ HANDBOOK_DOCS = [
         "title": "SRU Verified Knowledge Registry — Official Facts & Standards",
         "document_type": "registry",
         "department": "Admissions & University Administration",
-        "effective_date": datetime(2025, 8, 1, tzinfo=timezone.utc),
+        "effective_date": datetime(2026, 10, 30, tzinfo=timezone.utc),
+    },
+    {
+        "file": "10_admissions_presentation_oct2026.md",
+        "title": "SRU Admissions Presentation Facts (30 Oct 2026)",
+        "document_type": "admissions_deck",
+        "department": "Admissions & Marketing",
+        "effective_date": datetime(2026, 10, 30, tzinfo=timezone.utc),
     },
 ]
 
@@ -163,6 +170,20 @@ async def ingest_handbook():
 
     await embedding_provider.close()
     logger.info("Successfully ingested all SRU Student Handbook sections!")
+
+    # Invalidate cached answers (cache keys include index_version), as the admin upload path does.
+    try:
+        import redis.asyncio as aioredis
+        from app.services.cache_service import bump_index_version
+
+        redis_client = aioredis.from_url(settings.REDIS_URL)
+        try:
+            await bump_index_version(redis_client)
+        finally:
+            await redis_client.aclose()
+        logger.info("index_version bumped in Redis; cached answers invalidated.")
+    except Exception as exc:
+        logger.warning("Could not bump index_version in Redis (restart Redis or bump manually): %s", exc)
 
 
 if __name__ == "__main__":

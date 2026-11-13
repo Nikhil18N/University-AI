@@ -1,8 +1,8 @@
 # SR University — Campus Life, Facilities & Key Contacts
 
 ## 1. University Overview & Location
-* **Institution**: SR University (SRU), a State Private University established under Telangana State Act, spread across 150 acres of lush green campus in Warangal, Telangana.
-* **Student & Faculty Strength**: Currently ~9000 students, ~900 staff, 140+ Programs across five Schools (Computer Science and Artificial Intelligence, Engineering, Business, Agriculture, Sciences and Humanities) it may increase in future for accurate information reach admission office.
+* **Institution**: SR University (SRU), a State Private University established under Telangana State Act, spread across 170+ acres of lush green campus in Warangal, Telangana.
+* **Student & Faculty Strength**: ~9000 students, ~900 staff, 100+ programs in UG, PG & Ph.D. across six Schools (Computer Science & Artificial Intelligence, Engineering, Astra School of Business, Agriculture, Sciences & Humanities, Design).
 * **Leadership at SR University**:
   - **Chancellor**: **Sri A. Varada Reddy** — A pioneer in quality education serving since 1976; leading 185 educational institutions across South India under SR Educational Society with over 1 lakh students and 5 lakh alumni.
   - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science with specialization in Efficient Algorithm Design. Distinguished Professor in Artificial Intelligence, former Director of NVIDIA-BU Research Center on AI, leading the national `leadingindia.ai` ecosystem. CAC ABET Commissioner from India. Regular columnist/blogger in *The Times of India* under the nickname **"Breaking Shackles"**.
@@ -14,9 +14,13 @@
   - **Bhogatha Waterfalls**: Famous natural waterfall in the region.
   - **Thousand Pillar Temple**: Millennium-old Kakatiya temple in Hanamkonda.
 * **Accreditations & Recognitions**:
-  - NIRF: Ranked 98 in Engineering (2023) and 101–150 rank band in University category.
+  - NIRF (Engineering category): Rank 98 (2023), rank 98 (2024), rank 91 (2025). Among the Top 100 engineering institutions in India for four years in a row.
+  - Times Higher Education (THE) World University Rankings 2026: 801–1000 global band; 7th among private universities in India; Asia rankings 351–400 rank band. Subject rankings: Computer Science 601–800 global / 21st in India; Engineering 601–800 global / 18th in India; University category 801–1000 global / 28th in India. 6th in India in Research Quality.
+  - THE Sustainability Impact Ratings 2026 (overall): 24th in India, global band 401–600.
+  - UI GreenMetric World University Rankings 2025: 23rd in India.
+  - ICAR Accreditation for the School of Agriculture and B.Sc. (Hons.) Agriculture — first private university in Telangana and Andhra Pradesh to achieve it.
   - NBA: All UG programs (B.Tech CSE, ECE, EEE, ME & CE) are NBA Accredited in Tier-I category.
-  - Incubator: Hosts SRiX (SR Innovation Exchange), DST-sponsored Technology Business Incubator, All India 1st Rank in Private in Atal Ranking of Institutions on Innovation Achievements (ARIIA20).
+  - Incubator: Hosts SRiX (SR Innovation Exchange), a DST/NSTEDB-sponsored Technology Business Incubator with 171 registered startups and ₹76+ Cr funding, All India 1st Rank in Private in Atal Ranking of Institutions on Innovation Achievements (ARIIA20).
 * **Location & How to Reach**:
   - Campus Address: Ananthasagar, Hasanparthy (M), Warangal, Telangana 506371.
   - Distance: 14 km from Hanumakonda (main city), 16 km from Kazipet Railway Station (KZJ), 29 km from Warangal Railway Station.
@@ -27,14 +31,14 @@
 
 ## 2. Institutional Timings & Daily Schedule
 * **Academic Class Timings**:
-  - For all UG and PG courses: **8:30 to 4:30 and 9:30AM to 5:30 PM** (Monday to Friday).
+  - For all UG and PG courses: **9:00 AM to 5:00 PM** (Monday to Friday).
 * **College Bus Timings (Day-Scholars)**:
-  - Arrival at Campus: **8:20 AM and 9:20 AM**.
-  - Departure from Campus: **4:40 PM and 5:40 PM**.
+  - Arrival at Campus: **8:50 AM**.
+  - Departure from Campus: **5:00 PM**.
 * **Administrative & Student Support Office Hours**:
   - Functions till **5:30 PM** at the main office.
 * **Campus Facilities Timings**:
-  - Health & Wellness Centre: **8:30 AM to 5:30 PM** (Ambulance available 24x7).
+  - Health & Wellness Centre: **9:00 AM to 5:00 PM** (Ambulance available 24x7).
   - Central Library: Monday to Friday **8:30 AM to 8:30 PM**; Saturday & Sunday **10:00 AM to 4:00 PM**.
   - Reprographic & Printing Centre (Beside Block-I): **9:00 AM to 5:30 PM**.
   - Stationery Store (Adjacent to Block-I): **9:00 AM to 5:30 PM**.
