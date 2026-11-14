@@ -1471,3 +1471,347 @@
     margin: 8px 14px 0 14px;
   }
 }
+
+/* =========================================================
+   PROGRAMS OFFERED CARD (Interactive School & Degrees Browser)
+   ========================================================= */
+
+.programs-offered-card {
+  border-top: 3px solid #6366f1;
+  background: var(--card-bg, #ffffff);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+  margin-top: 12px;
+}
+
+.programs-card-header {
+  padding: 16px 20px 12px 20px;
+}
+
+.programs-card-header .card-badge {
+  background: rgba(99, 102, 241, 0.1);
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.programs-card-header .card-title {
+  color: var(--text-1, #0f172a);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.programs-card-header .card-subtitle {
+  color: var(--text-2, #64748b);
+  font-size: 0.8rem;
+  margin: 4px 0 0 0;
+}
+
+/* School Navigation Tabs */
+.school-tabs-container {
+  padding: 0 18px 10px 18px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.school-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.25) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.school-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.school-tabs::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+}
+
+.school-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-2, #475569);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.school-tab-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.school-tab-btn.active {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: #ffffff;
+  border-color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.28);
+}
+
+.school-tab-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.school-tab-label {
+  letter-spacing: 0.01em;
+}
+
+/* Active School Details Pane */
+.school-details-pane {
+  padding: 16px 20px;
+}
+
+.school-info-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-color, #e2e8f0);
+}
+
+.school-title-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.school-pane-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.school-pane-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-1, #0f172a);
+  line-height: 1.3;
+}
+
+.school-highlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 14px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Program Sections (UG, PG, Doctoral) */
+.school-programs-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.program-level-block {
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 0.2s ease;
+}
+
+.program-level-block:hover {
+  border-color: #cbd5e1;
+}
+
+.program-level-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.level-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6366f1;
+}
+
+.program-level-title {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-1, #1e293b);
+  letter-spacing: 0.02em;
+}
+
+.program-count-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+/* Degrees Grid */
+.degrees-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+
+.degree-item-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 11px;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.degree-item-pill:hover {
+  transform: translateY(-1px);
+  border-color: #a5b4fc;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08);
+}
+
+.degree-check-bullet {
+  color: #10b981;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.3;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.degree-name {
+  font-size: 0.77rem;
+  color: var(--text-1, #334155);
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Card Footer */
+.programs-card-footer {
+  padding: 12px 20px 14px 20px;
+  background: var(--bg-secondary, #f8fafc);
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  text-align: center;
+}
+
+.programs-footer-tagline {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #6366f1;
+  line-height: 1.4;
+}
+
+/* Dark mode for programs card */
+@media (prefers-color-scheme: dark) {
+  .programs-offered-card {
+    border-top-color: #818cf8;
+    background: #131b2e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+  .school-tabs-container {
+    border-bottom-color: #1e293b;
+  }
+  .school-tab-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+  }
+  .school-tab-btn:hover {
+    background: #253349;
+    color: #f1f5f9;
+  }
+  .school-tab-btn.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: #ffffff;
+    border-color: #6366f1;
+  }
+  .school-info-header {
+    border-bottom-color: #1e293b;
+  }
+  .school-pane-icon {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+  .school-pane-name {
+    color: #f1f5f9;
+  }
+  .program-level-block {
+    background: #182235;
+    border-color: #24324a;
+  }
+  .program-level-block:hover {
+    border-color: #3b4d6d;
+  }
+  .program-level-title {
+    color: #e2e8f0;
+  }
+  .degree-item-pill {
+    background: #1e293b;
+    border-color: #2c3c54;
+  }
+  .degree-item-pill:hover {
+    border-color: #6366f1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  .degree-name {
+    color: #cbd5e1;
+  }
+  .programs-card-footer {
+    background: #182235;
+    border-top-color: #24324a;
+  }
+  .programs-footer-tagline {
+    color: #a5b4fc;
+  }
+}
+
+/* Mobile responsive for programs card */
+@media (max-width: 600px) {
+  .programs-card-header {
+    padding: 14px 14px 10px 14px;
+  }
+  .school-tabs-container {
+    padding: 0 12px 8px 12px;
+  }
+  .school-details-pane {
+    padding: 12px 14px;
+  }
+  .degrees-list-grid {
+    grid-template-columns: 1fr;
+  }
+  .school-pane-name {
+    font-size: 0.95rem;
+  }
+  .programs-card-footer {
+    padding: 10px 14px;
+  }
+}
+

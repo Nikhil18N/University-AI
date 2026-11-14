@@ -488,6 +488,190 @@ PLACEMENT_EXCELLENCE_CARD = {
     ],
 }
 
+PROGRAMS_OFFERED_CARD = {
+    "type": "programs_offered",
+    "title": "Academic Programs & Degrees Offered by SR University",
+    "subtitle": "Multidisciplinary Programs Across 6 Specialized Schools & Doctoral Studies",
+    "schools": [
+        {
+            "name": "School of Computer Science & Artificial Intelligence",
+            "short_name": "CS & AI",
+            "icon": "💻",
+            "highlight": "Cutting-edge curriculum in AI, Quantum Computing, and Advanced Cyber Systems",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Tech Computer Science & Engineering (Core)",
+                        "B.Tech CSE — Artificial Intelligence & Machine Learning (AIML)",
+                        "B.Tech CSE — Cyber Security",
+                        "B.Tech CSE — Data Science",
+                        "B.Tech CSE — AI & Precision Agriculture",
+                        "B.Tech CSE — Gaming, AR & VR",
+                        "B.Tech CSE — Robotics & Automation",
+                        "B.Tech CSE — Quantum AI",
+                        "B.Tech in Artificial Intelligence & Robotics",
+                        "BCA (Bachelor of Computer Applications)",
+                        "B.Sc Computer Science",
+                        "B.Sc Mathematics",
+                        "B.Sc (Hons) Mathematics & AI",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Tech Computer Science & Engineering",
+                        "M.Tech CSE — Artificial Intelligence & Machine Learning",
+                        "M.Tech CSE — Data Science",
+                        "M.Tech CSE — Cyber Security",
+                        "MCA (Master of Computer Applications)",
+                        "M.Sc Computer Science",
+                        "M.Sc Statistics",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Engineering",
+            "short_name": "Engineering",
+            "icon": "⚙️",
+            "highlight": "Tier-1 NBA Accredited B.Tech Programs with Smart Robotics & EV Testing Labs",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Tech Electronics & Communication Engineering (AIML / VLSI / Robotics)",
+                        "B.Tech Electrical & Electronics Engineering (Renewable Energy / EV / Robotics)",
+                        "B.Tech Mechanical Engineering (Robotics & Automation / Smart Manufacturing)",
+                        "B.Tech Civil Engineering",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Tech Embedded Systems",
+                        "M.Tech Electronic Design Technology (EDT)",
+                        "M.Tech VLSI System Design",
+                        "M.Tech Power Electronics",
+                        "M.Tech Advanced Manufacturing Systems (AMS)",
+                        "M.Tech Thermal Engineering",
+                        "M.Tech Construction Technology & Management (CTM)",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "Astra School of Business",
+            "short_name": "Business",
+            "icon": "📊",
+            "highlight": "Modern Case-Study & Business Analytics Pedagogy with Global Networking",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "BBA (General Management)",
+                        "BBA (Finance, Operations, HR, Business Analytics, Marketing)",
+                        "BBA (Hospitality & Event Management)",
+                        "B.Com (Bachelor of Commerce)",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "MBA (Finance, Operations, HR, Business Analytics, Marketing)",
+                        "MBA in Agri-Business Management",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Agriculture",
+            "short_name": "Agriculture",
+            "icon": "🌾",
+            "highlight": "ICAR-Accredited — 1st Private University in the Telugu States to achieve accreditation",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Sc. (Hons.) Agriculture (ICAR-Accredited)",
+                        "B.Tech Food Technology",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Sc. Agriculture (Agronomy)",
+                        "M.Sc. Agriculture (Genetics & Plant Breeding)",
+                        "M.Sc. Agriculture (Horticulture)",
+                        "M.Sc. Agriculture (Plant Pathology)",
+                        "M.Sc. Agriculture (Soil Science)",
+                        "M.Sc. Agriculture (Agricultural Economics)",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Design",
+            "short_name": "Design",
+            "icon": "🎨",
+            "highlight": "Studio-Based Creative & Digital Prototyping Pathways with Industry Mentors",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Des Interior Design",
+                        "B.Des Fashion Design",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Sciences and Humanities",
+            "short_name": "Sciences & Humanities",
+            "icon": "🔬",
+            "highlight": "Interdisciplinary Research in AI, Biotechnology & Space Engineering",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Sc (Physics, Chemistry, Biology)",
+                        "B.Tech Biotechnology with AI",
+                        "B.Tech Engineering Physics in AI / Robotics / Space Sciences",
+                        "B.Tech Applied Chemistry in AI / Nano-Robotics / Drug Discovery",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Sc Physics",
+                        "M.Sc Chemistry",
+                        "M.Sc Biotechnology & AI",
+                        "M.A. English",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "Doctoral Studies & Research",
+            "short_name": "Ph.D. Studies",
+            "icon": "🎓",
+            "highlight": "Full-Time & Part-Time Doctoral Research Across All Specializations",
+            "programs": [
+                {
+                    "level": "Doctoral",
+                    "degrees": [
+                        "Ph.D. in Computer Science & Artificial Intelligence",
+                        "Ph.D. in Engineering (ECE, EEE, Mechanical, Civil)",
+                        "Ph.D. in Management & Business Studies",
+                        "Ph.D. in Agricultural Sciences",
+                        "Ph.D. in Basic Sciences & Humanities",
+                    ],
+                },
+            ],
+        },
+    ],
+}
+
 
 def generate_cards(
     user_message: str,
@@ -558,6 +742,19 @@ def generate_cards(
         "cse" in msg_lower or "computer science" in msg_lower or "engineering" in msg_lower
     ):
         cards.append(CURRICULUM_CARD)
+
+    # 3b. Academic Programs & Courses Offered card
+    is_courses_query = any(
+        k in msg_lower for k in (
+            "course", "courses", "programs", "programmes", "what can i study",
+            "what does sru offer", "courses offered", "programs offered",
+            "degrees offered", "branches available", "what streams", "degrees",
+            "schools and courses", "which courses", "all courses", "list of courses",
+            "what to study", "fields of study", "specializations offered", "schools offered"
+        )
+    ) and not any(k in msg_lower for k in ("fee", "fees", "cost", "how much", "tuition", "vs", "compare", "curriculum", "syllabus"))
+    if is_courses_query:
+        cards.append(PROGRAMS_OFFERED_CARD)
 
     # 4. Placement Highlights card ("Three Consecutive Years of Excellence")
     if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):

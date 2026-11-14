@@ -266,4 +266,47 @@ def test_170_acres_in_campus_tour_and_advantage_cards():
     assert "170-acre" in advantage_str or "170 acres" in advantage_str
 
 
+def test_programs_offered_card_trigger():
+    """Verify courses/programs inquiries trigger PROGRAMS_OFFERED_CARD with all 6 schools + Ph.D."""
+    from app.services.card_service import PROGRAMS_OFFERED_CARD
+
+    for query in (
+        "what courses are offered by sru?",
+        "what can i study at sru",
+        "tell me the programs offered",
+        "which degrees are available?",
+        "list all branches available in engineering and cs",
+    ):
+        cards = generate_cards(
+            user_message=query,
+            answer="SR University offers programs across 6 multidisciplinary schools.",
+        )
+        assert len(cards) >= 1
+        programs_cards = [c for c in cards if c.get("type") == "programs_offered"]
+        assert len(programs_cards) == 1
+        card = programs_cards[0]
+        assert card["type"] == "programs_offered"
+        assert len(card["schools"]) == 7  # 6 schools + Doctoral Studies
+
+        school_names = [s["short_name"] for s in card["schools"]]
+        assert "CS & AI" in school_names
+        assert "Engineering" in school_names
+        assert "Business" in school_names
+        assert "Agriculture" in school_names
+        assert "Design" in school_names
+        assert "Sciences & Humanities" in school_names
+        assert "Ph.D. Studies" in school_names
+
+
+def test_course_fee_query_does_not_trigger_programs_card():
+    """Verify queries asking about course fees trigger fee cards, not programs card."""
+    cards = generate_cards(
+        user_message="what are the course fees for b.tech cse?",
+        answer="The tuition fee for B.Tech CSE is ₹3,40,000 per year.",
+    )
+    programs_cards = [c for c in cards if c.get("type") == "programs_offered"]
+    assert len(programs_cards) == 0
+
+
+
 
