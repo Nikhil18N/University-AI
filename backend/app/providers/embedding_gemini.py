@@ -54,8 +54,9 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
         url = f"{self.base_url}/models/{self.model}:batchEmbedContents"
         total_keys = len(self.key_pool)
         last_response = None
+        max_attempts = max(total_keys * 2, 5)
 
-        for attempt in range(max(total_keys, 3)):
+        for attempt in range(max_attempts):
             active_key = self.key_pool.get_next_key(advance=True)
             try:
                 response = await self._client.post(
@@ -70,18 +71,21 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
                     return [item["values"] for item in data.get("embeddings", [])]
                 elif response.status_code in (401, 403, 429, 500, 502, 503):
                     logger.warning(
-                        "Gemini embedding key '%s...' hit HTTP %d. Rotating key.",
+                        "Gemini embedding key '%s...' hit HTTP %d. Rotating key (attempt %d/%d).",
                         active_key[:8],
                         response.status_code,
+                        attempt + 1,
+                        max_attempts,
                     )
                     self.key_pool.mark_rate_limited(active_key)
-                    await asyncio.sleep(0.5)
+                    backoff = 3.0 * (attempt + 1) if response.status_code == 429 else 1.0
+                    await asyncio.sleep(backoff)
                     continue
                 else:
                     response.raise_for_status()
             except httpx.TimeoutException:
                 logger.warning("Gemini embedding request with key '%s...' timed out. Retrying...", active_key[:8])
-                await asyncio.sleep(1.0)
+                await asyncio.sleep(2.0)
                 continue
 
         if last_response is not None:

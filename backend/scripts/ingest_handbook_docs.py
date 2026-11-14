@@ -165,6 +165,7 @@ async def ingest_handbook():
                 effective_date=doc_info["effective_date"],
             )
             logger.info("  [OK] Ingested as document_id=%s (status=%s)", doc.id, doc.status)
+            await asyncio.sleep(1.5)
 
         await db.commit()
 
