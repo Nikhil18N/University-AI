@@ -13,7 +13,8 @@
   - **Type**: State Private University established under the Telangana State Private Universities Act.
   - **Living & Learning Philosophy**: *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."* / *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
   - **Campus & Environment**: Largest lush green, 170+ acre master-planned residential campus for the next generation of innovators in Warangal, Telangana.
-  - **Student Community**: 10,000 active students from across India and internationally.
+  - **Goal of SR University**: To create an innovative living learning educational ecosystem whose graduates significantly contribute to the growth of Telangana and India.
+  - **Parent Body & Community**: Sri Rajeshwara Educational Society, a 50-year-old conglomerate of educational institutions with more than **1,00,000 students** and **17,000 teaching and non-teaching staff members** across 185 institutions in Telangana, Andhra Pradesh, and Karnataka.
   - **Distinguished Faculty**: World-class faculty holding doctoral and postdoctoral qualifications from prestigious institutions in India and abroad, including IITs, NITs, and leading international universities.
   - **National & Global Rankings**:
     * **NIRF 2025**: Holds the **91st rank in NIRF for the Engineering category** (improved from 98th to 91st, consistently securing top 100 ranks every year since 2021); ranked in the **101–150 band in the University category**.

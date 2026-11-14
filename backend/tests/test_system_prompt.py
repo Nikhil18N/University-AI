@@ -71,3 +71,29 @@ def test_website_facts_grounded_in_prompts():
     assert "Sparkrill" in prompt
 
 
+def test_sres_student_and_staff_facts():
+    """Verify 1,00,000+ students and 17,000 staff are grounded, and 10,000 active students is absent."""
+    system_prompt = load_prompt("system")
+    rag_prompt = load_prompt("rag")
+    from app.services.card_service import CAMPUS_TOUR_CARD, SRU_ADVANTAGE_CARD
+
+    # Verify 10,000 active students is absent
+    assert "10,000 active students" not in system_prompt
+    assert "10,000 active students" not in rag_prompt
+
+    # Verify 1,00,000+ and 17,000 staff are grounded
+    assert "1,00,000" in system_prompt
+    assert "17,000" in system_prompt
+    assert "1,00,000" in rag_prompt
+    assert "17,000" in rag_prompt
+
+    # Verify goal of SR University is present
+    assert "growth of Telangana and India" in system_prompt
+    assert "growth of Telangana and India" in rag_prompt
+
+    # Verify cards do not mention 10,000 active students
+    assert "10,000 active students" not in str(CAMPUS_TOUR_CARD)
+    assert "10,000+ active students" not in str(SRU_ADVANTAGE_CARD)
+
+
+

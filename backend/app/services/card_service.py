@@ -336,7 +336,7 @@ SRU_ADVANTAGE_CARD = {
         {
             "category": "Campus & Living Experience",
             "icon": "🌿",
-            "sru_highlight": "170-acre vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
+            "sru_highlight": "170-acre vast lush green, master-planned living & learning campus in Warangal, backed by Sri Rajeshwara Educational Society's 1,00,000+ students and 17,000 teaching and non-teaching staff. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
             "standout": "4,000-Seat Mega Dining Hall",
         },
         {
@@ -395,8 +395,8 @@ CAMPUS_TOUR_CARD = {
             "icon": "🌿",
         },
         {
-            "name": "World-Class Faculty & 10,000+ Students",
-            "desc": "Doctoral and postdoctoral faculty from IITs, NITs, and leading global universities guiding 10,000 active Indian and international students.",
+            "name": "World-Class Faculty & 1,00,000+ Student Heritage",
+            "desc": "Doctoral and postdoctoral faculty from IITs, NITs, and top global institutions; backed by Sri Rajeshwara Educational Society's 185 institutions with 1,00,000+ students and 17,000 teaching and non-teaching staff members.",
             "icon": "🎓",
         },
         {
