@@ -336,7 +336,7 @@ SRU_ADVANTAGE_CARD = {
         {
             "category": "Campus & Living Experience",
             "icon": "🌿",
-            "sru_highlight": "Vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
+            "sru_highlight": "170-acre vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
             "standout": "4,000-Seat Mega Dining Hall",
         },
         {
@@ -379,7 +379,7 @@ CAMPUS_TOUR_CARD = {
     "spots": [
         {
             "name": "Largest Lush Green Campus & Top Rankings",
-            "desc": "A vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
+            "desc": "170-acre vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
             "icon": "🌿",
         },
         {

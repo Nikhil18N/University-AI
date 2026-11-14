@@ -243,3 +243,14 @@ def test_no_150_acres_in_cards_or_descriptions():
         assert "150+ acre" not in card_str
 
 
+def test_170_acres_in_campus_tour_and_advantage_cards():
+    """Verify 170 acres is prominently featured in campus tour and advantage cards."""
+    import json
+    from app.services.card_service import CAMPUS_TOUR_CARD, SRU_ADVANTAGE_CARD
+    campus_tour_str = json.dumps(CAMPUS_TOUR_CARD).lower()
+    advantage_str = json.dumps(SRU_ADVANTAGE_CARD).lower()
+    assert "170-acre" in campus_tour_str or "170 acres" in campus_tour_str
+    assert "170-acre" in advantage_str or "170 acres" in advantage_str
+
+
+

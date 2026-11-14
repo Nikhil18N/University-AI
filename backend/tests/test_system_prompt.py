@@ -33,3 +33,29 @@ def test_rag_prompt_contains_core_formatting():
     prompt = load_prompt("rag")
     assert "MARKDOWN FORMATTING STANDARDS" in prompt
 
+
+def test_system_prompt_about_sru_8_pillars():
+    """Verify system.md defines all 8 core pillars for About SRU inquiries."""
+    prompt = load_prompt("system")
+    assert "1. **CAMPUS LIFE**" in prompt
+    assert "2. **FACULTY**" in prompt
+    assert "3. **INFRA" in prompt
+    assert "4. **PLACEMENTS**" in prompt
+    assert "5. **RANKINGS**" in prompt
+    assert "6. **RESEARCH**" in prompt
+    assert "7. **ACADEMIC**" in prompt
+    assert "8. **HOSTEL - LIVING & DINING**" in prompt
+    assert "As the academic day comes to an end, the living and learning experience continues" in prompt
+
+
+def test_170_acres_present_in_prompts():
+    """Verify 170 acres is grounded in system and rag prompts, and 150 acres is absent."""
+    system_prompt = load_prompt("system")
+    rag_prompt = load_prompt("rag")
+    assert "170 acres" in system_prompt or "170-acre" in system_prompt
+    assert "170 acres" in rag_prompt or "170-acre" in rag_prompt
+    assert "150 acres" not in system_prompt
+    assert "150-acre" not in system_prompt
+    assert "150 acres" not in rag_prompt
+    assert "150-acre" not in rag_prompt
+
