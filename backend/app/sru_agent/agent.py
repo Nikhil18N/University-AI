@@ -30,7 +30,17 @@ CARD_TOOLS = {"calculate_fee", "check_eligibility", "request_counsellor_callback
 def get_client():
     global _client
     if _client is None:
-        _client = genai.Client(api_key=config.GEMINI_API_KEY)
+        key = config.GEMINI_API_KEY
+        if not key:
+            try:
+                from app.config import settings
+                keys = settings.get_gemini_api_keys()
+                key = keys[0] if keys else ""
+            except Exception:
+                key = ""
+        if key and "," in key:
+            key = key.split(",")[0].strip()
+        _client = genai.Client(api_key=key)
     return _client
 
 
@@ -75,8 +85,21 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                 tool_config=types.ToolConfig(function_calling_config=types.FunctionCallingConfig(
                     mode="NONE" if last_round else "AUTO")),
             )
-            resp = await client.aio.models.generate_content(
-                model=config.AGENT_MODEL, contents=contents, config=cfg)
+            try:
+                resp = await client.aio.models.generate_content(
+                    model=config.AGENT_MODEL, contents=contents, config=cfg)
+            except Exception as model_err:
+                err_str = str(model_err).lower()
+                if ("not found" in err_str or "404" in err_str) and config.AGENT_MODEL != "gemini-2.0-flash":
+                    log.warning("Agent model %s failed, falling back to gemini-2.0-flash: %s", config.AGENT_MODEL, model_err)
+                    resp = await client.aio.models.generate_content(
+                        model="gemini-2.0-flash", contents=contents, config=cfg)
+                elif ("not found" in err_str or "404" in err_str) and config.AGENT_MODEL != "gemini-1.5-flash":
+                    log.warning("Falling back to gemini-1.5-flash: %s", model_err)
+                    resp = await client.aio.models.generate_content(
+                        model="gemini-1.5-flash", contents=contents, config=cfg)
+                else:
+                    raise
 
             calls = resp.function_calls or []
             if not calls:

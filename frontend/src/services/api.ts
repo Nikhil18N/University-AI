@@ -161,11 +161,10 @@ export function sendMessageStream(
   const controller = new AbortController();
 
   (async () => {
-    try {
-      const useAgent = import.meta.env.VITE_USE_AGENT !== "false";
-      let streamUrl = useAgent ? `${API_BASE}/api/v1/agent/stream` : `${API_BASE}/api/v1/chat/stream`;
+    let tokensStreamed = 0;
 
-      let res = await fetch(streamUrl, {
+    const streamFromEndpoint = async (url: string): Promise<boolean> => {
+      let res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -176,27 +175,8 @@ export function sendMessageStream(
         signal: controller.signal,
       });
 
-      if (!res.ok && useAgent && (res.status === 404 || res.status === 405)) {
-        // Zero-downtime fallback to legacy chat stream
-        res = await fetch(`${API_BASE}/api/v1/chat/stream`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            session_id: sessionId,
-            message,
-            conversation_id: conversationId || null,
-          }),
-          signal: controller.signal,
-        });
-      }
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || "Failed to stream message");
-      }
-
-      if (!res.body) {
-        throw new Error("No response stream available");
+      if (!res.ok || !res.body) {
+        return false;
       }
 
       const reader = res.body.getReader();
@@ -219,13 +199,13 @@ export function sendMessageStream(
           try {
             parsed = JSON.parse(jsonStr);
           } catch {
-            // Ignore partial frames
             continue;
           }
 
           if (parsed.type === "start") {
             callbacks.onStart?.(parsed.conversation_id);
           } else if (parsed.type === "token") {
+            tokensStreamed++;
             callbacks.onToken?.(parsed.delta);
           } else if (parsed.type === "tool") {
             callbacks.onTool?.(parsed);
@@ -236,9 +216,37 @@ export function sendMessageStream(
             callbacks.onCard?.(parsed.card || { type: parsed.name, data: parsed.result });
           } else if (parsed.type === "done") {
             callbacks.onDone?.(parsed);
+            return true;
           } else if (parsed.type === "error") {
+            // If an error is returned before any token was delivered, fail so fallback can attempt
+            if (tokensStreamed === 0) {
+              return false;
+            }
             throw new Error(parsed.detail || "Error streaming response");
           }
+        }
+      }
+      return tokensStreamed > 0;
+    };
+
+    try {
+      const useAgent = import.meta.env.VITE_USE_AGENT !== "false";
+      let success = false;
+
+      if (useAgent) {
+        try {
+          success = await streamFromEndpoint(`${API_BASE}/api/v1/agent/stream`);
+        } catch (err: unknown) {
+          if ((err as Error)?.name === "AbortError") return;
+          success = false;
+        }
+      }
+
+      // If agent stream was not used or failed before sending tokens, fall back to chat stream
+      if (!success && !controller.signal.aborted) {
+        const legacySuccess = await streamFromEndpoint(`${API_BASE}/api/v1/chat/stream`);
+        if (!legacySuccess) {
+          throw new Error("Failed to receive response from university companion.");
         }
       }
     } catch (err: unknown) {
