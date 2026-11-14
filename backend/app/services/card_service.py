@@ -336,7 +336,7 @@ SRU_ADVANTAGE_CARD = {
         {
             "category": "Campus & Living Experience",
             "icon": "🌿",
-            "sru_highlight": "Vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
+            "sru_highlight": "170-acre vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
             "standout": "4,000-Seat Mega Dining Hall",
         },
         {
@@ -364,6 +364,18 @@ SRU_ADVANTAGE_CARD = {
             "standout": "20+ Clubs, 50+ Events/Year",
         },
         {
+            "category": "Research Powerhouse",
+            "icon": "🔬",
+            "sru_highlight": "9,300+ research papers in top journals, 2,900+ patents filed, 159 patents granted, and 130+ top 10% globally cited publications. Ranked 6th in India in Research Quality by THE World University Rankings.",
+            "standout": "9,300+ Papers, 2,900+ Patents",
+        },
+        {
+            "category": "50-Year Legacy & Ecosystem",
+            "icon": "🏛️",
+            "sru_highlight": "Governed by Sri Rajeshwara Educational Society (est. 1976) with 185 institutions across Telangana, AP & Karnataka, serving 1,00,000+ students with 17,000 staff, 7,500+ faculty, and 5 Lakh+ alumni.",
+            "standout": "185 Institutions, 5L+ Alumni",
+        },
+        {
             "category": "Merit Scholarships",
             "icon": "💰",
             "sru_highlight": "Up to 40% tuition fee waiver based on board/entrance scores. 19 special category concessions up to Rs.50,000/year for girl students, defence personnel, differently-abled, sports achievers, and more.",
@@ -379,7 +391,7 @@ CAMPUS_TOUR_CARD = {
     "spots": [
         {
             "name": "Largest Lush Green Campus & Top Rankings",
-            "desc": "A vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
+            "desc": "170-acre vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
             "icon": "🌿",
         },
         {
@@ -465,7 +477,7 @@ PLACEMENT_EXCELLENCE_CARD = {
         {"company": "Infosys", "offers": 22},
     ],
     "marquee_offers": [
-        {"student": "Thangallapally Nithal", "batch": "CSE 2025", "package": "44 LPA", "company": "Salesforce"},
+        {"student": "Thangallapally Nihal", "batch": "CSE 2025", "package": "44 LPA", "company": "Salesforce"},
         {"student": "Bijigiri Vignesh", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
         {"student": "Ambati Krishna Sai", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
         {"student": "Jonnadula Sahith", "batch": "CSE 2025", "package": "34.5 LPA", "company": "PayPal"},

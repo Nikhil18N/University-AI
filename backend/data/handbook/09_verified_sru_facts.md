@@ -12,23 +12,46 @@
   - **Institution Full Name**: SR University (SRU)
   - **Type**: State Private University established under the Telangana State Private Universities Act.
   - **Living & Learning Philosophy**: *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."* / *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
-  - **Campus & Environment**: Largest lush green, master-planned residential campus (170+ acres) for the next generation of innovators in Warangal, Telangana.
+  - **Campus & Environment**: Largest lush green, 170+ acre master-planned residential campus for the next generation of innovators in Warangal, Telangana.
   - **Student Community**: 10,000 active students from across India and internationally.
   - **Distinguished Faculty**: World-class faculty holding doctoral and postdoctoral qualifications from prestigious institutions in India and abroad, including IITs, NITs, and leading international universities.
   - **National & Global Rankings**:
-    * **NIRF**: Holds the **91st rank in NIRF for the Engineering category** (with top 100 ranks consistently for four years).
+    * **NIRF 2025**: Holds the **91st rank in NIRF for the Engineering category** (improved from 98th to 91st, consistently securing top 100 ranks every year since 2021); ranked in the **101–150 band in the University category**.
     * **NBA**: **All B.Tech programs hold Tier-1 accreditation** from the National Board of Accreditation (NBA).
     * **ICAR**: School of Agriculture received **ICAR accreditation** (first private university in Telugu States).
-    * **QS Asia Rankings 2027**: Ranked **19th among India's State Private Universities**.
-    * **THE World University Rankings 2027**: Ranked **7th in India** among private universities, and **6th in India in Research Quality**.
+    * **QS Asia University Rankings 2027**: Debuts in the **701–710 Rank Band globally in Asia** and ranked **19th among Private Universities in India**.
+    * **THE World University Rankings 2027**: Placed in the **801–1000 band globally**, ranked **7th in India** among private universities, and **6th in India in Research Quality**.
+    * **UI GreenMetric World University Rankings 2026**: Ranked **16th among Indian institutions** and **540th globally**.
+    * **ARIIA 2020**: Ranked **1st among private institutions in India**.
     * **Distinction**: **India’s youngest and only private university in Telangana** to achieve prestigious National and Global Ranks.
+  - **Research & Innovation Powerhouse**:
+    * **9,300+ Research Papers Published** in peer-reviewed international journals.
+    * **2,900+ Patents Filed** & **159 Patents Granted**.
+    * **130+ Top 10 Percentile Publications** globally cited.
+    * **SR Innovation Exchange (SRiX)**: DST-supported Technology Business Incubator with **171+ startups** and **₹76+ Crore** funding, featuring an open Makerspace.
   - **Academic & Research Infrastructure**: Modern digital classrooms, University Central Library, high-tech labs, industry-grade setups for AI, robotics, innovation hubs, incubation spaces, and project studios supporting prototypes, experiments, and real solutions; 80+ international academic collaborations; Career Guidance Cell.
-  - **Campus Life & Vibrancy**: 20+ Student Clubs, 50+ annual events, cultural music festivals, sports grounds, indoor arenas, and fitness zones.
-  - **Location & Address**: Ananthasagar, Hasanparthy Mandal, Warangal, Telangana 506371, India (on the Warangal–Karimnagar Highway).
-  - **Distance**: 14 km from Hanumakonda, 16 km from Kazipet Junction (KZJ), 29 km from Warangal Railway Station.
-  - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary leading SR Educational Society since 1976 (over 185 institutions, 1 lakh+ students).
-  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science (Efficient Algorithm Design), AI pioneer, former Director of NVIDIA-BU Research Center on AI, CAC ABET Commissioner, Times of India columnist (*"Breaking Shackles"*).
-  - **Parent Society**: SR Educational Society (established 1976).
+  - **Campus Life & Spotlight Events**: 20+ Student Clubs (Google Developers Club, Startup & Innovation, Ashwavega); annual landmark events including **Sparkrill**, **PRAGATHI 2.0 Project Expo** (`https://www.sruprojectexpo.in/`), **Navadhara**, and **Swagatham**; Olympic-standard gym, sports complex, and 24/7 medical care (hospital tie-up with Aaditya Hospital).
+  - **Superstar Placement Highlights & Testimonials**:
+    * **B. Shiva Krishna**: 51 LPA @ Microsoft (₹1.25 Lakh/month stipend)
+    * **Mohammed Akramuddin**: 49.30 LPA @ ServiceNow (₹0.80 Lakh/month stipend)
+    * **Kencha Bhavana**: 46.38 LPA @ Amazon (₹1.10 Lakh/month stipend)
+    * **Bijigiri Vignesh**: 44 LPA @ ServiceNow
+    * **Thangallapally Nihal**: 44 LPA @ Salesforce
+    * **Ambati Krishna Sai**: ServiceNow
+    * **Biar Lual Aquila Manyuon**: B.Tech Civil Engineering (South Sudan international student testimonial)
+  - **Location & Offices**:
+    * Main Campus: Ananthasagar, Hasanparthy Mandal, Warangal, Telangana 506371 (14 km from Hanumakonda, 16 km from Kazipet Junction).
+    * Corporate Office: 604, 6th Floor, Sonthalia Emerald, Raj Bhavan Road, Somajiguda, Hyderabad, Telangana 500082.
+  - **Official Helpline & Portals**: Phone: **+91 8331004040**, **0870-2818333 / 2818311**; Email: `info@sru.edu.in` / `admissions@sru.edu.in`; Web: `https://sru.edu.in/`, `https://admission.sru.edu.in/`, `https://sraap.in/`, `https://alumni.sru.edu.in/`.
+  - **Leadership at SR University**:
+    * **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976.
+    * **Pro-Chancellor**: **Sri A. Madhukar Reddy** — General Secretary of Sri Rajeshwara Educational Society, championed 170-acre campus and SRiX.
+    * **Vice-Chancellor**: **Prof. Deepak Garg** — AI Professor & pioneer, former Bennett/Thapar Dean, led leadingindia.ai (1M+ students skilled), 160 papers, 1,600+ citations.
+    * **Pro Vice-Chancellor**: **Dr. V. Mahesh**
+    * **Registrar**: **Dr. P. Venkata Ramana Rao**
+    * **Operations & Growth**: **Dr. R. Archana Reddy**
+    * **Board of Advisors**: **Prof. G. R. C. Reddy** (Ex-Vice Chancellor)
+  - **Parent Society**: **Sri Rajeshwara Educational Society** (established 1976; 50 years of academic excellence, 185 institutions, 1,00,000+ students, 17,000 staff, 5 Lakh+ alumni).
 
 ---
 
