@@ -38,11 +38,11 @@ def test_extract_score_percentage():
 
 def test_extract_score_fraction():
     messages = [
-        {"role": "user", "content": "I have 599 out of 1000 marks in intermediate"},
+        {"role": "user", "content": "I have 480 out of 1000 marks in intermediate"},
     ]
     profile = extract_student_profile(messages)
     assert profile["has_score"] is True
-    assert profile["score_pct"] == 59.9
+    assert profile["score_pct"] == 48.0
 
     guidance = build_counsellor_guidance(profile)
     assert "below" in guidance.lower()
@@ -73,4 +73,5 @@ def test_guidance_eligibility_vs_comparison():
     guidance_elig = build_counsellor_guidance(
         profile, current_query="Am I eligible for admission in CSE?"
     )
-    assert "state the 60% requirement and ask for their 10+2 PCM percentage" in guidance_elig
+    assert "state the 50% MPC requirement and ask for their 10+2 PCM percentage" in guidance_elig
+

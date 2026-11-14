@@ -6,6 +6,7 @@ from app.services.video_service import (
     get_relevant_videos,
     is_explicit_video_query,
     is_video_topic_query,
+    should_display_videos,
 )
 
 COMPARISON_CSE_AIML = {
@@ -85,38 +86,123 @@ BTECH_ACADEMIC_FEE_CARD = {
 # Alias for backwards compatibility
 FEE_BREAKDOWN_CARD = BTECH_ACADEMIC_FEE_CARD
 
-BTECH_CSE_FEE_CARD = {
+BTECH_CSE_SEMESTER_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "B.Tech Computer Science & Engineering (CSE) Fee Structure",
+    "title": "B.Tech CSE Total Per-Semester Estimated Fee Breakdown (Official 2027-28)",
     "currency": "INR",
     "items": [
         {
-            "category": "Tuition Fee (B.Tech CSE)",
-            "amount": "₹1,70,000 / Sem",
-            "frequency": "₹3,40,000 / Year",
-            "note": "Annual base tuition ₹3,40,000 (+₹9k/yr increase); up to 40% merit scholarship",
+            "category": "1st Semester Tuition Fee (B.Tech CSE)",
+            "amount": "₹1,70,000",
+            "frequency": "Semester 1",
+            "note": "Base tuition (₹3,40,000/yr). Up to 40% merit scholarship waiver available",
         },
         {
-            "category": "Enrollment Fee (One-time)",
+            "category": "2nd Semester Tuition Fee (B.Tech CSE)",
+            "amount": "₹1,70,000",
+            "frequency": "Semester 2",
+            "note": "Annual base ₹3,40,000 (+₹9,000/yr annual escalation in subsequent years)",
+        },
+        {
+            "category": "One-Time Enrollment Fee",
             "amount": "₹5,000",
-            "frequency": "One-time (Year 1)",
-            "note": "Mandatory enrollment component",
+            "frequency": "One-Time (Semester 1)",
+            "note": "Mandatory official enrollment component paid once in Year 1",
         },
         {
-            "category": "Other & Exam Fees",
-            "amount": "₹20,000 / Year",
-            "frequency": "Annual",
-            "note": "₹15,000 other fee + ₹5,000 exam fee",
+            "category": "Other & Examination Fees",
+            "amount": "₹10,000 / Sem",
+            "frequency": "₹20,000 / Year",
+            "note": "₹15,000 other university fee + ₹5,000 semester-end examination fee",
         },
         {
-            "category": "Specialization Fee (Year 2+)",
-            "amount": "₹30,000 / Year",
-            "frequency": "From 2nd Year Onwards",
-            "note": "For AIML, Cyber Security, Data Science, AR/VR, Robotics",
+            "category": "Total Per-Semester Payable (Regular)",
+            "amount": "₹1,80,000 / Sem",
+            "frequency": "₹3,60,000 / Year",
+            "note": "Tuition (₹1,70,000) + Other & Exam Fees (₹10,000). Hostels separate.",
+        },
+        {
+            "category": "Total 1st Semester Payable",
+            "amount": "₹1,85,000",
+            "frequency": "Semester 1",
+            "note": "Regular semester total + one-time enrollment fee (₹5,000)",
+        },
+        {
+            "category": "CSE Specialization Fee (From Year 2+)",
+            "amount": "₹15,000 / Sem",
+            "frequency": "₹30,000 / Year",
+            "note": "Applicable from 3rd semester for AI & ML, Data Science, Cyber Security tracks",
         },
     ],
-    "scholarship_note": "Up to 40% tuition scholarship (₹1,36,000 waiver/yr, net ₹2,04,000/yr) based on Inter/CBSE/JEE/EAPCET scores.",
+    "scholarship_note": "Merit scholarships provide 10% to 40% tuition fee waiver (up to ₹68,000/sem saved; net tuition ₹1,02,000/sem; total regular sem ₹1,12,000/sem). Hostel is optional & separate (₹1,15,000 to ₹1,35,000/yr). 2027-28 fees, as per Admissions Office.",
 }
+
+BTECH_CSE_WITH_HOSTEL_FEE_CARD = {
+    "type": "fee_breakdown",
+    "title": "B.Tech CSE Fee + Hostel Per-Semester Total Breakdown (Official 2027-28)",
+    "currency": "INR",
+    "items": [
+        {
+            "category": "1st Semester Tuition Fee (B.Tech CSE)",
+            "amount": "₹1,70,000",
+            "frequency": "Semester 1",
+            "note": "Base tuition (₹3,40,000/yr). Up to 40% merit scholarship waiver available",
+        },
+        {
+            "category": "2nd Semester Tuition Fee (B.Tech CSE)",
+            "amount": "₹1,70,000",
+            "frequency": "Semester 2",
+            "note": "Annual base ₹3,40,000 (+₹9,000/yr annual escalation in subsequent years)",
+        },
+        {
+            "category": "Residential Hostel & Mess (AC 4-Sharing)",
+            "amount": "₹62,500 / Sem",
+            "frequency": "₹1,25,000 / Year",
+            "note": "4 daily meals in mega dining hall, laundry, high-speed Wi-Fi, 24/7 security",
+        },
+        {
+            "category": "Other & Examination Fees",
+            "amount": "₹10,000 / Sem",
+            "frequency": "₹20,000 / Year",
+            "note": "₹15,000 other university fee + ₹5,000 semester-end examination fee",
+        },
+        {
+            "category": "One-Time Enrollment Fee",
+            "amount": "₹5,000",
+            "frequency": "One-Time (Semester 1)",
+            "note": "Mandatory official enrollment component paid once in Year 1",
+        },
+        {
+            "category": "Combined Total Per-Semester (Regular)",
+            "amount": "₹2,42,500 / Sem",
+            "frequency": "₹4,85,000 / Year",
+            "note": "Combined Tuition (₹1.70L) + Other/Exam (₹10k) + Hostel & Mess (₹62.5k)",
+        },
+        {
+            "category": "Combined Total 1st Semester Payable",
+            "amount": "₹2,47,500",
+            "frequency": "Semester 1",
+            "note": "Regular combined total + one-time enrollment fee (₹5,000)",
+        },
+    ],
+    "scholarship_note": "With 40% merit scholarship, net tuition is ₹1,02,000/sem, bringing the combined regular per-semester total to ₹1,74,500/sem. 2027-28 fees, as per Admissions Office.",
+}
+
+# Alias for backwards compatibility
+BTECH_CSE_FEE_CARD = BTECH_CSE_SEMESTER_FEE_CARD
+
+APPLICATION_AD_CARD = {
+    "type": "application_ad",
+    "sponsor_name": "SR University Admissions",
+    "sponsor_logo": "/sru-logo.png",
+    "image_url": "/early-bird-offer.png",
+    "title": "Early Bird: 50% Off Online Application",
+    "description": "Apply early for 2027-28 admissions. Save 50% on official application processing (pay ₹550 instead of ₹1,100).",
+    "cta_text": "Apply Now ↗",
+    "cta_url": "https://apply.sru.edu.in",
+}
+
+
 
 MERIT_SCHOLARSHIP_CARD = {
     "type": "fee_breakdown",
@@ -341,7 +427,7 @@ SRU_ADVANTAGE_CARD = {
         {
             "category": "Campus & Living Experience",
             "icon": "🌿",
-            "sru_highlight": "Vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
+            "sru_highlight": "170-acre vast lush green, master-planned living & learning campus in Warangal, backed by Sri Rajeshwara Educational Society's 1,00,000+ students and 17,000 teaching and non-teaching staff. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
             "standout": "4,000-Seat Mega Dining Hall",
         },
         {
@@ -369,6 +455,18 @@ SRU_ADVANTAGE_CARD = {
             "standout": "20+ Clubs, 50+ Events/Year",
         },
         {
+            "category": "Research Powerhouse",
+            "icon": "🔬",
+            "sru_highlight": "9,300+ research papers in top journals, 2,900+ patents filed, 159 patents granted, and 130+ top 10% globally cited publications. Ranked 6th in India in Research Quality by THE World University Rankings.",
+            "standout": "9,300+ Papers, 2,900+ Patents",
+        },
+        {
+            "category": "50-Year Legacy & Ecosystem",
+            "icon": "🏛️",
+            "sru_highlight": "Governed by Sri Rajeshwara Educational Society (est. 1976) with 185 institutions across Telangana, AP & Karnataka, serving 1,00,000+ students with 17,000 staff, 7,500+ faculty, and 5 Lakh+ alumni.",
+            "standout": "185 Institutions, 5L+ Alumni",
+        },
+        {
             "category": "Merit Scholarships",
             "icon": "💰",
             "sru_highlight": "Up to 40% tuition fee waiver based on board/entrance scores. 19 special category concessions up to Rs.50,000/year for girl students, defence personnel, differently-abled, sports achievers, and more.",
@@ -384,12 +482,12 @@ CAMPUS_TOUR_CARD = {
     "spots": [
         {
             "name": "Largest Lush Green Campus & Top Rankings",
-            "desc": "A vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
+            "desc": "170-acre vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
             "icon": "🌿",
         },
         {
-            "name": "World-Class Faculty & 10,000+ Students",
-            "desc": "Doctoral and postdoctoral faculty from IITs, NITs, and leading global universities guiding 10,000 active Indian and international students.",
+            "name": "World-Class Faculty & 1,00,000+ Student Heritage",
+            "desc": "Doctoral and postdoctoral faculty from IITs, NITs, and top global institutions; backed by Sri Rajeshwara Educational Society's 185 institutions with 1,00,000+ students and 17,000 teaching and non-teaching staff members.",
             "icon": "🎓",
         },
         {
@@ -451,12 +549,12 @@ PLACEMENT_EXCELLENCE_CARD = {
         },
     ],
     "stats": [
-        {"label": "Record Highest Package", "value": "51 LPA", "note": "Microsoft (Batch 2025)"},
-        {"label": "ServiceNow Marquee Offer", "value": "49.30 LPA", "note": "ServiceNow (Batch 2027)"},
-        {"label": "Amazon SDE Package", "value": "46.38 LPA", "note": "Amazon (Batch 2026)"},
         {"label": "Total Job Offers", "value": "1,300+", "note": "Till April and counting"},
         {"label": "Paid Internships", "value": "3,500+", "note": "Stipends up to ₹1.25L/month"},
         {"label": "Average Package", "value": "6 LPA", "note": "Across graduating cohorts"},
+        {"label": "Highest Monthly Stipend", "value": "₹1.25L / mo", "note": "Microsoft (Batch 2025)"},
+        {"label": "Top Recruiting MNCs", "value": "80+", "note": "Global tech & Fortune 500 recruiters"},
+        {"label": "Placement Support", "value": "100%", "note": "One Student–One Job + Dream option"},
     ],
     "top_mnc_offers": [
         {"company": "Accenture", "offers": 254},
@@ -470,7 +568,7 @@ PLACEMENT_EXCELLENCE_CARD = {
         {"company": "Infosys", "offers": 22},
     ],
     "marquee_offers": [
-        {"student": "Thangallapally Nithal", "batch": "CSE 2025", "package": "44 LPA", "company": "Salesforce"},
+        {"student": "Thangallapally Nihal", "batch": "CSE 2025", "package": "44 LPA", "company": "Salesforce"},
         {"student": "Bijigiri Vignesh", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
         {"student": "Ambati Krishna Sai", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
         {"student": "Jonnadula Sahith", "batch": "CSE 2025", "package": "34.5 LPA", "company": "PayPal"},
@@ -478,6 +576,190 @@ PLACEMENT_EXCELLENCE_CARD = {
         {"student": "Repala Vignesh", "batch": "CSE 2025", "package": "25 LPA", "company": "Cisco"},
         {"student": "Suraram Hari Charan", "batch": "CSE 2026", "package": "19.75 LPA", "company": "JPMorgan Chase"},
         {"student": "Nadimadla Sanvitha", "batch": "ECE 2026", "package": "14.5 LPA", "company": "Flipkart"},
+    ],
+}
+
+PROGRAMS_OFFERED_CARD = {
+    "type": "programs_offered",
+    "title": "Academic Programs & Degrees Offered by SR University",
+    "subtitle": "Multidisciplinary Programs Across 6 Specialized Schools & Doctoral Studies",
+    "schools": [
+        {
+            "name": "School of Computer Science & Artificial Intelligence",
+            "short_name": "CS & AI",
+            "icon": "💻",
+            "highlight": "Cutting-edge curriculum in AI, Quantum Computing, and Advanced Cyber Systems",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Tech Computer Science & Engineering (Core)",
+                        "B.Tech CSE — Artificial Intelligence & Machine Learning (AIML)",
+                        "B.Tech CSE — Cyber Security",
+                        "B.Tech CSE — Data Science",
+                        "B.Tech CSE — AI & Precision Agriculture",
+                        "B.Tech CSE — Gaming, AR & VR",
+                        "B.Tech CSE — Robotics & Automation",
+                        "B.Tech CSE — Quantum AI",
+                        "B.Tech in Artificial Intelligence & Robotics",
+                        "BCA (Bachelor of Computer Applications)",
+                        "B.Sc Computer Science",
+                        "B.Sc Mathematics",
+                        "B.Sc (Hons) Mathematics & AI",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Tech Computer Science & Engineering",
+                        "M.Tech CSE — Artificial Intelligence & Machine Learning",
+                        "M.Tech CSE — Data Science",
+                        "M.Tech CSE — Cyber Security",
+                        "MCA (Master of Computer Applications)",
+                        "M.Sc Computer Science",
+                        "M.Sc Statistics",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Engineering",
+            "short_name": "Engineering",
+            "icon": "⚙️",
+            "highlight": "Tier-1 NBA Accredited B.Tech Programs with Smart Robotics & EV Testing Labs",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Tech Electronics & Communication Engineering (AIML / VLSI / Robotics)",
+                        "B.Tech Electrical & Electronics Engineering (Renewable Energy / EV / Robotics)",
+                        "B.Tech Mechanical Engineering (Robotics & Automation / Smart Manufacturing)",
+                        "B.Tech Civil Engineering",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Tech Embedded Systems",
+                        "M.Tech Electronic Design Technology (EDT)",
+                        "M.Tech VLSI System Design",
+                        "M.Tech Power Electronics",
+                        "M.Tech Advanced Manufacturing Systems (AMS)",
+                        "M.Tech Thermal Engineering",
+                        "M.Tech Construction Technology & Management (CTM)",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "Astra School of Business",
+            "short_name": "Business",
+            "icon": "📊",
+            "highlight": "Modern Case-Study & Business Analytics Pedagogy with Global Networking",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "BBA (General Management)",
+                        "BBA (Finance, Operations, HR, Business Analytics, Marketing)",
+                        "BBA (Hospitality & Event Management)",
+                        "B.Com (Bachelor of Commerce)",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "MBA (Finance, Operations, HR, Business Analytics, Marketing)",
+                        "MBA in Agri-Business Management",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Agriculture",
+            "short_name": "Agriculture",
+            "icon": "🌾",
+            "highlight": "ICAR-Accredited — 1st Private University in the Telugu States to achieve accreditation",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Sc. (Hons.) Agriculture (ICAR-Accredited)",
+                        "B.Tech Food Technology",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Sc. Agriculture (Agronomy)",
+                        "M.Sc. Agriculture (Genetics & Plant Breeding)",
+                        "M.Sc. Agriculture (Horticulture)",
+                        "M.Sc. Agriculture (Plant Pathology)",
+                        "M.Sc. Agriculture (Soil Science)",
+                        "M.Sc. Agriculture (Agricultural Economics)",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Design",
+            "short_name": "Design",
+            "icon": "🎨",
+            "highlight": "Studio-Based Creative & Digital Prototyping Pathways with Industry Mentors",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Des Interior Design",
+                        "B.Des Fashion Design",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "School of Sciences and Humanities",
+            "short_name": "Sciences & Humanities",
+            "icon": "🔬",
+            "highlight": "Interdisciplinary Research in AI, Biotechnology & Space Engineering",
+            "programs": [
+                {
+                    "level": "Undergraduate (UG)",
+                    "degrees": [
+                        "B.Sc (Physics, Chemistry, Biology)",
+                        "B.Tech Biotechnology with AI",
+                        "B.Tech Engineering Physics in AI / Robotics / Space Sciences",
+                        "B.Tech Applied Chemistry in AI / Nano-Robotics / Drug Discovery",
+                    ],
+                },
+                {
+                    "level": "Postgraduate (PG)",
+                    "degrees": [
+                        "M.Sc Physics",
+                        "M.Sc Chemistry",
+                        "M.Sc Biotechnology & AI",
+                        "M.A. English",
+                    ],
+                },
+            ],
+        },
+        {
+            "name": "Doctoral Studies & Research",
+            "short_name": "Ph.D. Studies",
+            "icon": "🎓",
+            "highlight": "Full-Time & Part-Time Doctoral Research Across All Specializations",
+            "programs": [
+                {
+                    "level": "Doctoral",
+                    "degrees": [
+                        "Ph.D. in Computer Science & Artificial Intelligence",
+                        "Ph.D. in Engineering (ECE, EEE, Mechanical, Civil)",
+                        "Ph.D. in Management & Business Studies",
+                        "Ph.D. in Agricultural Sciences",
+                        "Ph.D. in Basic Sciences & Humanities",
+                    ],
+                },
+            ],
+        },
     ],
 }
 
@@ -518,9 +800,57 @@ def generate_cards(
         k in msg_lower for k in ("scholarship slab", "scholarship slabs", "merit scholarship details", "scholarship percentage", "scholarship criteria", "scholarship %", "merit scholarship")
     ) and not any(k in msg_lower for k in ("tuition fee", "fee structure", "how much fee", "complete fee"))
 
-    is_cse_fee_query = any(k in msg_lower for k in ("cse", "computer science")) and any(
-        k in msg_lower for k in ("fee", "fees", "tuition", "cost", "charge", "how much")
-    ) and not any(k in msg_lower for k in ("all branches", "complete fee", "other branches", "overall", "fee structure"))
+    is_cse_join_query = any(k in msg_lower for k in ("cse", "computer science")) and any(
+        k in msg_lower for k in (
+            "join", "want to join", "how to join", "admission", "take admission",
+            "enroll", "enrol", "apply for cse", "apply cse", "seat in cse",
+            "joining", "btech cse join", "select cse", "interested in cse", "opt cse", "choose cse"
+        )
+    )
+
+    is_cse_fee_query = is_cse_join_query or (
+        any(k in msg_lower for k in ("cse", "computer science")) and any(
+            k in msg_lower for k in ("fee", "fees", "tuition", "cost", "charge", "how much", "breakdown", "per sem", "semester", "sem fee")
+        ) and not any(k in msg_lower for k in ("all branches", "complete fee", "other branches", "overall", "fee structure"))
+    )
+
+    is_ad_query = any(k in msg_lower for k in (
+        "50% off", "50% discount", "early bird", "application discount", "application fee discount",
+        "sponsored", "discount on application", "cheap application", "coupon", "promo", "voucher", "early ad"
+    )) or bool(re.search(r"\bad\b", msg_lower)) or (
+        any(k in msg_lower for k in ("apply online", "how to apply", "application form", "apply now", "register online", "online application"))
+        and not any(k in msg_lower for k in ("transport", "bus", "hostel", "admission fee", "one-time", "enrollment fee"))
+    )
+
+    is_join_interest_query = (
+        any(k in msg_lower for k in (
+            "interested to join", "interested in joining", "want to join", "how to join",
+            "how can i join", "like to join", "wishing to join", "planning to join",
+            "join sru", "join sr university", "join sr", "join the university",
+            "take admission in sru", "take admission at sru", "get admission in sru",
+            "admission in sru", "admissions in sru", "admission at sru", "admission process",
+            "how to get admission", "how do i get admission", "how can i get admission",
+            "apply to sru", "apply at sru", "how to apply to sru", "apply for sru",
+            "interested in admission", "interested in sru", "interested to study at sru",
+            "want to study at sru", "enroll at sru", "enrol at sru", "seat in sru",
+            "how to get a seat in sru", "admission open", "eligibility to join",
+            "can i join sru", "can i get admission in sru", "admission procedure",
+            "join btech", "join b.tech", "join mba", "join bba", "join mtech"
+        )) or is_cse_join_query or (
+            any(k in msg_lower for k in ("join", "take admission", "interested in joining", "want to join")) and
+            any(k in msg_lower for k in ("sru", "sr university", "here", "college", "campus", "this university"))
+        )
+    ) and not is_admission_fee_query
+
+
+    is_fee_with_hostel_query = any(k in msg_lower for k in (
+        "with hostel", "including hostel", "plus hostel", "hostel and tuition",
+        "tuition and hostel", "both tuition and hostel", "and hostel fee", "add hostel",
+        "hostel fee included", "fee along with hostel", "along with hostel"
+    )) or (
+        any(k in msg_lower for k in ("hostel", "mess", "boarding")) and
+        any(k in msg_lower for k in ("tuition", "cse fee", "btech fee", "b.tech fee", "total fee", "per sem"))
+    )
 
     is_btech_fee_query = any(k in msg_lower for k in ("btech", "b.tech", "engineering fee", "btech fee", "b.tech fee")) or (
         any(k in msg_lower for k in ("btech", "b.tech")) and any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "scholarship"))
@@ -528,7 +858,11 @@ def generate_cards(
 
     if is_transport_fee_query:
         cards.append(TRANSPORT_FEE_CARD)
-    elif is_hostel_fee_query:
+    elif is_fee_with_hostel_query:
+        # User explicitly asked to include hostel in the fee breakdown
+        cards.append(BTECH_CSE_WITH_HOSTEL_FEE_CARD)
+    elif is_hostel_fee_query and not (is_cse_fee_query or is_btech_fee_query):
+        # User asked purely for hostel fees
         cards.append(HOSTEL_FEE_CARD)
     elif is_exam_fee_query:
         cards.append(EXAM_FEE_CARD)
@@ -537,7 +871,8 @@ def generate_cards(
     elif is_scholarship_only_query:
         cards.append(MERIT_SCHOLARSHIP_CARD)
     elif is_cse_fee_query:
-        cards.append(BTECH_CSE_FEE_CARD)
+        # User asked for CSE fee WITHOUT hostel (hostel not added)
+        cards.append(BTECH_CSE_SEMESTER_FEE_CARD)
     elif is_btech_fee_query:
         cards.append(BTECH_ACADEMIC_FEE_CARD)
     elif any(k in msg_lower for k in ("fee", "fees", "tuition", "cost of study", "how much is the fee")):
@@ -546,11 +881,33 @@ def generate_cards(
             if not any(k in msg_lower for k in ("transport", "bus", "hostel", "mess", "exam")):
                 cards.append(BTECH_ACADEMIC_FEE_CARD)
 
+
+    # 2b. Sponsored Early Bird Application Ad Card (media_1794676975023.png reference)
+    # Attached whenever student is interested in joining SRU, querying application discount, applying online, or early bird offers
+    if (is_join_interest_query or is_ad_query or (is_cse_fee_query and any(k in msg_lower for k in ("join", "admission", "apply", "want", "breakdown")))) and not is_admission_fee_query:
+        if APPLICATION_AD_CARD not in cards:
+            cards.append(APPLICATION_AD_CARD)
+
+
+
     # 3. Curriculum card
     if any(k in msg_lower for k in ("curriculum", "syllabus", "subjects", "course structure", "credits")) and (
         "cse" in msg_lower or "computer science" in msg_lower or "engineering" in msg_lower
     ):
         cards.append(CURRICULUM_CARD)
+
+    # 3b. Academic Programs & Courses Offered card
+    is_courses_query = any(
+        k in msg_lower for k in (
+            "course", "courses", "programs", "programmes", "what can i study",
+            "what does sru offer", "courses offered", "programs offered",
+            "degrees offered", "branches available", "what streams", "degrees",
+            "schools and courses", "which courses", "all courses", "list of courses",
+            "what to study", "fields of study", "specializations offered", "schools offered"
+        )
+    ) and not any(k in msg_lower for k in ("fee", "fees", "cost", "how much", "tuition", "vs", "compare", "curriculum", "syllabus"))
+    if is_courses_query:
+        cards.append(PROGRAMS_OFFERED_CARD)
 
     # 4. Placement Highlights card ("Three Consecutive Years of Excellence")
     if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):
@@ -580,17 +937,19 @@ def generate_cards(
 
     # 6. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
     # Zero keyword matching: relevance is governed purely by ChromaDB semantic cosine distance.
-    # Attached only when explicitly requested or confirmed via affirmative Yes/No response.
-    if (is_video_query or is_video_confirmed) and query_embedding:
-        relevant_videos = get_relevant_videos(
-            user_message=user_message,
-            answer=answer,
-            sources=sources,
-            query_embedding=query_embedding,
-            is_explicit=is_video_query,
-        )
-        if relevant_videos:
-            cards.append(create_video_card(relevant_videos, is_explicit=True))
+    # Directly displayed for visual / campus / placement queries or when asked/confirmed.
+    if query_embedding:
+        should_show_videos = is_video_query or is_video_confirmed or should_display_videos(user_message)
+        if should_show_videos:
+            relevant_videos = get_relevant_videos(
+                user_message=user_message,
+                answer=answer,
+                sources=sources,
+                query_embedding=query_embedding,
+                is_explicit=is_video_query,
+            )
+            if relevant_videos:
+                cards.append(create_video_card(relevant_videos, is_explicit=is_video_query))
 
     # 7. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):

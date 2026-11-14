@@ -121,6 +121,212 @@ def test_wizard_step_progression():
     assert step4["is_eligible"] is True
 
 
+def test_wizard_completion_prevents_loop():
+    """Verify that once Step 4 is rendered, subsequent queries (like Hostel Details) exit the wizard."""
+    step4_answer, _ = execute_wizard_step({
+        "flow_name": "admission_wizard",
+        "step": 4,
+        "total_steps": 4,
+        "step_title": "Eligibility Verdict & Next Steps",
+        "degree": "B.Tech",
+        "branch": "CSE (Core)",
+        "score": "78%",
+        "is_eligible": True,
+        "completed": True,
+    })
+    history = [
+        {"role": "user", "content": "admission wizard"},
+        {"role": "assistant", "content": "Welcome to the SR University Admission Wizard! (Step 1 of 4)"},
+        {"role": "user", "content": "B.Tech"},
+        {"role": "assistant", "content": "Step 2 of 4: Select Your Branch"},
+        {"role": "user", "content": "CSE"},
+        {"role": "assistant", "content": "Step 3 of 4: Qualifying Percentage"},
+        {"role": "user", "content": "78%"},
+        {"role": "assistant", "content": step4_answer},
+    ]
+
+    # Follow-up button click or question must NOT re-trigger step 4
+    next_step = get_wizard_step_from_history(history, "🏠 Hostel Details")
+    assert next_step is None
+
+    next_step_fee = get_wizard_step_from_history(history, "💰 Fee Structure")
+    assert next_step_fee is None
+
+    next_step_general = get_wizard_step_from_history(history, "What is the hostel fee?")
+    assert next_step_general is None
+
+
+def test_calculator_handoff_query_does_not_trigger_wizard():
+    """Verify calculator handoff query does NOT falsely hijack into admission wizard."""
+    calc_query = (
+        "I evaluated the scholarship for B.Tech Computer Science and Engineering with 78% "
+        "which qualifies for a 20% merit waiver (Payable: ₹60,000/sem). "
+        "Please share details on admission verification and hostel accommodation."
+    )
+    assert detect_flow_trigger(calc_query) is None
+    assert get_wizard_step_from_history([], calc_query) is None
+
+
+def test_wizard_eligibility_50_percent_cutoff():
+    """Verify 50% minimum MPC cutoff for B.Tech."""
+    # 55% should be eligible (above 50% cutoff)
+    step4_55 = get_wizard_step_from_history(
+        [
+            {"role": "user", "content": "admission wizard"},
+            {"role": "user", "content": "B.Tech"},
+            {"role": "user", "content": "CSE"},
+        ],
+        "55%",
+    )
+    assert step4_55["is_eligible"] is True
+
+    # 45% should require additional guidance (below 50% cutoff)
+    step4_45 = get_wizard_step_from_history(
+        [
+            {"role": "user", "content": "admission wizard"},
+            {"role": "user", "content": "B.Tech"},
+            {"role": "user", "content": "CSE"},
+        ],
+        "45%",
+    )
+    assert step4_45["is_eligible"] is False
+
+
+def test_wizard_cancellation():
+    """Verify that users can exit the wizard with cancel/stop keywords."""
+    history = [
+        {"role": "user", "content": "admission wizard"},
+        {"role": "assistant", "content": "Welcome to the SR University Admission Wizard! (Step 1 of 4)"},
+    ]
+    assert get_wizard_step_from_history(history, "cancel") is None
+    assert get_wizard_step_from_history(history, "stop") is None
+    assert get_wizard_step_from_history(history, "nevermind") is None
+
+
 def test_time_aware_greeting():
     greeting = get_conversational_response("GREETING", has_context=False)
     assert "SRU Buddy" in greeting or "SR University" in greeting
+
+
+def test_btech_cse_join_and_fee_card():
+    """Verify that asking to join B.Tech CSE yields both per-semester fee breakdown and the Early Bird Ad Card."""
+    cards = generate_cards(
+        user_message="I want to join B.Tech CSE",
+        answer="We would be delighted to have you join B.Tech CSE! Here is the per-semester fee breakdown.",
+    )
+    assert len(cards) >= 2
+    types = [c.get("type") for c in cards]
+    assert "fee_breakdown" in types
+    assert "application_ad" in types
+
+    # Check fee card details
+    fee_card = next(c for c in cards if c.get("type") == "fee_breakdown")
+    assert "B.Tech CSE" in fee_card["title"]
+    categories = [item["category"] for item in fee_card["items"]]
+    assert any("1st Semester" in cat for cat in categories)
+    assert any("Enrollment" in cat for cat in categories)
+
+    # Check Ad card details (media_1794676975023.png reference)
+    ad_card = next(c for c in cards if c.get("type") == "application_ad")
+    assert "SR University Admissions" in ad_card["sponsor_name"]
+    assert "50% Off" in ad_card["title"]
+    assert "https://apply.sru.edu.in" in ad_card["cta_url"]
+
+
+def test_application_ad_card_on_discount_query():
+    """Verify that asking for early bird application discount attaches the Ad Card."""
+    cards = generate_cards(
+        user_message="Is there any 50% off on online application early bird offer?",
+        answer="Yes, early applicants get a 50% waiver on the online application fee.",
+    )
+    assert any(c.get("type") == "application_ad" for c in cards)
+
+
+def test_application_ad_on_interested_to_join_sru():
+    """Verify that asking general 'interested to join SRU' questions attaches the compact Ad Card."""
+    queries = [
+        "I am interested to join SR University",
+        "How can I join SRU?",
+        "I want to take admission in SRU",
+        "How do I apply to SRU for 2027-28?",
+    ]
+    for q in queries:
+        cards = generate_cards(user_message=q, answer="Welcome to SR University!")
+        types = [c.get("type") for c in cards]
+        assert "application_ad" in types, f"Expected application_ad card for query: {q}"
+        ad_card = next(c for c in cards if c.get("type") == "application_ad")
+        assert "50% Off" in ad_card["title"]
+        assert "https://apply.sru.edu.in" in ad_card["cta_url"]
+
+
+
+def test_btech_cse_semester_fee_structure():
+    """Verify exact per-semester fee amounts for B.Tech CSE."""
+    from app.services.card_service import BTECH_CSE_SEMESTER_FEE_CARD
+    items = {i["category"]: i["amount"] for i in BTECH_CSE_SEMESTER_FEE_CARD["items"]}
+    assert "1st Semester Tuition Fee (B.Tech CSE)" in items
+    assert items["1st Semester Tuition Fee (B.Tech CSE)"] == "₹1,70,000"
+    assert "One-Time Enrollment Fee" in items
+    assert items["One-Time Enrollment Fee"] == "₹5,000"
+
+
+def test_btech_cse_fee_without_hostel_does_not_add_hostel():
+    """Verify that asking for B.Tech CSE fee without hostel does NOT add hostel fee."""
+    from app.services.card_service import generate_cards
+    cards = generate_cards(
+        user_message="What is the fee breakdown for B.Tech CSE per semester?",
+        answer="Here is the per semester fee breakdown for B.Tech CSE.",
+    )
+    assert len(cards) >= 1
+    fee_card = next(c for c in cards if c.get("type") == "fee_breakdown")
+    assert "B.Tech CSE" in fee_card["title"]
+    assert "Hostel" not in fee_card["title"]
+    # Verify no item has hostel in category or amount
+    assert not any("Hostel" in item["category"] for item in fee_card["items"])
+    # Verify regular academic per-sem total
+    item_map = {i["category"]: i["amount"] for i in fee_card["items"]}
+    assert item_map.get("Total Per-Semester Payable (Regular)") == "₹1,80,000 / Sem"
+    assert item_map.get("Total 1st Semester Payable") == "₹1,85,000"
+
+
+def test_btech_cse_fee_with_hostel_adds_hostel_per_sem():
+    """Verify that asking for fee WITH hostel adds the hostel per-semester breakdown."""
+    from app.services.card_service import generate_cards
+    cards = generate_cards(
+        user_message="I want to join B.Tech CSE with hostel, what is the total fee breakdown per sem?",
+        answer="Here is the total per-semester fee breakdown including tuition and hostel.",
+    )
+    assert len(cards) >= 1
+    fee_card = next(c for c in cards if c.get("type") == "fee_breakdown")
+    assert "Hostel" in fee_card["title"]
+    item_map = {i["category"]: i["amount"] for i in fee_card["items"]}
+    assert "Residential Hostel & Mess (AC 4-Sharing)" in item_map
+    assert item_map["Residential Hostel & Mess (AC 4-Sharing)"] == "₹62,500 / Sem"
+    assert item_map.get("Combined Total Per-Semester (Regular)") == "₹2,42,500 / Sem"
+    assert item_map.get("Combined Total 1st Semester Payable") == "₹2,47,500"
+
+
+def test_calculate_fee_conditional_hostel():
+    """Verify calculate_fee tool conditional hostel behavior."""
+    from app.sru_agent.fees import calculate_fee
+
+    # 1. Without hostel (default)
+    res_no_hostel = calculate_fee(program="btech_cse", hostel="none")
+    assert res_no_hostel["has_hostel"] is False
+    assert res_no_hostel["total_per_semester"] == "₹1,80,000"
+    assert res_no_hostel["sem1_total_payable"] == "₹1,85,000"
+    assert "hostel_per_sem" not in res_no_hostel["per_sem_breakdown"]
+    assert res_no_hostel["hostel"] is None
+
+    # 2. With AC 4-sharing hostel explicitly requested
+    res_with_hostel = calculate_fee(program="btech_cse", hostel="ac_4")
+    assert res_with_hostel["has_hostel"] is True
+    assert res_with_hostel["hostel"] is not None
+    assert res_with_hostel["hostel"]["per_semester"] == "₹62,500"
+    assert res_with_hostel["total_per_semester"] == "₹2,42,500"
+    assert res_with_hostel["sem1_total_payable"] == "₹2,47,500"
+    assert res_with_hostel["per_sem_breakdown"]["hostel_per_sem"] == "₹62,500"
+
+
+
+

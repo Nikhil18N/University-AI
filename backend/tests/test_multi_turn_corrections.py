@@ -39,20 +39,21 @@ class TestMultiTurnBranchCorrection:
 
 class TestMultiTurnScoreCorrection:
     def test_score_correction_flips_eligibility(self):
-        # Turn 1: Below cutoff (55%)
+        # Turn 1: Below cutoff (45%)
         messages = [
-            {"role": "user", "content": "I got 55% in 12th boards, want B.Tech CSE"},
+            {"role": "user", "content": "I got 45% in 12th boards, want B.Tech CSE"},
         ]
         profile1 = extract_student_profile(messages)
-        assert profile1["score_pct"] == 55.0
+        assert profile1["score_pct"] == 45.0
         guidance1 = build_counsellor_guidance(profile1)
-        assert "below the 60% cutoff" in guidance1
+        assert "below" in guidance1.lower() and "cutoff" in guidance1.lower()
 
         # Turn 2: Student corrects the score (75%)
         messages.extend([
-            {"role": "assistant", "content": "Unfortunately 55% is below our 60% cutoff."},
+            {"role": "assistant", "content": "Unfortunately 45% is below our 50% cutoff."},
             {"role": "user", "content": "Sorry typo, my marks are actually 75% in PCM!"},
         ])
+
         profile2 = extract_student_profile(messages)
         assert profile2["score_pct"] == 75.0
         assert profile2["score_raw"] == "75.0%" or profile2["score_raw"] == "75%"

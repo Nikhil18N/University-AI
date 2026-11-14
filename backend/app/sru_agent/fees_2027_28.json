@@ -1,0 +1,173 @@
+{
+  "_README": "SINGLE SOURCE OF TRUTH for fees and scholarships across SR University.",
+  "academic_year": "2027-28",
+  "source": "SR University Official Admissions & Fee Structure 2027-28",
+  "verified": true,
+  "one_time": {"enrollment_fee": 5000, "application_fee": 1100, "admission_fee": 25000},
+  "yearly_other": {"other_fee": 15000, "exam_fee": 5000},
+  "hostel_per_year": {"non_ac_4": 115000, "non_ac_3": 125000, "ac_4": 125000, "ac_3": 135000},
+  "programs": {
+    "btech_cse": {
+      "name": "B.Tech CSE and allied (AI & ML, Data Science, Cyber Security)",
+      "aliases": ["cse", "computer science", "ai & ml", "ai and ml", "aiml", "ai ml", "data science", "cyber security", "cs", "btech cse"],
+      "duration_years": 4, "tuition_per_year": 340000, "yearly_increase": 9000,
+      "specialization_fee_per_year_from_year2": 30000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "slab_set": "btech"
+    },
+    "btech_ece": {
+      "name": "B.Tech ECE (AIML / VLSI / Robotics)",
+      "aliases": ["ece", "electronics", "btech ece", "electronics and communication"],
+      "duration_years": 4, "tuition_per_year": 270000, "yearly_increase": 8000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "slab_set": "btech"
+    },
+    "btech_eee": {
+      "name": "B.Tech EEE (Renewable Energy / EV / Robotics)",
+      "aliases": ["eee", "electrical", "btech eee", "electrical and electronics"],
+      "duration_years": 4, "tuition_per_year": 200000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "slab_set": "btech"
+    },
+    "btech_mech": {
+      "name": "B.Tech Mechanical Engineering (Robotics / Smart Manufacturing)",
+      "aliases": ["mechanical", "mech", "btech mech", "btech mechanical"],
+      "duration_years": 4, "tuition_per_year": 200000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "slab_set": "btech"
+    },
+    "btech_civil": {
+      "name": "B.Tech Civil Engineering",
+      "aliases": ["civil", "civil engineering", "btech civil"],
+      "duration_years": 4, "tuition_per_year": 200000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "slab_set": "btech"
+    },
+    "bsc_agri": {
+      "name": "B.Sc. (Hons.) Agriculture (ICAR-Accredited)",
+      "aliases": ["agriculture", "agri", "bsc agriculture", "b.sc agriculture", "bsc agri", "b.sc. (hons.) agriculture"],
+      "duration_years": 4, "tuition_per_year": 240000, "yearly_increase": 8000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with BiPC / MPC",
+      "slab_set": "other_ug"
+    },
+    "bdes": {
+      "name": "B.Des (Interior Design / Fashion Design)",
+      "aliases": ["bdes", "design", "b.des", "interior design", "fashion design"],
+      "duration_years": 4, "tuition_per_year": 220000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate, any stream",
+      "slab_set": "other_ug"
+    },
+    "bba": {
+      "name": "BBA (General Management)",
+      "aliases": ["bba", "bba general", "bachelor of business administration"],
+      "duration_years": 3, "tuition_per_year": 150000, "yearly_increase": 4000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate, any stream",
+      "slab_set": "other_ug"
+    },
+    "bba_specialised": {
+      "name": "BBA specialised (Business Analytics, FinTech, Digital Marketing)",
+      "aliases": ["bba business analytics", "bba fintech", "bba digital marketing", "specialised bba", "specialized bba"],
+      "duration_years": 3, "tuition_per_year": 200000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate, any stream",
+      "slab_set": "other_ug"
+    },
+    "bca": {
+      "name": "BCA (Bachelor of Computer Applications)",
+      "aliases": ["bca", "bachelor of computer applications"],
+      "duration_years": 3, "tuition_per_year": 150000, "yearly_increase": 4000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Mathematics",
+      "slab_set": "other_ug"
+    },
+    "bsc_cs": {
+      "name": "B.Sc Computer Science / Mathematics & AI",
+      "aliases": ["bsc cs", "bsc computer science", "b.sc computer science", "bsc maths"],
+      "duration_years": 3, "tuition_per_year": 120000, "yearly_increase": 4000,
+      "min_percent": 50, "eligibility_note": "10+2 / Intermediate with Mathematics",
+      "slab_set": "other_ug"
+    },
+    "mba": {
+      "name": "MBA (Dual Specializations: Finance, Marketing, HR, Business Analytics)",
+      "aliases": ["mba", "master of business administration"],
+      "duration_years": 2, "tuition_per_year": 300000, "yearly_increase": 10000,
+      "min_percent": 50, "eligibility_note": "Any recognized Bachelor's degree (50% aggregate)",
+      "slab_set": "pg"
+    },
+    "mca": {
+      "name": "MCA (Master of Computer Applications)",
+      "aliases": ["mca", "master of computer applications"],
+      "duration_years": 2, "tuition_per_year": 160000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "BCA / B.Sc / B.Com / B.A with Mathematics at 10+2 or degree level",
+      "slab_set": "pg"
+    },
+    "mtech": {
+      "name": "M.Tech (CSE, AIML, Embedded Systems, VLSI)",
+      "aliases": ["mtech", "m.tech", "master of technology"],
+      "duration_years": 2, "tuition_per_year": 160000, "yearly_increase": 6000,
+      "min_percent": 50, "eligibility_note": "B.Tech / B.E. in relevant engineering discipline",
+      "slab_set": "pg"
+    }
+  },
+  "slab_sets": {
+    "btech": {
+      "state_board": [
+        {"min": 60, "max": 64.99, "percent": 10},
+        {"min": 65, "max": 69.99, "percent": 15},
+        {"min": 70, "max": 79.99, "percent": 20},
+        {"min": 80, "max": 91.99, "percent": 25},
+        {"min": 92, "max": 97.99, "percent": 30},
+        {"min": 98, "max": 100, "percent": 40}
+      ],
+      "cbse": [
+        {"min": 60, "max": 64.99, "percent": 10},
+        {"min": 65, "max": 69.99, "percent": 15},
+        {"min": 70, "max": 79.99, "percent": 20},
+        {"min": 80, "max": 89.99, "percent": 25},
+        {"min": 90, "max": 94.99, "percent": 30},
+        {"min": 95, "max": 100, "percent": 40}
+      ],
+      "eapcet_rank": [
+        {"min": 1, "max": 8000, "percent": 40},
+        {"min": 8001, "max": 20000, "percent": 25},
+        {"min": 20001, "max": 40000, "percent": 15},
+        {"min": 40001, "max": 60000, "percent": 10}
+      ],
+      "jee_percentile": [
+        {"min": 50, "max": 59.99, "percent": 10},
+        {"min": 60, "max": 69.99, "percent": 15},
+        {"min": 70, "max": 79.99, "percent": 20},
+        {"min": 80, "max": 89.99, "percent": 25},
+        {"min": 90, "max": 94.99, "percent": 30},
+        {"min": 95, "max": 100, "percent": 40}
+      ]
+    },
+    "other_ug": {
+      "state_board": [
+        {"min": 65, "max": 74.99, "percent": 15},
+        {"min": 75, "max": 84.99, "percent": 25},
+        {"min": 85, "max": 100, "percent": 35}
+      ],
+      "cbse": [
+        {"min": 65, "max": 74.99, "percent": 15},
+        {"min": 75, "max": 84.99, "percent": 25},
+        {"min": 85, "max": 100, "percent": 35}
+      ],
+      "eapcet_rank": [],
+      "jee_percentile": []
+    },
+    "pg": {
+      "state_board": [
+        {"min": 70, "max": 79.99, "percent": 15},
+        {"min": 80, "max": 89.99, "percent": 25},
+        {"min": 90, "max": 100, "percent": 35}
+      ],
+      "cbse": [
+        {"min": 70, "max": 79.99, "percent": 15},
+        {"min": 80, "max": 89.99, "percent": 25},
+        {"min": 90, "max": 100, "percent": 35}
+      ],
+      "eapcet_rank": [],
+      "jee_percentile": []
+    }
+  }
+}
+

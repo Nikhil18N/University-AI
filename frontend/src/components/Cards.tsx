@@ -408,13 +408,16 @@ export function PlacementHighlightsCard({ card }: CardProps) {
   ];
 
   const stats = card.stats || [
-    { label: "Highest Package", value: "51 LPA", note: "Microsoft" },
-    { label: "Total Job Offers", value: "1,300+", note: "And counting" },
-    { label: "Internships", value: "3,500+", note: "Stipends to ₹1.25L/mo" },
+    { label: "Total Job Offers", value: "1,300+", note: "Till April and counting" },
+    { label: "Paid Internships", value: "3,500+", note: "Stipends to ₹1.25L/mo" },
     { label: "Average CTC", value: "6 LPA", note: "Cohort Average" },
+    { label: "Highest Stipend", value: "₹1.25L / mo", note: "Microsoft (Batch 2025)" },
+    { label: "Top Recruiting MNCs", value: "80+", note: "Fortune 500 & tech leaders" },
+    { label: "Placement Support", value: "100%", note: "One Student–One Job" },
   ];
 
   const topMncs = card.top_mnc_offers || [];
+  const marqueeOffers = card.marquee_offers || [];
 
   return (
     <div className="rich-card placement-card">
@@ -463,7 +466,7 @@ export function PlacementHighlightsCard({ card }: CardProps) {
         ))}
       </div>
 
-      {/* Key Milestone Stats */}
+      {/* Key Milestone Stats (Non-repetitive university metrics) */}
       <div className="placement-stats-grid">
         {stats.map((s: any, idx: number) => (
           <div key={idx} className="placement-stat-box">
@@ -474,11 +477,36 @@ export function PlacementHighlightsCard({ card }: CardProps) {
         ))}
       </div>
 
+      {/* Other Marquee Superstar Achievers */}
+      {marqueeOffers.length > 0 && (
+        <div className="placement-marquee-section">
+          <h6 className="placement-mnc-title">
+            <AwardIcon size={13} /> Other Marquee Superstar Achievers
+          </h6>
+          <div className="marquee-offers-grid">
+            {marqueeOffers.map((m: any, idx: number) => (
+              <div key={idx} className="marquee-offer-item">
+                <div className="marquee-offer-main">
+                  <span className="marquee-student-name">{m.student}</span>
+                  <span className="marquee-batch-tag">{m.batch}</span>
+                </div>
+                <div className="marquee-offer-sub">
+                  <span className="marquee-company-tag">
+                    <BriefcaseIcon size={12} /> Placed @ <strong>{m.company}</strong>
+                  </span>
+                  <span className="marquee-package-tag">{m.package}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Top Recruiting MNCs Volume */}
       {topMncs.length > 0 && (
         <div className="placement-mnc-section">
           <h6 className="placement-mnc-title">
-            <SparklesIcon size={13} /> Top MNC Offers
+            <SparklesIcon size={13} /> Top MNC Hiring Volume
           </h6>
           <div className="placement-mnc-pills">
             {topMncs.map((m: any, idx: number) => (
@@ -536,6 +564,335 @@ function SRUAdvantageCard({ card }: { card: any }) {
   );
 }
 
+export function ProgramsOfferedCard({ card }: CardProps) {
+  const schools = card.schools || [];
+  const [activeSchoolIndex, setActiveSchoolIndex] = useState(0);
+
+  if (!schools || schools.length === 0) return null;
+
+  const activeSchool = schools[activeSchoolIndex] || schools[0];
+  const programs = activeSchool.programs || [];
+
+  return (
+    <div className="rich-card programs-offered-card">
+      <div className="card-header programs-card-header">
+        <span className="card-badge">
+          <BookOpenIcon size={14} /> Academic Programs
+        </span>
+        <h4 className="card-title">{card.title || "Academic Programs Across 6 Schools"}</h4>
+        {card.subtitle && <p className="card-subtitle">{card.subtitle}</p>}
+      </div>
+
+      {/* School Tabs */}
+      <div className="school-tabs-container">
+        <div className="school-tabs" role="tablist">
+          {schools.map((school: any, idx: number) => {
+            const isActive = idx === activeSchoolIndex;
+            return (
+              <button
+                key={idx}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`school-tab-btn ${isActive ? "active" : ""}`}
+                onClick={() => setActiveSchoolIndex(idx)}
+              >
+                <span className="school-tab-icon">{school.icon}</span>
+                <span className="school-tab-label">{school.short_name || school.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Active School Banner & Degrees */}
+      <div className="school-details-pane">
+        <div className="school-info-header">
+          <div className="school-title-wrap">
+            <span className="school-pane-icon">{activeSchool.icon}</span>
+            <div>
+              <h5 className="school-pane-name">{activeSchool.name}</h5>
+              {activeSchool.highlight && (
+                <div className="school-highlight-badge">
+                  <SparklesIcon size={12} /> {activeSchool.highlight}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="school-programs-sections">
+          {programs.map((progGroup: any, pIdx: number) => (
+            <div key={pIdx} className="program-level-block">
+              <div className="program-level-header">
+                <span className="level-dot" />
+                <h6 className="program-level-title">{progGroup.level}</h6>
+                <span className="program-count-badge">
+                  {progGroup.degrees ? progGroup.degrees.length : 0} Programs
+                </span>
+              </div>
+              <div className="degrees-list-grid">
+                {progGroup.degrees && progGroup.degrees.map((deg: string, dIdx: number) => (
+                  <div key={dIdx} className="degree-item-pill">
+                    <span className="degree-check-bullet">✓</span>
+                    <span className="degree-name">{deg}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Card Footer */}
+      <div className="programs-card-footer">
+        <span className="programs-footer-tagline">
+          ✨ Tier-1 NBA & ICAR Accredited Programs • Fully Flexible Credit System (FFCS) • Merit Scholarships Up to 40%
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export function AgentFeeCard({ card }: CardProps) {
+  const d = card.data || {};
+  const progName = d.program_name || d.program || "Academic Program";
+  const semTuition = d.net_tuition_per_sem ?? d.base_tuition_per_sem ?? (d.per_semester_after_scholarship || "₹1,70,000");
+  const waiver = d.scholarship_percent || 0;
+  const hasHostel = Boolean(d.has_hostel || (d.hostel && d.hostel.per_year));
+  const hostelPerSem = d.hostel?.per_semester || (d.hostel?.per_year ? `₹${Math.round(parseInt(String(d.hostel.per_year).replace(/[^\d]/g, ""), 10) / 2).toLocaleString("en-IN")}` : null);
+  const totalPerSem = d.total_per_semester || (hasHostel ? "₹2,42,500" : "₹1,80,000");
+  const sem1Total = d.sem1_total_payable || (hasHostel ? "₹2,47,500" : "₹1,85,000");
+
+  const handleWhatsApp = () => {
+    const text = `Hello SR University Admissions! I received this fee calculation for ${progName} (${d.admission_year || "2027-28"}). Net Tuition: ${semTuition}/sem, Scholarship: ${waiver}%, Total/sem: ${totalPerSem} ${hasHostel ? "(including hostel)" : "(without hostel)"}. Please assist me with admissions.`;
+    window.open(`https://wa.me/918331003030?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  return (
+    <div className="rich-card fee-card agent-fee-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">
+          <RupeeIcon size={14} /> Official 2027-28 Fee
+        </span>
+        <h4 className="card-title">{progName}</h4>
+      </div>
+      <div className="agent-fee-stats-grid">
+        <div className="agent-fee-stat">
+          <span className="agent-fee-stat-label">Net Tuition / Sem</span>
+          <span className="agent-fee-stat-val bold-emerald">
+            {typeof semTuition === "number" ? `₹${semTuition.toLocaleString("en-IN")}` : semTuition}
+          </span>
+          <span className="agent-fee-stat-sub">per semester tuition</span>
+        </div>
+        <div className="agent-fee-stat">
+          <span className="agent-fee-stat-label">Merit Scholarship</span>
+          <span className="agent-fee-stat-val bold-blue">{waiver > 0 ? `${waiver}% Waiver` : "Standard Slabs"}</span>
+          <span className="agent-fee-stat-sub">official merit waiver</span>
+        </div>
+        {hasHostel ? (
+          <>
+            <div className="agent-fee-stat">
+              <span className="agent-fee-stat-label">Hostel & Mess / Sem</span>
+              <span className="agent-fee-stat-val bold-blue">{hostelPerSem}</span>
+              <span className="agent-fee-stat-sub">{d.hostel?.type || "AC 4-Sharing"} (4 meals/day)</span>
+            </div>
+            <div className="agent-fee-stat">
+              <span className="agent-fee-stat-label">Combined Total / Sem</span>
+              <span className="agent-fee-stat-val bold-emerald">{totalPerSem}</span>
+              <span className="agent-fee-stat-sub">Tuition + Other + Hostel</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="agent-fee-stat">
+              <span className="agent-fee-stat-label">Total / Sem (Academic)</span>
+              <span className="agent-fee-stat-val bold-emerald">{totalPerSem}</span>
+              <span className="agent-fee-stat-sub">Tuition + Other/Exam Fees</span>
+            </div>
+            <div className="agent-fee-stat">
+              <span className="agent-fee-stat-label">1st Sem Total</span>
+              <span className="agent-fee-stat-val">{sem1Total}</span>
+              <span className="agent-fee-stat-sub">includes ₹5k enrollment</span>
+            </div>
+          </>
+        )}
+      </div>
+      <div className="agent-card-footer">
+        <span className="agent-card-source-tag">
+          {hasHostel
+            ? "🏠 Hostel & Dining included in total per semester."
+            : "ℹ️ Hostel fee NOT included (separate & optional: ₹1.15L – ₹1.35L/yr)."}
+        </span>
+        <button type="button" className="agent-card-wa-btn" onClick={handleWhatsApp}>
+          💬 WhatsApp Admissions
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+export function AgentCallbackCard({ card }: CardProps) {
+  const d = card.data || {};
+  return (
+    <div className="rich-card agent-action-card callback-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">
+          ✓ Callback Requested
+        </span>
+        <h4 className="card-title">Admissions Counselor Call Scheduled</h4>
+      </div>
+      <div className="agent-action-body">
+        <p className="agent-action-msg">
+          Thank you, <strong>{d.name || "Student"}</strong>. An official SR University admissions counselor will contact you on your registered mobile (ending in <strong>•••{d.phone_last4 || "••••"}</strong>).
+        </p>
+        <div className="agent-action-meta">
+          {d.preferred_time && <div><strong>Preferred Time:</strong> {d.preferred_time}</div>}
+          {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
+          <div><strong>Admissions Helpline:</strong> +91 8331003030 / 9959664400</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AgentCampusVisitCard({ card }: CardProps) {
+  const d = card.data || {};
+  return (
+    <div className="rich-card agent-action-card visit-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">
+          🏛️ Campus Tour
+        </span>
+        <h4 className="card-title">Campus Visit Scheduled</h4>
+      </div>
+      <div className="agent-action-body">
+        <p className="agent-action-msg">
+          Visit requested for <strong>{d.visit_date || "Upcoming date"}</strong> for <strong>{d.visitors || 1} visitor(s)</strong>.
+        </p>
+        <div className="agent-action-meta">
+          <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
+          <div><strong>Timings:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
+          {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
+        </div>
+        <div className="agent-card-footer">
+          <span className="agent-card-source-tag">The admissions team will confirm arrival logistics via phone.</span>
+          <a
+            href="https://maps.google.com/?q=SR+University+Warangal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="agent-card-map-btn"
+          >
+            📍 Open in Google Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AgentContactLinksCard({ card }: CardProps) {
+  const d = card.data || {};
+  return (
+    <div className="rich-card agent-action-card contact-card">
+      <div className="card-header">
+        <span className="card-badge">
+          📞 Direct Contacts
+        </span>
+        <h4 className="card-title">SR University Admissions Office</h4>
+      </div>
+      <div className="agent-contacts-row">
+        {d.phone && (
+          <a href={`tel:${d.phone}`} className="agent-contact-pill">
+            📞 Call {d.phone}
+          </a>
+        )}
+        {d.whatsapp && (
+          <a href={d.whatsapp} target="_blank" rel="noopener noreferrer" className="agent-contact-pill wa">
+            💬 WhatsApp Us
+          </a>
+        )}
+        {d.apply_online && (
+          <a href={d.apply_online} target="_blank" rel="noopener noreferrer" className="agent-contact-pill primary">
+            📝 Apply Online 2027-28
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function ApplicationAdCard({ card }: CardProps) {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) {
+    return null;
+  }
+
+  const d = card.data || card;
+  const sponsorName = d.sponsor_name || "SR University Admissions";
+  const sponsorLogo = d.sponsor_logo || "/sru-logo.png";
+  const title = d.title || "Early Bird: 50% Off Online Application";
+  const description =
+    d.description ||
+    "Apply early for 2027-28 admissions & save 50% on application fee (₹550 instead of ₹1,100).";
+  const ctaText = d.cta_text || "Apply Now ↗";
+  const ctaUrl = d.cta_url || "https://apply.sru.edu.in";
+  const imageUrl = d.image_url || "/early-bird-offer.png";
+  const introText = d.intro_text;
+
+  return (
+    <div className="application-ad-container">
+      {introText && <div className="application-ad-intro">{introText}</div>}
+      <div className="application-ad-card">
+        <div className="application-ad-thumb-col">
+          <img
+            src={imageUrl}
+            alt={title}
+            className="application-ad-thumb-img"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/sru-logo.png";
+            }}
+          />
+        </div>
+        <div className="application-ad-content-col">
+          <div className="application-ad-header-row">
+            <div className="application-ad-sponsor-info">
+              <img src={sponsorLogo} alt="Sponsor" className="application-ad-sponsor-icon" />
+              <span className="application-ad-sponsor-name">{sponsorName}</span>
+            </div>
+            <div className="application-ad-header-right">
+              <span className="application-ad-pill">Ad</span>
+              <button
+                type="button"
+                className="application-ad-remove-btn"
+                onClick={() => setDismissed(true)}
+                title="Remove ad"
+                aria-label="Remove ad"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <h4 className="application-ad-title">{title}</h4>
+          <p className="application-ad-desc">{description}</p>
+          <div className="application-ad-footer-row">
+            <a
+              href={ctaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="application-ad-cta-link"
+            >
+              {ctaText}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RenderCard({ card }: { card: any }) {
   if (!card || !card.type) return null;
 
@@ -544,6 +901,14 @@ export function RenderCard({ card }: { card: any }) {
       return <ComparisonCard card={card} />;
     case "fee_breakdown":
       return <FeeBreakdownCard card={card} />;
+    case "calculate_fee":
+      return <AgentFeeCard card={card} />;
+    case "request_counsellor_callback":
+      return <AgentCallbackCard card={card} />;
+    case "book_campus_visit":
+      return <AgentCampusVisitCard card={card} />;
+    case "get_contact_and_apply_links":
+      return <AgentContactLinksCard card={card} />;
     case "curriculum":
       return <CurriculumCard card={card} />;
     case "campus_tour":
@@ -556,8 +921,14 @@ export function RenderCard({ card }: { card: any }) {
       return <PlacementHighlightsCard card={card} />;
     case "sru_comparison":
       return <SRUAdvantageCard card={card} />;
+    case "programs_offered":
+      return <ProgramsOfferedCard card={card} />;
+    case "application_ad":
+    case "ad":
+      return <ApplicationAdCard card={card} />;
     default:
       return null;
   }
 }
+
 

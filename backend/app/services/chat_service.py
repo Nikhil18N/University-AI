@@ -44,6 +44,8 @@ from app.services.rag_service import RAGService
 from app.services.reformulation_service import canonicalize_query, needs_reformulation, reformulate_query
 from app.services.suggestion_service import generate_suggestions
 from app.services.video_service import (
+    DEFAULT_MAX_SEMANTIC_DISTANCE,
+    EXPLICIT_MAX_SEMANTIC_DISTANCE,
     check_video_affirmative_or_negative,
     create_video_card,
     format_video_offer_prompt,
@@ -55,6 +57,7 @@ from app.services.video_service import (
     has_recent_video_offer,
     sanitize_answer_video_prompts,
     should_retrieve_video_matches,
+    should_display_videos,
 )
 
 logger = logging.getLogger(__name__)
@@ -895,9 +898,11 @@ async def handle_chat_stream(
         if not is_video_yes and not is_video_no:
             if video_lookup_allowed and not query_embedding and rag_service:
                 try:
-                    query_embedding = await rag_service.embeddings.embed_single(request.message)
+                    canonical = canonicalize_query(request.message)
+                    query_embedding = await rag_service.embeddings.embed_single(canonical)
                 except Exception:
                     query_embedding = None
+
 
             if video_lookup_allowed and query_embedding:
                 semantic_videos = get_semantic_videos(

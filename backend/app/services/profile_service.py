@@ -233,7 +233,7 @@ def build_counsellor_guidance(profile: dict[str, Any], current_query: str = "") 
 
     if has_score and score_pct is not None:
         directives.append(f"- Stated 12th/Intermediate Score: {score_raw} (ALREADY PROVIDED — DO NOT ask for their score or percentage again!).")
-        cutoff = 60.0  # SRU general cutoff for B.Tech
+        cutoff = 50.0  # SRU official cutoff for B.Tech in 10+2 MPC
         if score_pct >= cutoff:
             directives.append(
                 f"- Cutoff Evaluation: The student's score of {score_raw} is >= {cutoff:.0f}% cutoff. "
@@ -247,11 +247,11 @@ def build_counsellor_guidance(profile: dict[str, Any], current_query: str = "") 
     else:
         is_asking_eligibility = bool(current_query and ELIGIBILITY_INTENT_PATTERN.search(current_query))
         directives.append(
-            "- Stated Score: NOT PROVIDED YET. NEVER invent or assume any percentage (like 75% or 60%)."
+            "- Stated Score: NOT PROVIDED YET. NEVER invent or assume any percentage (like 75% or 50%)."
         )
         if is_asking_eligibility:
             directives.append(
-                "The student explicitly asked about eligibility/joining: state the 60% requirement and ask for their 10+2 PCM percentage as the single follow-up."
+                "The student explicitly asked about eligibility/joining: state the 50% MPC requirement and ask for their 10+2 PCM percentage as the single follow-up."
             )
         else:
             directives.append(

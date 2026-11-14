@@ -174,6 +174,19 @@ def test_placement_excellence_card_generation():
     assert "Amazon" in companies
     assert "ServiceNow" in companies
 
+    # Verify stats do NOT repeat the 3 superstars
+    stat_values = [s["value"] for s in cards[0]["stats"]]
+    assert "51 LPA" not in stat_values
+    assert "49.30 LPA" not in stat_values
+    assert "46.38 LPA" not in stat_values
+
+    # Verify marquee_offers celebrates the other achievers
+    assert len(cards[0]["marquee_offers"]) >= 5
+    marquee_companies = [m["company"] for m in cards[0]["marquee_offers"]]
+    assert "Salesforce" in marquee_companies
+    assert "PayPal" in marquee_companies
+    assert "Cisco" in marquee_companies
+
 
 def test_hostel_card_includes_4000_seat_dining_and_living_motto():
     """Verify hostel card includes living & learning subtitle and 4,000 capacity dining hall."""
@@ -241,5 +254,59 @@ def test_no_150_acres_in_cards_or_descriptions():
         assert "150 acre" not in card_str
         assert "150-acre" not in card_str
         assert "150+ acre" not in card_str
+
+
+def test_170_acres_in_campus_tour_and_advantage_cards():
+    """Verify 170 acres is prominently featured in campus tour and advantage cards."""
+    import json
+    from app.services.card_service import CAMPUS_TOUR_CARD, SRU_ADVANTAGE_CARD
+    campus_tour_str = json.dumps(CAMPUS_TOUR_CARD).lower()
+    advantage_str = json.dumps(SRU_ADVANTAGE_CARD).lower()
+    assert "170-acre" in campus_tour_str or "170 acres" in campus_tour_str
+    assert "170-acre" in advantage_str or "170 acres" in advantage_str
+
+
+def test_programs_offered_card_trigger():
+    """Verify courses/programs inquiries trigger PROGRAMS_OFFERED_CARD with all 6 schools + Ph.D."""
+    from app.services.card_service import PROGRAMS_OFFERED_CARD
+
+    for query in (
+        "what courses are offered by sru?",
+        "what can i study at sru",
+        "tell me the programs offered",
+        "which degrees are available?",
+        "list all branches available in engineering and cs",
+    ):
+        cards = generate_cards(
+            user_message=query,
+            answer="SR University offers programs across 6 multidisciplinary schools.",
+        )
+        assert len(cards) >= 1
+        programs_cards = [c for c in cards if c.get("type") == "programs_offered"]
+        assert len(programs_cards) == 1
+        card = programs_cards[0]
+        assert card["type"] == "programs_offered"
+        assert len(card["schools"]) == 7  # 6 schools + Doctoral Studies
+
+        school_names = [s["short_name"] for s in card["schools"]]
+        assert "CS & AI" in school_names
+        assert "Engineering" in school_names
+        assert "Business" in school_names
+        assert "Agriculture" in school_names
+        assert "Design" in school_names
+        assert "Sciences & Humanities" in school_names
+        assert "Ph.D. Studies" in school_names
+
+
+def test_course_fee_query_does_not_trigger_programs_card():
+    """Verify queries asking about course fees trigger fee cards, not programs card."""
+    cards = generate_cards(
+        user_message="what are the course fees for b.tech cse?",
+        answer="The tuition fee for B.Tech CSE is ₹3,40,000 per year.",
+    )
+    programs_cards = [c for c in cards if c.get("type") == "programs_offered"]
+    assert len(programs_cards) == 0
+
+
 
 

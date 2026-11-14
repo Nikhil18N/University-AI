@@ -48,10 +48,11 @@ GENERAL_FEE_SUGGESTIONS = [
 
 BTECH_FEE_SUGGESTIONS = [
     "🎓 B.Tech CSE Fee Breakdown",
-    "⚡ B.Tech ECE Fees",
-    "🏠 Hostel & Mess Fees",
+    "💰 CSE Per-Semester Fee",
+    "🎯 Apply with 50% Off",
     "🧮 Scholarship Calculator",
 ]
+
 
 SCHOLARSHIP_SUGGESTIONS = [
     "🧮 Open Scholarship Calculator",
@@ -234,10 +235,13 @@ def generate_suggestions(
             "🍽️ Mess & Food Facilities",
             "🕒 Hostel Curfew & In-Time",
         ]
-    if any(k in msg_lower for k in ("btech", "b.tech", "cse", "ece", "mech", "civil", "engineering")) and any(k in msg_lower for k in ("fee", "fees", "tuition")):
+    if any(k in msg_lower for k in ("join cse", "join b.tech cse", "join btech cse", "want to join cse", "admission in cse", "btech cse join", "join btech")):
+        return BTECH_FEE_SUGGESTIONS
+    if any(k in msg_lower for k in ("btech", "b.tech", "cse", "ece", "mech", "civil", "engineering")) and any(k in msg_lower for k in ("fee", "fees", "tuition", "join")):
         return BTECH_FEE_SUGGESTIONS
     if any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "caution deposit")):
         return GENERAL_FEE_SUGGESTIONS
+
 
 
     # 7. Startups & SRiX incubator

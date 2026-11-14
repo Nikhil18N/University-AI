@@ -113,7 +113,15 @@ export default function MessageBubble({
 
         {/* Message Content Bubble */}
         <div className={`message-text-bubble ${role}`}>
-          <MarkdownContent content={content} isStreaming={isStreaming} />
+          {(() => {
+            const hasPlacementCard = cards?.some(
+              (c) => c.type === "placement_highlights" || c.image_url === "/placements-three-years.png"
+            );
+            const displayContent = hasPlacementCard
+              ? content.replace(/!\[.*?\]\(\/placements-three-years\.png\)/g, "").trim()
+              : content;
+            return <MarkdownContent content={displayContent} isStreaming={isStreaming} />;
+          })()}
         </div>
 
         {/* Rich Interactive Cards (e.g. branch comparison, fee breakdown) */}
