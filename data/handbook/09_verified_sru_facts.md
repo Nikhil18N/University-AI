@@ -12,7 +12,7 @@
   - **Institution Full Name**: SR University (SRU)
   - **Type**: State Private University established under the Telangana State Private Universities Act.
   - **Living & Learning Philosophy**: *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."* / *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
-  - **Campus & Environment**: Largest lush green, 170-acre master-planned residential campus for the next generation of innovators in Warangal, Telangana.
+  - **Campus & Environment**: Largest lush green, 170+ acre master-planned residential campus for the next generation of innovators in Warangal, Telangana.
   - **Goal of SR University**: To create an innovative living learning educational ecosystem whose graduates significantly contribute to the growth of Telangana and India.
   - **Parent Body & Community**: Sri Rajeshwara Educational Society, a 50-year-old conglomerate of educational institutions with more than **1,00,000 students** and **17,000 teaching and non-teaching staff members** across 185 institutions in Telangana, Andhra Pradesh, and Karnataka.
   - **Distinguished Faculty**: World-class faculty holding doctoral and postdoctoral qualifications from prestigious institutions in India and abroad, including IITs, NITs, and leading international universities.
@@ -168,8 +168,8 @@
     1. **Batch 2025**: **51 LPA** — B. Shiva Krishna (Software Engineer at **Microsoft**), with **₹1.25 Lakh / month** internship stipend.
     2. **Batch 2026**: **46.38 LPA** — Kencha Bhavana (Software Development Engineer at **Amazon**), with **₹1.10 Lakh / month** internship stipend.
     3. **Batch 2027**: **49.30 LPA** — Mohammed Akramuddin (Associate Software Engineer at **ServiceNow**), with **₹0.80 Lakh / month** internship stipend.
-  - **Overall Average Package**: **6 LPA** across graduating B.Tech batches.
-  - **Placement & Internship Scale**: **1,300+ total placement offers**, **3,500+ internships**.
+  - **Overall Average Package**: **6 LPA** across graduating B.Tech batches (School-wise: ECE 5 LPA, EEE 4 LPA, Mech 4 LPA, Civil 6 LPA, Business 5 LPA).
+  - **Placement & Internship Scale**: **1,300+ total placement offers**, **3,500+ internships**, **150+ recruiters**.
   - **Top MNC Offers Volume**:
     - Accenture: **254 offers**
     - Cognizant: **165 offers**
@@ -268,3 +268,21 @@
   - **Impact**: **171+ Startups Incubated**, **₹76+ Crores external funding raised**.
   - **Focus Areas**: AI/ML, Internet of Things (IoT), Agritech, Medtech, Clean Energy.
   - **Facilities**: 14+ maker spaces, rapid prototyping labs, IP facilitation, mentorship, seed funding access, and incubation support for students and faculty.
+
+---
+
+## 9. Rankings, Accreditations & International Programs (Admissions Presentation, 30-Oct-2026)
+
+- **[FACT-ID: RNK-001] [STATUS: VERIFIED] [SOURCE: 10_admissions_presentation_oct2026.md]**
+  - **NIRF Engineering**: Rank **98** (2023), **98** (2024), **91** (2025); Top 100 for four years in a row.
+  - **THE World University Rankings 2026**: **801–1000** global band; **7th** among private universities in India; Asia rank band **351–400**.
+  - **THE Sustainability Impact Ratings 2026**: **24th** in India; global band **401–600**.
+  - **UI GreenMetric 2025**: **23rd** in India.
+- **[FACT-ID: ACC-001] [STATUS: VERIFIED] [SOURCE: 10_admissions_presentation_oct2026.md]**
+  - **ICAR Accreditation**: School of Agriculture and B.Sc. (Hons.) Agriculture; first private university in Telangana and Andhra Pradesh to achieve it.
+  - **NBA**: Tier-I accreditation for B.Tech CSE, ECE, EEE, ME and CE.
+- **[FACT-ID: INT-001] [STATUS: VERIFIED] [SOURCE: 10_admissions_presentation_oct2026.md]**
+  - **International Engineering Program (IEP)**: 3+1 or 2+2 with partner universities in the USA (UMass Lowell, University of New Haven, University of Missouri, University of Central Missouri); M.S. in the 5th year. T&C apply.
+  - **International Business Accelerated Program (IBAP)**: BBA + MBA/MS (Finance / Business Analytics), 3 years at SRU + 2 years at UMass Lowell, USA.
+  - **2+2 New Zealand**: Years 1–2 at SRU, Years 3–4 at University of Otago (B.Sc. Food Science) or Massey University (B.Sc. Agriculture).
+

@@ -5,7 +5,7 @@ The **Centre for Student Services and Placements (CSSP)** and the **Career and J
 * **Placement Cell Location**: SRiX Block, 1st Floor.
 * **Key Contacts**:
   - Mr. D. Sridhar (Head CSSP): `stu.cssp@sru.edu.in`
-  - Mr. Gurcharan (Placement Operations): (SRiX 1st Floor)
+  - Mr. Gurcharan (Placement Operations): `stu.cssp@sru.edu.in` (SRiX 1st Floor)
 
 ---
 
@@ -43,6 +43,14 @@ The **Centre for Student Services and Placements (CSSP)** and the **Career and J
   * **Savantis**: 43 offers
   * **Edufyi Tech Solutions**: 38 offers
   * **Infosys**: 22 offers
+  * **Recruiting Companies**: 150+ national and multinational recruiters, including Microsoft, Amazon, PayPal, Flipkart, Cisco, IBM, Accenture, Cognizant, Infosys, TCS, Wipro, Capgemini, Virtusa, Tech Mahindra, HCLTech, HSBC, DBS, PwC, ADP, Genpact, Synopsys, S&P Global, Bosch, Schneider Electric, Larsen & Toubro, Hexaware, Cyient, opentext, and core engineering firms.
+
+* **School-wise Placement Snapshot**:
+  - **Electronics & Communication Engineering**: highest ₹14.5 LPA (Flipkart); highest internship ₹50K/month; 10 students placed at ₹9 LPA; 300+ internships; average 5 LPA.
+  - **Electrical & Electronics Engineering**: highest ₹12 LPA; average 4 LPA.
+  - **Mechanical Engineering**: highest 6 LPA; average 4 LPA; 200+ internships.
+  - **Civil Engineering**: average 6 LPA; 25+ companies visited.
+  - **School of Business**: highest ₹14 LPA (HCLTech); 10 students placed at ₹8 LPA; 150+ internships; average 5 LPA.
 
 ---
 
@@ -88,13 +96,3 @@ A student will be debarred / blacklisted from campus placement assistance in any
 4. Unprofessional behavior, misconduct, or rudeness reported by visiting HR representatives, company interviewers, or student volunteers.
 5. Directly contacting visiting HR executives or recruiters without official CJAC authorization.
 6. **Failure to Apply**: If a student is eligible as per the job description and company criteria but fails to apply for **three (3) consecutive eligible campus job postings**, they will be deemed disinterested and disqualified from the placement process.
-
-
-## 7. Campus Placement Highlights & Top Recruiter Cutoffs
-* **Highest Placement Package**:
-  - **51 LPA (Lakhs Per Annum)**, secured by students at **Microsoft**.
-* **Average Placement Package**:
-  - **6 LPA** overall average across graduating B.Tech batches.
-* **Eligibility Criteria for Top Recruiters**:
-  - Students must maintain a minimum **CGPA of 7.5 and above**.
-  - Must have **no active backlogs** at the time of the recruitment drive.

@@ -5,7 +5,7 @@
   > *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."*
   > *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
 * **Lush Green Campus & Community**:
-  - Stands as the **largest lush green campus for the next generation of innovators**, spanning over **170 acres** in Warangal, Telangana.
+  - Stands as the **largest lush green campus for the next generation of innovators**, spanning over **170+ acres** in Warangal, Telangana.
   - **Goal of SR University**: To create an innovative living learning educational ecosystem whose graduates significantly contribute to the growth of Telangana and India.
 * **Parent Society & 50-Year Heritage of Excellence**:
   - **Sri Rajeshwara Educational Society**, the parent body of SR University, is a 50-year-old conglomerate of educational institutions founded in 1976 by educational pioneer Sri A. Varada Reddy.
@@ -54,6 +54,18 @@
   - **Sports & Fitness**: Indoor & Outdoor Sports Complex (Basketball, Cricket ground with nets, Football, Badminton, Tennis, Volleyball, Kabaddi), and **Olympic-Standard Gym & Fitness Centers** equipped with latest training gear.
   - **Student Support & Wellness**: 24/7 Medical & Emergency Support with on-campus Health Centre, stationed ambulance, and tie-up with **Aaditya Hospital**; professional **Mental Health & Counseling Services** for stress management and personal development; peer support networks and student helplines.
   - **Dedicated International Student Support**: Specialized visa and immigration guidance, cultural integration, affordable accommodation, and dedicated international scholarships.
+* **Warangal Heritage & Places to Visit (Weekend Getaways)**:
+  - **Ramappa Temple**: UNESCO World Heritage site built during the Kakatiya era, known for ancient engineering.
+  - **Laknavaram Lake & Suspension Bridge**: Scenic lake built by Ganapati Deva with famous hanging bridge.
+  - **Bhadrakali Temple**: Historic temple in Warangal.
+  - **Warangal Fort & Khush Mahal**: Historic 12th-century stone fort and monument.
+  - **Bhogatha Waterfalls**: Famous natural waterfall in the region.
+  - **Thousand Pillar Temple**: Millennium-old Kakatiya temple in Hanamkonda.
+* **Location, Highway Transit & How to Reach**:
+  - Campus Address: Ananthasagar, Hasanparthy (M), Warangal, Telangana 506371.
+  - Distance: 14 km from Hanumakonda (main city), 16 km from Kazipet Railway Station (KZJ), 29 km from Warangal Railway Station.
+  - Nearest Airport: Rajiv Gandhi International Airport (RGIA), Hyderabad (approx. 3 hours drive).
+  - Highway & Public Transit: Situated on the Warangal – Karimnagar Highway. Dedicated university bus stop served by TSRTC buses running every 20 minutes in both directions.
 * **Key Campus Locations & Portals**:
   - **Main Residential Campus**: Ananthasagar, Hasanparthy, Warangal, Telangana - 506371.
   - **Corporate Office**: 604, 6th Floor, Sonthalia Emerald, Raj Bhavan Road, Somajiguda, Hyderabad, Telangana - 500082.
@@ -72,14 +84,14 @@
 
 ## 2. Institutional Timings & Daily Schedule
 * **Academic Class Timings**:
-  - For all UG and PG courses: **8:30 to 4:30 and 9:30AM to 5:30 PM** (Monday to Friday).
+  - For all UG and PG courses: **9:00 AM to 5:00 PM** (Monday to Friday).
 * **College Bus Timings (Day-Scholars)**:
-  - Arrival at Campus: **8:20 AM and 9:20 AM**.
-  - Departure from Campus: **4:40 PM and 5:40 PM**.
+  - Arrival at Campus: **8:50 AM**.
+  - Departure from Campus: **5:00 PM**.
 * **Administrative & Student Support Office Hours**:
   - Functions till **5:30 PM** at the main office.
 * **Campus Facilities Timings**:
-  - Health & Wellness Centre: **8:30 AM to 5:30 PM** (Ambulance available 24x7).
+  - Health & Wellness Centre: **9:00 AM to 5:00 PM** (Ambulance available 24x7).
   - Central Library: Monday to Friday **8:30 AM to 8:30 PM**; Saturday & Sunday **10:00 AM to 4:00 PM**.
   - Reprographic & Printing Centre (Beside Block-I): **9:00 AM to 5:30 PM**.
   - Stationery Store (Adjacent to Block-I): **9:00 AM to 5:30 PM**.
