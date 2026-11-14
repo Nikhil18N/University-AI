@@ -183,34 +183,35 @@ TRANSPORT_FEE_CARD = {
 HOSTEL_FEE_CARD = {
     "type": "fee_breakdown",
     "title": "SR University Residential Hostel & Dining Fees (Annual)",
+    "subtitle": "As the academic day comes to an end, the living and learning experience continues.",
     "currency": "INR",
     "items": [
         {
             "category": "Girls Hostel (AC 4-Sharing)",
             "amount": "₹1,25,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, laundry & 24/7 biometric security",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, laundry & 24/7 biometric security",
         },
         {
             "category": "Girls Hostel (AC 3-Sharing)",
             "amount": "₹1,35,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, laundry & 24/7 biometric security",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, laundry & 24/7 biometric security",
         },
         {
             "category": "Boys Hostel (Non-AC 4/3-Sharing)",
             "amount": "₹85,000 – ₹95,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, study lounges & laundry",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, study lounges & laundry",
         },
         {
             "category": "Boys Hostel (AC 4/3-Sharing)",
             "amount": "₹1,20,000 – ₹1,35,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, gym & laundry",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, gym & laundry",
         },
     ],
-    "scholarship_note": "In-time curfew is 8:30 PM. Nutritious veg and non-veg dining provided 4 times daily.",
+    "scholarship_note": "Hostels for Boys & Girls offer 4,000-seat mega dining hall, 24/7 surveillance, high-speed Wi-Fi, dedicated study areas, and on-campus medical care.",
 }
 
 EXAM_FEE_CARD = {
@@ -299,32 +300,38 @@ CURRICULUM_CARD = {
 
 CAMPUS_TOUR_CARD = {
     "type": "campus_tour",
-    "title": "SR University Campus Life & Facilities",
+    "title": "SR University — Next-Generation Living & Learning Campus",
+    "subtitle": "Where every step connects with nature, and every breath brings a spark of inspiration.",
     "spots": [
         {
-            "name": "Academic Blocks & Smart Classrooms",
-            "desc": "Air-conditioned interactive lecture halls equipped with digital smart boards and ergonomic amphitheater seating.",
+            "name": "Largest Lush Green Campus & Top Rankings",
+            "desc": "150+ acres for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
+            "icon": "🌿",
+        },
+        {
+            "name": "World-Class Faculty & 10,000+ Students",
+            "desc": "Doctoral and postdoctoral faculty from IITs, NITs, and leading global universities guiding 10,000 active Indian and international students.",
+            "icon": "🎓",
+        },
+        {
+            "name": "Academic & AI/Robotics Infrastructure",
+            "desc": "Digital classrooms, Central Library, high-tech labs, industry setups for AI & robotics, project studios, and 80+ international collaborations.",
             "icon": "🏫",
         },
         {
-            "name": "SRiX Technology Business Incubator",
-            "desc": "DST-supported innovation center nurturing 50+ student startups with seed funding, maker spaces, and mentoring.",
-            "icon": "🚀",
-        },
-        {
-            "name": "Modern Residential Hostels",
-            "desc": "Comfortable AC and non-AC rooms, high-speed Wi-Fi, study lounges, indoor gym, and round-the-clock medical care.",
+            "name": "Hostels & 4,000-Seat Mega Dining Hall",
+            "desc": "'As the academic day comes to an end, the living and learning experience continues.' AC/Non-AC rooms, 24/7 security, Wi-Fi, and 4,000-seat hygienic dining hall.",
             "icon": "🏠",
         },
         {
-            "name": "Sports & Recreation Arena",
-            "desc": "Floodlit cricket stadium, football ground, basketball courts, badminton complex, and running tracks.",
+            "name": "Vibrant Campus Life & Sports",
+            "desc": "20+ student clubs, 50+ annual events, cultural music festivals, expansive sports grounds, indoor arenas, and fitness zones.",
             "icon": "⚽",
         },
         {
-            "name": "Central Library & Digital Commons",
-            "desc": "50,000+ print volumes, 24/7 digital access to IEEE/ACM journals, and collaborative discussion zones.",
-            "icon": "📚",
+            "name": "SRiX Startup & Innovation Exchange",
+            "desc": "DST-supported incubator powering 171+ startups with maker spaces, rapid prototyping labs, mentoring, and ₹76+ Cr funding.",
+            "icon": "🚀",
         },
     ],
 }
@@ -470,9 +477,9 @@ def generate_cards(
     if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):
         cards.append(PLACEMENT_EXCELLENCE_CARD)
 
-    # 5. Campus tour card (render static spot highlights if explicitly asking for campus walkthrough/tour)
+    # 5. Campus tour card (render static spot highlights if asking for about sru, campus walkthrough/tour, or facilities)
     is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "tour", "shorts"))
-    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities")):
+    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "describe sru")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
 

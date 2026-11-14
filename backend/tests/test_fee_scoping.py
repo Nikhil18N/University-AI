@@ -174,3 +174,30 @@ def test_placement_excellence_card_generation():
     assert "Amazon" in companies
     assert "ServiceNow" in companies
 
+
+def test_hostel_card_includes_4000_seat_dining_and_living_motto():
+    """Verify hostel card includes living & learning subtitle and 4,000 capacity dining hall."""
+    from app.services.card_service import HOSTEL_FEE_CARD
+    cards = generate_cards(
+        user_message="what are the hostel fees and facilities?",
+        answer="Hostel fees range from ₹85,000 to ₹1,35,000 per year with modern amenities.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == HOSTEL_FEE_CARD
+    assert "living and learning experience continues" in cards[0].get("subtitle", "").lower()
+    assert any("4,000-seat" in item.get("note", "") for item in cards[0]["items"])
+
+
+def test_about_sru_triggers_campus_tour_card():
+    """Verify general 'about sru' questions trigger CAMPUS_TOUR_CARD."""
+    from app.services.card_service import CAMPUS_TOUR_CARD
+    cards = generate_cards(
+        user_message="tell me about sru and the campus",
+        answer="SR University is a next-generation living and learning campus spread over 150 acres.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == CAMPUS_TOUR_CARD
+    assert any("4,000-Seat" in spot["name"] for spot in cards[0]["spots"])
+    assert any("Faculty" in spot["name"] for spot in cards[0]["spots"])
+
+

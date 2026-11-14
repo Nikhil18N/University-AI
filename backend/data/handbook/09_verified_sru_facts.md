@@ -11,7 +11,19 @@
 - **[FACT-ID: GEN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md]**
   - **Institution Full Name**: SR University (SRU)
   - **Type**: State Private University established under the Telangana State Private Universities Act.
-  - **Campus Size**: 150-acre lush green residential campus.
+  - **Living & Learning Philosophy**: *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."* / *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
+  - **Campus & Environment**: Largest lush green campus for the next generation of innovators (over 150-acre master-planned residential campus in Warangal, Telangana).
+  - **Student Community**: 10,000 active students from across India and internationally.
+  - **Distinguished Faculty**: World-class faculty holding doctoral and postdoctoral qualifications from prestigious institutions in India and abroad, including IITs, NITs, and leading international universities.
+  - **National & Global Rankings**:
+    * **NIRF**: Holds the **91st rank in NIRF for the Engineering category** (with top 100 ranks consistently for four years).
+    * **NBA**: **All B.Tech programs hold Tier-1 accreditation** from the National Board of Accreditation (NBA).
+    * **ICAR**: School of Agriculture received **ICAR accreditation** (first private university in Telugu States).
+    * **QS Asia Rankings 2027**: Ranked **19th among India's State Private Universities**.
+    * **THE World University Rankings 2027**: Ranked **7th in India** among private universities, and **6th in India in Research Quality**.
+    * **Distinction**: **India’s youngest and only private university in Telangana** to achieve prestigious National and Global Ranks.
+  - **Academic & Research Infrastructure**: Modern digital classrooms, University Central Library, high-tech labs, industry-grade setups for AI, robotics, innovation hubs, incubation spaces, and project studios supporting prototypes, experiments, and real solutions; 80+ international academic collaborations; Career Guidance Cell.
+  - **Campus Life & Vibrancy**: 20+ Student Clubs, 50+ annual events, cultural music festivals, sports grounds, indoor arenas, and fitness zones.
   - **Location & Address**: Ananthasagar, Hasanparthy Mandal, Warangal, Telangana 506371, India (on the Warangal–Karimnagar Highway).
   - **Distance**: 14 km from Hanumakonda, 16 km from Kazipet Junction (KZJ), 29 km from Warangal Railway Station.
   - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary leading SR Educational Society since 1976 (over 185 institutions, 1 lakh+ students).
@@ -171,7 +183,18 @@
 ## 6. Hostel Living & Residential Rules
 
 - **[FACT-ID: HST-001] [STATUS: VERIFIED] [SOURCE: 04_hostels_rules_and_discipline_code.md & 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Accommodations**: Dedicated separate hostel blocks for male and female students.
+  - **Living & Learning Philosophy**: *"As the academic day comes to an end, the living and learning experience continues. Step into the campus hostels for Boys & Girls.. Designed to provide a safe and supportive environment for students."*
+  - **Accommodations**: Dedicated separate hostel blocks for Boys and Girls on campus.
+  - **Modern Amenities & Features**:
+    * Spacious rooms with **Air-Conditioned (AC)** and **Non-AC** options.
+    * 24/7 security, professional guards, and CCTV surveillance.
+    * Well-furnished rooms (dedicated bed, mattress, study desk, ergonomic chair, wardrobe).
+    * High-speed Wi-Fi connectivity throughout all blocks.
+    * Dedicated study areas, reading halls, and recreational spaces.
+    * 24/7 medical support and on-campus emergency ambulance care.
+  - **Mega Dining Hall & Food Quality**:
+    * Massive **4,000 seating capacity dining hall**.
+    * Healthy, hygienic, fresh, and nutritious food prepared under strict safety standards.
   - **Hostel Fee Structure (Annual Room & Mess)**:
     - **4 Person Occupancy (Non-AC)**: **₹1,15,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
     - **3 Person Occupancy (Non-AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
