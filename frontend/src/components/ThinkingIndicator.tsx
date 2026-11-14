@@ -10,7 +10,11 @@ export const THINKING_STEPS = [
   { icon: "✨", label: "Preparing your response..." },
 ];
 
-export default function ThinkingIndicator() {
+interface Props {
+  activeToolLabel?: string | null;
+}
+
+export default function ThinkingIndicator({ activeToolLabel }: Props) {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [elapsedSecs, setElapsedSecs] = useState(0);
 
@@ -32,13 +36,17 @@ export default function ThinkingIndicator() {
   }, []);
 
   const activeStep = THINKING_STEPS[currentStepIdx];
+  const displayLabel = activeToolLabel
+    ? (activeToolLabel.endsWith("…") || activeToolLabel.endsWith("...") ? activeToolLabel : `${activeToolLabel}…`)
+    : activeStep.label;
+  const displayIcon = activeToolLabel ? "⚡" : activeStep.icon;
 
   return (
     <div className="thinking-indicator-wrapper">
       <div className="thinking-top-row">
         <div className="thinking-badge-group">
           <span className="thinking-badge-step">
-            Step {currentStepIdx + 1} of {THINKING_STEPS.length}
+            {activeToolLabel ? "AI Agent Action" : `Step ${currentStepIdx + 1} of ${THINKING_STEPS.length}`}
           </span>
           <span className="thinking-badge-timer">{elapsedSecs}s</span>
         </div>
@@ -51,9 +59,9 @@ export default function ThinkingIndicator() {
 
       <div className="thinking-active-step-row">
         <span className="step-icon-bubble">
-          {renderUniIcon(activeStep.icon, 20, "step-sru-icon-svg") || activeStep.icon}
+          {renderUniIcon(displayIcon, 20, "step-sru-icon-svg") || displayIcon}
         </span>
-        <span className="step-title-animated">{activeStep.label}</span>
+        <span className="step-title-animated">{displayLabel}</span>
       </div>
 
       <div className="thinking-progress-track">

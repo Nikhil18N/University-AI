@@ -14,7 +14,7 @@ import {
   InfoIcon,
   TrendingUpIcon,
 } from "./Icons";
-import { createLead } from "../services/api";
+import { createLead, calculateAgentFee } from "../services/api";
 import "./ScholarshipCalculatorModal.css";
 
 interface Props {
@@ -566,6 +566,40 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       studentName: nameToUse,
       studentPhone: phoneToUse,
     });
+
+    // Query backend calculate endpoint to ensure 100% agreement with the AI agent
+    try {
+      const backendCalc = await calculateAgentFee({
+        program: prog.id,
+        percent: scoreMatch.percentage,
+        board: exam.key === "cbse" ? "cbse" : "state_board",
+        eapcet_rank: scoreMatch.rank,
+      });
+      if (backendCalc && backendCalc.status === "ok") {
+        const netSem = parseInt(backendCalc.per_semester_after_scholarship.replace(/[^\d]/g, ""), 10) || slab.payableFeeSem;
+        const discountAmt = Math.round(parseInt(backendCalc.saving_first_year.replace(/[^\d]/g, ""), 10) / 2) || discount;
+        const backendSlab: ScholarshipSlab = {
+          ...slab,
+          scholarshipPercent: backendCalc.scholarship_percent,
+          payableFeeSem: netSem,
+          cseYearlyPayable: backendCalc.year_by_year?.length === 4
+            ? {
+                yr1: parseInt(backendCalc.year_by_year[0].after_scholarship.replace(/[^\d]/g, ""), 10),
+                yr2: parseInt(backendCalc.year_by_year[1].after_scholarship.replace(/[^\d]/g, ""), 10),
+                yr3: parseInt(backendCalc.year_by_year[2].after_scholarship.replace(/[^\d]/g, ""), 10),
+                yr4: parseInt(backendCalc.year_by_year[3].after_scholarship.replace(/[^\d]/g, ""), 10),
+              }
+            : slab.cseYearlyPayable,
+        };
+        setCalculatedSnapshot((prev) => prev ? {
+          ...prev,
+          slab: backendSlab,
+          discountAmount: discountAmt,
+        } : null);
+      }
+    } catch {
+      // Graceful fallback to optimistic client-side calculations
+    }
   };
 
   // Initial calculation on mount - show base fee breakdown immediately without false defaults

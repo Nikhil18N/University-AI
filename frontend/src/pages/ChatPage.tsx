@@ -56,6 +56,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeToolStatus, setActiveToolStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Responsive sidebar: closed by default on mobile (< 768px), open on desktop
@@ -442,6 +443,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setMessages((prev) => [...prev, tempUserMsg, placeholderAssistantMsg]);
 
     let accumulatedContent = "";
+    const accumulatedCards: any[] = [];
 
     // 3. Initiate Server-Sent Events stream
     const cancelFn = sendMessageStream(sessionId, text, activeConvId, {
@@ -450,7 +452,23 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           setActiveConvId(convId);
         }
       },
+      onTool: (tool) => {
+        if (tool.status === "running") {
+          setActiveToolStatus(tool.label || "Working...");
+        } else {
+          setActiveToolStatus(null);
+        }
+      },
+      onCard: (card) => {
+        accumulatedCards.push(card);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId ? { ...m, cards: [...accumulatedCards] } : m
+          )
+        );
+      },
       onToken: (delta) => {
+        setActiveToolStatus(null);
         accumulatedContent += delta;
         setMessages((prev) =>
           prev.map((m) =>
@@ -460,6 +478,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       },
       onDone: (data: ChatResponse) => {
         setIsLoading(false);
+        setActiveToolStatus(null);
         setStreamingMsgId(null);
         cancelStreamRef.current = null;
 
@@ -477,6 +496,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           triggerConfetti();
         }
 
+        const finalCards = (data.cards?.length ? data.cards : accumulatedCards);
+
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsgId
@@ -486,7 +507,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   content: data.answer || accumulatedContent,
                   sources: data.sources?.length ? data.sources : undefined,
                   suggestions: data.suggestions?.length ? data.suggestions : undefined,
-                  cards: data.cards?.length ? data.cards : undefined,
+                  cards: finalCards.length ? finalCards : undefined,
                   flow: data.flow,
                   model: data.model,
                 }
@@ -498,6 +519,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       },
       onError: (err) => {
         setIsLoading(false);
+        setActiveToolStatus(null);
         setStreamingMsgId(null);
         cancelStreamRef.current = null;
         setError(err.message || "Failed to get response.");
@@ -853,7 +875,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                     </div>
                     <div className="message-content-col">
                       <div className="message-text-bubble assistant">
-                        <ThinkingIndicator />
+                        <ThinkingIndicator activeToolLabel={activeToolStatus} />
                       </div>
                     </div>
                   </div>

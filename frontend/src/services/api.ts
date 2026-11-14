@@ -91,6 +91,57 @@ export async function sendMessage(
   }
 }
 
+export interface AgentFeeParams {
+  program: string;
+  percent?: number;
+  board?: string;
+  eapcet_rank?: number;
+  jee_percentile?: number;
+  hostel?: string;
+  specialization?: boolean;
+}
+
+export interface AgentFeeResult {
+  status: string;
+  academic_year: string;
+  source: string;
+  data_status: string;
+  program: string;
+  scholarship_percent: number;
+  scholarship_basis?: string;
+  tuition_first_year: string;
+  tuition_first_year_after_scholarship: string;
+  per_semester_after_scholarship: string;
+  saving_first_year: string;
+  one_time_enrollment_fee: string;
+  other_yearly_fees: string;
+  hostel?: { type?: string; per_year?: string } | null;
+  first_year_total_payable: string;
+  yearly_increase: string;
+  duration_years?: number;
+  year_by_year?: Array<{ year: number; tuition: string; after_scholarship: string; per_semester: string }>;
+  full_course_total?: string;
+  specialization_fee?: string;
+  notes: string[];
+}
+
+export async function calculateAgentFee(params: AgentFeeParams): Promise<AgentFeeResult> {
+  const res = await fetch(`${API_BASE}/api/v1/agent/calculate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      program: params.program,
+      percent: params.percent !== undefined && !isNaN(params.percent) ? params.percent : null,
+      board: params.board || "state_board",
+      eapcet_rank: params.eapcet_rank || null,
+      jee_percentile: params.jee_percentile || null,
+      hostel: params.hostel || "none",
+      specialization: Boolean(params.specialization),
+    }),
+  });
+  return await handleResponse<AgentFeeResult>(res, "Failed to calculate fee");
+}
+
 /**
  * Send a chat message with Server-Sent Events (SSE) streaming tokens in real time.
  */
@@ -101,6 +152,8 @@ export function sendMessageStream(
   callbacks: {
     onStart?: (conversationId: string) => void;
     onToken?: (delta: string) => void;
+    onTool?: (tool: { name: string; status: string; label?: string; result?: any }) => void;
+    onCard?: (card: { type: string; data: any }) => void;
     onDone?: (data: ChatResponse) => void;
     onError?: (error: Error) => void;
   }
@@ -174,6 +227,13 @@ export function sendMessageStream(
             callbacks.onStart?.(parsed.conversation_id);
           } else if (parsed.type === "token") {
             callbacks.onToken?.(parsed.delta);
+          } else if (parsed.type === "tool") {
+            callbacks.onTool?.(parsed);
+            if (parsed.status === "done" && parsed.result) {
+              callbacks.onCard?.({ type: parsed.name, data: parsed.result });
+            }
+          } else if (parsed.type === "card") {
+            callbacks.onCard?.(parsed.card || { type: parsed.name, data: parsed.result });
           } else if (parsed.type === "done") {
             callbacks.onDone?.(parsed);
           } else if (parsed.type === "error") {
