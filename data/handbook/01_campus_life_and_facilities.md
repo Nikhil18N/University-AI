@@ -7,30 +7,66 @@
 * **Lush Green Campus & Community**:
   - Stands as the **largest lush green campus for the next generation of innovators**, spanning over **170 acres** in Warangal, Telangana.
   - Home to **10,000 active students** from across India and internationally.
+* **Parent Society & 50-Year Heritage of Excellence**:
+  - **Sri Rajeshwara Educational Society**, the parent body of SR University, is a 50-year-old educational conglomerate founded in 1976 by educational pioneer Sri A. Varada Reddy.
+  - Governs **185 Educational Institutions** across Telangana, Andhra Pradesh, and Karnataka, serving more than **1,00,000 students** with over **17,000 teaching and non-teaching staff**, **7,500+ faculty members**, and a proud network of **5 Lakh+ alumni**.
+  - **Institutional Journey**: Started in 2002 as SR Engineering College with 240 students; earned UGC autonomous status in 2014; launched the DST-supported **SRiX Technology Business Incubator** in March 2018 (India's first private university to host a DST TBI); notified as **SR University** in May 2020 under the Telangana State Private Universities Act; recognised under Section 2(f) of the UGC Act; ranked **1st among private institutions in ARIIA 2020**.
+* **Distinguished University Leadership**:
+  - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976 who built the trusted SR brand name across 95 institutions in Telangana and Andhra Pradesh, embedding quality consciousness and ethical standards as SR's DNA.
+  - **Pro-Chancellor**: **Sri A. Madhukar Reddy** — General Secretary of Sri Rajeshwara Educational Society; visionary who drove SR's transformation from an engineering college into a world-class university with a 170-acre campus, NIRF top-100 standing, SRiX incubator, merit scholarships, and social impact via SR Foundation.
+  - **Vice-Chancellor**: **Prof. Deepak Garg** — Renowned Professor of Artificial Intelligence with a Ph.D. in Computer Science and 25 years of academic and research leadership (former Professor & Dean at Bennett University and Thapar Institute; expert in Reinforcement Learning and Generative AI with 160 publications, 1,600+ citations, 14 Ph.D. scholars guided; national leader who contributed to AIRAWAT, led leadingindia.ai skilling over 1 million students, and served on NAAC, NBA, UGC, and AICTE committees).
+  - **Pro Vice-Chancellor**: **Dr. V. Mahesh**
+  - **Registrar**: **Dr. P. Venkata Ramana Rao**
+  - **Operations & Growth**: **Dr. R. Archana Reddy**
+  - **Board of Advisors**: **Prof. G. R. C. Reddy** (Ex-Vice-Chancellor)
 * **World-Class Faculty**:
   - World-class faculty holding **doctoral and postdoctoral qualifications from prestigious institutions in India and abroad**, including **IITs, NITs, and leading international universities**.
-* **National & Global Rankings Excellence**:
-  - **NIRF (National Institutional Ranking Framework)**: Holds the **91st rank in NIRF for the Engineering category** — consistently securing **top 100 ranks for four consecutive years**.
+* **National & Global Rankings & Recognition Excellence**:
+  - **NIRF (National Institutional Ranking Framework) 2025**: Holds the **91st rank in NIRF for the Engineering category** (improved from 98th to 91st, securing top 100 ranks every year since 2021); ranked in the **101–150 band in the University category**.
   - **NBA Tier-1 Accreditation**: **All B.Tech programs hold Tier-1 accreditation** from the National Board of Accreditation (NBA).
   - **ICAR Accreditation**: The School of Agriculture received prestigious **ICAR accreditation**, making SR University the **first private university in the Telugu States** to achieve it.
-  - **QS Asia Rankings 2027**: Ranked **19th among India's State Private Universities**.
-  - **THE (Times Higher Education) World University Rankings 2027**: Ranked **7th in India** among private universities and **6th in India in Research Quality**.
+  - **QS Asia University Rankings 2027**: Debuts in the **701–710 Rank Band globally in Asia** and ranked **19th among Private Universities in India**.
+  - **THE (Times Higher Education) World University Rankings 2027**: Placed in the **801–1000 band globally**, ranked **7th in India** among private universities, and **6th in India in Research Quality**.
+  - **UI GreenMetric World University Rankings 2026**: Ranked **16th among Indian institutions** and **540th globally** for sustainability and green campus stewardship.
+  - **ARIIA 2020**: Ranked **1st among private institutions in India** by the Ministry of Education.
   - **Historic Distinction**: **India’s youngest and only private university in Telangana** to achieve prestigious National and Global Ranks.
+* **Research & Innovation Powerhouse**:
+  - **9,300+ Research Papers Published** in top-tier peer-reviewed international journals.
+  - **2,900+ Patents Filed** demonstrating an extraordinary culture of invention and intellectual property creation.
+  - **159 Patents Granted**, translating innovative solutions into legally recognized assets.
+  - **130+ Top 10 Percentile Publications**, ranked among the most highly cited research works globally.
+  - **Research Focus Domains**: Advanced Composite Materials for Aerospace & Defence, Artificial Intelligence, Generative AI, Robotics, Smart Farming, and Nanotechnology.
+  - **SR Innovation Exchange (SRiX)**: A DST-supported Technology Business Incubator empowering startups from idea stage to scale, with **171+ startups nurtured** and **₹76+ Crore** in total funding. Includes a state-of-the-art **Makerspace** to innovate, build, and create prototypes.
 * **Academic Infrastructure & Emerging Disciplines**:
-  - Offering forward-looking undergraduate, postgraduate, and doctoral programmes across **Engineering, Agriculture, Business, Sciences, Design, and emerging interdisciplinary domains**.
+  - Offering forward-looking undergraduate, postgraduate, and doctoral programmes across 6 schools: **School of Computer Science & AI**, **School of Engineering**, **Astra School of Business**, **School of Agriculture**, **School of Design**, and **School of Sciences & Humanities**.
   - Facilities include modern digital smart classrooms, the University Central Library, and high-tech laboratories.
   - Features **industry-grade setups for Artificial Intelligence, robotics, innovation hubs, incubation spaces, and project studios** supporting rapid prototypes, experiments, and real-world solutions.
   - **80+ International Academic Collaborations**: Providing students unparalleled opportunities for global learning, semester exchange, and international research exposure.
-  - **SR Innovation Exchange (SRiX)**: A DST-supported Technology Business Incubator empowering students to explore entrepreneurship, innovation, and startup venture development.
-  - **Career Guidance Cell**: Guides students in discovering their strengths through industry-oriented training, technical skill development, and practical capstone projects for premier career pathways.
-* **Campus Life, Vibrancy & Sports**:
-  - Campus life stays vibrant through continuous learning, sports, and culture.
-  - **20+ Student Clubs & 50+ Annual Events**: Diverse technical, cultural, entrepreneurial, and creative activities building strong leadership skills.
-  - **Grand Cultural Festivals**: Bringing music, talent, passion, and high energy with active student participation.
-  - **Athletic & Fitness Facilities**: Expansive sports grounds (cricket, football), floodlit basketball & badminton courts, indoor arenas, and fitness zones keeping students strong, healthy, and active.
-* **Leadership at SR University**:
-  - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976; leading 185+ educational institutions under the SR Educational Society with over 1 lakh students and 5 lakh alumni.
-  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science (Efficient Algorithm Design), AI pioneer, former Director of NVIDIA-BU Research Center on AI, CAC ABET Commissioner, and *The Times of India* columnist (*"Breaking Shackles"*).
+  - **Career Guidance Cell**: Guides students in discovering their strengths through industry-oriented training, technical skill development, mock interviews, and practical capstone projects for premier career pathways.
+* **Campus Life, Vibrancy, Sports & Wellness**:
+  - **Spotlight Campus Events**:
+    * **Sparkrill** (Annual National Cultural Mega-Fest, e.g. Sparkill ’27 on Jan 26).
+    * **PRAGATHI 2.0 Project Expo** (National Project Exhibition, Oct 9, `https://www.sruprojectexpo.in/`).
+    * **Navadhara** (Talent, Arts & Cultural Fest, Nov 6).
+    * **Swagatham** (Grand Fresher’s Welcome Festival, Oct 16).
+    * Auto Expo, Campus Joy, and Traditional Celebrations.
+  - **Student Clubs**: Active ecosystem of 37+ clubs including **Google Developers Club**, **Startup & Innovation Club**, **Ashwavega Club**, **Coding Club**, and departmental technical societies.
+  - **Sports & Fitness**: Indoor & Outdoor Sports Complex (Basketball, Cricket ground with nets, Football, Badminton, Tennis, Volleyball, Kabaddi), and **Olympic-Standard Gym & Fitness Centers** equipped with latest training gear.
+  - **Student Support & Wellness**: 24/7 Medical & Emergency Support with on-campus Health Centre, stationed ambulance, and tie-up with **Aaditya Hospital**; professional **Mental Health & Counseling Services** for stress management and personal development; peer support networks and student helplines.
+  - **Dedicated International Student Support**: Specialized visa and immigration guidance, cultural integration, affordable accommodation, and dedicated international scholarships.
+* **Key Campus Locations & Portals**:
+  - **Main Residential Campus**: Ananthasagar, Hasanparthy, Warangal, Telangana - 506371.
+  - **Corporate Office**: 604, 6th Floor, Sonthalia Emerald, Raj Bhavan Road, Somajiguda, Hyderabad, Telangana - 500082.
+  - **Official Phone Lines**: **+91 8331004040**, **0870-2818333**, **0870-2818311**.
+  - **Official Email**: `info@sru.edu.in` / `admissions@sru.edu.in`.
+  - **Key Online Portals**:
+    * Main University: `https://sru.edu.in/`
+    * Admissions: `https://admission.sru.edu.in/`
+    * SRAAP (Academics, Ph.D. & Post-Doc Applications): `https://sraap.in/`
+    * Alumni Network: `https://alumni.sru.edu.in/`
+    * Careers: `https://sru.edu.in/careers`
+    * IQAC: `https://iqac.sru.edu.in/`
+    * NIRF: `https://nirf.sru.edu.in/`
 
 ---
 

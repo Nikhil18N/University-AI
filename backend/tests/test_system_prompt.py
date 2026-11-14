@@ -59,3 +59,15 @@ def test_170_acres_present_in_prompts():
     assert "150 acres" not in rag_prompt
     assert "150-acre" not in rag_prompt
 
+
+def test_website_facts_grounded_in_prompts():
+    """Verify official website facts are grounded in prompts."""
+    prompt = load_prompt("system")
+    assert "Sri Rajeshwara Educational Society" in prompt
+    assert "Deepak Garg" in prompt
+    assert "9,300+" in prompt
+    assert "2,900+" in prompt
+    assert "UI GreenMetric" in prompt
+    assert "Sparkrill" in prompt
+
+
