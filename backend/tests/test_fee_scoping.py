@@ -174,6 +174,19 @@ def test_placement_excellence_card_generation():
     assert "Amazon" in companies
     assert "ServiceNow" in companies
 
+    # Verify stats do NOT repeat the 3 superstars
+    stat_values = [s["value"] for s in cards[0]["stats"]]
+    assert "51 LPA" not in stat_values
+    assert "49.30 LPA" not in stat_values
+    assert "46.38 LPA" not in stat_values
+
+    # Verify marquee_offers celebrates the other achievers
+    assert len(cards[0]["marquee_offers"]) >= 5
+    marquee_companies = [m["company"] for m in cards[0]["marquee_offers"]]
+    assert "Salesforce" in marquee_companies
+    assert "PayPal" in marquee_companies
+    assert "Cisco" in marquee_companies
+
 
 def test_hostel_card_includes_4000_seat_dining_and_living_motto():
     """Verify hostel card includes living & learning subtitle and 4,000 capacity dining hall."""

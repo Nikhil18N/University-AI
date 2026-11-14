@@ -1077,7 +1077,7 @@
 /* Placement Stats Grid */
 .placement-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 
@@ -1107,6 +1107,85 @@
 .stat-sub {
   font-size: 0.65rem;
   color: var(--text-2, #64748b);
+}
+
+/* Other Marquee Offers Section */
+.placement-marquee-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.marquee-offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.marquee-offer-item {
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.marquee-offer-item:hover {
+  border-color: #0284c7;
+  transform: translateY(-1px);
+}
+
+.marquee-offer-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.marquee-student-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-1, #0f172a);
+}
+
+.marquee-batch-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-2, #64748b);
+  background: var(--surface-3, #f1f5f9);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.marquee-offer-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+}
+
+.marquee-company-tag {
+  color: var(--text-2, #64748b);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.marquee-company-tag strong {
+  color: var(--text-1, #0f172a);
+}
+
+.marquee-package-tag {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #047857;
+  background: #d1fae5;
+  padding: 1px 6px;
+  border-radius: 10px;
 }
 
 /* Top MNC Section */
@@ -1166,6 +1245,21 @@
   color: #34d399;
 }
 
+[data-theme="dark"] .marquee-offer-item {
+  background: #212631;
+  border-color: #2d3340;
+}
+
+[data-theme="dark"] .marquee-batch-tag {
+  background: #2d3340;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .marquee-package-tag {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
 /* Mobile Optimizations */
 @media (max-width: 600px) {
   .rich-card {
@@ -1185,6 +1279,10 @@
 
   .placement-stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .marquee-offers-grid {
+    grid-template-columns: 1fr;
   }
 
   .yt-card-item {

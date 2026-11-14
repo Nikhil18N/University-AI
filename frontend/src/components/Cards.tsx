@@ -408,13 +408,16 @@ export function PlacementHighlightsCard({ card }: CardProps) {
   ];
 
   const stats = card.stats || [
-    { label: "Highest Package", value: "51 LPA", note: "Microsoft" },
-    { label: "Total Job Offers", value: "1,300+", note: "And counting" },
-    { label: "Internships", value: "3,500+", note: "Stipends to ₹1.25L/mo" },
+    { label: "Total Job Offers", value: "1,300+", note: "Till April and counting" },
+    { label: "Paid Internships", value: "3,500+", note: "Stipends to ₹1.25L/mo" },
     { label: "Average CTC", value: "6 LPA", note: "Cohort Average" },
+    { label: "Highest Stipend", value: "₹1.25L / mo", note: "Microsoft (Batch 2025)" },
+    { label: "Top Recruiting MNCs", value: "80+", note: "Fortune 500 & tech leaders" },
+    { label: "Placement Support", value: "100%", note: "One Student–One Job" },
   ];
 
   const topMncs = card.top_mnc_offers || [];
+  const marqueeOffers = card.marquee_offers || [];
 
   return (
     <div className="rich-card placement-card">
@@ -463,7 +466,7 @@ export function PlacementHighlightsCard({ card }: CardProps) {
         ))}
       </div>
 
-      {/* Key Milestone Stats */}
+      {/* Key Milestone Stats (Non-repetitive university metrics) */}
       <div className="placement-stats-grid">
         {stats.map((s: any, idx: number) => (
           <div key={idx} className="placement-stat-box">
@@ -474,11 +477,36 @@ export function PlacementHighlightsCard({ card }: CardProps) {
         ))}
       </div>
 
+      {/* Other Marquee Superstar Achievers */}
+      {marqueeOffers.length > 0 && (
+        <div className="placement-marquee-section">
+          <h6 className="placement-mnc-title">
+            <AwardIcon size={13} /> Other Marquee Superstar Achievers
+          </h6>
+          <div className="marquee-offers-grid">
+            {marqueeOffers.map((m: any, idx: number) => (
+              <div key={idx} className="marquee-offer-item">
+                <div className="marquee-offer-main">
+                  <span className="marquee-student-name">{m.student}</span>
+                  <span className="marquee-batch-tag">{m.batch}</span>
+                </div>
+                <div className="marquee-offer-sub">
+                  <span className="marquee-company-tag">
+                    <BriefcaseIcon size={12} /> Placed @ <strong>{m.company}</strong>
+                  </span>
+                  <span className="marquee-package-tag">{m.package}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Top Recruiting MNCs Volume */}
       {topMncs.length > 0 && (
         <div className="placement-mnc-section">
           <h6 className="placement-mnc-title">
-            <SparklesIcon size={13} /> Top MNC Offers
+            <SparklesIcon size={13} /> Top MNC Hiring Volume
           </h6>
           <div className="placement-mnc-pills">
             {topMncs.map((m: any, idx: number) => (

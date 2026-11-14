@@ -458,12 +458,12 @@ PLACEMENT_EXCELLENCE_CARD = {
         },
     ],
     "stats": [
-        {"label": "Record Highest Package", "value": "51 LPA", "note": "Microsoft (Batch 2025)"},
-        {"label": "ServiceNow Marquee Offer", "value": "49.30 LPA", "note": "ServiceNow (Batch 2027)"},
-        {"label": "Amazon SDE Package", "value": "46.38 LPA", "note": "Amazon (Batch 2026)"},
         {"label": "Total Job Offers", "value": "1,300+", "note": "Till April and counting"},
         {"label": "Paid Internships", "value": "3,500+", "note": "Stipends up to ₹1.25L/month"},
         {"label": "Average Package", "value": "6 LPA", "note": "Across graduating cohorts"},
+        {"label": "Highest Monthly Stipend", "value": "₹1.25L / mo", "note": "Microsoft (Batch 2025)"},
+        {"label": "Top Recruiting MNCs", "value": "80+", "note": "Global tech & Fortune 500 recruiters"},
+        {"label": "Placement Support", "value": "100%", "note": "One Student–One Job + Dream option"},
     ],
     "top_mnc_offers": [
         {"company": "Accenture", "offers": 254},
