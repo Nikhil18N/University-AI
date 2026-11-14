@@ -1,54 +1,37 @@
 # SR University — Hostel Rules & Student Discipline Code
 
 ## 1. Hostel Accommodation & Living Amenities
-* **Guiding Principle**: "Your Home Away from Home" — providing a secure, healthy, and disciplined residential environment.
-* **Room Features**:
-  - Separate hostel buildings for boys and girls on campus.
-  - **Visitor & Cross-Gender Entry Policy**:
-    - Male students and male visitors are strictly prohibited from entering female hostel buildings, floors, or rooms under any circumstances.
-    - Female students and female visitors are strictly prohibited from entering male hostel buildings, floors, or rooms.
-    - Cross-gender room visits for group study or any other reason are strictly forbidden; group studies must be conducted in common academic areas such as the University Library or cafeteria during regular hours.
-    - Unauthorized entry into opposite-gender hostels is a severe disciplinary violation attracting suspension and expulsion.
-  - Occupancy: **Triple sharing basis** (rooms are also available in quadruple configuration in specific blocks).
-  - Types: Both **Air-Conditioned (AC)** and **Non-AC** rooms available.
-  - Allotted furniture: Every student is provided a dedicated bed, mattress, study table, chair, and cupboard.
-* **Facilities & Utilities**:
-  - Hot water supply: Available twice daily from **7:00 AM to 9:00 AM** and **7:00 PM to 9:00 PM**.
-  - Drinking water: RO-treated water coolers installed on every floor of every block.
-  - Internet: 24x7 Wi-Fi connectivity throughout all hostel corridors and rooms.
-  - Recreational amenities: TV halls, common reading rooms, shuttle badminton courts in every block, table tennis, carroms, chess, and board games.
-  - Gymnasium: Dedicated gym facilities with exclusive timings and fitness trainer for female students.
-  - Laundry & Essentials: In-house laundry services, daily provision stores in hostel blocks, and Canara Bank ATM at main gate.
-  - Safety & Elevators: 24x7 security guards, full CCTV coverage on corridors, staircases, and lifts; elevators equipped with Auto Rescue Devices (ARD).
+* **Living & Learning Philosophy**: *"As the academic day comes to an end, the living and learning experience continues."* Step into the campus hostels for Boys & Girls, designed to provide a safe, supportive, and inspiring environment for students.
+* **Modern Living Amenities**:
+  - **Spacious Rooms**: Available in both **Air-Conditioned (AC)** and **Non-AC** configurations (triple-sharing and quad-sharing).
+  - **Well-Furnished Living Spaces**: Every student is provided a dedicated bed, comfortable mattress, individual study desk, ergonomic chair, and personal wardrobe/cupboard.
+  - **24/7 Security & Surveillance**: Round-the-clock professional security personnel, full CCTV surveillance covering all corridors, staircases, and entrance lobbies, with biometric access checkpoints.
+  - **High-Speed Wi-Fi Connectivity**: Seamless, 24x7 high-speed wireless internet across all hostel blocks, rooms, and common lounges.
+  - **Dedicated Study Areas & Quiet Zones**: Ergonomically designed study halls and reading rooms for undisturbed late-night revision and group coursework during daylight hours.
+  - **Recreational Spaces & Fitness**: Indoor recreation facilities including table tennis, carroms, chess, shuttle badminton courts in every block, TV lounges, and dedicated gymnasium with fitness trainers.
+  - **Medical Support & Emergency Care**: 24/7 emergency medical assistance, campus health centre with on-duty nurse, stationed ambulance, and tie-up with Aaditya Hospital.
+  - **Utilities**: Hot water supply twice daily (7:00 AM – 9:00 AM & 7:00 PM – 9:00 PM), RO-purified water dispensers on every floor, in-house laundry service, daily utility stores, and Canara Bank ATM at the main gate.
+* **Visitor & Cross-Gender Entry Policy**:
+  - Male students and male visitors are strictly prohibited from entering female hostel buildings, floors, or rooms.
+  - Female students and female visitors are strictly prohibited from entering male hostel buildings, floors, or rooms.
+  - Cross-gender room visits are strictly forbidden; group studies must be conducted in common academic areas (library or central cafeteria).
 
 ---
 
-## 2. Hostel Management & Contacts
-* **Dean Student Welfare**: Overall oversight of campus residential life.
-* **Girls Hostel Warden**: Ms. Anitha GP (Phone: **9599042878** / `stu.girlshostel@sru.edu.in`).
-* **Boys Hostel Wardens**:
-  - Dr. Rupesh Mishra (Phone: **9716935695** / `stu.boyshostel@sru.edu.in`)
-  - Dr. Anshu Kumar (Phone: **6394355001**)
-* **Resident Psychological Counsellors**:
-  - Boys Hostel: Mr. Benson (**7893525257**)
-  - Girls Hostel: Ms. Swapna (**7207672300**)
-
----
-
-## 3. Mess Timings & Dining Regulations
+## 2. Mess & Dining Facilities — Mega Dining Hall
+* **Mega Dining Hall**: Modern, hygienic dining facility with a massive **4,000 seating capacity**, serving healthy, fresh, and nutritious meals.
+* **Healthy & Hygienic Food**: Prepared under strict food safety and hygiene protocols, offering balanced vegetarian and non-vegetarian menus designed by nutritionists.
 * **Mess Schedule**:
-  | Meal | Timings |
-  | :--- | :--- |
-  | **Breakfast** | **7:30 AM to 8:30 AM** |
-  | **Lunch** | **12:00 Noon to 2:00 PM** |
-  | **Snacks** | **5:00 PM to 6:00 PM** |
-  | **Dinner** | **7:30 PM to 8:30 PM** |
-* **Dining Rules**:
-  - Service style: Self-service in all dining halls; unlimited food quantity (except special festive items).
-  - Food & Utensils: Students are strictly forbidden from taking mess food or utensils (plates, spoons, tumblers) to hostel rooms.
-  - Room Delivery: Sick food trays are permitted only when a student is certified sick and registered in the hostel sick register.
-  - Food Wastage: Strictly discouraged; paying mess fees does not entitle anyone to waste food.
-  - Cleanliness: Diners must drop plates, cups, and food waste into designated bins after eating.
+  | Meal | Timings | Highlights |
+  | :--- | :--- | :--- |
+  | **Breakfast** | **7:30 AM to 8:30 AM** | Nutritious South & North Indian breakfast items, tea/coffee/milk |
+  | **Lunch** | **12:00 Noon to 2:00 PM** | Complete balanced meal, rice, roti, curries, dal, curd |
+  | **Snacks** | **5:00 PM to 6:00 PM** | Evening snacks, tea and refreshments |
+  | **Dinner** | **7:30 PM to 8:30 PM** | Wholesome dinner with special festive dinners on scheduled occasions |
+* **Dining Standards**:
+  - Unlimited self-service quantity (except special sweets/festive delicacies).
+  - Hygienic sanitization of trays, cutlery, and kitchen surfaces.
+  - Zero tolerance for food wastage. Sick diet trays permitted on registered doctor certification.
 
 ---
 
@@ -122,4 +105,4 @@ Ragging is a criminal, non-bailable offense under Supreme Court of India directi
 * **Penalties**: Debarring from examinations, withholding results, suspension from classes, cancellation of admission, expulsion from hostels, rustication up to 4 semesters, fines ranging from **₹25,000 to ₹1,00,000**, and police prosecution leading to imprisonment up to 2 years.
 * **Reporting**:
   - Anti-Ragging Helpline Email: `stu.antiraggingcell@sru.edu.in`
-  - Incharge: Mr. A. Rajeshwar Rao (**9948533654**) / Dr. A.V.V. Sudhakar (**9000708123**).
+  - Incharge: Mr. A. Rajeshwar Rao / Dr. A.V.V. Sudhakar .

@@ -11,7 +11,19 @@
 - **[FACT-ID: GEN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md]**
   - **Institution Full Name**: SR University (SRU)
   - **Type**: State Private University established under the Telangana State Private Universities Act.
-  - **Campus Size**: 170+ acre lush green residential campus.
+  - **Living & Learning Philosophy**: *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."* / *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
+  - **Campus & Environment**: Largest lush green, master-planned residential campus (170+ acres) for the next generation of innovators in Warangal, Telangana.
+  - **Student Community**: 10,000 active students from across India and internationally.
+  - **Distinguished Faculty**: World-class faculty holding doctoral and postdoctoral qualifications from prestigious institutions in India and abroad, including IITs, NITs, and leading international universities.
+  - **National & Global Rankings**:
+    * **NIRF**: Holds the **91st rank in NIRF for the Engineering category** (with top 100 ranks consistently for four years).
+    * **NBA**: **All B.Tech programs hold Tier-1 accreditation** from the National Board of Accreditation (NBA).
+    * **ICAR**: School of Agriculture received **ICAR accreditation** (first private university in Telugu States).
+    * **QS Asia Rankings 2027**: Ranked **19th among India's State Private Universities**.
+    * **THE World University Rankings 2027**: Ranked **7th in India** among private universities, and **6th in India in Research Quality**.
+    * **Distinction**: **India’s youngest and only private university in Telangana** to achieve prestigious National and Global Ranks.
+  - **Academic & Research Infrastructure**: Modern digital classrooms, University Central Library, high-tech labs, industry-grade setups for AI, robotics, innovation hubs, incubation spaces, and project studios supporting prototypes, experiments, and real solutions; 80+ international academic collaborations; Career Guidance Cell.
+  - **Campus Life & Vibrancy**: 20+ Student Clubs, 50+ annual events, cultural music festivals, sports grounds, indoor arenas, and fitness zones.
   - **Location & Address**: Ananthasagar, Hasanparthy Mandal, Warangal, Telangana 506371, India (on the Warangal–Karimnagar Highway).
   - **Distance**: 14 km from Hanumakonda, 16 km from Kazipet Junction (KZJ), 29 km from Warangal Railway Station.
   - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary leading SR Educational Society since 1976 (over 185 institutions, 1 lakh+ students).
@@ -38,59 +50,128 @@
 
 - **[FACT-ID: FEE-001] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
   - **Program-Specific Scoping Rule**: When asked about fees, ONLY state the fee for the specific program or branch requested (e.g. B.Tech CSE, ECE, Core, MBA, MCA, Hostel). Never dump all unrelated degrees together. If the user asks generally ("what is the fee?"), ask them which program they are interested in.
-  - **B.Tech Computer Science & Engineering (CSE) (Per Semester)**:
-    - I Year: **₹1,47,500** / semester
-    - II Year: **₹1,55,000** / semester
-    - III Year: **₹1,63,000** / semester
-    - IV Year: **₹1,71,000** / semester
-    - One-time Fees: Enrollment: **₹5,000**, Admission Fee: **₹25,000**.
-    - Specialization Fee: **₹30,000 per year** (from Year 2 onwards for AI&ML, Cyber Security, Data Science, Gaming & ARVR, Robotics).
-  - **B.Tech ECE (Per Semester)**: Tuition Fee: **₹1,20,000** | Enrollment: ₹5,000 | Admission: ₹25,000 | Specialization: ₹30,000/yr (from Year 2).
-  - **B.Tech EEE, Mechanical & Civil (Per Semester)**: Tuition Fee: **₹1,00,000** | Enrollment: ₹5,000 | Admission: ₹25,000 | Specialization: ₹30,000/yr.
-  - **B.Tech Lateral Entry (Per Year)**: CSE & ECE: **₹1,41,000 / year** | EEE, Mech, Civil: **₹1,30,000 / year**.
-  - **BCA**: **₹90,000 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **B.Sc. (Hons) Agriculture**: **₹97,500 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **B.Sc. (Hons)**: **₹90,000 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **B.Sc. (PCM) & B.Com**: **₹50,000 / semester** (no separate enrollment/admission fee).
-  - **BBA**: **₹90,000 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **B.Des (Interior & Fashion Design)**: **₹1,30,000 / semester** | Registration: ₹1,500 | Admission: ₹5,000.
-  - **MBA**: **₹1,50,000 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **MCA**: **₹75,000 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **M.Tech**: **₹52,250 / semester** | Enrollment: ₹5,000 | Admission: ₹25,000.
-  - **M.Sc. Agriculture**: **₹90,000 / semester** | **M.Sc. Programs**: **₹37,500 / semester**.
-  - **Other Fees**: Wi-Fi, Cultural, Placements & ERP: **₹15,000** | Exam Fee: **₹5,000 / year**.
-  - **Transport & Bus Fee**: **₹22,000 – ₹30,000 per year** for tri-cities bus routes (Warangal, Hanamkonda, Kazipet). Contact: Mr. A. Keerthi Reddy (**9640606408**, `transport@sru.edu.in`).
+  - **B.Tech Computer Science & Engineering (CSE) & CSE Allied (AIML, Data Science, Cyber Security, Robotics, Quantum AI)**:
+    - Base Tuition Fee: **₹3,40,000 / year** (Payable as ₹1,70,000 per semester or ₹3,40,000 annually).
+    - Yearly Fee Increase: **₹9,000 per year** (Year 1: ₹3,40,000 | Year 2: ₹3,49,000 | Year 3: ₹3,58,000 | Year 4: ₹3,67,000).
+  - **B.Tech in Artificial Intelligence & Robotics**:
+    - Base Tuition Fee: **₹4,00,000 / year** (+₹12,000 yearly increase).
+  - **B.Tech in Electronics & Communication Engineering (ECE)**:
+    - Base Tuition Fee: **₹2,70,000 / year** (+₹8,000 yearly increase).
+  - **B.Tech Core Engineering (Biotechnology, Mechanical, Civil, EEE, Food Technology)**:
+    - Base Tuition Fee: **₹2,00,000 / year** (+₹6,000 yearly increase).
+  - **B.Tech International Engineering Program (IEP)**:
+    - Base Tuition Fee: **₹3,40,000 / year** (+₹10,000 yearly increase).
+  - **B.Des (Interior & Fashion Design)**: **₹2,10,000 / year** (+₹6,000 yearly increase).
+  - **B.Sc. (Hons) Agriculture**: **₹2,00,000 / year** (+₹6,000 yearly increase).
+  - **BBA / B.Sc. Hospitality & Hotel Administration**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+  - **BBA (Business Analytics, FinTech, Digital Marketing)**: **₹2,00,000 / year** (+₹6,000 yearly increase).
+  - **BCA (Hons) / B.Sc. Computer Science (Hons)**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+  - **B.Com / B.Sc. (Physics, Chemistry, Maths)**: **₹1,00,000 / year** (+₹3,000 yearly increase).
+  - **Postgraduate Programs (Per Year)**:
+    - **MBA**: **₹3,00,000 / year** (+₹10,000 yearly increase).
+    - **MCA**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+    - **M.Tech**: **₹1,50,000 / year** (+₹4,000 yearly increase).
+    - **M.Sc. Agriculture**: **₹2,00,000 / year** (+₹6,000 yearly increase).
+    - **M.Sc. Programs (General/Others)**: **₹80,000 / year** (+₹2,000 yearly increase).
+  - **Additional Annual Components & One-Time Fees**:
+    - Enrollment Fee: **₹5,000** (one-time admission component).
+    - Other Fee (Wi-Fi, cultural, placements, ERP): **₹15,000 / year**.
+    - Exam Fee: **₹5,000 / year**.
+    - Bus Transport Fee: **₹30,000 / year** for tri-cities bus routes (Warangal, Hanamkonda, Kazipet).
+    - Specialization Fee (from Year 2 onwards for specialized domains): **₹30,000 / year**.
+    - Application Processing Fee: **₹1,100**.
+    - Electricity Deposit (Hostel): Non-AC: **₹5,000** | AC: **₹10,000**.
   - **Strict Fee Category Scoping Rule**: When asked about a specific fee (transport, hostel, tuition, exam, or admission), return ONLY that specific fee. Never cross-contaminate or dump unrequested fees.
 
 ---
 
-## 4. Merit Scholarships & Calculator Slabs
+## 4. Merit Scholarships & Special Category Concessions
 
 - **[FACT-ID: FEE-002] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **B.Tech CSE Scholarship Slabs (Per Semester)**:
-    - 60–69.99% State / 60–64.99% CBSE / 75–85% JEE / 16001–18000 EAMCET / 1151–1200 SAT / 27–29 IB: **20% Scholarship** (Payable: I Yr ₹1,18,000, II Yr ₹1,24,000, III Yr ₹1,30,000, IV Yr ₹1,36,000).
-    - 70–79.99% State / 65–74.99% CBSE / 85.1–90% JEE / 15001–16000 EAMCET / 1201–1250 SAT / 30–32 IB: **30% Scholarship** (Payable: I Yr ₹1,04,000, II Yr ₹1,09,000, III Yr ₹1,14,000, IV Yr ₹1,19,000).
-    - 80–91.99% State / 75–89.99% CBSE / 90.1–93% JEE / 12001–15000 EAMCET / 1251–1350 SAT / 33–35 IB: **35% Scholarship** (Payable: I Yr ₹96,000, II Yr ₹1,01,000, III Yr ₹1,06,000, IV Yr ₹1,11,000).
-    - 92–97.99% State / 90–97.99% CBSE / 93.1–95% JEE / 10001–12000 EAMCET / 1351–1450 SAT / 36–38 IB: **40% Scholarship** (Payable: I Yr ₹89,000, II Yr ₹94,000, III Yr ₹99,000, IV Yr ₹1,04,000).
-    - 98%+ State / 98%+ CBSE / 95%+ JEE / 1–10000 EAMCET / 1451+ SAT / 39+ IB: **50% Scholarship** (Payable: I Yr ₹74,000, II Yr ₹78,000, III Yr ₹82,000, IV Yr ₹86,000).
-  - **B.Tech ECE (on ₹1,20,000 Tuition)**: 10% (₹1,08,000), 20% (₹96,000), 30% (₹84,000), 40% (₹72,000), 50% (₹60,000).
-  - **B.Tech Core (EEE, Mech, Civil on ₹1,00,000 Tuition)**: 10% (₹90,000), 20% (₹80,000), 30% (₹70,000), 40% (₹60,000), 50% (₹50,000).
-  - **BCA, B.Sc, BBA (on ₹90,000 Tuition)**: 10% (₹81,000), 20% (₹72,000), 30% (₹63,000), 40% (₹54,000), 50% (₹45,000).
-  - **B.Sc. Agriculture (on ₹97,500 Tuition)**: 10% (₹88,000), 20% (₹78,000), 30% (₹69,000), 40% (₹59,000), 50% (₹49,000).
-  - **MBA (on ₹1,50,000 Tuition)**: 10% (₹1,35,000), 20% (₹1,20,000), 30% (₹1,05,000), 40% (₹90,000), 50% (₹75,000).
-  - **MCA (on ₹75,000 Tuition)**: 10% (₹68,000), 20% (₹60,000), 30% (₹53,000), 40% (₹45,000), 50% (₹38,000).
-  - **M.Tech (on ₹52,250 Tuition)**: 10% (₹47,025), 20% (₹41,800), 30% (₹36,575), 40% (₹31,350), 50% (₹26,125).
-  - **Special Scholarship Category**: 15% additional scholarship for students who have lost their parents (Death certificates required, continuation condition min 7.5 CGPA without backlogs).
+  - **Undergraduate Merit Scholarship Slabs**:
+    - **10% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **60% – 64.9%** | CBSE/ICSE: **60% – 64.9%** | JEE Mains: **50 – 59.9 Percentile**.
+      - B.Tech CSE Annual Fee after waiver: **₹3,06,000 / year** (Save ₹34,000).
+    - **15% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **65% – 69.9%** | CBSE/ICSE: **65% – 69.9%** | JEE Mains: **60 – 69.9 Percentile**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,89,000 / year** (Save ₹51,000).
+    - **20% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **70% – 79.9%** | CBSE/ICSE: **70% – 79.9%** | IB Diploma: **24 – 29** | JEE Mains: **70 – 79.9 Percentile**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,72,000 / year** (Save ₹68,000).
+    - **25% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **80% – 91.9%** | CBSE/ICSE: **80% – 89.9%** | IB Diploma: **30 – 33** | JEE Mains: **80 – 89.9 Percentile** | TG/AP EAPCET Rank: **8,001 – 20,000**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,55,000 / year** (Save ₹85,000).
+    - **30% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **92% – 97.9%** | CBSE/ICSE: **90% – 94.9%** | IB Diploma: **34 – 37** | JEE Mains: **90 – 94.5 Percentile** | TG/AP EAPCET Rank: **2,001 – 8,000**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,38,000 / year** (Save ₹1,02,000).
+    - **40% Tuition Scholarship**:
+      - Eligibility: Intermediate / State Board: **≥ 98%** | CBSE/ICSE: **≥ 95%** | IB Diploma: **≥ 38/45** | JEE Mains: **≥ 95 Percentile** | TG/AP EAPCET Rank: **1 – 2,000**.
+      - B.Tech CSE Annual Fee after waiver: **₹2,04,000 / year** (Save ₹1,36,000).
+  - **PG Merit Scholarship Slabs (M.Tech, MBA, MCA, M.Sc)**:
+    - 10% (UG 60–69.9% / CAT/MAT 60–69.9) | 15% (UG 70–79.9% / CAT/MAT 70–79.9) | 20% (UG 80–89.9% / CAT/MAT 80–89.9) | 25% (UG ≥ 90% / CAT/MAT ≥ 90).
+  - **20 Special Category Concessions (Flat Annual Tuition Waivers)**:
+    - **₹50,000 / year Waiver**:
+      1. Sports International Representation.
+      2. Orphan Students (Both parents deceased).
+      3. Regular SRU Staff Children.
+    - **₹20,000 / year Waiver**:
+      4. Differently Abled Students (More than 50% physical disability).
+    - **₹15,000 / year Waiver**:
+      5. Girl Child (All female students).
+      6. Single Parent Child.
+      7. Children of Defence / Armed Forces & Police Personnel.
+      8. SR Junior College Alumni.
+      9. SRU Alumni / Real Sibling studying concurrently at SRU.
+      10. NCC 'C' Certificate Holders.
+      11. Non-Local / Out-of-State Students (Outside Telangana).
+      12. Sports National Representation.
+      13. Lateral Entry Diploma Students.
+      14. Padma / J&K / Gallantry Awardees or Children.
+      15. Andhra Pradesh Students.
+      16. International Students.
+      17. North East Domicile Students.
+      18. Teachers/Educators Children.
+      19. COVID Affected Bereaved Students.
+      20. Wards of University Partner Organizations.
 
 ---
 
 ## 5. Campus Placements & Recruitment Records
 
-- **[FACT-ID: PLC-001] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md & 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Highest Placement Package**: **51 LPA (Lakhs Per Annum)** offered by **Microsoft** (Batch 2025); **46.38 LPA** offered by **Amazon** (Batch 2026, CSE).
-  - **Average Placement Package**: **6 LPA** university-wide (earlier CSSP record); school-wise averages (Oct-2026 deck): ECE 5, EEE 4, Mechanical 4, Civil 6, Business 5 LPA.
-  - **Total Job Offers**: **1300+**; **Total Internships (Batch 2026)**: **2500+**; **Recruiters**: **150+**.
+- **[FACT-ID: PLC-001] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md & University Official Placement Registry]**
+  - **Core Benchmark**: **"Three Consecutive Years of Excellence in Highest Packages & Internships"**
+  - **Three Consecutive Record Highest Packages**:
+    1. **Batch 2025**: **51 LPA** — B. Shiva Krishna (Software Engineer at **Microsoft**), with **₹1.25 Lakh / month** internship stipend.
+    2. **Batch 2026**: **46.38 LPA** — Kencha Bhavana (Software Development Engineer at **Amazon**), with **₹1.10 Lakh / month** internship stipend.
+    3. **Batch 2027**: **49.30 LPA** — Mohammed Akramuddin (Associate Software Engineer at **ServiceNow**), with **₹0.80 Lakh / month** internship stipend.
+  - **Overall Average Package**: **6 LPA** across graduating B.Tech batches (School-wise: ECE 5 LPA, EEE 4 LPA, Mech 4 LPA, Civil 6 LPA, Business 5 LPA).
+  - **Placement & Internship Scale**: **1,300+ total placement offers**, **3,500+ internships**, **150+ recruiters**.
+  - **Top MNC Offers Volume**:
+    - Accenture: **254 offers**
+    - Cognizant: **165 offers**
+    - Brakes India: **66 offers**
+    - Capgemini: **57 offers**
+    - Virtusa: **48 offers**
+    - TCS: **45 offers**
+    - Savantis: **43 offers**
+    - Edufyi Tech Solutions: **38 offers**
+    - Infosys: **22 offers**
+  - **Marquee Superstar Packages**:
+    - **44 LPA** @ Salesforce (Thangallapally Nithal, CSE 2025)
+    - **44 LPA** @ ServiceNow (Bijigiri Vignesh & Ambati Krishna Sai, CSE 2025)
+    - **34.5 LPA** @ PayPal (Jonnadula Sahith & Harsha Vardhan, CSE 2025)
+    - **25 LPA** @ Cisco (Repala Vignesh, CSE 2025)
+    - **19.75 LPA** @ JPMorgan Chase (Suraram Hari Charan, CSE 2026)
+    - **16.75 LPA** @ Cisco (Garrepalli Anjali, CSE 2026)
+    - **14.5 LPA** @ Flipkart (Nadimadla Sanvitha, ECE 2026)
+    - **14.53 LPA** @ Flipkart (Sindhu Domakuntla, ECE 2027)
   - **Top Recruiters Cutoff**: Minimum **CGPA of 7.5 or above** with **zero active backlogs** at the time of recruitment drive.
+  - **Authoritative Accreditations & Global Rankings**:
+    - **THE (Times Higher Education) World University Rankings**: **7th Rank Among Private Universities in India** (801–1000 Band), **1st in Telangana**.
+    - **QS World University Rankings Asia**: **19th Rank Among Private Universities in India** (701–710 Band).
+    - **NIRF (National Institutional Ranking Framework)**: **91st Rank** in Engineering Category (101–150 University Category).
+    - **ICAR Accreditation**: **1st Private University** to achieve ICAR accreditation in Telangana & Andhra Pradesh.
+    - **NBA Tier-1 Accredited** B.Tech Programs & **NAAC 'A' Grade**.
   - **Placement Department**: Centre for Student Services and Placements (CSSP).
 - **[FACT-ID: PLC-002] [STATUS: VERIFIED] [SOURCE: 05_career_and_placement_policy.md]**
   - **Placement Job Policy**: Follows strict **"One Student–One Job"** policy.
@@ -102,7 +183,18 @@
 ## 6. Hostel Living & Residential Rules
 
 - **[FACT-ID: HST-001] [STATUS: VERIFIED] [SOURCE: 04_hostels_rules_and_discipline_code.md & 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Accommodations**: Dedicated separate hostel blocks for male and female students.
+  - **Living & Learning Philosophy**: *"As the academic day comes to an end, the living and learning experience continues. Step into the campus hostels for Boys & Girls.. Designed to provide a safe and supportive environment for students."*
+  - **Accommodations**: Dedicated separate hostel blocks for Boys and Girls on campus.
+  - **Modern Amenities & Features**:
+    * Spacious rooms with **Air-Conditioned (AC)** and **Non-AC** options.
+    * 24/7 security, professional guards, and CCTV surveillance.
+    * Well-furnished rooms (dedicated bed, mattress, study desk, ergonomic chair, wardrobe).
+    * High-speed Wi-Fi connectivity throughout all blocks.
+    * Dedicated study areas, reading halls, and recreational spaces.
+    * 24/7 medical support and on-campus emergency ambulance care.
+  - **Mega Dining Hall & Food Quality**:
+    * Massive **4,000 seating capacity dining hall**.
+    * Healthy, hygienic, fresh, and nutritious food prepared under strict safety standards.
   - **Hostel Fee Structure (Annual Room & Mess)**:
     - **4 Person Occupancy (Non-AC)**: **₹1,15,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
     - **3 Person Occupancy (Non-AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
@@ -147,8 +239,9 @@
 
 ## 8. Innovation, Startups & Incubation (SRiX)
 
-- **[FACT-ID: INN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md]**
-  - **Incubator**: **SRiX (SR Innovation Exchange)** — A Technology Business Incubator supported by the Department of Science and Technology (DST), Government of India. **171 startups** registered, **₹76+ Cr** funding for startups.
+- **[FACT-ID: INN-001] [STATUS: VERIFIED] [SOURCE: 01_campus_life_and_facilities.md & University Presentation Deck]**
+  - **Incubator**: **SRiX (SR Innovation Exchange)** — A Technology Business Incubator supported by the Department of Science and Technology (DST), Government of India.
+  - **Impact**: **171+ Startups Incubated**, **₹76+ Crores external funding raised**.
   - **Focus Areas**: AI/ML, Internet of Things (IoT), Agritech, Medtech, Clean Energy.
   - **Facilities**: 14+ maker spaces, rapid prototyping labs, IP facilitation, mentorship, seed funding access, and incubation support for students and faculty.
 

@@ -142,21 +142,21 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
         question="What is the annual tuition fee for B.Tech Computer Science (CSE)?",
         handbook_source="data/handbook/08_admissions_fees_scholarships_and_eligibility.md",
         ground_truth_claims=[
-            "Official tuition fee for CSE is ₹1,47,500 per semester",
-            "Annual tuition fee is ₹2,95,000 per year",
-            "One-time fees include ₹5,000 enrollment and ₹25,000 admission fee",
+            "Official tuition fee for CSE is ₹3,40,000 per year (or ₹1,70,000 per semester)",
+            "Yearly fee increase is ₹9,000 per year",
+            "One-time enrollment fee is ₹5,000",
         ],
         required_keywords_any=[
-            ["1,47,500", "147500", "2,95,000", "295000", "1.475", "2.95"],
+            ["3,40,000", "340000", "3.4", "1,70,000", "170000"],
             ["semester", "per year", "annual"],
         ],
         prohibited_hallucinations=[
             (
                 re.compile(r"\b(?:rs\.?|inr|₹)?\s*(?:50,000|1,40,000|2,10,000|5,00,000|10\s*lakhs?)\b", re.I),
-                "Hallucination: Outdated or fabricated tuition fee number for CSE (must be ₹1,47,500/semester = ₹2,95,000/yr)",
+                "Hallucination: Outdated or fabricated tuition fee number for CSE (must be ₹3,40,000/year or ₹1,70,000/sem)",
             ),
         ],
-        allowed_numbers=["1,47,500", "2,95,000", "5,000", "25,000", "30,000", "3,25,000", "147500", "295000"],
+        allowed_numbers=["3,40,000", "1,70,000", "340000", "170000", "5,000", "9,000", "15,000", "20,000", "30,000", "2,95,000", "1,47,500"],
     ),
     "merit_scholarships_slabs": FactualityBenchmarkItem(
         policy_id="merit_scholarships_slabs",
@@ -165,12 +165,12 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
         handbook_source="data/handbook/08_admissions_fees_scholarships_and_eligibility.md",
         ground_truth_claims=[
             "Merit scholarships are awarded strictly based on 12th / Intermediate marks or entrance ranks",
-            "92% to 97.99% in Intermediate qualifies for 40% scholarship for CSE",
-            "98%+ qualifies for 50% to 100% scholarship",
-            "85% to 91.99% qualifies for 25% scholarship",
+            "98%+ qualifies for 40% scholarship for CSE (net fee ₹2,04,000/yr)",
+            "92% to 97.9% qualifies for 30% scholarship for CSE (net fee ₹2,38,000/yr)",
+            "80% to 91.9% qualifies for 25% scholarship",
         ],
         required_keywords_any=[
-            ["40%", "40 percent"],
+            ["40%", "40 percent", "30%", "25%"],
             ["scholarship", "merit", "concession", "waiver"],
         ],
         prohibited_hallucinations=[
@@ -179,7 +179,7 @@ BENCHMARK_POLICIES: dict[str, FactualityBenchmarkItem] = {
                 "Hallucination: Claiming 100% full fee waiver is unconditionally guaranteed for all intermediate students",
             ),
         ],
-        allowed_numbers=["40%", "50%", "100%", "25%", "15%", "92%", "98%", "85%", "75%", "88,500", "1,77,000"],
+        allowed_numbers=["40%", "30%", "25%", "20%", "15%", "10%", "50%", "100%", "98%", "97.99%", "97.9%", "95%", "92%", "90%", "80%", "70%", "65%", "60%", "2,04,000", "2,38,000", "2,55,000", "2,72,000", "2,89,000", "3,06,000", "88,500", "1,77,000", "3,40,000"],
     ),
     "highest_placement_package": FactualityBenchmarkItem(
         policy_id="highest_placement_package",

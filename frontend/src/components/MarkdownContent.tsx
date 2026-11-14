@@ -103,14 +103,34 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
     });
   };
 
-  // Format inline tokens: bold, italic, strikethrough, inline code, links
+  // Format inline tokens: bold, italic, strikethrough, inline code, links, images
   const formatInline = (text: string): React.ReactNode[] => {
-    // Regex matches **bold**, *italic*, ~~strikethrough~~, `code`, and [link](url)
-    const regex = /(\*\*.*?\*\*|\*.*?\*|~~.*?~~|`.*?`|\[.*?\]\(.*?\))/g;
+    // Regex matches images !\[...\](...), **bold**, *italic*, ~~strikethrough~~, `code`, and [link](url)
+    const regex = /(!\[.*?\]\(.*?\)|\*\*.*?\*\*|\*.*?\*|~~.*?~~|`.*?`|\[.*?\]\(.*?\))/g;
     const parts = text.split(regex);
 
     return parts.map((part, index) => {
       if (!part) return null;
+
+      // Image: ![alt](url)
+      if (part.startsWith("![") && part.includes("](") && part.endsWith(")")) {
+        const imgMatch = part.match(/^!\[(.*?)\]\((.*?)\)$/);
+        if (imgMatch) {
+          const [, altText, imgUrl] = imgMatch;
+          return (
+            <span key={index} className="chat-image-inline-container">
+              <img
+                src={imgUrl}
+                alt={altText || "SR University Placement"}
+                className="chat-embedded-image"
+                loading="lazy"
+                onClick={() => window.open(imgUrl, "_blank")}
+              />
+              {altText && <span className="chat-image-caption">{altText}</span>}
+            </span>
+          );
+        }
+      }
 
       // Bold: **text**
       if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
@@ -499,6 +519,27 @@ export default function MarkdownContent({ content, isStreaming }: Props) {
         <div key={`num-${renderedBlocks.length}-${i}`} className="chat-numbered-item">
           <span className="num-badge">{numMatch[1]}.</span>
           <span className="num-text">{formatInline(numMatch[2])}</span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // 9.5 Standalone Image (![alt](url))
+    const imgBlockMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
+    if (imgBlockMatch) {
+      flushList();
+      const [, altText, imgUrl] = imgBlockMatch;
+      renderedBlocks.push(
+        <div key={`img-block-${renderedBlocks.length}-${i}`} className="chat-image-block">
+          <img
+            src={imgUrl}
+            alt={altText || "SR University Placement Highlights"}
+            className="chat-embedded-image"
+            loading="lazy"
+            onClick={() => window.open(imgUrl, "_blank")}
+          />
+          {altText && <span className="chat-image-caption">{altText}</span>}
         </div>
       );
       i++;

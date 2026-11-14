@@ -1,197 +1,154 @@
 # SR University — Admissions, Fees & Scholarships
 
-> **Source:** [SR University Fee & Scholarship](https://sru.edu.in/fee-scholarship/)  
-> The page labels its information **2026–27**. This file records only information shown on that page. It does not provide general academic admission eligibility or application instructions.
+> **Source:** SR UNIVERSITY — Official Fee Structure & Merit Scholarship Matrix Circulation  
+> **Status:** Internal & Official Administrative Circular (Effective 2026–27 / 2027–28)  
+> **Currency:** All figures in Indian Rupees (INR ₹) per annum, unless explicitly noted.
 
-## 1. Program fees
+---
 
-Amounts below are transcribed from the page. Admission fees are labeled as one-time in the source; enrollment and registration fee labels are retained as shown. Tuition periods are shown in the table.
+## 1. Undergraduate (UG) Programs — Tuition Fee & Merit Scholarship Structure
 
-### Bachelor's programs
+Amounts below are transcribed directly from the official SR University Fee Circulation document. All tuition fees are per annum.
 
-| Program | Enrollment / registration fee | Admission fee (one time) | Tuition |
-|---|---:|---:|---:|
-| B.Tech CSE | ₹5,000 enrollment | ₹25,000 | Per semester: Year I ₹1,47,500; Year II ₹1,55,000; Year III ₹1,63,000; Year IV ₹1,71,000 |
-| B.Tech ECE | ₹5,000 enrollment | ₹25,000 | ₹1,20,000 per semester |
-| B.Tech EEE, Mechanical and Civil | ₹5,000 enrollment | ₹25,000 | ₹1,00,000 per semester |
-| B.Tech lateral entry, CSE and ECE | ₹5,000 enrollment | ₹25,000 | ₹1,41,000 per year |
-| B.Tech lateral entry, EEE, Mechanical and Civil | ₹5,000 enrollment | ₹25,000 | ₹1,30,000 per year |
-| BCA | ₹5,000 enrollment | ₹25,000 | ₹90,000 per semester |
-| B.Sc. (Hons) Agriculture | ₹5,000 enrollment | ₹25,000 | ₹97,500 per semester |
-| B.Sc. (Hons) | ₹5,000 enrollment | ₹25,000 | ₹90,000 per semester |
-| B.Sc. (Physics, Chemistry and Mathematics) and B.Com | — | — | ₹50,000 per semester |
-| BBA | ₹5,000 enrollment | ₹25,000 | ₹90,000 per semester |
-| B.Des. Interior Design | ₹1,500 registration | ₹5,000 | ₹1,30,000 per semester |
-| B.Des. Fashion Design | ₹1,500 registration | ₹5,000 | ₹1,30,000 per semester |
+### UG Fee & Merit Scholarship Matrix
 
+| Program / Course Specialization | Standard Base Fee (55–59.9% CSE/ECE; 50–59.9% Others) | 10% Scholarship (10% OFF) | 15% Scholarship (15% OFF) | 20% Scholarship (20% OFF) | 25% Scholarship (25% OFF) | 30% Scholarship (30% OFF) | 40% Scholarship (40% OFF) | Yearly Fee Increase (Irrespective of Schol.) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **B.Tech CSE** (AIML, Data Science, Cyber Security, Robotics and Automation, Quantum AI) | **₹3,40,000** | ₹3,06,000 | ₹2,89,000 | ₹2,72,000 | ₹2,55,000 | ₹2,38,000 | **₹2,04,000** | ₹9,000 |
+| **B.Tech in AI and Robotics** | **₹4,00,000** | ₹3,60,000 | ₹3,40,000 | ₹3,20,000 | ₹3,00,000 | ₹2,80,000 | **₹2,40,000** | ₹12,000 |
+| **B.Tech in ECE** (AIML, VLSI, Robotics and Automation) | **₹2,70,000** | ₹2,43,000 | ₹2,29,500 | ₹2,16,000 | ₹2,02,500 | ₹1,89,000 | **₹1,62,000** | ₹8,000 |
+| **B.Tech in Biotechnology with AI / Mechanical (Robotics, Smart Mfg) / EEE (EV, Renewable Energy) / Civil / Engineering Physics / Applied Chemistry / Food Technology** | **₹2,00,000** | ₹1,80,000 | ₹1,70,000 | ₹1,60,000 | ₹1,50,000 | ₹1,40,000 | **₹1,20,000** | ₹6,000 |
+| **B.Tech IEP** (International Engineering Program) | **₹3,40,000** | ₹3,06,000 | ₹2,89,000 | ₹2,72,000 | ₹2,55,000 | ₹2,38,000 | **₹2,04,000** | ₹10,000 |
+| **B.Des (Design)** | **₹2,10,000** | ₹1,89,000 | ₹1,78,500 | ₹1,68,000 | ₹1,57,500 | ₹1,47,000 | **₹1,26,000** | ₹6,000 |
+| **B.Sc Agriculture** | **₹2,00,000** | ₹1,80,000 | ₹1,70,000 | ₹1,60,000 | ₹1,50,000 | ₹1,40,000 | **₹1,20,000** | ₹6,000 |
+| **BBA / B.Sc in Hospitality and Event Management** | **₹1,50,000** | ₹1,35,000 | ₹1,27,500 | ₹1,20,000 | ₹1,12,500 | ₹1,05,000 | **₹90,000** | ₹4,000 |
+| **BBA** (Finance, Operations, HR, Business Analytics, Marketing) | **₹2,00,000** | ₹1,80,000 | ₹1,70,000 | ₹1,60,000 | ₹1,50,000 | ₹1,40,000 | **₹1,20,000** | ₹6,000 |
+| **BCA Hons** | **₹1,50,000** | ₹1,35,000 | ₹1,27,500 | ₹1,20,000 | ₹1,12,500 | ₹1,05,000 | **₹90,000** | ₹4,000 |
+| **B.Sc CS Hons** | **₹1,50,000** | ₹1,35,000 | ₹1,27,500 | ₹1,20,000 | ₹1,12,500 | ₹1,05,000 | **₹90,000** | ₹4,000 |
+| **B.Com** | **₹1,00,000** | ₹90,000 | ₹85,000 | ₹80,000 | ₹75,000 | ₹70,000 | **₹60,000** | ₹3,000 |
+| **B.Sc Physics** | **₹1,00,000** | ₹90,000 | ₹85,000 | ₹80,000 | ₹75,000 | ₹70,000 | **₹60,000** | ₹3,000 |
+| **B.Sc Chemistry** | **₹1,00,000** | ₹90,000 | ₹85,000 | ₹80,000 | ₹75,000 | ₹70,000 | **₹60,000** | ₹3,000 |
+| **B.Sc Hons in Mathematics and AI** | **₹1,00,000** | ₹90,000 | ₹85,000 | ₹80,000 | ₹75,000 | ₹70,000 | **₹60,000** | ₹3,000 |
 
-- **CSE:** Artificial Intelligence & Machine Learning; Cyber Security; Data Science; Gaming & ARVR; Robotics and Automation.
-- **ECE:** Artificial Intelligence & Machine Learning; VLSI Design.
-- **EEE, Mechanical and Civil:** EEE—Renewable Energy, Robotics and Automation, Electric Vehicles; Mechanical—Robotics and Automation, Smart Manufacturing; Civil—Robotics and Automation.
-- **B.Tech lateral entry:** Renewable Energy; Robotics and Automation; Electric Vehicles; Smart Manufacturing.
-- **BBA:** Finance; Marketing; Human Resource Management; Business Analytics.
+### Undergraduate Merit Scholarship Qualifying Bands
 
+- **Base Fee (Standard Fee)**:
+  - 55–59.9% in 10+2 / Intermediate for CSE and ECE.
+  - 50–59.9% in 10+2 / Intermediate for all Other Undergraduate Courses.
+- **10% Scholarship (10% OFF)**:
+  - Inter (10+2): 60–64.9%
+  - CBSE / ICSE: 60–64.9%
+  - JEE Main: 50–59.9 percentile
+- **15% Scholarship (15% OFF)**:
+  - Inter (10+2): 65–69.9%
+  - CBSE / ICSE: 65–69.9%
+  - JEE Main: 60–69.9 percentile
+- **20% Scholarship (20% OFF)**:
+  - Inter (10+2): 70–79.9%
+  - CBSE / ICSE: 70–79.9%
+  - IB: 24–29
+  - JEE Main: 70–79.9 percentile
+- **25% Scholarship (25% OFF)**:
+  - Inter (10+2): 80–91.9%
+  - CBSE / ICSE: 80–89.9%
+  - IB: 30–33
+  - JEE Main: 80–89.9 percentile
+  - TG EAPCET / EAMCET: Rank 8,001–20,000
+- **30% Scholarship (30% OFF)**:
+  - Inter (10+2): 92–97.9%
+  - CBSE / ICSE: 90–94.9%
+  - IB: 30–37
+  - JEE Main: 90–94.5 percentile
+  - TG EAPCET / EAMCET: Rank 2,001–8,000
+- **40% Scholarship (40% OFF)**:
+  - Inter (10+2): 98% and above
+  - CBSE / ICSE: 95% and above
+  - IB: 35/45 and above
+  - JEE Main: 95 percentile and above
+  - TG EAPCET / EAMCET: Rank 1–2,000
 
+---
 
-### Master's programs
+## 2. Postgraduate (PG) Programs — Tuition Fee & Merit Scholarship Structure
 
-| Program | Enrollment fee (one time) | Admission fee (one time) | Tuition per semester |
-|---|---:|---:|---:|
-| MBA | ₹5,000 | ₹25,000 | ₹1,50,000 |
-| M.Sc. Agriculture | ₹5,000 | ₹25,000 | ₹90,000 |
-| MCA | ₹5,000 | ₹25,000 | ₹75,000 |
-| M.Tech | ₹5,000 | ₹25,000 | ₹52,250 |
-| M.Sc. | ₹5,000 | ₹25,000 | ₹37,500 |
+| Program / Stream | Standard Base Fee (50–59.9%) | 10% Scholarship (60–64.9%) | 15% Scholarship (65–69.9%) | 20% Scholarship (70–79.9%) | 25% Scholarship (80–91.9%) | 30% Scholarship (92–97.9%) | 40% Scholarship (98%+) | Yearly Fee Increase (Irrespective of Schol.) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **MBA** (Finance, Operations, HR, Business Analytics, Marketing) | **₹3,00,000** | ₹2,70,000 | ₹2,55,000 | ₹2,40,000 | ₹2,25,000 | ₹2,10,000 | **₹1,80,000** | ₹9,000 |
+| **MCA** | **₹1,50,000** | ₹1,35,000 | ₹1,27,500 | ₹1,20,000 | ₹1,12,500 | ₹1,05,000 | **₹90,000** | ₹4,000 |
+| **M.Tech** (CSE, Data Science, AIML, Electronic Design Tech, VLSI, Embedded Systems, Advance Mfg, Thermal Engg, Construction Tech, Power Electronics) | **₹1,00,000** | ₹90,000 | ₹85,000 | ₹80,000 | ₹75,000 | ₹70,000 | **₹60,000** | ₹3,000 |
+| **M.Sc.** (CS, Agronomy, Genetics & Plant Breeding, Horticulture, Agri Extension, Agri Economics, Plant Pathology, Soil Science) | **₹1,00,000** | ₹90,000 | ₹85,000 | ₹80,000 | ₹75,000 | ₹70,000 | **₹60,000** | ₹3,000 |
+| **MBA in Agri Business Management** | **₹2,00,000** | ₹1,80,000 | ₹1,70,000 | ₹1,60,000 | ₹1,50,000 | ₹1,40,000 | **₹1,20,000** | ₹6,000 |
 
-### Other charges and facilities
+---
 
-| Item | Amount / detail shown |
-|---|---|
-| Wi-Fi, cultural events, placements and ERP | ₹15,000 |
-| Exam fee | ₹5,000 per year |
-| Bus fee | Based on distance; routes listed from Warangal, Kazipet, Hanamkonda, Huzurabad, Jammikunta and Karimnagar |
-| Hostel application | Available at the Admissions Office |
+## 3. Annual Fee Components & Institutional Charges
 
-
-
-| Hostel accommodation (per year) | Caution deposit | Electricity deposit | Laundry charges (annual) | Annual fee |
-|---|---:|---:|---:|---:|
-| 4-person occupancy, non-AC | ₹5,000 | — | ₹5,000 | ₹1,15,000 |
-| 3-person occupancy, non-AC | ₹5,000 | — | ₹5,000 | ₹1,25,000 |
-| 4-person occupancy, AC | ₹5,000 | ₹5,000 | ₹5,000 | ₹1,25,000 |
-| 3-person occupancy, AC | ₹5,000 | ₹5,000 | ₹5,000 | ₹1,35,000 |
-
-
-
-## 3. Merit scholarship schedules
-
-### B.Tech CSE
-
-| State Board % | CBSE % | JEE Mains % | EAMCET/EAPCET rank | SAT | IB | Scholarship | Payable Year I | Year II | Year III | Year IV |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 60–69.99% | 60–64.99% | 75–85% | 16001–18000 | 1151–1200 | 27–29 | 20% | ₹1,18,000 | ₹1,24,000 | ₹1,30,000 | ₹1,36,000 |
-| 70–79.99% | 65–74.99% | 85.1–90% | 15001–16000 | 1201–1250 | 30–32 | 30% | ₹1,04,000 | ₹1,09,000 | ₹1,14,000 | ₹1,19,000 |
-| 80–91.99% | 75–89.99% | 90.1–93% | 12001–15000 | 1251–1350 | 33–35 | 35% | ₹96,000 | ₹1,01,000 | ₹1,06,000 | ₹1,11,000 |
-| 92–97.99% | 90–97.99% | 93.1–95% | 10001–12000 | 1351–1450 | 36–38 | 40% | ₹89,000 | ₹94,000 | ₹99,000 | ₹1,04,000 |
-| 98% and above | 98% and above | 95% and above | 1–10000 | 1451–1600 | 39 and above | 50% | ₹74,000 | ₹78,000 | ₹82,000 | ₹86,000 |
-
-### Other listed undergraduate programs
-
-
-| State Board % | CBSE % | JEE Mains % | EAMCET/EAPCET rank | SAT | IB | Scholarship |
-|---:|---:|---:|---:|---:|---:|---:|
-| 60–69.99% | 60–64.99% | 60–69.99% | 16001–18000 | 1151–1200 | 27–29 | 10% |
-| 70–79.99% | 65–74.99% | 70–74.99% | 15001–16000 | 1201–1250 | 30–32 | 20% |
-| 80–91.99% | 75–89.99% | 75–79.99% | 12001–15000 | 1251–1350 | 33–35 | 30% |
-| 92–97.99% | 90–97.99% | 80–89.99% | 10001–12000 | 1351–1450 | 36–38 | 40% |
-| 90% and above | 98% and above | 90% and above | 1–10000 | 1451–1600 | 39 and above | 50% |
-
-The page lists these payable semester tuition amounts for the corresponding scholarship rates:
-
-| Program | 10% | 20% | 30% | 40% | 50% |
-|---|---:|---:|---:|---:|---:|
-| B.Tech ECE | ₹1,08,000 | ₹96,000 | ₹84,000 | ₹72,000 | ₹60,000 |
-| B.Tech EEE, Mechanical and Civil | ₹90,000 | ₹80,000 | ₹70,000 | ₹60,000 | ₹50,000 |
-| BCA | ₹81,000 | ₹72,000 | ₹63,000 | ₹54,000 | ₹45,000 |
-| B.Sc. (Hons) Agriculture | ₹88,000 | ₹78,000 | ₹69,000 | ₹59,000 | ₹49,000 |
-| B.Sc. (Hons) | ₹81,000 | ₹72,000 | ₹63,000 | ₹54,000 | ₹45,000 |
-| B.Sc. (Physics, Chemistry and Mathematics) and B.Com | ₹45,000 | ₹40,000 | ₹35,000 | ₹30,000 | ₹25,000 |
-| BBA | ₹81,000 | ₹72,000 | ₹63,000 | ₹54,000 | ₹45,000 |
-
-### B.Tech lateral entry
-
-The page's lateral-entry scholarship table is headed for CSE, ECE, EEE, Mechanical and Civil. It shows the following values but does **not** provide labels for its eligibility columns. To avoid assigning an exam or board to an unlabeled column, the values are reproduced as displayed:
-
-| Eligibility value 1 (unlabeled) | Eligibility value 2 (unlabeled) | Eligibility value 3 (unlabeled) | Scholarship | Payable amounts shown (per semester) |
-|---:|---:|---:|---:|---|
-| 60–69.99% | 60–64.99% | 60–69.99% | 10% | ₹90,000; ₹90,000; ₹90,000; ₹90,000 |
-| 70–79.99% | 65–74.99% | 70–74.99% | 20% | ₹80,000; ₹80,000; ₹80,000; ₹80,000 |
-| 80–91.99% | 75–89.99% | 75–79.99% | 30% | ₹70,000; ₹70,000; ₹70,000; ₹70,000 |
-| 92–97.99% | 90–97.99% | 80–89.99% | 40% | ₹60,000; ₹60,000; ₹60,000; ₹60,000 |
-| 90% and above | 98% and above | 90% and above | 50% | ₹50,000; ₹50,000; ₹50,000; ₹50,000 |
-
-The source does not identify what each of the four payable columns represents.
-
-### MBA
-
-| Any degree % | ICET rank | MAT/XAT/NMAT/CAT % | Scholarship | Payable tuition per semester |
-|---:|---:|---:|---:|---:|
-| 60–69.99% | 1751–2000 | 60–69.99% | 10% | ₹1,35,000 |
-| 70–79.99% | 1501–1750 | 70–74.99% | 20% | ₹1,20,000 |
-| 80–91.99% | 1201–1500 | 75–89.99% | 30% | ₹1,05,000 |
-| 92–97.99% | 1001–1200 | 90–97.99% | 40% | ₹90,000 |
-| 90% and above | 1–1000 | 98% and above | 50% | ₹75,000 |
-
-### M.Sc. Agriculture
-
-| B.Sc. Agriculture or equivalent % | ICAR marks | Scholarship | Payable tuition per semester |
-|---:|---:|---:|---:|
-| 60–69.99% | 200–250 | 10% | ₹81,000 |
-| 70–79.99% | 251–300 | 20% | ₹72,000 |
-| 80–91.99% | 301–350 | 30% | ₹63,000 |
-| 92–97.99% | 400–351 | 40% | ₹54,000 |
-| 90% and above | 401–480 | 50% | ₹45,000 |
-
-The ICAR range **400–351** is printed in descending order on the source page and is reproduced without correction.
-
-### MCA
-
-| Any degree % | ICET rank | Scholarship | Payable tuition per semester |
-|---:|---:|---:|---:|
-| 60–69.99% | 1751–2000 | 10% | ₹68,000 |
-| 70–79.99% | 1501–1750 | 20% | ₹60,000 |
-| 80–91.99% | 1201–1500 | 30% | ₹53,000 |
-| 92–97.99% | 1001–1200 | 40% | ₹45,000 |
-| 90% and above | 1–1000 | 50% | ₹38,000 |
-
-### M.Tech
-
-| B.Tech / B.E. % | GATE rank | PGECET rank | Scholarship | Payable tuition per semester |
-|---:|---:|---:|---:|---:|
-| 60–69.99% | 1751–2000 | 1751–2000 | 10% | ₹47,025 |
-| 70–79.99% | 1501–1750 | 1501–1750 | 20% | ₹41,800 |
-| 80–91.99% | 1201–1500 | 1201–1500 | 30% | ₹36,575 |
-| 92–97.99% | 1001–1200 | 1001–1200 | 40% | ₹31,350 |
-| 90% and above | 1–1000 | 1–1000 | 50% | ₹26,125 |
-
-### M.Sc.
-
-| B.Tech / B.E. % | GATE rank | PGECET rank | Scholarship | Payable amount per semester as listed |
-|---:|---:|---:|---:|---:|
-| 60–69.99% | 1751–2000 | 1751–2000 | 10% | ₹34,000 |
-| 70–79.99% | 1501–1750 | 1501–1750 | 20% | ₹30,000 |
-| 80–91.99% | 1201–1500 | 1201–1500 | 30% | ₹27,000 |
-| 92–97.99% | 1001–1200 | 1001–1200 | 40% | ₹23,000 |
-| 90% and above | 1–1000 | 1–1000 | 50% | ₹19,000 |
-
-**Source discrepancy:** The M.Sc. fee table states tuition of ₹37,500 per semester, while the scholarship table labels its tuition basis as ₹37,000. The payable figures above are copied as printed; confirm the current amount with the university.
-
-The source's undergraduate, MBA, MCA, M.Tech and M.Sc. scholarship schedules also print **“90% and above”** as their top score band after a **92–97.99%** band. This overlap is retained as published and should be confirmed with SRU rather than interpreted as a corrected threshold.
-
-## 4. Special scholarship categories
-
-The page lists the following scholarships **in addition to the eligible merit scholarship**:
-
-| Category | Scholarship | Confirmation method / required document |
+| Fee Component / Head | Amount (INR ₹) | Frequency / Policy Details |
 |---|---:|---|
-| Children without both parents | 15% | Death certificates |
-| Real siblings (not distant sibling or cousin) | 15% | Aadhaar cards or passports of both siblings |
-| SRU alumni (candidate is an alumnus) | 15% | Degree certificate |
-| Defence personnel: serving or retired defence services personnel, martyrs' families, and paramilitary forces (not State Police) | 15% | Proof of defence service |
-| More than 50% disability | 15% | Confirmation by a certified doctor and a face-to-face meeting with the Admission Director |
-| Children of Padma Award winners | 15% | Padma certificate |
-| Bravery Award recipients from the President | 15% | Bravery certificate |
-| Victims of acid attacks or terrorist attacks | 15% | Certificate by SDM |
+| **Enrollment Fee** | ₹5,000 | One-time at admission |
+| **Other Fee** | ₹15,000 | Annual institutional and amenities charge |
+| **Exam Fee Year-1** | ₹5,000 | Annual examination evaluation fee |
+| **Application Form (Net)** | ₹1,100 | Admissions application processing fee |
+| **Bus / Transport Fee** | ₹30,000 | Annual transport fee covering Warangal, Hanamkonda, Kazipet and outstation routes |
+| **Specialisation Fee** | ₹30,000 | Per year; starts from Second Year onwards for advanced engineering tracks |
+| **Ph.D. Fee** | ₹70,000 | Annual doctoral research and tuition fee |
+| **Electricity Deposit (Non-AC)** | ₹5,000 | Refundable / adjustable hostel electricity deposit |
+| **Electricity Deposit (AC)** | ₹10,000 | Refundable / adjustable hostel AC electricity deposit |
 
-For these categories, the page states a continuation condition of **minimum 7.5 CGPA at the end of each semester, with no backlogs and no disciplinary case**.
+---
 
-**Sports scholarship:** The page lists 15% for State Level, 30% for National Level, and 45% for International Level. Required document: certificate of participation in the specific category. Continuation conditions: no backlog at the end of each semester; no disciplinary case; and active participation in SRU sports competitions as directed by the Director (Sports), SRU.
+## 4. Annual Special Category Concessions (All Courses)
 
-The page says a maximum of **50 scholarships across all the above categories combined** are allowed.
+SR University awards special institutional concessions per academic year across 20 distinct categories, subject to verification of official credentials:
 
-## 5. Contact shown on the page
+| Category Criteria / Eligibility | Annual Concession Amount (INR ₹) |
+|---|---:|
+| **Real brother or sister on rolls in SRU in 2027–28** | ₹15,000 |
+| **Only girl child from Telangana** | ₹15,000 |
+| **Girl Child from Outside Telangana** | ₹15,000 |
+| **Only one parent alive or divorced** | ₹15,000 |
+| **Defence / CRPF / martyr family** | ₹15,000 |
+| **Child of State Police of any state** | ₹15,000 |
+| **SR Junior College student** | ₹15,000 |
+| **SRU old student, child of old student, or Sibling of Old Student** | ₹15,000 |
+| **NCC C certificate holder** | ₹15,000 |
+| **Student from outside Telangana and Andhra Pradesh (Non-Local)** | ₹15,000 |
+| **Sports — National Level representation** | ₹15,000 |
+| **Chancellor / Pro Chancellor Recommendation** | ₹10,000 |
+| **Lateral Entry Students** | ₹15,000 |
+| **Children of Padma Awards / J&K Migrants / Gallantry Awards** | ₹15,000 |
+| **Sports — International Level representation** | ₹50,000 |
+| **Both parents not alive (Orphan students)** | ₹50,000 |
+| **International Students** | ₹15,000 |
+| **Students from Andhra Pradesh** | ₹15,000 |
+| **Children of Regular SRU Staff** | ₹50,000 |
+| **More than 50% Disability** | ₹20,000 |
 
-- **Email:** info@sru.edu.in
-- **WhatsApp:** +91 8331004040
-- **Phone:** 0(870) 281-8333/8311
-- **Address:** Ananthasagar, Hasanparthy, Warangal, Telangana, India — 506371
+### Important Administrative Terms:
+1. **Yearly Increase**: The yearly increase in tuition fee applies annually irrespective of scholarship status (e.g. ₹9,000/yr for CSE, ₹12,000/yr for AI & Robotics, ₹8,000/yr for ECE, ₹6,000/yr for Core B.Tech).
+2. **Verification of Credentials**: Special category concessions apply per academic year subject to strict verification of supporting official documents.
+
+---
+
+## 5. Hostel Accommodation & Dining Charges
+
+| Hostel Accommodation Option (Annual) | Caution Deposit | Electricity Deposit | Laundry Charges (Annual) | Annual Room & Mess Fee |
+|---|---:|---:|---:|---:|
+| **4-person occupancy, Non-AC** | ₹5,000 | — | ₹5,000 | ₹1,15,000 |
+| **3-person occupancy, Non-AC** | ₹5,000 | — | ₹5,000 | ₹1,25,000 |
+| **4-person occupancy, AC** | ₹5,000 | ₹5,000 | ₹5,000 | ₹1,25,000 |
+| **3-person occupancy, AC** | ₹5,000 | ₹5,000 | ₹5,000 | ₹1,35,000 |
+
+- **Dining & Mess**: Includes 4 nutritious meals daily (breakfast, lunch, evening tea/snacks, dinner) with both vegetarian and non-vegetarian selections.
+- **Facilities**: 24/7 high-speed Wi-Fi, 4000-seat capacity dining hall, dedicated study areas, emergency ambulance care on campus, and 100% power backup generators.
+
+---
+
+## 6. Official Admissions Contacts
+
+- **Admissions Helpline**: 0870-2818333 / 0870-2818311
+- **Direct Admissions Mobile**: +91 8331003030 / +91 8331004040
+- **Email**: `admissions@sru.edu.in` / `info@sru.edu.in`
+- **Application Portal**: [https://apply.sru.edu.in](https://apply.sru.edu.in)
+- **Official Website**: [https://www.sru.edu.in](https://www.sru.edu.in)
+- **Campus Address**: SR University, Ananthasagar, Hasanparthy, Warangal, Telangana — 506371.

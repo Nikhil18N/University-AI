@@ -1,11 +1,33 @@
 # SR University — Campus Life, Facilities & Key Contacts
 
-## 1. University Overview & Location
-* **Institution**: SR University (SRU), a State Private University established under Telangana State Act, spread across 150 acres of lush green campus in Warangal, Telangana.
-* **Student & Faculty Strength**: ~9000 students, ~900 staff, 140+ Programs across five Schools (Computer Science and Artificial Intelligence, Engineering, Business, Agriculture, Sciences and Humanities).
-* **Leadership at SR University**:
-  - **Chancellor**: **Sri A. Varada Reddy** — A pioneer in quality education serving since 1976; leading 185 educational institutions across South India under SR Educational Society with over 1 lakh students and 5 lakh alumni.
-  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science with specialization in Efficient Algorithm Design. Distinguished Professor in Artificial Intelligence, former Director of NVIDIA-BU Research Center on AI, leading the national `leadingindia.ai` ecosystem. CAC ABET Commissioner from India. Regular columnist/blogger in *The Times of India* under the nickname **"Breaking Shackles"**.
+## 1. University Overview, Vision & Core Identity
+* **Living & Learning Philosophy**:
+  > *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."*
+  > *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
+* **Lush Green Campus & Community**:
+  - Stands as the **largest lush green campus for the next generation of innovators**, spread across **170+ acres** in Warangal, Telangana.
+  - Home to **10,000 active students** and ~900 staff across six Schools (Computer Science & Artificial Intelligence, Engineering, Astra School of Business, Agriculture, Sciences & Humanities, Design).
+* **World-Class Faculty**:
+  - World-class faculty holding **doctoral and postdoctoral qualifications from prestigious institutions in India and abroad**, including **IITs, NITs, and leading international universities**.
+* **National & Global Rankings Excellence**:
+  - **NIRF (National Institutional Ranking Framework)**: Holds the **91st rank in NIRF for the Engineering category** (2025) — consistently securing **top 100 ranks for four consecutive years** (Rank 98 in 2023, 98 in 2024, 91 in 2025).
+  - **NBA Tier-1 Accreditation**: **All B.Tech programs hold Tier-1 accreditation** from the National Board of Accreditation (NBA).
+  - **ICAR Accreditation**: The School of Agriculture received prestigious **ICAR accreditation**, making SR University the **first private university in the Telugu States** to achieve it.
+  - **QS Asia Rankings 2027**: Ranked **19th among India's State Private Universities**.
+  - **THE (Times Higher Education) World University Rankings 2027**: Ranked **7th in India** among private universities and **6th in India in Research Quality** (801–1000 global band).
+  - **Historic Distinction**: **India’s youngest and only private university in Telangana** to achieve prestigious National and Global Ranks.
+* **Academic Infrastructure & Emerging Disciplines**:
+  - Offering forward-looking undergraduate, postgraduate, and doctoral programmes across **Engineering, Agriculture, Business, Sciences, Design, and emerging interdisciplinary domains**.
+  - Facilities include modern digital smart classrooms, the University Central Library, and high-tech laboratories.
+  - Features **industry-grade setups for Artificial Intelligence, robotics, innovation hubs, incubation spaces, and project studios** supporting rapid prototypes, experiments, and real-world solutions.
+  - **80+ International Academic Collaborations**: Providing students unparalleled opportunities for global learning, semester exchange, and international research exposure.
+  - **SR Innovation Exchange (SRiX)**: A DST-supported Technology Business Incubator empowering students to explore entrepreneurship, innovation, and startup venture development (171+ startups, ₹76+ Cr funding).
+  - **Career Guidance Cell**: Guides students in discovering their strengths through industry-oriented training, technical skill development, and practical capstone projects for premier career pathways.
+* **Campus Life, Vibrancy & Sports**:
+  - Campus life stays vibrant through continuous learning, sports, and culture.
+  - **20+ Student Clubs & 50+ Annual Events**: Diverse technical, cultural, entrepreneurial, and creative activities building strong leadership skills.
+  - **Grand Cultural Festivals**: Bringing music, talent, passion, and high energy with active student participation.
+  - **Athletic & Fitness Facilities**: Expansive sports grounds (cricket, football), floodlit basketball & badminton courts, indoor arenas, and fitness zones keeping students strong, healthy, and active.
 * **Warangal Heritage & Places to Visit (Weekend Getaways)**:
   - **Ramappa Temple**: UNESCO World Heritage site built during the Kakatiya era, known for ancient engineering.
   - **Laknavaram Lake & Suspension Bridge**: Scenic lake built by Ganapati Deva with famous hanging bridge.
@@ -13,15 +35,14 @@
   - **Warangal Fort & Khush Mahal**: Historic 12th-century stone fort and monument.
   - **Bhogatha Waterfalls**: Famous natural waterfall in the region.
   - **Thousand Pillar Temple**: Millennium-old Kakatiya temple in Hanamkonda.
-* **Accreditations & Recognitions**:
-  - NIRF: Ranked 98 in Engineering (2023) and 101–150 rank band in University category.
-  - NBA: All UG programs (B.Tech CSE, ECE, EEE, ME & CE) are NBA Accredited in Tier-I category.
-  - Incubator: Hosts SRiX (SR Innovation Exchange), DST-sponsored Technology Business Incubator, All India 1st Rank in Private in Atal Ranking of Institutions on Innovation Achievements (ARIIA20).
 * **Location & How to Reach**:
   - Campus Address: Ananthasagar, Hasanparthy (M), Warangal, Telangana 506371.
   - Distance: 14 km from Hanumakonda (main city), 16 km from Kazipet Railway Station (KZJ), 29 km from Warangal Railway Station.
   - Nearest Airport: Rajiv Gandhi International Airport (RGIA), Hyderabad (approx. 3 hours drive).
   - Highway & Public Transit: Situated on the Warangal – Karimnagar Highway. Dedicated university bus stop served by TSRTC buses running every 20 minutes in both directions.
+* **Leadership at SR University**:
+  - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976; leading 185+ educational institutions under the SR Educational Society with over 1 lakh students and 5 lakh alumni.
+  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science (Efficient Algorithm Design), AI pioneer, former Director of NVIDIA-BU Research Center on AI, CAC ABET Commissioner, and *The Times of India* columnist (*"Breaking Shackles"*).
 
 ---
 
@@ -55,16 +76,14 @@
 ## 4. Internet & Wi-Fi Facilities
 * The campus, academic blocks, labs, library, and hostels are 100% Wi-Fi enabled.
 * **Student Credentials**: Every student is provided an official university email and network login in the format: `rollno@sru.edu.in`.
-* **Technical Support Contacts**:
-  - Mr. A. Bala Krishna: **8886522500**
-  - Mr. E. Manikanta: **8008917297**
+* **Technical issue and Technical support don't hesistate to reach out to them.**:
 
 ---
 
 ## 5. University Central Library
 * **Infrastructure**: Spread over 1,000 sq. meters, featuring reading rooms, reference section, and a digital library section.
 * **Catalog Access**: Fully computerized with OPAC terminals at circulation counters and intranet **WEBOPAC**: `http://192.168.30.100/webopac/default.aspx`.
-* **Library Incharge**: Mr. Sammi Reddy (Contact: **0870-2818384**).
+* **Library Incharge**: Mr. Sammi Reddy.
 * **Borrowing Privileges**:
   | Category | Number of Books | Loan Period |
   | :--- | :--- | :--- |
@@ -76,17 +95,16 @@
 
 ## 6. Transportation Services
 * **Routes**: Operates Monday through Friday covering all areas of the tri-cities (Kazipet, Hanamkonda, Warangal) and neighboring towns: Karimnagar, Husnabad, Jammikunta, and Huzurabad.
-* **Schedule**: Buses depart starting points at **7:30 AM** and depart the university campus at **5:00 PM**.
+* **Schedule**: Buses depart starting points at **7:30 AM** and depart the university campus at **5:40 PM**.
 * **Policy**: Available on a chargeable annual basis. No refund for unused portions if opting out mid-year. Day-scholars must board and deboard only at designated points.
-* **Transport Incharge / Complaints**:
-  - Mr. T. Surendar: **9177302052**
-  - Mr. A. Keerthi Reddy: **9640606408** (`transport@sru.edu.in`)
+* **Transport Complaints reach out them through (`transport@sru.edu.in`)**
+  - Mr. T. Surendar : **9177302052**
 
 ---
 
 ## 7. Campus Security & Personal Vehicles
 * **Security**: 24x7 security personnel and CCTV surveillance across blocks, hostels, and gates.
-* **Security Incharge**: Mr. K. Venkateshwar Rao (**9618503127**).
+* **Security Incharge**: Mr. K. Venkateshwar Rao
 * **Student Vehicles Policy**:
   - **Motorized vehicles (bikes, cars, scooters) of students are strictly prohibited inside the campus.**
   - Students must park motorized vehicles outside the second gate at designated parking at their own risk. The university is not responsible for damage or theft.
@@ -97,11 +115,11 @@
 ## 8. Health, Wellness & Psychological Counselling
 * **Health Centre**: 2-bed medical facility with on-duty nurse and doctor from 9:00 AM to 5:00 PM.
 * **Emergency Care**: Tie-up with **Aaditya Hospital**; 24x7 ambulance stationed on campus.
-  - On-duty Nurse: Ms. Pavani (**8712615910**)
+  - On-duty Nurse: Ms. Pavani  (**8712615910**)
   - Ambulance Driver: Mr. Sai Kumar (**7989738242**)
 * **Psychological Counselling**: Free, confidential clinical psychological counseling services:
   - Boys Helpline: Mr. Benson (**7893525257** / **+91 8341581850**)
-  - Girls Helpline: Ms. Swapna (**7207672300** / **+91 8341581850**)
+  - Girls Helpline: Ms. Swapna  (**7207672300** / **+91 8341581850**)
 
 ---
 
@@ -110,26 +128,24 @@
   - Online student portal to update student profiles, verify parent contacts, review academic regulations, check academic calendars and holiday lists.
   - Course enrollment, tracking Continuous Internal Evaluation (CIE), End-Term Examination (ETE) marks, and final results.
   - Daily attendance and mid-term marks are automatically sent to parents via SMS.
-  - Technical assistance helpline: **8074253480**.
 * **Student Central Help Desk**:
   - Located at the Main Administrative Office, functions till **5:30 PM**.
   - Handles certificates, fee receipts, bonafide letters, medical assistance, and general student queries.
-  - Coordinator: Mr. J. Sambamurthy (**9989899611**).
+  - Coordinator: Mr. J. Sambamurthy .
 
 ---
 
 ## 10. Sports & Recreation Facilities
 * **Outdoor Facilities**: Cricket ground, football ground, basketball court, volleyball court, kabaddi court, throwball court, kho-kho court, 400m running track, cricket practice nets, and dedicated badminton court beside SRiX Block.
 * **Indoor Facilities**: Table tennis, chess, carroms, and a fully equipped modern gymnasium located in sheds behind Block-1.
-* **Physical Education Director**: Dr. P. Srinivas Goud (**9949279800** / `stu.sports@sru.edu.in`).
+* **Physical Education Director**: Dr. P. Srinivas Goud ( `stu.sports@sru.edu.in`).
 
 ---
 
 ## 11. National Service Scheme (NSS) & NCC
-* **NSS**: Focuses on community service, road safety, blood donation drives, tree plantation, and civic responsibility. Incharge: Dr. K. Ravinder (**9912782872**).
+* **NSS**: Focuses on community service, road safety, blood donation drives, tree plantation, and civic responsibility.
 * **NCC**: Established September 2020 under 1(T) Compo (Tech) Regt. NCC, Warangal Group, with authorized strength of 160 cadets (Company).
   - Senior Division (SD) for male cadets and Senior Wing (SW) for female cadets.
-  - Associate NCC Officer: Mr. T. Haribabu (**8810415979**).
 
 ---
 
@@ -147,29 +163,29 @@ SR University hosts 37 active student clubs categorized by scope:
 ---
 
 ## 13. Official University Directory & Help Numbers
-| Department / Cell | Coordinator / Head | Official Email | Phone Number |
+| Department / Cell | Coordinator / Head | Official Email 
 | :--- | :--- | :--- | :--- |
-| **Student Help Desk** | Ms. Divya | `helpdesk@sru.edu.in` | **9701177036** |
-| **Examination Cell** | Mr. K. Kiran Babu | `examcell@sru.edu.in` | **9908336336** |
-| **Placement Cell (CSSP)** | Mr. D. Sridhar | `stu.cssp@sru.edu.in` | **9000966994** |
-| **Placement Operations** | Mr. Gurcharan | — | **8520954128** (SRiX 1st Floor) |
-| **Student Grievance Cell** | Dr. D. Rajababu | `stu.grievance@sru.edu.in` | **9949501190** |
-| **Counselling (Girls)** | Ms. Swapna | `stu.counseling@sru.edu.in` | **7207672300** |
-| **Counselling (Boys)** | Mr. Benson | `stu.counseling@sru.edu.in` | **7207362300** |
-| **Anti-Ragging Cell** | Mr. A. Rajeshwar Rao | `stu.antiraggingcell@sru.edu.in` | **9948533654** |
-| **Dean Student Affairs** | Dr. A.V.V. Sudhakar | `dean.sa@sru.edu.in` | **9000708123** |
-| **Transport Services** | Mr. A. Keerthi Reddy | `transport@sru.edu.in` | **9640606408** |
-| **Sports & Physical Ed.** | Dr. P. Srinivas Goud | `stu.sports@sru.edu.in` | **9949279800** |
-| **Finance Office** | Ms. Sunitha | `stu.finance@sru.edu.in` | **9912654505** |
-| **Administration** | Mr. T. Surender | — | **9177302052** |
-| **Girls Hostel Warden** | Ms. Anitha GP | `stu.girlshostel@sru.edu.in` | **9599042878** |
-| **Boys Hostel Warden** | Dr. Rupesh Mishra | `stu.boyshostel@sru.edu.in` | **9716935695** |
-| **Boys Hostel Warden** | Dr. Anshu Kumar | — | **6394355001** |
-| **School of Agriculture** | Program Coordinator | `pc.soa@sru.edu.in` | **9515980884** |
-| **School of Business** | Program Coordinator | `pc.sob@sru.edu.in` | — |
-| **School of CS & AI** | Program Coordinator | `pc.csai@sru.edu.in` | **9100208378** |
-| **School of Engineering** | Program Coordinator | `pc.soe@sru.edu.in` | **8106156408** |
-| **Office of Research** | Program Coordinator | `pc.research@sru.edu.in` | **9949445275** |
-| **Alumni Affairs** | Mr. G. Sunil Reddy | `assocdean.alumni@sru.edu.in` | **9676561828** |
-| **International Affairs**| Ms. Pritha Chakrabarty| — | **9354395227** |
-| **SRiX Incubation** | Mr. Prashanth | — | **8008025400** |
+| **Student Help Desk** | Ms. Divya | `helpdesk@sru.edu.in` |
+| **Examination Cell** | Mr. K. Kiran Babu | `examcell@sru.edu.in` |
+| **Placement Cell (CSSP)** | Mr. D. Sridhar | `stu.cssp@sru.edu.in` |
+| **Placement Operations** | Mr. Gurcharan | — | (SRiX 1st Floor) |
+| **Student Grievance Cell** | Dr. D. Rajababu | `stu.grievance@sru.edu.in` |
+| **Counselling (Girls)** | Ms. Swapna | `stu.counseling@sru.edu.in` |
+| **Counselling (Boys)** | Mr. Benson | `stu.counseling@sru.edu.in` |
+| **Anti-Ragging Cell** | Mr. A. Rajeshwar Rao | `stu.antiraggingcell@sru.edu.in` |
+| **Dean Student Affairs** | Dr. A.V.V. Sudhakar | `dean.sa@sru.edu.in` |
+| **Transport Services** | Mr. A. Keerthi Reddy | `transport@sru.edu.in` |
+| **Sports & Physical Ed.** | Dr. P. Srinivas Goud | `stu.sports@sru.edu.in` |
+| **Finance Office** | Ms. Sunitha | `stu.finance@sru.edu.in` |
+| **Administration** | Mr. T. Surender | — |
+| **Girls Hostel Warden** | Ms. Anitha GP | `stu.girlshostel@sru.edu.in` |
+| **Boys Hostel Warden** | Dr. Rupesh Mishra | `stu.boyshostel@sru.edu.in` |
+| **Boys Hostel Warden** | Dr. Anshu Kumar | — |
+| **School of Agriculture** | Program Coordinator | `pc.soa@sru.edu.in` |
+| **School of Business** | Program Coordinator | `pc.sob@sru.edu.in` | 
+| **School of CS & AI** | Program Coordinator | `pc.csai@sru.edu.in` |
+| **School of Engineering** | Program Coordinator | `pc.soe@sru.edu.in` |
+| **Office of Research** | Program Coordinator | `pc.research@sru.edu.in` |
+| **Alumni Affairs** | Mr. G. Sunil Reddy | `assocdean.alumni@sru.edu.in` |
+| **International Affairs**| Ms. Pritha Chakrabarty| — |
+| **SRiX Incubation** | Mr. Prashanth | — | 

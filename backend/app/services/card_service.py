@@ -28,41 +28,53 @@ COMPARISON_CSE_AIML = {
 
 BTECH_ACADEMIC_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "SR University B.Tech Tuition Fee Breakdown (2026-27 / 2027-28)",
+    "title": "SR University B.Tech Tuition Fee Breakdown (Official 2026-27)",
     "currency": "INR",
     "items": [
         {
-            "category": "Tuition Fee (B.Tech CSE)",
-            "amount": "₹1,47,500 / Sem",
-            "frequency": "₹2,95,000 / Year",
-            "note": "Semester-wise billing; 40% scholarship for 92%+ in Inter",
+            "category": "Tuition Fee (B.Tech CSE & Allied)",
+            "amount": "₹1,70,000 / Sem",
+            "frequency": "₹3,40,000 / Year",
+            "note": "Annual base tuition ₹3,40,000 (+₹9k/yr increase); up to 40% merit scholarship",
+        },
+        {
+            "category": "Tuition Fee (B.Tech AI & Robotics)",
+            "amount": "₹2,00,000 / Sem",
+            "frequency": "₹4,00,000 / Year",
+            "note": "Annual base tuition ₹4,00,000 (+₹12k/yr increase)",
         },
         {
             "category": "Tuition Fee (B.Tech ECE)",
-            "amount": "₹1,20,000 / Sem",
-            "frequency": "₹2,40,000 / Year",
-            "note": "Semester-wise billing; merit scholarships up to 50%",
+            "amount": "₹1,35,000 / Sem",
+            "frequency": "₹2,70,000 / Year",
+            "note": "Annual base tuition ₹2,70,000 (+₹8k/yr increase)",
         },
         {
-            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE)",
+            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE / Biotech)",
             "amount": "₹1,00,000 / Sem",
             "frequency": "₹2,00,000 / Year",
-            "note": "Semester-wise billing; merit scholarships up to 50%",
+            "note": "Annual base tuition ₹2,00,000 (+₹6k/yr increase)",
         },
         {
-            "category": "Admission & Enrollment (One-time)",
-            "amount": "₹30,000",
+            "category": "Enrollment & Admission Fee (One-time)",
+            "amount": "₹5,000",
             "frequency": "One-time (Year 1)",
-            "note": "₹5,000 enrollment + ₹25,000 admission fee",
+            "note": "Mandatory enrollment component",
+        },
+        {
+            "category": "Other & Exam Fees",
+            "amount": "₹20,000 / Year",
+            "frequency": "Annual",
+            "note": "₹15,000 other fee + ₹5,000 exam fee",
         },
         {
             "category": "CSE Specialization Fee (Year 2+)",
             "amount": "₹30,000 / Year",
             "frequency": "From 2nd Year Onwards",
-            "note": "Applicable for AI&ML, Cyber Security, Data Science, AR/VR",
+            "note": "Applicable for AIML, Data Science, Cyber Security, AR/VR, Robotics",
         },
     ],
-    "scholarship_note": "Merit scholarships offer 10% to 50% tuition reduction based on board marks, JEE Main, or EAMCET ranks.",
+    "scholarship_note": "Merit scholarships offer 10% to 40% tuition reduction based on board marks, JEE Main, or TG EAPCET ranks.",
 }
 
 # Alias for backwards compatibility
@@ -75,24 +87,30 @@ BTECH_CSE_FEE_CARD = {
     "items": [
         {
             "category": "Tuition Fee (B.Tech CSE)",
-            "amount": "₹1,47,500 / Sem",
-            "frequency": "₹2,95,000 / Year",
-            "note": "Semester-wise billing; 40% scholarship for 92%+ in Inter",
+            "amount": "₹1,70,000 / Sem",
+            "frequency": "₹3,40,000 / Year",
+            "note": "Annual base tuition ₹3,40,000 (+₹9k/yr increase); up to 40% merit scholarship",
         },
         {
-            "category": "Admission & Enrollment (One-time)",
-            "amount": "₹30,000",
+            "category": "Enrollment Fee (One-time)",
+            "amount": "₹5,000",
             "frequency": "One-time (Year 1)",
-            "note": "₹5,000 enrollment + ₹25,000 admission fee",
+            "note": "Mandatory enrollment component",
+        },
+        {
+            "category": "Other & Exam Fees",
+            "amount": "₹20,000 / Year",
+            "frequency": "Annual",
+            "note": "₹15,000 other fee + ₹5,000 exam fee",
         },
         {
             "category": "Specialization Fee (Year 2+)",
             "amount": "₹30,000 / Year",
             "frequency": "From 2nd Year Onwards",
-            "note": "For AI&ML, Cyber Security, Data Science, AR/VR",
+            "note": "For AIML, Cyber Security, Data Science, AR/VR, Robotics",
         },
     ],
-    "scholarship_note": "40% tuition scholarship for 92%–97.99% in 10+2 MPC for CSE; up to 100% for top rankers.",
+    "scholarship_note": "Up to 40% tuition scholarship (₹1,36,000 waiver/yr, net ₹2,04,000/yr) based on Inter/CBSE/JEE/EAPCET scores.",
 }
 
 MERIT_SCHOLARSHIP_CARD = {
@@ -102,36 +120,42 @@ MERIT_SCHOLARSHIP_CARD = {
     "items": [
         {
             "category": "40% Tuition Waiver Slab",
-            "amount": "₹88,500 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "92%–97.99% State Board | CBSE 90%+ | JEE Main 90%+ | TG EAPCET < 10k",
+            "amount": "₹2,04,000 / Year (CSE)",
+            "frequency": "Save ₹1,36,000 / Year",
+            "note": "Inter ≥ 98% | CBSE ≥ 95% | JEE ≥ 95%ile | TG EAPCET 1–2000",
         },
         {
             "category": "30% Tuition Waiver Slab",
-            "amount": "₹1,03,250 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "85%–91.99% State Board | CBSE 80%+ | JEE Main 80%+ | TG EAPCET 10k–20k",
+            "amount": "₹2,38,000 / Year (CSE)",
+            "frequency": "Save ₹1,02,000 / Year",
+            "note": "Inter 92–97.9% | CBSE 90–94.9% | JEE 90–94.5%ile | TG EAPCET 2001–8000",
+        },
+        {
+            "category": "25% Tuition Waiver Slab",
+            "amount": "₹2,55,000 / Year (CSE)",
+            "frequency": "Save ₹85,000 / Year",
+            "note": "Inter 80–91.9% | CBSE 80–89.9% | JEE 80–89.9%ile | TG EAPCET 8001–20000",
         },
         {
             "category": "20% Tuition Waiver Slab",
-            "amount": "₹1,18,000 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "75%–84.99% State Board | CBSE 70%+ | JEE Main 70%+ | TG EAPCET 20k–30k",
+            "amount": "₹2,72,000 / Year (CSE)",
+            "frequency": "Save ₹68,000 / Year",
+            "note": "Inter 70–79.9% | CBSE 70–79.9% | JEE 70–79.9%ile",
+        },
+        {
+            "category": "15% Tuition Waiver Slab",
+            "amount": "₹2,89,000 / Year (CSE)",
+            "frequency": "Save ₹51,000 / Year",
+            "note": "Inter 65–69.9% | CBSE 65–69.9% | JEE 60–69.9%ile",
         },
         {
             "category": "10% Tuition Waiver Slab",
-            "amount": "₹1,32,750 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "65%–74.99% State Board | CBSE 60%+ | JEE Main 60%+ | TG EAPCET 30k–40k",
-        },
-        {
-            "category": "50%–100% Top Ranker Slab",
-            "amount": "₹0 – ₹73,750 / Sem (CSE)",
-            "frequency": "Per Semester (4 Years)",
-            "note": "98%+ State Board | State Top 1000 / National Top Rankers",
+            "amount": "₹3,06,000 / Year (CSE)",
+            "frequency": "Save ₹34,000 / Year",
+            "note": "Inter 60–64.9% | CBSE 60–64.9% | JEE 50–59.9%ile",
         },
     ],
-    "scholarship_note": "Calculated on standard CSE tuition (₹1,47,500/sem). Slabs apply similarly to ECE and core engineering.",
+    "scholarship_note": "Calculated on standard B.Tech CSE base tuition (₹3,40,000/yr). Slabs apply similarly across all UG disciplines.",
 }
 
 
@@ -159,34 +183,35 @@ TRANSPORT_FEE_CARD = {
 HOSTEL_FEE_CARD = {
     "type": "fee_breakdown",
     "title": "SR University Residential Hostel & Dining Fees (Annual)",
+    "subtitle": "As the academic day comes to an end, the living and learning experience continues.",
     "currency": "INR",
     "items": [
         {
             "category": "Girls Hostel (AC 4-Sharing)",
             "amount": "₹1,25,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, laundry & 24/7 biometric security",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, laundry & 24/7 biometric security",
         },
         {
             "category": "Girls Hostel (AC 3-Sharing)",
             "amount": "₹1,35,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, laundry & 24/7 biometric security",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, laundry & 24/7 biometric security",
         },
         {
             "category": "Boys Hostel (Non-AC 4/3-Sharing)",
             "amount": "₹85,000 – ₹95,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, study lounges & laundry",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, study lounges & laundry",
         },
         {
             "category": "Boys Hostel (AC 4/3-Sharing)",
             "amount": "₹1,20,000 – ₹1,35,000",
             "frequency": "Per Year",
-            "note": "Includes 4 meals daily, Wi-Fi, gym & laundry",
+            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, gym & laundry",
         },
     ],
-    "scholarship_note": "In-time curfew is 8:30 PM. Nutritious veg and non-veg dining provided 4 times daily.",
+    "scholarship_note": "Hostels for Boys & Girls offer 4,000-seat mega dining hall, 24/7 surveillance, high-speed Wi-Fi, dedicated study areas, and on-campus medical care.",
 }
 
 EXAM_FEE_CARD = {
@@ -273,35 +298,181 @@ CURRICULUM_CARD = {
     ],
 }
 
+
+# ---------------------------------------------------------------------------
+# SRU ADVANTAGE COMPARISON CARD
+# Highlights what makes SR University uniquely exceptional — framed entirely
+# as SRU strengths (never naming or criticising any specific competitor).
+# ---------------------------------------------------------------------------
+SRU_ADVANTAGE_CARD = {
+    "type": "sru_comparison",
+    "title": "Why SR University Stands Apart",
+    "subtitle": "What sets SRU uniquely ahead — verified facts, real results.",
+    "advantages": [
+        {
+            "category": "Rankings & Accreditations",
+            "icon": "🏆",
+            "sru_highlight": "NIRF 91st in Engineering — top 100 for 4 consecutive years. All B.Tech programs carry Tier-1 NBA accreditation. School of Agriculture holds ICAR accreditation — the first private university in the Telugu States to earn it.",
+            "standout": "Top 100 for 4 Straight Years",
+        },
+        {
+            "category": "Global Recognition",
+            "icon": "🌐",
+            "sru_highlight": "Ranked 7th in India by THE World University Rankings 2027, 6th in Research Quality, and 19th among India's State Private Universities in QS Asia 2027. India's youngest private university in Telangana to achieve national and global ranks.",
+            "standout": "Global Top Rankings",
+        },
+        {
+            "category": "Placement Excellence",
+            "icon": "💼",
+            "sru_highlight": "Three consecutive record highest packages: 51 LPA @ Microsoft (2025), 49.3 LPA @ ServiceNow (2027), 46.38 LPA @ Amazon (2026). 1,300+ job offers, 3,500+ internships, 6 LPA average. Active recruiters: Accenture (254), Cognizant (165), TCS, Capgemini, Infosys & more.",
+            "standout": "51 LPA Highest Package",
+        },
+        {
+            "category": "Innovation & Startups (SRiX)",
+            "icon": "🚀",
+            "sru_highlight": "SR Innovation Exchange (SRiX) — a DST-backed Technology Business Incubator with 171+ startups launched and ₹76+ Crore in total funding. Students get real incubation, mentoring, and investor access from Day 1.",
+            "standout": "171+ Startups, ₹76+ Cr Funded",
+        },
+        {
+            "category": "Campus & Living Experience",
+            "icon": "🌿",
+            "sru_highlight": "Vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
+            "standout": "4,000-Seat Mega Dining Hall",
+        },
+        {
+            "category": "World-Class Faculty",
+            "icon": "🎓",
+            "sru_highlight": "Faculty holding doctoral and postdoctoral qualifications from IITs, NITs, and prestigious global universities. Research-active professors with international publications bringing real-world expertise into every classroom.",
+            "standout": "IIT/NIT PhD Faculty",
+        },
+        {
+            "category": "Global Collaborations",
+            "icon": "🤝",
+            "sru_highlight": "80+ international academic collaborations enabling semester exchange, joint research, dual degrees, and global exposure. Students access global knowledge networks without leaving the campus.",
+            "standout": "80+ Global Tie-Ups",
+        },
+        {
+            "category": "Flexible & Modern Curriculum",
+            "icon": "📚",
+            "sru_highlight": "Fully Flexible Credit System (FFCS) under Outcome-Based Education — students choose their own faculty and timetable slots. Forward-looking programs in AI, Quantum AI, Robotics, Cybersecurity, Food Technology, and Agri-AI.",
+            "standout": "Student-Chosen Timetables",
+        },
+        {
+            "category": "Vibrant Student Life",
+            "icon": "🎉",
+            "sru_highlight": "20+ student clubs, 50+ annual events, music festivals, cultural programs, hackathons, sports grounds, indoor arenas, and fitness zones — building well-rounded future leaders alongside academic excellence.",
+            "standout": "20+ Clubs, 50+ Events/Year",
+        },
+        {
+            "category": "Merit Scholarships",
+            "icon": "💰",
+            "sru_highlight": "Up to 40% tuition fee waiver based on board/entrance scores. 19 special category concessions up to Rs.50,000/year for girl students, defence personnel, differently-abled, sports achievers, and more.",
+            "standout": "Up to 40% Scholarship",
+        },
+    ],
+}
+
 CAMPUS_TOUR_CARD = {
     "type": "campus_tour",
-    "title": "SR University Campus Life & Facilities",
+    "title": "SR University — Next-Generation Living & Learning Campus",
+    "subtitle": "Where every step connects with nature, and every breath brings a spark of inspiration.",
     "spots": [
         {
-            "name": "Academic Blocks & Smart Classrooms",
-            "desc": "Air-conditioned interactive lecture halls equipped with digital smart boards and ergonomic amphitheater seating.",
+            "name": "Largest Lush Green Campus & Top Rankings",
+            "desc": "A vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
+            "icon": "🌿",
+        },
+        {
+            "name": "World-Class Faculty & 10,000+ Students",
+            "desc": "Doctoral and postdoctoral faculty from IITs, NITs, and leading global universities guiding 10,000 active Indian and international students.",
+            "icon": "🎓",
+        },
+        {
+            "name": "Academic & AI/Robotics Infrastructure",
+            "desc": "Digital classrooms, Central Library, high-tech labs, industry setups for AI & robotics, project studios, and 80+ international collaborations.",
             "icon": "🏫",
         },
         {
-            "name": "SRiX Technology Business Incubator",
-            "desc": "DST-supported innovation center nurturing 50+ student startups with seed funding, maker spaces, and mentoring.",
-            "icon": "🚀",
-        },
-        {
-            "name": "Modern Residential Hostels",
-            "desc": "Comfortable AC and non-AC rooms, high-speed Wi-Fi, study lounges, indoor gym, and round-the-clock medical care.",
+            "name": "Hostels & 4,000-Seat Mega Dining Hall",
+            "desc": "'As the academic day comes to an end, the living and learning experience continues.' AC/Non-AC rooms, 24/7 security, Wi-Fi, and 4,000-seat hygienic dining hall.",
             "icon": "🏠",
         },
         {
-            "name": "Sports & Recreation Arena",
-            "desc": "Floodlit cricket stadium, football ground, basketball courts, badminton complex, and running tracks.",
+            "name": "Vibrant Campus Life & Sports",
+            "desc": "20+ student clubs, 50+ annual events, cultural music festivals, expansive sports grounds, indoor arenas, and fitness zones.",
             "icon": "⚽",
         },
         {
-            "name": "Central Library & Digital Commons",
-            "desc": "50,000+ print volumes, 24/7 digital access to IEEE/ACM journals, and collaborative discussion zones.",
-            "icon": "📚",
+            "name": "SRiX Startup & Innovation Exchange",
+            "desc": "DST-supported incubator powering 171+ startups with maker spaces, rapid prototyping labs, mentoring, and ₹76+ Cr funding.",
+            "icon": "🚀",
         },
+    ],
+}
+
+PLACEMENT_EXCELLENCE_CARD = {
+    "type": "placement_highlights",
+    "title": "Three Consecutive Years of Excellence in Highest Packages & Internships",
+    "subtitle": "SR University Campus Recruitment & Corporate Placement Highlights",
+    "image_url": "/placements-three-years.png",
+    "image_alt": "Three Consecutive Years of Excellence in Highest Packages & Internships",
+    "superstars": [
+        {
+            "name": "B. Shiva Krishna",
+            "role": "Software Engineer",
+            "company": "Microsoft",
+            "package": "51 LPA",
+            "stipend": "₹1.25L / month",
+            "batch": "Batch 2025",
+            "badge_color": "#10b981",
+        },
+        {
+            "name": "Mohammed Akramuddin",
+            "role": "Associate Software Engineer",
+            "company": "ServiceNow",
+            "package": "49.30 LPA",
+            "stipend": "₹0.80L / month",
+            "batch": "Batch 2027",
+            "badge_color": "#6366f1",
+        },
+        {
+            "name": "Kencha Bhavana",
+            "role": "Software Development Engineer",
+            "company": "Amazon",
+            "package": "46.38 LPA",
+            "stipend": "₹1.10L / month",
+            "batch": "Batch 2026",
+            "badge_color": "#0284c7",
+        },
+    ],
+    "stats": [
+        {"label": "Record Highest Package", "value": "51 LPA", "note": "Microsoft (Batch 2025)"},
+        {"label": "ServiceNow Marquee Offer", "value": "49.30 LPA", "note": "ServiceNow (Batch 2027)"},
+        {"label": "Amazon SDE Package", "value": "46.38 LPA", "note": "Amazon (Batch 2026)"},
+        {"label": "Total Job Offers", "value": "1,300+", "note": "Till April and counting"},
+        {"label": "Paid Internships", "value": "3,500+", "note": "Stipends up to ₹1.25L/month"},
+        {"label": "Average Package", "value": "6 LPA", "note": "Across graduating cohorts"},
+    ],
+    "top_mnc_offers": [
+        {"company": "Accenture", "offers": 254},
+        {"company": "Cognizant", "offers": 165},
+        {"company": "Brakes India", "offers": 66},
+        {"company": "Capgemini", "offers": 57},
+        {"company": "Virtusa", "offers": 48},
+        {"company": "TCS", "offers": 45},
+        {"company": "Savantis", "offers": 43},
+        {"company": "Edufyi Tech", "offers": 38},
+        {"company": "Infosys", "offers": 22},
+    ],
+    "marquee_offers": [
+        {"student": "Thangallapally Nithal", "batch": "CSE 2025", "package": "44 LPA", "company": "Salesforce"},
+        {"student": "Bijigiri Vignesh", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
+        {"student": "Ambati Krishna Sai", "batch": "CSE 2025", "package": "44 LPA", "company": "ServiceNow"},
+        {"student": "Jonnadula Sahith", "batch": "CSE 2025", "package": "34.5 LPA", "company": "PayPal"},
+        {"student": "Harsha Vardhan", "batch": "CSE 2025", "package": "34.5 LPA", "company": "PayPal"},
+        {"student": "Repala Vignesh", "batch": "CSE 2025", "package": "25 LPA", "company": "Cisco"},
+        {"student": "Suraram Hari Charan", "batch": "CSE 2026", "package": "19.75 LPA", "company": "JPMorgan Chase"},
+        {"student": "Nadimadla Sanvitha", "batch": "ECE 2026", "package": "14.5 LPA", "company": "Flipkart"},
     ],
 }
 
@@ -376,13 +547,30 @@ def generate_cards(
     ):
         cards.append(CURRICULUM_CARD)
 
-    # 4. Campus tour card (render static spot highlights if explicitly asking for campus walkthrough/tour)
+    # 4. Placement Highlights card ("Three Consecutive Years of Excellence")
+    if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):
+        cards.append(PLACEMENT_EXCELLENCE_CARD)
+
+    # 5. Campus tour card (render static spot highlights if asking for about sru, campus walkthrough/tour, or facilities)
     is_video_query = any(k in msg_lower for k in ("video", "videos", "watch", "youtube", "clip", "tour", "shorts"))
-    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities")):
+    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "describe sru")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
 
-    # 5. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
+    # 5b. SRU Advantage Comparison Card — triggered on comparison / "why SRU" intent
+    _comparison_triggers = (
+        "why sru", "why choose sru", "why should i choose sru", "is sru good",
+        "compare sru", "sru vs", "how is sru different", "is sru better",
+        "what makes sru unique", "sru better than", "sru special",
+        "advantages of sru", "benefits of sru", "sru advantage",
+        "what sru offers", "sru unique", "sru stand out", "sru stands out",
+        "compare with other", "how does sru compare", "sru worth it",
+        "is sru worth", "sru highlight", "sru highlights",
+    )
+    if any(k in msg_lower for k in _comparison_triggers):
+        cards.append(SRU_ADVANTAGE_CARD)
+
+    # 6. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
     # Zero keyword matching: relevance is governed purely by ChromaDB semantic cosine distance.
     # Attached only when explicitly requested or confirmed via affirmative Yes/No response.
     if (is_video_query or is_video_confirmed) and query_embedding:
@@ -396,18 +584,18 @@ def generate_cards(
         if relevant_videos:
             cards.append(create_video_card(relevant_videos, is_explicit=True))
 
-    # 5. Student profile card (if board_score is known and user asked about eligibility or admission)
+    # 7. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):
         score = profile.get("board_score")
         branch = profile.get("branch_interest") or "B.Tech CSE"
         is_eligible = False
         try:
             num = float(re.sub(r"[^\d.]", "", score))
-            is_eligible = num >= 60.0
+            is_eligible = num >= 50.0
         except ValueError:
             is_eligible = True
 
-        status_text = "Eligible (Minimum Cutoff: 60%)" if is_eligible else "Cutoff Requirement: 60%"
+        status_text = "Eligible (Minimum Cutoff: 50%)" if is_eligible else "Cutoff Requirement: 50%"
         status_color = "success" if is_eligible else "warning"
 
         profile_card = {

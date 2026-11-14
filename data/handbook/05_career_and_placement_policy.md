@@ -9,18 +9,48 @@ The **Centre for Student Services and Placements (CSSP)** and the **Career and J
 
 ---
 
-## 2. Placement Highlights & Statistics
-* **Highest Package**: **51 LPA** offered by **Microsoft** (Software Engineer, Batch 2025). Highest package for Batch 2026: **46.38 LPA** offered by **Amazon** (CSE).
-* **Average Package**: **6 LPA** university-wide (earlier CSSP record). School-wise averages published in the Oct-2026 admissions presentation: ECE 5 LPA, EEE 4 LPA, Mechanical 4 LPA, Civil 6 LPA, Business 5 LPA.
-* **Total Job Offers**: **1300+** (as of April, and counting). **Total Internships (Batch 2026)**: **2500+**. **Highest internship stipend**: **1.25 lakh per month** at **Microsoft** (Batch 2025).
-* **Recruiting Companies**: **150+** national and multinational recruiters, including Microsoft, Amazon, PayPal, Flipkart, Cisco, IBM, Accenture, Cognizant, Infosys, TCS, Wipro, Capgemini, Virtusa, Tech Mahindra, HCLTech, HSBC, DBS, PwC, ADP, Genpact, Synopsys, S&P Global, Bosch, Schneider Electric, Larsen & Toubro, Hexaware, Cyient, opentext and core engineering firms.
-* **Offers from Top MNCs (as stated in the deck)**: Accenture 254, Cognizant 165, Brakes India 66, Capgemini 57, Virtusa 48, TCS 45, Savantis 43, Infosys 22.
-* **School-wise Placement Snapshot (Oct-2026 deck)**:
-  - Electronics & Communication Engineering: highest ₹13.5 LPA (Flipkart); highest internship ₹50K per month; 10 students placed at ₹9 LPA; 300+ internships; average 5 LPA.
-  - Electrical & Electronics Engineering: highest ₹12 LPA; average 4 LPA.
-  - Mechanical Engineering: highest 6 LPA; average 4 LPA; 200+ internships.
-  - Civil Engineering: average 6 LPA; 25+ companies visited.
-  - School of Business: highest ₹14 LPA (HCLTech); 10 students placed at ₹8 LPA; 150+ internships; average 5 LPA.
+## 2. Placement Highlights & Statistics — Three Consecutive Years of Excellence
+
+> **Core Benchmark**: **"Three Consecutive Years of Excellence in Highest Packages & Internships"**
+
+* **Three Consecutive Record Highest Packages**:
+  1. **Batch 2025**: **51 LPA** — **B. Shiva Krishna** (Software Engineer at **Microsoft**), including internship with **₹1.25 Lakh / month**.
+  2. **Batch 2026**: **46.38 LPA** — **Kencha Bhavana** (Software Development Engineer at **Amazon**), including internship with **₹1.10 Lakh / month**.
+  3. **Batch 2027**: **49.30 LPA** — **Mohammed Akramuddin** (Associate Software Engineer at **ServiceNow**), including internship with **₹0.80 Lakh / month**.
+
+* **Placement & Internship Scale**:
+  * **Total Job Offers**: **1,300+** offers (and counting).
+  * **Total Internships**: **3,500+** internships with top-tier technology and corporate organizations.
+  * **Average Package**: **6 LPA** across graduating engineering disciplines.
+
+* **Marquee Offers & Superstar Achievements**:
+  * **44 LPA** @ **Salesforce**: Thangallapally Nithal (CSE – Batch 2025)
+  * **44 LPA** @ **ServiceNow**: Bijigiri Vignesh (CSE – Batch 2025) & Ambati Krishna Sai (CSE – Batch 2025)
+  * **34.5 LPA** @ **PayPal**: Jonnadula Sahith (CSE – Batch 2025) & Harsha Vardhan (CSE – Batch 2025)
+  * **25 LPA** @ **Cisco**: Repala Vignesh (CSE – Batch 2025)
+  * **19.75 LPA** @ **JPMorgan Chase**: Suraram Hari Charan (CSE – Batch 2026)
+  * **16.75 LPA** @ **Cisco**: Garrepalli Anjali (CSE – Batch 2026)
+  * **14.5 LPA** @ **Flipkart**: Nadimadla Sanvitha (ECE – Batch 2026)
+  * **14.53 LPA** @ **Flipkart**: Sindhu Domakuntla (ECE – Batch 2027)
+
+* **Top MNC Recruitment Volume**:
+  * **Accenture**: 254 offers
+  * **Cognizant**: 165 offers
+  * **Brakes India**: 66 offers
+  * **Capgemini**: 57 offers
+  * **Virtusa**: 48 offers
+  * **TCS (Tata Consultancy Services)**: 45 offers
+  * **Savantis**: 43 offers
+  * **Edufyi Tech Solutions**: 38 offers
+  * **Infosys**: 22 offers
+  * **Recruiting Companies**: 150+ national and multinational recruiters, including Microsoft, Amazon, PayPal, Flipkart, Cisco, IBM, Accenture, Cognizant, Infosys, TCS, Wipro, Capgemini, Virtusa, Tech Mahindra, HCLTech, HSBC, DBS, PwC, ADP, Genpact, Synopsys, S&P Global, Bosch, Schneider Electric, Larsen & Toubro, Hexaware, Cyient, opentext, and core engineering firms.
+
+* **School-wise Placement Snapshot**:
+  - **Electronics & Communication Engineering**: highest ₹14.5 LPA (Flipkart); highest internship ₹50K/month; 10 students placed at ₹9 LPA; 300+ internships; average 5 LPA.
+  - **Electrical & Electronics Engineering**: highest ₹12 LPA; average 4 LPA.
+  - **Mechanical Engineering**: highest 6 LPA; average 4 LPA; 200+ internships.
+  - **Civil Engineering**: average 6 LPA; 25+ companies visited.
+  - **School of Business**: highest ₹14 LPA (HCLTech); 10 students placed at ₹8 LPA; 150+ internships; average 5 LPA.
 
 ---
 

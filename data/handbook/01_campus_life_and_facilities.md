@@ -1,11 +1,33 @@
 # SR University — Campus Life, Facilities & Key Contacts
 
-## 1. University Overview & Location
-* **Institution**: SR University (SRU), a State Private University established under Telangana State Act, spread across 170+ acres of lush green campus in Warangal, Telangana.
-* **Student & Faculty Strength**: ~9000 students, ~900 staff, 100+ programs in UG, PG & Ph.D. across six Schools (Computer Science & Artificial Intelligence, Engineering, Astra School of Business, Agriculture, Sciences & Humanities, Design).
-* **Leadership at SR University**:
-  - **Chancellor**: **Sri A. Varada Reddy** — A pioneer in quality education serving since 1976; leading 185 educational institutions across South India under SR Educational Society with over 1 lakh students and 5 lakh alumni.
-  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science with specialization in Efficient Algorithm Design. Distinguished Professor in Artificial Intelligence, former Director of NVIDIA-BU Research Center on AI, leading the national `leadingindia.ai` ecosystem. CAC ABET Commissioner from India. Regular columnist/blogger in *The Times of India* under the nickname **"Breaking Shackles"**.
+## 1. University Overview, Vision & Core Identity
+* **Living & Learning Philosophy**:
+  > *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."*
+  > *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
+* **Lush Green Campus & Community**:
+  - Stands as the **largest lush green campus for the next generation of innovators**, spread across **170+ acres** in Warangal, Telangana.
+  - Home to **10,000 active students** and ~900 staff across six Schools (Computer Science & Artificial Intelligence, Engineering, Astra School of Business, Agriculture, Sciences & Humanities, Design).
+* **World-Class Faculty**:
+  - World-class faculty holding **doctoral and postdoctoral qualifications from prestigious institutions in India and abroad**, including **IITs, NITs, and leading international universities**.
+* **National & Global Rankings Excellence**:
+  - **NIRF (National Institutional Ranking Framework)**: Holds the **91st rank in NIRF for the Engineering category** (2025) — consistently securing **top 100 ranks for four consecutive years** (Rank 98 in 2023, 98 in 2024, 91 in 2025).
+  - **NBA Tier-1 Accreditation**: **All B.Tech programs hold Tier-1 accreditation** from the National Board of Accreditation (NBA).
+  - **ICAR Accreditation**: The School of Agriculture received prestigious **ICAR accreditation**, making SR University the **first private university in the Telugu States** to achieve it.
+  - **QS Asia Rankings 2027**: Ranked **19th among India's State Private Universities**.
+  - **THE (Times Higher Education) World University Rankings 2027**: Ranked **7th in India** among private universities and **6th in India in Research Quality** (801–1000 global band).
+  - **Historic Distinction**: **India’s youngest and only private university in Telangana** to achieve prestigious National and Global Ranks.
+* **Academic Infrastructure & Emerging Disciplines**:
+  - Offering forward-looking undergraduate, postgraduate, and doctoral programmes across **Engineering, Agriculture, Business, Sciences, Design, and emerging interdisciplinary domains**.
+  - Facilities include modern digital smart classrooms, the University Central Library, and high-tech laboratories.
+  - Features **industry-grade setups for Artificial Intelligence, robotics, innovation hubs, incubation spaces, and project studios** supporting rapid prototypes, experiments, and real-world solutions.
+  - **80+ International Academic Collaborations**: Providing students unparalleled opportunities for global learning, semester exchange, and international research exposure.
+  - **SR Innovation Exchange (SRiX)**: A DST-supported Technology Business Incubator empowering students to explore entrepreneurship, innovation, and startup venture development (171+ startups, ₹76+ Cr funding).
+  - **Career Guidance Cell**: Guides students in discovering their strengths through industry-oriented training, technical skill development, and practical capstone projects for premier career pathways.
+* **Campus Life, Vibrancy & Sports**:
+  - Campus life stays vibrant through continuous learning, sports, and culture.
+  - **20+ Student Clubs & 50+ Annual Events**: Diverse technical, cultural, entrepreneurial, and creative activities building strong leadership skills.
+  - **Grand Cultural Festivals**: Bringing music, talent, passion, and high energy with active student participation.
+  - **Athletic & Fitness Facilities**: Expansive sports grounds (cricket, football), floodlit basketball & badminton courts, indoor arenas, and fitness zones keeping students strong, healthy, and active.
 * **Warangal Heritage & Places to Visit (Weekend Getaways)**:
   - **Ramappa Temple**: UNESCO World Heritage site built during the Kakatiya era, known for ancient engineering.
   - **Laknavaram Lake & Suspension Bridge**: Scenic lake built by Ganapati Deva with famous hanging bridge.
@@ -13,19 +35,14 @@
   - **Warangal Fort & Khush Mahal**: Historic 12th-century stone fort and monument.
   - **Bhogatha Waterfalls**: Famous natural waterfall in the region.
   - **Thousand Pillar Temple**: Millennium-old Kakatiya temple in Hanamkonda.
-* **Accreditations & Recognitions**:
-  - NIRF (Engineering category): Rank 98 (2023), rank 98 (2024), rank 91 (2025). Among the Top 100 engineering institutions in India for four years in a row.
-  - Times Higher Education (THE) World University Rankings 2026: 801–1000 global band; 7th among private universities in India; Asia rankings 351–400 rank band. Subject rankings: Computer Science 601–800 global / 21st in India; Engineering 601–800 global / 18th in India; University category 801–1000 global / 28th in India. 6th in India in Research Quality.
-  - THE Sustainability Impact Ratings 2026 (overall): 24th in India, global band 401–600.
-  - UI GreenMetric World University Rankings 2025: 23rd in India.
-  - ICAR Accreditation for the School of Agriculture and B.Sc. (Hons.) Agriculture — first private university in Telangana and Andhra Pradesh to achieve it.
-  - NBA: All UG programs (B.Tech CSE, ECE, EEE, ME & CE) are NBA Accredited in Tier-I category.
-  - Incubator: Hosts SRiX (SR Innovation Exchange), a DST/NSTEDB-sponsored Technology Business Incubator with 171 registered startups and ₹76+ Cr funding, All India 1st Rank in Private in Atal Ranking of Institutions on Innovation Achievements (ARIIA20).
 * **Location & How to Reach**:
   - Campus Address: Ananthasagar, Hasanparthy (M), Warangal, Telangana 506371.
   - Distance: 14 km from Hanumakonda (main city), 16 km from Kazipet Railway Station (KZJ), 29 km from Warangal Railway Station.
   - Nearest Airport: Rajiv Gandhi International Airport (RGIA), Hyderabad (approx. 3 hours drive).
   - Highway & Public Transit: Situated on the Warangal – Karimnagar Highway. Dedicated university bus stop served by TSRTC buses running every 20 minutes in both directions.
+* **Leadership at SR University**:
+  - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976; leading 185+ educational institutions under the SR Educational Society with over 1 lakh students and 5 lakh alumni.
+  - **Vice-Chancellor**: **Prof. Deepak Garg** — Ph.D. in Computer Science (Efficient Algorithm Design), AI pioneer, former Director of NVIDIA-BU Research Center on AI, CAC ABET Commissioner, and *The Times of India* columnist (*"Breaking Shackles"*).
 
 ---
 

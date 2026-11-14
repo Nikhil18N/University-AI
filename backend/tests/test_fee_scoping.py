@@ -101,7 +101,7 @@ def test_btech_cse_fee_query_shows_cse_only():
     from app.services.card_service import BTECH_CSE_FEE_CARD
     cards = generate_cards(
         user_message="What is the fee for btech cse?",
-        answer="The tuition fee is ₹1,47,500 per semester (₹2,95,000 per year).",
+        answer="The tuition fee is ₹3,40,000 per year (₹1,70,000 per semester).",
     )
     assert len(cards) == 1
     assert cards[0] == BTECH_CSE_FEE_CARD
@@ -117,7 +117,7 @@ def test_btech_complete_fee_structure_shows_pure_academic_fees():
     from app.services.card_service import BTECH_ACADEMIC_FEE_CARD
     cards = generate_cards(
         user_message="What is the complete fee structure and merit scholarship details for B.Tech?",
-        answer="B.Tech tuition fees vary by branch: CSE is ₹1,47,500/sem, ECE is ₹1,20,000/sem, and Core is ₹1,00,000/sem.",
+        answer="B.Tech tuition fees vary by branch: CSE is ₹3,40,000/yr, ECE is ₹2,70,000/yr, and Core is ₹2,00,000/yr.",
     )
     assert len(cards) == 1
     assert cards[0] == BTECH_ACADEMIC_FEE_CARD
@@ -156,4 +156,90 @@ def test_vague_fee_query_returns_no_card():
     )
     # Should not attach an unprompted all-in-one card
     assert len(cards) == 0
+
+
+def test_placement_excellence_card_generation():
+    """Verify placement questions generate PLACEMENT_EXCELLENCE_CARD with image_url and 3 superstars."""
+    from app.services.card_service import PLACEMENT_EXCELLENCE_CARD
+    cards = generate_cards(
+        user_message="tell me about campus placements and highest packages",
+        answer="SR University achieved three consecutive years of excellence with highest package of 51 LPA at Microsoft.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == PLACEMENT_EXCELLENCE_CARD
+    assert cards[0]["image_url"] == "/placements-three-years.png"
+    assert len(cards[0]["superstars"]) == 3
+    companies = [star["company"] for star in cards[0]["superstars"]]
+    assert "Microsoft" in companies
+    assert "Amazon" in companies
+    assert "ServiceNow" in companies
+
+
+def test_hostel_card_includes_4000_seat_dining_and_living_motto():
+    """Verify hostel card includes living & learning subtitle and 4,000 capacity dining hall."""
+    from app.services.card_service import HOSTEL_FEE_CARD
+    cards = generate_cards(
+        user_message="what are the hostel fees and facilities?",
+        answer="Hostel fees range from ₹85,000 to ₹1,35,000 per year with modern amenities.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == HOSTEL_FEE_CARD
+    assert "living and learning experience continues" in cards[0].get("subtitle", "").lower()
+    assert any("4,000-seat" in item.get("note", "") for item in cards[0]["items"])
+
+
+def test_about_sru_triggers_campus_tour_card():
+    """Verify general 'about sru' questions trigger CAMPUS_TOUR_CARD."""
+    from app.services.card_service import CAMPUS_TOUR_CARD
+    cards = generate_cards(
+        user_message="tell me about sru and the campus",
+        answer="SR University is a next-generation living and learning campus located in Warangal, Telangana.",
+    )
+    assert len(cards) == 1
+    assert cards[0] == CAMPUS_TOUR_CARD
+    assert any("4,000-Seat" in spot["name"] for spot in cards[0]["spots"])
+    assert any("Faculty" in spot["name"] for spot in cards[0]["spots"])
+
+
+def test_sru_advantage_comparison_card_trigger():
+    """Verify comparison / 'why sru' queries trigger SRU_ADVANTAGE_CARD."""
+    from app.services.card_service import SRU_ADVANTAGE_CARD
+    
+    test_queries = [
+        "why should I choose SRU over other colleges?",
+        "how is sru different from other private universities?",
+        "compare sru with other colleges",
+        "what makes sru unique and special?",
+        "is sru better than other colleges?",
+    ]
+    for q in test_queries:
+        cards = generate_cards(
+            user_message=q,
+            answer="SR University uniquely offers Tier-1 NBA accredited programs, NIRF Top-100 ranking, and 51 LPA highest placement.",
+        )
+        assert any(c.get("type") == "sru_comparison" for c in cards), f"Failed for query: {q}"
+        sru_card = next(c for c in cards if c.get("type") == "sru_comparison")
+        assert sru_card == SRU_ADVANTAGE_CARD
+        assert len(sru_card["advantages"]) >= 8
+        categories = [adv["category"] for adv in sru_card["advantages"]]
+        assert "Rankings & Accreditations" in categories
+        assert "Placement Excellence" in categories
+        assert "Innovation & Startups (SRiX)" in categories
+
+
+def test_no_150_acres_in_cards_or_descriptions():
+    """Verify 150 acres is completely absent from all card definitions."""
+    import json
+    from app.services.card_service import (
+        CAMPUS_TOUR_CARD,
+        SRU_ADVANTAGE_CARD,
+        PLACEMENT_EXCELLENCE_CARD,
+        HOSTEL_FEE_CARD,
+    )
+    for card in (CAMPUS_TOUR_CARD, SRU_ADVANTAGE_CARD, PLACEMENT_EXCELLENCE_CARD, HOSTEL_FEE_CARD):
+        card_str = json.dumps(card).lower()
+        assert "150 acre" not in card_str
+        assert "150-acre" not in card_str
+        assert "150+ acre" not in card_str
+
 

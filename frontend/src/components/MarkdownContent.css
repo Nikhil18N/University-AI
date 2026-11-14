@@ -446,3 +446,48 @@
   display: block;
 }
 
+/* Embedded Markdown Images & Media */
+.chat-image-block {
+  margin: 12px 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.chat-image-inline-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px 0;
+  max-width: 100%;
+}
+
+.chat-embedded-image {
+  max-width: 100%;
+  max-height: 460px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  cursor: zoom-in;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  background: #ffffff;
+}
+
+.chat-embedded-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+.chat-image-caption {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--text-2, #64748b);
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
