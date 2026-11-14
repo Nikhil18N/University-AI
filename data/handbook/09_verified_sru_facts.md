@@ -12,7 +12,7 @@
   - **Institution Full Name**: SR University (SRU)
   - **Type**: State Private University established under the Telangana State Private Universities Act.
   - **Living & Learning Philosophy**: *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."* / *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
-  - **Campus & Environment**: Largest lush green campus for the next generation of innovators (over 150-acre master-planned residential campus in Warangal, Telangana).
+  - **Campus & Environment**: Largest lush green, master-planned residential campus for the next generation of innovators in Warangal, Telangana.
   - **Student Community**: 10,000 active students from across India and internationally.
   - **Distinguished Faculty**: World-class faculty holding doctoral and postdoctoral qualifications from prestigious institutions in India and abroad, including IITs, NITs, and leading international universities.
   - **National & Global Rankings**:

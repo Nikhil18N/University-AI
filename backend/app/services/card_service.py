@@ -298,6 +298,80 @@ CURRICULUM_CARD = {
     ],
 }
 
+
+# ---------------------------------------------------------------------------
+# SRU ADVANTAGE COMPARISON CARD
+# Highlights what makes SR University uniquely exceptional — framed entirely
+# as SRU strengths (never naming or criticising any specific competitor).
+# ---------------------------------------------------------------------------
+SRU_ADVANTAGE_CARD = {
+    "type": "sru_comparison",
+    "title": "Why SR University Stands Apart",
+    "subtitle": "What sets SRU uniquely ahead — verified facts, real results.",
+    "advantages": [
+        {
+            "category": "Rankings & Accreditations",
+            "icon": "🏆",
+            "sru_highlight": "NIRF 91st in Engineering — top 100 for 4 consecutive years. All B.Tech programs carry Tier-1 NBA accreditation. School of Agriculture holds ICAR accreditation — the first private university in the Telugu States to earn it.",
+            "standout": "Top 100 for 4 Straight Years",
+        },
+        {
+            "category": "Global Recognition",
+            "icon": "🌐",
+            "sru_highlight": "Ranked 7th in India by THE World University Rankings 2027, 6th in Research Quality, and 19th among India's State Private Universities in QS Asia 2027. India's youngest private university in Telangana to achieve national and global ranks.",
+            "standout": "Global Top Rankings",
+        },
+        {
+            "category": "Placement Excellence",
+            "icon": "💼",
+            "sru_highlight": "Three consecutive record highest packages: 51 LPA @ Microsoft (2025), 49.3 LPA @ ServiceNow (2027), 46.38 LPA @ Amazon (2026). 1,300+ job offers, 3,500+ internships, 6 LPA average. Active recruiters: Accenture (254), Cognizant (165), TCS, Capgemini, Infosys & more.",
+            "standout": "51 LPA Highest Package",
+        },
+        {
+            "category": "Innovation & Startups (SRiX)",
+            "icon": "🚀",
+            "sru_highlight": "SR Innovation Exchange (SRiX) — a DST-backed Technology Business Incubator with 171+ startups launched and ₹76+ Crore in total funding. Students get real incubation, mentoring, and investor access from Day 1.",
+            "standout": "171+ Startups, ₹76+ Cr Funded",
+        },
+        {
+            "category": "Campus & Living Experience",
+            "icon": "🌿",
+            "sru_highlight": "Vast lush green, master-planned living & learning campus in Warangal with 10,000+ active students. Boys & Girls hostels with AC/Non-AC options, 24/7 security & CCTV, high-speed Wi-Fi, and a 4,000-seat mega dining hall with healthy hygienic food.",
+            "standout": "4,000-Seat Mega Dining Hall",
+        },
+        {
+            "category": "World-Class Faculty",
+            "icon": "🎓",
+            "sru_highlight": "Faculty holding doctoral and postdoctoral qualifications from IITs, NITs, and prestigious global universities. Research-active professors with international publications bringing real-world expertise into every classroom.",
+            "standout": "IIT/NIT PhD Faculty",
+        },
+        {
+            "category": "Global Collaborations",
+            "icon": "🤝",
+            "sru_highlight": "80+ international academic collaborations enabling semester exchange, joint research, dual degrees, and global exposure. Students access global knowledge networks without leaving the campus.",
+            "standout": "80+ Global Tie-Ups",
+        },
+        {
+            "category": "Flexible & Modern Curriculum",
+            "icon": "📚",
+            "sru_highlight": "Fully Flexible Credit System (FFCS) under Outcome-Based Education — students choose their own faculty and timetable slots. Forward-looking programs in AI, Quantum AI, Robotics, Cybersecurity, Food Technology, and Agri-AI.",
+            "standout": "Student-Chosen Timetables",
+        },
+        {
+            "category": "Vibrant Student Life",
+            "icon": "🎉",
+            "sru_highlight": "20+ student clubs, 50+ annual events, music festivals, cultural programs, hackathons, sports grounds, indoor arenas, and fitness zones — building well-rounded future leaders alongside academic excellence.",
+            "standout": "20+ Clubs, 50+ Events/Year",
+        },
+        {
+            "category": "Merit Scholarships",
+            "icon": "💰",
+            "sru_highlight": "Up to 40% tuition fee waiver based on board/entrance scores. 19 special category concessions up to Rs.50,000/year for girl students, defence personnel, differently-abled, sports achievers, and more.",
+            "standout": "Up to 40% Scholarship",
+        },
+    ],
+}
+
 CAMPUS_TOUR_CARD = {
     "type": "campus_tour",
     "title": "SR University — Next-Generation Living & Learning Campus",
@@ -305,7 +379,7 @@ CAMPUS_TOUR_CARD = {
     "spots": [
         {
             "name": "Largest Lush Green Campus & Top Rankings",
-            "desc": "150+ acres for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
+            "desc": "A vast lush green, master-planned campus for next-generation innovators; NIRF 91st in Engineering (top 100 for 4 years), 19th in QS Asia, 7th in THE India, and 6th in Research Quality.",
             "icon": "🌿",
         },
         {
@@ -482,6 +556,19 @@ def generate_cards(
     if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "describe sru")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             cards.append(CAMPUS_TOUR_CARD)
+
+    # 5b. SRU Advantage Comparison Card — triggered on comparison / "why SRU" intent
+    _comparison_triggers = (
+        "why sru", "why choose sru", "why should i choose sru", "is sru good",
+        "compare sru", "sru vs", "how is sru different", "is sru better",
+        "what makes sru unique", "sru better than", "sru special",
+        "advantages of sru", "benefits of sru", "sru advantage",
+        "what sru offers", "sru unique", "sru stand out", "sru stands out",
+        "compare with other", "how does sru compare", "sru worth it",
+        "is sru worth", "sru highlight", "sru highlights",
+    )
+    if any(k in msg_lower for k in _comparison_triggers):
+        cards.append(SRU_ADVANTAGE_CARD)
 
     # 6. University YouTube Media Recommendations (Dense Semantic Search via ChromaDB)
     # Zero keyword matching: relevance is governed purely by ChromaDB semantic cosine distance.

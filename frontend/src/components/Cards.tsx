@@ -493,6 +493,49 @@ export function PlacementHighlightsCard({ card }: CardProps) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// SRU Advantage Comparison Card
+// Positive-only comparison — highlights SRU's strengths as differentiators
+// ---------------------------------------------------------------------------
+interface SRUAdvantage {
+  category: string;
+  icon: string;
+  sru_highlight: string;
+  standout: string;
+}
+
+function SRUAdvantageCard({ card }: { card: any }) {
+  const advantages: SRUAdvantage[] = card.advantages || [];
+  return (
+    <div className="sru-advantage-card card-animate">
+      <div className="sru-advantage-header">
+        <span className="sru-advantage-badge">🏅 SRU Edge</span>
+        <h2 className="sru-advantage-title">{card.title}</h2>
+        <p className="sru-advantage-subtitle">{card.subtitle}</p>
+      </div>
+      <div className="sru-advantage-grid">
+        {advantages.map((adv, i) => (
+          <div key={i} className="sru-advantage-item">
+            <div className="sru-advantage-item-header">
+              <span className="sru-advantage-icon">{adv.icon}</span>
+              <div>
+                <div className="sru-advantage-category">{adv.category}</div>
+                <div className="sru-advantage-standout">{adv.standout}</div>
+              </div>
+            </div>
+            <p className="sru-advantage-desc">{adv.sru_highlight}</p>
+          </div>
+        ))}
+      </div>
+      <div className="sru-advantage-footer">
+        <span className="sru-advantage-tagline">
+          🌟 SR University — Where Learning Meets Opportunity, and Futures Take Shape.
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function RenderCard({ card }: { card: any }) {
   if (!card || !card.type) return null;
 
@@ -511,6 +554,8 @@ export function RenderCard({ card }: { card: any }) {
       return <VideoRecommendationsCard card={card} />;
     case "placement_highlights":
       return <PlacementHighlightsCard card={card} />;
+    case "sru_comparison":
+      return <SRUAdvantageCard card={card} />;
     default:
       return null;
   }

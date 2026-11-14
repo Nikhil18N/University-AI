@@ -5,7 +5,7 @@
   > *"A campus where every step connects with nature... Every breath brings a spark of inspiration... This is SR University – A Next-Generation Living & Learning Campus."*
   > *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
 * **Lush Green Campus & Community**:
-  - Stands as the **largest lush green campus for the next generation of innovators**, spanning over 150 acres in Warangal, Telangana.
+  - Stands as the **largest lush green campus for the next generation of innovators**, located in Warangal, Telangana.
   - Home to **10,000 active students** from across India and internationally.
 * **World-Class Faculty**:
   - World-class faculty holding **doctoral and postdoctoral qualifications from prestigious institutions in India and abroad**, including **IITs, NITs, and leading international universities**.
