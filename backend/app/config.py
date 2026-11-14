@@ -45,8 +45,16 @@ class Settings(BaseSettings):
 
     # ---- Paths ----
     PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent
-    PROMPTS_DIR: Path = PROJECT_ROOT / "prompts"
-    UPLOAD_DIR: Path = PROJECT_ROOT / "uploads"
+    PROMPTS_DIR: Path = (
+        PROJECT_ROOT / "prompts"
+        if (PROJECT_ROOT / "prompts").exists()
+        else (Path(__file__).resolve().parent.parent / "prompts")
+    )
+    UPLOAD_DIR: Path = (
+        PROJECT_ROOT / "uploads"
+        if (PROJECT_ROOT / "uploads").exists()
+        else (Path(__file__).resolve().parent.parent / "uploads")
+    )
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

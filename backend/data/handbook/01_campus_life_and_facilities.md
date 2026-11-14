@@ -6,10 +6,10 @@
   > *"SR University – Where Learning Meets Opportunity, and Futures Take Shape."*
 * **Lush Green Campus & Community**:
   - Stands as the **largest lush green campus for the next generation of innovators**, spanning over **170 acres** in Warangal, Telangana.
-  - Home to **10,000 active students** from across India and internationally.
+  - **Goal of SR University**: To create an innovative living learning educational ecosystem whose graduates significantly contribute to the growth of Telangana and India.
 * **Parent Society & 50-Year Heritage of Excellence**:
-  - **Sri Rajeshwara Educational Society**, the parent body of SR University, is a 50-year-old educational conglomerate founded in 1976 by educational pioneer Sri A. Varada Reddy.
-  - Governs **185 Educational Institutions** across Telangana, Andhra Pradesh, and Karnataka, serving more than **1,00,000 students** with over **17,000 teaching and non-teaching staff**, **7,500+ faculty members**, and a proud network of **5 Lakh+ alumni**.
+  - **Sri Rajeshwara Educational Society**, the parent body of SR University, is a 50-year-old conglomerate of educational institutions founded in 1976 by educational pioneer Sri A. Varada Reddy.
+  - Governs **185 Educational Institutions** across Telangana, Andhra Pradesh, and Karnataka, serving more than **1,00,000 students** with over **17,000 teaching and non-teaching staff members**, **7,500+ faculty members**, and a proud network of **5 Lakh+ alumni**.
   - **Institutional Journey**: Started in 2002 as SR Engineering College with 240 students; earned UGC autonomous status in 2014; launched the DST-supported **SRiX Technology Business Incubator** in March 2018 (India's first private university to host a DST TBI); notified as **SR University** in May 2020 under the Telangana State Private Universities Act; recognised under Section 2(f) of the UGC Act; ranked **1st among private institutions in ARIIA 2020**.
 * **Distinguished University Leadership**:
   - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976 who built the trusted SR brand name across 95 institutions in Telangana and Andhra Pradesh, embedding quality consciousness and ethical standards as SR's DNA.
