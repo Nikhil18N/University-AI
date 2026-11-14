@@ -89,3 +89,37 @@ class PromoteExemplarResponse(BaseModel):
     success: bool
     message: str
 
+
+class AgentRunItem(BaseModel):
+    id: UUID
+    conversation_id: UUID
+    message_id: UUID | None = None
+    route: str
+    tool: str | None = None
+    reason: str
+    status: str
+    step_count: int
+    created_at: datetime
+
+
+class AgentRunListResponse(BaseModel):
+    items: list[AgentRunItem]
+    total: int
+
+
+class CalculationScenarioItem(BaseModel):
+    id: UUID
+    conversation_id: UUID
+    message_id: UUID | None = None
+    calculation_type: str
+    status: str
+    inputs: dict
+    result: dict
+    source_text: str | None = None
+    created_at: datetime
+
+
+class CalculationScenarioListResponse(BaseModel):
+    items: list[CalculationScenarioItem]
+    total: int
+

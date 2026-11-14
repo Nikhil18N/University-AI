@@ -22,24 +22,75 @@ VIDEO_SEMANTIC_COLLECTION = "university_videos_semantic"
 DEFAULT_MAX_SEMANTIC_DISTANCE = 0.25  # High-confidence semantic match
 EXPLICIT_MAX_SEMANTIC_DISTANCE = 0.30  # Slightly relaxed when user explicitly asks for video
 
-# Explicit intent cues indicating the user wants to watch a video/tour
+# Strong intent cues indicating the user explicitly wants media.
 _EXPLICIT_VIDEO_CUES = (
     "video",
     "videos",
-    "watch",
     "youtube",
     "yt",
-    "tour",
-    "walkthrough",
-    "drone",
-    "look like",
-    "how does it look",
+    "shorts",
+    "watch a video",
+    "show me a video",
+    "show a video",
+    "video tour",
+    "video walkthrough",
+    "campus tour",
+    "hostel tour",
+    "campus walkthrough",
+    "hostel walkthrough",
+    "drone video",
     "see the campus",
     "see the hostel",
-    "visual",
-    "clip",
-    "shorts",
-    "short",
+)
+
+_VIDEO_TOPIC_CUES = (
+    "university",
+    "campus",
+    "college",
+    "sru",
+    "hostel",
+    "accommodation",
+    "hostel life",
+    "placement",
+    "recruiter",
+    "career",
+    "job",
+    "sports",
+    "athletics",
+    "club",
+    "clubs",
+    "startup",
+    "startups",
+    "srix",
+    "incubator",
+    "innovation",
+    "cultural",
+    "culture",
+    "fest",
+    "festival",
+    "event",
+    "events",
+    "library",
+)
+
+_VIDEO_TOPIC_EXCLUSIONS = (
+    "fee",
+    "fees",
+    "cost",
+    "scholarship",
+    "admission",
+    "eligibility",
+    "cutoff",
+    "percentage",
+    "marks",
+    "attendance",
+    "exam",
+    "examination",
+    "syllabus",
+    "curriculum",
+    "transport",
+    "bus",
+    "application",
 )
 
 _VIDEO_OFFER_REGEX = re.compile(
@@ -150,6 +201,50 @@ def is_explicit_video_query(message: str) -> bool:
     """Return True if message explicitly asks to watch or see videos/tours."""
     msg_lower = message.lower().strip()
     return any(cue in msg_lower for cue in _EXPLICIT_VIDEO_CUES)
+
+
+def is_video_topic_query(message: str) -> bool:
+    """Return whether the question is within an approved university media topic."""
+    msg_lower = message.lower().strip()
+    if any(cue in msg_lower for cue in _VIDEO_TOPIC_EXCLUSIONS):
+        return False
+    return any(cue in msg_lower for cue in _VIDEO_TOPIC_CUES)
+
+
+def has_recent_video_offer(
+    recent_messages: list[dict],
+    lookback: int = 20,
+) -> bool:
+    """Return whether the recent conversation already offered or showed a video."""
+    for message in reversed(recent_messages[-lookback:]):
+        if message.get("role") != "assistant":
+            continue
+        metadata = message.get("metadata")
+        if not isinstance(metadata, dict):
+            metadata = {}
+        if metadata.get("video_offer") or any(
+            isinstance(card, dict) and card.get("type") == "video_recommendations"
+            for card in metadata.get("cards", [])
+            if isinstance(metadata.get("cards"), list)
+        ):
+            return True
+    return False
+
+
+def should_retrieve_video_matches(
+    user_message: str,
+    intent: str,
+    recent_messages: list[dict],
+    contextual_offer_allowed: bool,
+) -> bool:
+    """Gate expensive video retrieval to explicit requests or one contextual offer."""
+    if is_explicit_video_query(user_message) and is_video_topic_query(user_message):
+        return True
+    return (
+        intent == "UNIVERSITY"
+        and contextual_offer_allowed
+        and not has_recent_video_offer(recent_messages)
+    )
 
 
 def get_semantic_videos(

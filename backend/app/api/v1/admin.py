@@ -25,6 +25,8 @@ from app.services.rag_service import RAGService
 from app.schemas.admin import (
     AdminConversationDetailResponse,
     AdminConversationListResponse,
+    AgentRunListResponse,
+    CalculationScenarioListResponse,
     AdminStatsResponse,
     FeedbackItem,
     FeedbackListResponse,
@@ -33,13 +35,63 @@ from app.schemas.admin import (
 )
 from app.schemas.common import ErrorResponse
 from app.schemas.document import DocumentListResponse, DocumentResponse
+from app.schemas.finance import FinanceCatalog
 from app.schemas.lead import LeadListResponse, LeadResponse, LeadStatsResponse, LeadStatusUpdate
-from app.services import admin_service, lead_service
+from app.services import (
+    admin_service,
+    agent_admin_service,
+    calculation_admin_service,
+    finance_service,
+    lead_service,
+)
 from app.services.ingestion_service import IngestionService
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
+
+
+@router.get("/agent-runs", response_model=AgentRunListResponse)
+async def get_agent_runs(
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+) -> AgentRunListResponse:
+    """List recent bounded-agent executions for operational review."""
+    return await agent_admin_service.list_agent_runs(db, limit=limit)
+
+
+@router.get("/calculations", response_model=CalculationScenarioListResponse)
+async def get_calculations(
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _admin: str = Depends(verify_admin_key),
+) -> CalculationScenarioListResponse:
+    """List recent deterministic calculation scenarios for review."""
+    return await calculation_admin_service.list_calculations(db, limit=limit)
+
+
+@router.get("/finance-rules", response_model=FinanceCatalog)
+async def get_finance_rules(
+    _admin: str = Depends(verify_admin_key),
+) -> FinanceCatalog:
+    """Review the currently published fee and scholarship rules."""
+    return finance_service.get_finance_catalog()
+
+
+@router.put("/finance-rules", response_model=FinanceCatalog)
+async def replace_finance_rules(
+    catalog: FinanceCatalog,
+    _admin: str = Depends(verify_admin_key),
+) -> FinanceCatalog:
+    """Publish a validated fee and scholarship catalog."""
+    for rule in catalog.scholarship_rules:
+        if rule.minimum_score_percent > rule.maximum_score_percent:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid score range for scholarship '{rule.name}'.",
+            )
+    return finance_service.replace_finance_catalog(catalog)
 
 
 @router.post(

@@ -1,6 +1,7 @@
 """Suggestion service — generates contextual quick-reply chips for chat interactions."""
 
 import re
+from app.services.video_service import is_video_topic_query
 
 # Specialist domain suggestion banks
 ELIGIBILITY_CONFIRMED_SUGGESTIONS = [
@@ -184,7 +185,10 @@ def generate_suggestions(
         return TRANSPORT_SUGGESTIONS
 
     # 2c. Video or Tour explicit query
-    is_explicit_video = any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like"))
+    is_explicit_video = (
+        any(k in msg_lower for k in ("video", "videos", "watch", "tour", "walkthrough", "drone", "look like"))
+        and is_video_topic_query(user_message)
+    )
     if is_explicit_video:
         if "hostel" in msg_lower:
             return HOSTEL_SUGGESTIONS

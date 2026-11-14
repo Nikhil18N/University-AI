@@ -822,7 +822,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   <p className="welcome-hero-tagline">Your AI agent</p>
                 </div>
 
-                {/* 4 Clean Suggestion Cards */}
+                {/* Clean starter cards */}
                 <div className="minimal-starters-grid">
                   {MINIMAL_STARTERS.map((item, idx) => (
                     <button

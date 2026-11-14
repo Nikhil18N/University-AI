@@ -12,6 +12,10 @@ from app.services.video_service import (
     create_video_card,
     check_video_affirmative_or_negative,
     format_video_offer_prompt,
+    has_recent_video_offer,
+    is_explicit_video_query,
+    is_video_topic_query,
+    should_retrieve_video_matches,
 )
 
 
@@ -115,6 +119,98 @@ def test_create_video_card():
     assert "channel_url" in card
     assert "channel_name" in card
     assert len(card["videos"]) == 2
+
+
+def test_video_retrieval_is_not_enabled_for_ordinary_questions():
+    assert is_explicit_video_query("What are the hostel fees?") is False
+    assert is_explicit_video_query("How does attendance work?") is False
+    assert is_video_topic_query("What are the hostel fees?") is False
+    assert is_video_topic_query("Tell me about the sports clubs") is True
+    assert is_video_topic_query("Show me a video of the library") is True
+    assert should_retrieve_video_matches(
+        "What are the hostel fees?",
+        "UNIVERSITY",
+        [],
+        contextual_offer_allowed=False,
+    ) is False
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "Show me a video of the university campus",
+        "Show me a hostel tour video",
+        "Show me placement videos",
+        "Show me sports and clubs videos",
+        "Show me startup and incubation videos",
+        "Show me cultural event videos",
+        "Show me a library video",
+    ],
+)
+def test_video_topic_policy_allows_approved_topics(query):
+    assert is_video_topic_query(query) is True
+    assert should_retrieve_video_matches(
+        query,
+        "UNIVERSITY",
+        [],
+        contextual_offer_allowed=False,
+    ) is True
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "Show me a video about fees",
+        "Show me scholarship videos",
+        "Show me admission videos",
+        "Show me an attendance video",
+        "Show me exam videos",
+        "Show me syllabus videos",
+        "Show me transport videos",
+        "Show me the application video",
+    ],
+)
+def test_video_topic_policy_blocks_excluded_topics(query):
+    assert is_video_topic_query(query) is False
+    assert should_retrieve_video_matches(
+        query,
+        "UNIVERSITY",
+        [],
+        contextual_offer_allowed=False,
+    ) is False
+
+
+def test_contextual_video_offer_has_a_cooldown():
+    recent = [
+        {
+            "role": "assistant",
+            "content": "Would you like to watch a short video tour of Campus Life? (Yes / No)",
+            "metadata": {"video_offer": True, "cards": []},
+        }
+    ]
+    assert has_recent_video_offer(recent) is True
+    assert should_retrieve_video_matches(
+        "Tell me about campus life",
+        "UNIVERSITY",
+        recent,
+        contextual_offer_allowed=True,
+    ) is False
+
+
+def test_contextual_video_offer_cooldown_covers_longer_conversations():
+    recent = [
+        {"role": "assistant", "content": "Earlier answer", "metadata": {}}
+        for _ in range(19)
+    ]
+    recent.insert(
+        0,
+        {
+            "role": "assistant",
+            "content": "Would you like to watch a video?",
+            "metadata": {"video_offer": True},
+        },
+    )
+    assert has_recent_video_offer(recent) is True
 
 
 def test_check_video_affirmative_or_negative():

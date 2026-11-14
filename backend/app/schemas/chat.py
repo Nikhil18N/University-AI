@@ -42,6 +42,7 @@ class ChatResponse(BaseModel):
     suggestions: list[str] = Field(default_factory=list)
     cards: list[dict] = Field(default_factory=list)
     flow: dict | None = None
+    agent: dict | None = None
     model: str | None = None
 
 
@@ -55,6 +56,7 @@ class MessageResponse(BaseModel):
     suggestions: list[str] = Field(default_factory=list)
     cards: list[dict] = Field(default_factory=list)
     flow: dict | None = None
+    agent: dict | None = None
     model: str | None = None
     created_at: datetime
 

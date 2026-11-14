@@ -15,6 +15,57 @@ DELETE /api/v1/conversations/{conversation_id}
 ## Feedback
 POST /api/v1/feedback
 
+## Deterministic finance tools
+POST /api/v1/finance/estimate
+GET /api/v1/admin/finance-rules
+PUT /api/v1/admin/finance-rules
+GET /api/v1/admin/agent-runs
+GET /api/v1/admin/calculations
+
+Finance estimates are calculated only from versioned official rules in the finance
+catalog. If a matching fee or scholarship rule is unavailable, the endpoint returns
+`status: "insufficient_data"` rather than inventing an amount.
+The admin endpoints require `X-Admin-Key` and publish the validated catalog atomically.
+
+## Memory controls
+GET /api/v1/memory?session_id=...
+POST /api/v1/memory
+DELETE /api/v1/memory/{key}
+GET /api/v1/memory/conversations/{conversation_id}/summary?session_id=...
+GET /api/v1/memory/calculations?session_id=...
+DELETE /api/v1/memory/calculations?session_id=...
+
+Memory writes require explicit consent and are limited to non-sensitive preferences.
+Raw messages remain the source of truth; summaries are bounded context and are
+deleted with their conversation.
+
+The chat orchestrator routes explicit calculation requests containing fee or
+scholarship intent to this deterministic tool. Ordinary informational questions
+continue through the existing intent/RAG/LLM path. Responses expose an optional
+`agent` field such as `{ "agent": "finance", "status": "executed" }`.
+
+Agent execution is bounded by an allowlisted tool registry and a maximum of
+three steps. The model cannot invoke arbitrary endpoints or services.
+Each agent execution is also persisted in `agent_runs` with its route, selected
+tool, policy reason, status, step count, conversation, and response message.
+Administrators can inspect recent records through `/api/v1/admin/agent-runs`.
+Finance calculations additionally persist their explicit inputs, result status,
+result payload, source references, and originating message in
+`calculation_scenarios`.
+When required finance inputs are missing, the agent stores a pending
+`pending_agent_tasks` record and resumes it when the user supplies the missing
+details in the same conversation.
+
+Pending clarification tasks can be listed with
+`GET /api/v1/memory/pending-tasks?session_id=...` and cancelled with
+`DELETE /api/v1/memory/pending-tasks/{conversation_id}?session_id=...`.
+Both endpoints enforce browser-session ownership.
+Administrators can inspect recent scenarios through `/api/v1/admin/calculations`.
+Users can inspect only their own session's calculations through
+`/api/v1/memory/calculations`.
+They can delete that calculation history without deleting the associated chat
+conversation through `DELETE /api/v1/memory/calculations`.
+
 ## Admin
 POST /api/v1/admin/documents
 GET /api/v1/admin/documents

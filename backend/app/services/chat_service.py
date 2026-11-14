@@ -14,11 +14,24 @@ from app.config import settings
 from app.providers.base import LLMProvider
 from app.schemas.chat import ChatRequest, ChatResponse, SourceReference
 from app.services import conversation_service, prompt_service
+from app.services import memory_service
+from app.services.agent_service import AgentRoute, decide_route, validate_tool_call
+from app.services.agent_audit_service import record_agent_run
+from app.services.calculation_service import record_finance_calculation
+from app.services.agent_task_service import (
+    complete_pending_task,
+    get_pending_task,
+    save_pending_task,
+)
 from app.services.card_service import generate_cards
 from app.services.flow_service import (
     detect_flow_trigger,
     execute_wizard_step,
     get_wizard_step_from_history,
+)
+from app.services.finance_service import (
+    build_finance_request,
+    estimate_finance,
 )
 from app.services.guardrail_service import (
     sanitize_hallucinated_urls,
@@ -38,7 +51,10 @@ from app.services.video_service import (
     get_relevant_videos,
     get_semantic_videos,
     is_explicit_video_query,
+    is_video_topic_query,
+    has_recent_video_offer,
     sanitize_answer_video_prompts,
+    should_retrieve_video_matches,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,28 +90,33 @@ def get_time_aware_greeting() -> str:
 
 
 def should_offer_video_tour(message: str) -> bool:
-    """Return True only if the user query naturally welcomes a visual or campus tour."""
+    """Return True only for approved university topics that have relevant media."""
     msg = message.lower()
-    tour_keywords = (
-        "campus tour", "hostel tour", "see the campus", "see the hostel",
-        "how does it look", "how does the campus look", "look like", "drone",
-        "walkthrough", "virtual tour", "campus video", "hostel video", "watch video",
-        "video tour", "show video"
-    )
-    if any(k in msg for k in tour_keywords):
-        return True
-
-    # If the user is asking about admissions, fees, ranks, marks, scholarships, or general evaluation, do NOT offer video
-    disallowed_keywords = (
-        "fee", "fees", "cost", "scholarship", "cutoff", "percentage", "marks", "rank",
-        "eligibility", "eligible", "syllabus", "curriculum", "apply", "good",
-        "why", "ad", "instagram", "rule", "regulations", "attendance", "mistake", "wrong"
-    )
-    if any(k in msg for k in disallowed_keywords):
+    if not is_video_topic_query(msg):
         return False
-
-    facility_keywords = ("campus life", "hostel rooms", "srix", "incubator", "sports facilities")
-    return any(k in msg for k in facility_keywords)
+    return any(
+        cue in msg
+        for cue in (
+            "campus",
+            "hostel",
+            "placement",
+            "recruiter",
+            "sports",
+            "club",
+            "startup",
+            "srix",
+            "cultural",
+            "fest",
+            "library",
+            "video",
+            "tour",
+            "walkthrough",
+            "look like",
+            "what does it look",
+            "show me",
+            "see ",
+        )
+    )
 
 
 def sanitize_staff_contact_numbers(text: str) -> str:
@@ -217,15 +238,32 @@ async def handle_chat(
 
     # 3. Build context from recent messages
     recent = await conversation_service.get_recent_messages(db, conversation.id)
+    pending_task = await get_pending_task(db, conversation.id, request.session_id)
     conversation_context = "\n".join(
         f"{m['role']}: {m['content']}" for m in recent[:-1]
     )
+    stored_summary = await memory_service.get_summary(db, conversation.id, request.session_id)
+    memory_context = await memory_service.get_memory_context(db, request.session_id)
+    if stored_summary and stored_summary.summary:
+        conversation_context = (
+            f"Conversation summary:\n{stored_summary.summary}\n\n{conversation_context}"
+        )
+    if memory_context:
+        conversation_context = f"{memory_context}\n\n{conversation_context}".strip()
 
     sources: list[dict] = []
     flow_info: dict | None = None
     is_video_yes = False
     is_video_no = False
     semantic_videos: list[dict] = []
+    agent_trace: dict | None = None
+    finance_request = None
+    finance_result = None
+    agent_message = (
+        f"{pending_task.original_query}\nAdditional details: {request.message}"
+        if pending_task
+        else request.message
+    )
 
     # Check if user is confirming or declining a prior video tour offer
     is_video_yes, is_video_no = check_video_affirmative_or_negative(
@@ -246,6 +284,7 @@ async def handle_chat(
                 except Exception:
                     matching_videos = None
 
+        semantic_videos = matching_videos or []
         cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
         if matching_videos:
             vid_links = "\n".join(
@@ -304,7 +343,52 @@ async def handle_chat(
         profile = extract_student_profile(recent)
 
         # 5. Route and generate response
-        if intent == "STUDENT_SPECIFIC":
+        agent_decision = decide_route(agent_message)
+        if agent_decision.route == AgentRoute.FINANCE:
+            validate_tool_call(agent_decision.tool or "", 1)
+            finance_request, missing_inputs = build_finance_request(agent_message)
+            intent = "FINANCE_AGENT"
+            agent_trace = {"agent": "finance", "status": "clarification" if missing_inputs else "executed"}
+            if missing_inputs:
+                await save_pending_task(
+                    db,
+                    conversation.id,
+                    request.session_id,
+                    "finance_estimate",
+                    agent_message,
+                    missing_inputs,
+                )
+                answer = (
+                    "I can calculate that from the official fee and scholarship rules. "
+                    "Please provide: " + ", ".join(missing_inputs) + "."
+                )
+            else:
+                finance_result = estimate_finance(finance_request)
+                if pending_task:
+                    await complete_pending_task(db, pending_task)
+                agent_trace["result_status"] = finance_result.status
+                if finance_result.status == "calculated":
+                    breakdown = "\n".join(
+                        f"- {item.label}: ₹{item.amount:,.2f}" for item in finance_result.line_items
+                    )
+                    scholarship = (
+                        f"\n- {finance_result.scholarship_name}: -₹{finance_result.scholarship_amount:,.2f}"
+                        if finance_result.scholarship_amount
+                        else ""
+                    )
+                    answer = (
+                        f"Estimated payable amount: **₹{finance_result.total:,.2f}**\n\n"
+                        f"{breakdown}{scholarship}\n\n"
+                        "This is calculated from the published rules and may change if the university updates them."
+                    )
+                    sources = [{"document_id": source, "title": source} for source in finance_result.sources]
+                else:
+                    answer = (
+                        "I cannot calculate an official amount yet because the required published "
+                        + ", ".join(finance_result.missing_inputs)
+                        + " is unavailable."
+                    )
+        elif intent == "STUDENT_SPECIFIC":
             answer = STUDENT_AUTH_MESSAGE
             logger.info("Handled via STUDENT_SPECIFIC auth guardrail")
 
@@ -345,13 +429,34 @@ async def handle_chat(
             logger.info("Handled via conversational LLM (%s)", intent)
 
     # Pure Semantic Vector Search for Video Recommendations (Zero Keywords)
-    explicit_video = is_explicit_video_query(request.message)
+    explicit_video = (
+        is_explicit_video_query(request.message)
+        and is_video_topic_query(request.message)
+    )
+    contextual_offer_allowed = (
+        intent == "UNIVERSITY"
+        and should_offer_video_tour(request.message)
+        and not has_recent_video_offer(recent)
+    )
+    video_lookup_allowed = should_retrieve_video_matches(
+        request.message,
+        intent,
+        recent,
+        contextual_offer_allowed,
+    )
     query_embedding = getattr(rag_service, "last_query_embedding", None)
 
     if not is_video_yes and not is_video_no:
-        if query_embedding:
-            semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
-            if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
+        if video_lookup_allowed and not query_embedding and rag_service:
+            query_embedding = await rag_service.embeddings.embed_single(request.message)
+
+        if video_lookup_allowed and query_embedding:
+            semantic_videos = get_semantic_videos(
+                query_embedding,
+                limit=2,
+                max_distance=0.30 if explicit_video else 0.25,
+            )
+            if semantic_videos and contextual_offer_allowed and not explicit_video:
                 cat = semantic_videos[0].get("category", "our campus")
                 answer = format_video_offer_prompt(answer, cat)
             else:
@@ -368,7 +473,7 @@ async def handle_chat(
             profile=profile,
             flow_state=flow_info,
         )
-        if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
+        if semantic_videos and contextual_offer_allowed and not explicit_video:
             suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
 
         cards = generate_cards(
@@ -395,10 +500,35 @@ async def handle_chat(
             "suggestions": suggestions,
             "cards": cards,
             "flow": flow_info,
-            "matched_videos": semantic_videos if semantic_videos else None,
-            "video_offer": bool(semantic_videos and not explicit_video and intent == "UNIVERSITY"),
+            "agent": agent_trace,
+            "matched_videos": semantic_videos if (semantic_videos and (explicit_video or contextual_offer_allowed or is_video_yes)) else None,
+            "video_offer": bool(semantic_videos and contextual_offer_allowed and not explicit_video),
         },
     )
+    await memory_service.save_summary(
+        db,
+        conversation.id,
+        memory_service.build_extractive_summary(
+            await conversation_service.get_recent_messages(db, conversation.id)
+        ),
+    )
+    if agent_trace:
+        await record_agent_run(
+            db,
+            conversation.id,
+            assistant_msg.id,
+            decide_route(request.message),
+            str(agent_trace.get("status", "completed")),
+        )
+    if finance_result is not None:
+        await record_finance_calculation(
+            db,
+            conversation.id,
+            assistant_msg.id,
+            finance_request,
+            finance_result,
+            request.message,
+        )
 
     # 8. Auto-title on first exchange
     if conversation.title == "New conversation":
@@ -418,6 +548,7 @@ async def handle_chat(
         suggestions=suggestions,
         cards=cards,
         flow=flow_info,
+        agent=agent_trace,
         model=settings.LLM_MODEL,
     )
 
@@ -452,15 +583,32 @@ async def handle_chat_stream(
 
         # 3. Build context
         recent = await conversation_service.get_recent_messages(db, conversation.id)
+        pending_task = await get_pending_task(db, conversation.id, request.session_id)
         conversation_context = "\n".join(
             f"{m['role']}: {m['content']}" for m in recent[:-1]
         )
+        stored_summary = await memory_service.get_summary(db, conversation.id, request.session_id)
+        memory_context = await memory_service.get_memory_context(db, request.session_id)
+        if stored_summary and stored_summary.summary:
+            conversation_context = (
+                f"Conversation summary:\n{stored_summary.summary}\n\n{conversation_context}"
+            )
+        if memory_context:
+            conversation_context = f"{memory_context}\n\n{conversation_context}".strip()
 
         sources: list[dict] = []
         flow_info: dict | None = None
         answer = ""
         query_embedding: list[float] | None = None
         profile: dict = {}
+        agent_trace: dict | None = None
+        finance_request = None
+        finance_result = None
+        agent_message = (
+            f"{pending_task.original_query}\nAdditional details: {request.message}"
+            if pending_task
+            else request.message
+        )
 
         # Check for guided flow or video confirmation/decline
         is_video_yes, is_video_no = check_video_affirmative_or_negative(
@@ -481,6 +629,7 @@ async def handle_chat_stream(
                     except Exception:
                         matching_videos = None
 
+            semantic_videos = matching_videos or []
             cat = matching_videos[0].get("category", "Campus Life") if matching_videos else "Campus Life"
             if matching_videos:
                 vid_links = "\n".join(
@@ -547,7 +696,63 @@ async def handle_chat_stream(
                 llm_provider=llm_provider,
             )
 
-            if intent == "STUDENT_SPECIFIC":
+            agent_decision = decide_route(agent_message)
+            if agent_decision.route == AgentRoute.FINANCE:
+                validate_tool_call(agent_decision.tool or "", 1)
+                finance_request, missing_inputs = build_finance_request(agent_message)
+                intent = "FINANCE_AGENT"
+                agent_trace = {
+                    "agent": "finance",
+                    "status": "clarification" if missing_inputs else "executed",
+                }
+                if missing_inputs:
+                    await save_pending_task(
+                        db,
+                        conversation.id,
+                        request.session_id,
+                        "finance_estimate",
+                        agent_message,
+                        missing_inputs,
+                    )
+                    answer = (
+                        "I can calculate that from the official fee and scholarship rules. "
+                        "Please provide: " + ", ".join(missing_inputs) + "."
+                    )
+                else:
+                    finance_result = estimate_finance(finance_request)
+                    if pending_task:
+                        await complete_pending_task(db, pending_task)
+                    agent_trace["result_status"] = finance_result.status
+                    if finance_result.status == "calculated":
+                        breakdown = "\n".join(
+                            f"- {item.label}: ₹{item.amount:,.2f}"
+                            for item in finance_result.line_items
+                        )
+                        scholarship = (
+                            f"\n- {finance_result.scholarship_name}: -₹{finance_result.scholarship_amount:,.2f}"
+                            if finance_result.scholarship_amount
+                            else ""
+                        )
+                        answer = (
+                            f"Estimated payable amount: **₹{finance_result.total:,.2f}**\n\n"
+                            f"{breakdown}{scholarship}\n\n"
+                            "This is calculated from the published rules and may change if the university updates them."
+                        )
+                        sources = [
+                            {"document_id": source, "title": source}
+                            for source in finance_result.sources
+                        ]
+                    else:
+                        answer = (
+                            "I cannot calculate an official amount yet because the required published "
+                            + ", ".join(finance_result.missing_inputs)
+                            + " is unavailable."
+                        )
+                for chunk in chunk_text_stream(answer):
+                    yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
+                    await asyncio.sleep(0.012)
+
+            elif intent == "STUDENT_SPECIFIC":
                 # Lazy-fetch for non-UNIVERSITY path
                 all_user_messages = await conversation_service.get_all_user_messages(db, conversation.id)
                 profile = extract_student_profile(all_user_messages)
@@ -671,18 +876,36 @@ async def handle_chat_stream(
                 answer = "".join(streamed_tokens)
 
         semantic_videos = []
-        explicit_video = is_explicit_video_query(request.message)
+        explicit_video = (
+            is_explicit_video_query(request.message)
+            and is_video_topic_query(request.message)
+        )
+        contextual_offer_allowed = (
+            intent == "UNIVERSITY"
+            and should_offer_video_tour(request.message)
+            and not has_recent_video_offer(recent)
+        )
+        video_lookup_allowed = should_retrieve_video_matches(
+            request.message,
+            intent,
+            recent,
+            contextual_offer_allowed,
+        )
 
         if not is_video_yes and not is_video_no:
-            if not query_embedding and rag_service:
+            if video_lookup_allowed and not query_embedding and rag_service:
                 try:
                     query_embedding = await rag_service.embeddings.embed_single(request.message)
                 except Exception:
                     query_embedding = None
 
-            if query_embedding:
-                semantic_videos = get_semantic_videos(query_embedding, limit=2, max_distance=0.25)
-                if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
+            if video_lookup_allowed and query_embedding:
+                semantic_videos = get_semantic_videos(
+                    query_embedding,
+                    limit=2,
+                    max_distance=0.30 if explicit_video else 0.25,
+                )
+                if semantic_videos and contextual_offer_allowed and not explicit_video:
                     cat = semantic_videos[0].get("category", "our campus")
                     new_answer = format_video_offer_prompt(answer, cat)
                     if new_answer != answer:
@@ -705,7 +928,7 @@ async def handle_chat_stream(
                 profile=profile,
                 flow_state=flow_info,
             )
-            if semantic_videos and not explicit_video and intent == "UNIVERSITY" and should_offer_video_tour(request.message):
+            if semantic_videos and contextual_offer_allowed and not explicit_video:
                 suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
 
             cards = generate_cards(
@@ -732,10 +955,35 @@ async def handle_chat_stream(
                 "suggestions": suggestions,
                 "cards": cards,
                 "flow": flow_info,
-                "matched_videos": semantic_videos if semantic_videos else None,
-                "video_offer": bool(semantic_videos and not explicit_video and intent == "UNIVERSITY"),
+                "agent": agent_trace,
+                "matched_videos": semantic_videos if (semantic_videos and (explicit_video or contextual_offer_allowed or is_video_yes)) else None,
+                "video_offer": bool(semantic_videos and contextual_offer_allowed and not explicit_video),
             },
         )
+        await memory_service.save_summary(
+            db,
+            conversation.id,
+            memory_service.build_extractive_summary(
+                await conversation_service.get_recent_messages(db, conversation.id)
+            ),
+        )
+        if agent_trace:
+            await record_agent_run(
+                db,
+                conversation.id,
+                assistant_msg.id,
+                decide_route(request.message),
+                str(agent_trace.get("status", "completed")),
+            )
+        if finance_result is not None:
+            await record_finance_calculation(
+                db,
+                conversation.id,
+                assistant_msg.id,
+                finance_request,
+                finance_result,
+                request.message,
+            )
 
         if conversation.title == "New conversation":
             title = request.message[:50].strip()
@@ -746,7 +994,7 @@ async def handle_chat_stream(
             )
 
         # Final completion event
-        yield f"data: {json.dumps({'type': 'done', 'conversation_id': str(conversation.id), 'message_id': str(assistant_msg.id), 'answer': answer, 'sources': sources, 'suggestions': suggestions, 'cards': cards, 'flow': flow_info, 'model': settings.LLM_MODEL})}\n\n"
+        yield f"data: {json.dumps({'type': 'done', 'conversation_id': str(conversation.id), 'message_id': str(assistant_msg.id), 'answer': answer, 'sources': sources, 'suggestions': suggestions, 'cards': cards, 'flow': flow_info, 'agent': agent_trace, 'model': settings.LLM_MODEL})}\n\n"
 
     except Exception as e:
         logger.error("Chat stream error: %s", e, exc_info=True)

@@ -76,6 +76,7 @@ async def get_conversation(
                 suggestions=(m.metadata_ or {}).get("suggestions", []),
                 cards=(m.metadata_ or {}).get("cards", []),
                 flow=(m.metadata_ or {}).get("flow"),
+                agent=(m.metadata_ or {}).get("agent"),
                 model=m.model,
                 created_at=m.created_at,
             )
@@ -112,6 +113,7 @@ async def get_shared_conversation(
                 suggestions=(m.metadata_ or {}).get("suggestions", []),
                 cards=(m.metadata_ or {}).get("cards", []),
                 flow=(m.metadata_ or {}).get("flow"),
+                agent=(m.metadata_ or {}).get("agent"),
                 model=m.model,
                 created_at=m.created_at,
             )
@@ -168,7 +170,7 @@ async def add_message(
 
 
 async def get_recent_messages(
-    db: AsyncSession, conversation_id: uuid.UUID, limit: int = 10
+    db: AsyncSession, conversation_id: uuid.UUID, limit: int = 20
 ) -> list[dict[str, str]]:
     """Get recent messages formatted for the LLM context window."""
     stmt = (
