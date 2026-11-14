@@ -116,11 +116,9 @@ async def ensure_exemplars_seeded():
         if not match:
             ans = (
                 "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with "
-                "a minimum of 60% aggregate marks in Physics, Chemistry, and Mathematics. The admission process "
-                "is straightforward as we offer direct admissions based on your board marks, meaning there is no "
-                "requirement to appear for any entrance exams.\n\n"
-                "To help me confirm your eligibility, could you please share your 10+2 PCM percentage? \n\n"
-                "Would you like to know more about our available engineering branches?"
+                "a minimum of 50% aggregate marks in Mathematics, Physics, and Chemistry (MPC). We offer admissions based "
+                "on board marks as well as JEE Main and TG EAPCET ranks.\n\n"
+                "To help confirm your eligibility and merit scholarship slab, could you please share your 10+2 MPC percentage?"
             )
             await svc.register_exemplar(uuid.uuid4(), q, ans)
             await svc.register_exemplar(uuid.uuid4(), "What is the eligibility criteria and admission process for B.Tech?", ans)
