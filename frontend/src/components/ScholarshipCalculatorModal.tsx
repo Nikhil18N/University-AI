@@ -1243,7 +1243,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 onClick={() => {
                   onClose();
                   onAskBuddy(
-                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText} which qualifies for a ${calculatedSnapshot.slab.scholarshipPercent}% merit waiver (Payable: ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem). Can you guide me through admission verification and hostel accommodation?`
+                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText} which qualifies for a ${calculatedSnapshot.slab.scholarshipPercent}% merit waiver (Payable: ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem). Please share details on admission verification and hostel accommodation.`
                   );
                 }}
               >

@@ -121,6 +121,88 @@ def test_wizard_step_progression():
     assert step4["is_eligible"] is True
 
 
+def test_wizard_completion_prevents_loop():
+    """Verify that once Step 4 is rendered, subsequent queries (like Hostel Details) exit the wizard."""
+    step4_answer, _ = execute_wizard_step({
+        "flow_name": "admission_wizard",
+        "step": 4,
+        "total_steps": 4,
+        "step_title": "Eligibility Verdict & Next Steps",
+        "degree": "B.Tech",
+        "branch": "CSE (Core)",
+        "score": "78%",
+        "is_eligible": True,
+        "completed": True,
+    })
+    history = [
+        {"role": "user", "content": "admission wizard"},
+        {"role": "assistant", "content": "Welcome to the SR University Admission Wizard! (Step 1 of 4)"},
+        {"role": "user", "content": "B.Tech"},
+        {"role": "assistant", "content": "Step 2 of 4: Select Your Branch"},
+        {"role": "user", "content": "CSE"},
+        {"role": "assistant", "content": "Step 3 of 4: Qualifying Percentage"},
+        {"role": "user", "content": "78%"},
+        {"role": "assistant", "content": step4_answer},
+    ]
+
+    # Follow-up button click or question must NOT re-trigger step 4
+    next_step = get_wizard_step_from_history(history, "🏠 Hostel Details")
+    assert next_step is None
+
+    next_step_fee = get_wizard_step_from_history(history, "💰 Fee Structure")
+    assert next_step_fee is None
+
+    next_step_general = get_wizard_step_from_history(history, "What is the hostel fee?")
+    assert next_step_general is None
+
+
+def test_calculator_handoff_query_does_not_trigger_wizard():
+    """Verify calculator handoff query does NOT falsely hijack into admission wizard."""
+    calc_query = (
+        "I evaluated the scholarship for B.Tech Computer Science and Engineering with 78% "
+        "which qualifies for a 20% merit waiver (Payable: ₹60,000/sem). "
+        "Please share details on admission verification and hostel accommodation."
+    )
+    assert detect_flow_trigger(calc_query) is None
+    assert get_wizard_step_from_history([], calc_query) is None
+
+
+def test_wizard_eligibility_50_percent_cutoff():
+    """Verify 50% minimum MPC cutoff for B.Tech."""
+    # 55% should be eligible (above 50% cutoff)
+    step4_55 = get_wizard_step_from_history(
+        [
+            {"role": "user", "content": "admission wizard"},
+            {"role": "user", "content": "B.Tech"},
+            {"role": "user", "content": "CSE"},
+        ],
+        "55%",
+    )
+    assert step4_55["is_eligible"] is True
+
+    # 45% should require additional guidance (below 50% cutoff)
+    step4_45 = get_wizard_step_from_history(
+        [
+            {"role": "user", "content": "admission wizard"},
+            {"role": "user", "content": "B.Tech"},
+            {"role": "user", "content": "CSE"},
+        ],
+        "45%",
+    )
+    assert step4_45["is_eligible"] is False
+
+
+def test_wizard_cancellation():
+    """Verify that users can exit the wizard with cancel/stop keywords."""
+    history = [
+        {"role": "user", "content": "admission wizard"},
+        {"role": "assistant", "content": "Welcome to the SR University Admission Wizard! (Step 1 of 4)"},
+    ]
+    assert get_wizard_step_from_history(history, "cancel") is None
+    assert get_wizard_step_from_history(history, "stop") is None
+    assert get_wizard_step_from_history(history, "nevermind") is None
+
+
 def test_time_aware_greeting():
     greeting = get_conversational_response("GREETING", has_context=False)
     assert "SRU Buddy" in greeting or "SR University" in greeting

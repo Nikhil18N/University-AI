@@ -7,9 +7,7 @@ WIZARD_TRIGGERS = [
     "guided admission",
     "admission journey",
     "start wizard",
-    "guide me through admission",
-    "walk me through admission",
-    "wizard",
+    "start the wizard",
 ]
 
 
@@ -23,19 +21,65 @@ def detect_flow_trigger(user_message: str) -> str | None:
 
 def get_wizard_step_from_history(history: list[dict[str, str]], current_message: str) -> dict | None:
     """Analyze conversation history and current message to determine Admission Wizard step."""
-    # Check if a wizard was already started in recent messages
-    wizard_active = False
+    clean_msg = current_message.lower().strip()
+
+    # User cancellation check
+    if any(clean_msg == cmd or clean_msg.startswith(cmd + " ") for cmd in ("cancel", "stop", "exit", "quit", "nevermind", "restart")):
+        return None
+
+    # Determine if a wizard is explicitly requested in current message
+    is_explicit_trigger = any(t in clean_msg for t in WIZARD_TRIGGERS)
+
+    # Check whether the wizard was already completed in history (Step 4 rendered)
+    last_step4_idx = -1
+    last_trigger_idx = -1
+
+    for i, m in enumerate(history):
+        content = m.get("content", "").lower()
+        if (
+            "step 4 of 4" in content
+            or "instant admission verdict" in content
+            or "admission assessment: additional guidance" in content
+        ):
+            last_step4_idx = i
+        if (
+            any(t in content for t in WIZARD_TRIGGERS)
+            or "step 1 of 4" in content
+            or "welcome to the sr university admission wizard" in content
+        ):
+            last_trigger_idx = i
+
+    # If Step 4 has already been displayed after the most recent wizard trigger,
+    # and the user did NOT explicitly start a new wizard in this message,
+    # then the flow is done. Return None so normal RAG / chat handles the query.
+    if last_step4_idx != -1 and last_step4_idx >= last_trigger_idx and not is_explicit_trigger:
+        return None
+
+    # If no wizard has been started in history and this message isn't an explicit trigger, return None
+    if last_trigger_idx == -1 and not is_explicit_trigger:
+        return None
+
+    # Limit history inspection to messages starting from the most recent wizard trigger
+    wizard_start_idx = max(last_trigger_idx, 0) if last_trigger_idx != -1 else len(history)
+    wizard_history = history[wizard_start_idx:] + [{"role": "user", "content": current_message}]
+
+    # If this is a fresh wizard trigger and nothing else is selected yet, start at Step 1
+    if is_explicit_trigger and len(wizard_history) <= 1:
+        return {
+            "flow_name": "admission_wizard",
+            "step": 1,
+            "total_steps": 4,
+            "step_title": "Choose Degree Program",
+            "completed": False,
+            "options": ["🎓 B.Tech", "📘 M.Tech", "💼 MBA", "🔬 Ph.D."],
+        }
+
     extracted_degree = None
     extracted_branch = None
     extracted_score = None
 
-    full_history = history + [{"role": "user", "content": current_message}]
-
-    # Scan history for wizard presence
-    for m in full_history:
+    for m in wizard_history:
         text = m.get("content", "").lower()
-        if "admission wizard" in text or "step 1 of 4" in text:
-            wizard_active = True
 
         if any(d in text for d in ("b.tech", "btech", "m.tech", "mtech", "mba", "ph.d", "phd")):
             if "b.tech" in text or "btech" in text:
@@ -67,11 +111,12 @@ def get_wizard_step_from_history(history: list[dict[str, str]], current_message:
             extracted_score = "85%"
         elif "60%" in text or "70%" in text:
             extracted_score = "68%"
+        elif "50%" in text:
+            extracted_score = "55%"
+        elif "below 50%" in text:
+            extracted_score = "45%"
         elif "below 60%" in text:
             extracted_score = "55%"
-
-    if not wizard_active:
-        return None
 
     # Step 4: All info collected -> Verdict
     if extracted_degree and extracted_branch and extracted_score:
@@ -81,7 +126,7 @@ def get_wizard_step_from_history(history: list[dict[str, str]], current_message:
         except ValueError:
             score_val = 70.0
 
-        is_eligible = score_val >= 60.0
+        is_eligible = score_val >= 50.0
         return {
             "flow_name": "admission_wizard",
             "step": 4,
@@ -110,7 +155,7 @@ def get_wizard_step_from_history(history: list[dict[str, str]], current_message:
             "degree": extracted_degree,
             "branch": extracted_branch,
             "completed": False,
-            "options": ["90%+ Marks", "80% - 89%", "60% - 79%", "Below 60%"],
+            "options": ["90%+ Marks", "80% - 89%", "60% - 79%", "50% - 59%", "Below 50%"],
         }
 
     # Step 2: Degree known -> Ask Branch
@@ -177,27 +222,29 @@ def execute_wizard_step(step_info: dict) -> tuple[str, dict]:
                 score_num = 75.0
 
             scholarship_note = (
-                "\n🌟 **Bonus:** With 90%+, you qualify for our Merit Scholarship waiver of up to 50% tuition fees!"
+                "\n🌟 **Merit Scholarship:** With your score, you qualify for up to a **40% merit tuition waiver**!"
                 if score_num >= 90.0
                 else ""
             )
 
             text = (
                 f"🎉 **Instant Admission Verdict: FULLY ELIGIBLE!** (Step 4 of 4)\n\n"
-                f"With **{score}**, you comfortably meet and exceed our 60% minimum cutoff in 10+2 PCM for **{degree} {branch}**!{scholarship_note}\n\n"
+                f"With **{score}**, you meet and exceed our 50% minimum eligibility cutoff in 10+2 MPC for **{degree} {branch}**!{scholarship_note}\n\n"
                 f"**Personalized Next Steps:**\n"
                 f"1. **Online Application:** Visit [sru.edu.in](https://sru.edu.in) and register your basic details.\n"
                 f"2. **Document Verification:** Upload your 10th and 12th marksheets.\n"
                 f"3. **Seat Allocation & Offer Letter:** Receive your official branch admission letter.\n\n"
+                f"> *Note: Final admission and branch allocation are subject to original document verification and seat availability as per SR University guidelines.*\n\n"
                 f"What would you like to explore next about life at SR University?"
             )
         else:
             text = (
                 f"📋 **Admission Assessment: Additional Guidance** (Step 4 of 4)\n\n"
-                f"The standard minimum cutoff for B.Tech is 60% in 10+2 PCM. With **{score}**, direct B.Tech admission requires special academic review or alternate pathways:\n\n"
+                f"The standard minimum cutoff for B.Tech is 50% aggregate in 10+2 (MPC). With **{score}**, direct B.Tech admission requires special academic review or alternate pathways:\n\n"
                 f"• **Diploma Lateral Entry:** Join directly into 2nd year after a polytechnic diploma.\n"
                 f"• **Vocational & Certificate Tracks:** Specialized technology programs at SRU.\n"
                 f"• **Admissions Helpdesk:** We encourage you to speak directly with an SRU counsellor for seat guidance.\n\n"
+                f"> *Note: All admissions are subject to document verification and seat availability.*\n\n"
                 f"Would you like details on counsellor contacts or fee structures?"
             )
 
