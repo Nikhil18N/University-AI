@@ -464,16 +464,18 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
   const [isVerified, setIsVerified] = useState<boolean>(Boolean(savedLead?.name && savedLead?.phone));
 
-  // Form state
+  // Form state - start without hardcoded marks so user sees real input state
   const [selectedProgramId, setSelectedProgramId] = useState<string>("btech_cse");
   const [selectedExamKey, setSelectedExamKey] = useState<string>("stateBoard");
-  const [enteredScore, setEnteredScore] = useState<string>("780");
-  const [selectedSlabIndex, setSelectedSlabIndex] = useState<number>(1); // Default matches 30% slab for 780
+  const [enteredScore, setEnteredScore] = useState<string>("");
+  const [selectedSlabIndex, setSelectedSlabIndex] = useState<number>(-1);
   const [showProgramPicker, setShowProgramPicker] = useState<boolean>(false);
 
-  // Student Authentication inputs (only used if unverified)
+  // Optional admissions callback / lead inputs
   const [studentName, setStudentName] = useState<string>(savedLead?.name || "");
   const [studentPhone, setStudentPhone] = useState<string>(savedLead?.phone || "");
+  const [consentAgreed, setConsentAgreed] = useState<boolean>(true);
+  const [leadSuccessMsg, setLeadSuccessMsg] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   // Calculated snapshot state
@@ -495,21 +497,21 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     return matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
   }, [currentProgram, currentExam.key, enteredScore]);
 
-  // Execute calculation snapshot
+  // Execute calculation snapshot (displays fee immediately, saves lead only if name & phone provided)
   const computeAndSaveSnapshot = async (
     prog: ProgramConfig,
     exam: { key: string; label: string },
     scoreInput: string,
     slabIdx: number,
-    nameToUse: string,
-    phoneToUse: string
+    nameToUse: string = "",
+    phoneToUse: string = ""
   ) => {
     const isNoScholarship = slabIdx === -1;
     const slab: ScholarshipSlab = isNoScholarship
       ? {
           scholarshipPercent: 0,
           payableFeeSem: prog.baseTuitionSem,
-          ranges: { [exam.key]: "Standard Tuition (Below Cutoff)" },
+          ranges: { [exam.key]: scoreInput.trim() ? "Standard Tuition (Below Cutoff)" : "Standard Tuition (Base Fee)" },
           cseYearlyPayable:
             prog.id === "btech_cse"
               ? { yr1: 340000, yr2: 349000, yr3: 358000, yr4: 367000 }
@@ -518,7 +520,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       : prog.slabs[slabIdx] || prog.slabs[0];
 
     const rangeText = isNoScholarship
-      ? "Standard Tuition (No Merit Waiver)"
+      ? (scoreInput.trim() ? "Standard Tuition (No Merit Waiver)" : "Standard Tuition (Base Fee)")
       : (slab.ranges as any)[exam.key] ||
         slab.ranges.stateBoard ||
         `Slab ${slabIdx + 1}`;
@@ -529,8 +531,8 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
     const finalScoreDisplay = scoreMatch.displayText || scoreInput.trim() || rangeText;
 
-    // Save lead in localStorage and PostgreSQL backend
-    if (nameToUse && phoneToUse) {
+    // Save lead in localStorage and PostgreSQL backend if valid contact provided
+    if (nameToUse && phoneToUse && phoneToUse.replace(/\D/g, "").length >= 10) {
       const leadData = {
         name: nameToUse,
         phone: phoneToUse,
@@ -542,6 +544,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           calculated_discount: discount,
           scholarship_percent: slab.scholarshipPercent,
           payable_sem: slab.payableFeeSem,
+          admission_year: "2027-28",
         },
       };
       try {
@@ -565,42 +568,37 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     });
   };
 
-  // Initial calculation on mount (auto-evaluate default 780 marks for instant fee view)
+  // Initial calculation on mount - show base fee breakdown immediately without false defaults
   useEffect(() => {
-    const initialMatch = matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
-    const initialSlabIdx = initialMatch.slabIndex >= 0 ? initialMatch.slabIndex : 1;
-    setSelectedSlabIndex(initialSlabIdx);
     computeAndSaveSnapshot(
       currentProgram,
       currentExam,
-      enteredScore,
-      initialSlabIdx,
+      "",
+      -1,
       savedLead?.name || "",
       savedLead?.phone || ""
     );
   }, []);
 
-  // Handle score change live
+  // Handle score change live - updates fee snapshot immediately
   const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEnteredScore(val);
     const res = matchSlabFromScore(currentProgram, currentExam.key, val);
     setSelectedSlabIndex(res.slabIndex);
 
-    // Live update snapshot if already verified
-    if (isVerified && savedLead) {
-      computeAndSaveSnapshot(
-        currentProgram,
-        currentExam,
-        val,
-        res.slabIndex,
-        savedLead.name,
-        savedLead.phone
-      );
-    }
+    // Live update snapshot immediately for all students
+    computeAndSaveSnapshot(
+      currentProgram,
+      currentExam,
+      val,
+      res.slabIndex,
+      savedLead?.name || studentName.trim(),
+      savedLead?.phone || studentPhone.trim()
+    );
   };
 
-  // Apply quick preset
+  // Apply quick preset - updates fee snapshot immediately
   const applyPreset = (preset: QuickPreset) => {
     setEnteredScore(preset.value);
     setSelectedExamKey(preset.examKey);
@@ -662,33 +660,81 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     );
   };
 
-  // Form submit handler
+  // Form submit handler for score calculation (immediate, no name/phone required)
   const handleCalculateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    let nameToUse = savedLead?.name || "";
-    let phoneToUse = savedLead?.phone || "";
-
-    // If not verified, validate inputs
-    if (!isVerified) {
-      const cleanName = studentName.trim();
-      const cleanPhone = studentPhone.replace(/\D/g, "");
-      if (!cleanName) {
-        setValidationError("Please enter student name to view official fee structure.");
-        return;
-      }
-      if (cleanPhone.length < 10) {
-        setValidationError("Please enter a valid 10-digit mobile number for admissions authentication.");
-        return;
-      }
-      nameToUse = cleanName;
-      phoneToUse = studentPhone.trim();
-      setValidationError(null);
-    }
-
     const res = matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
     setSelectedSlabIndex(res.slabIndex);
-    await computeAndSaveSnapshot(currentProgram, currentExam, enteredScore, res.slabIndex, nameToUse, phoneToUse);
+    await computeAndSaveSnapshot(
+      currentProgram,
+      currentExam,
+      enteredScore,
+      res.slabIndex,
+      savedLead?.name || studentName.trim(),
+      savedLead?.phone || studentPhone.trim()
+    );
+  };
+
+  // Optional admissions callback / lead request handler with mandatory consent
+  const handleRequestCallback = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanName = studentName.trim();
+    const cleanPhone = studentPhone.replace(/\D/g, "");
+    if (!cleanName) {
+      setValidationError("Please enter student name.");
+      return;
+    }
+    if (cleanPhone.length < 10) {
+      setValidationError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    if (!consentAgreed) {
+      setValidationError("Please agree that SR University may contact you about admissions.");
+      return;
+    }
+
+    setValidationError(null);
+    const leadData = {
+      name: cleanName,
+      phone: cleanPhone,
+      program_interest: currentProgram.name,
+      score: scoreMatch.displayText || enteredScore || "Direct Inquiry",
+      exam_type: currentExam.label,
+      source: "scholarship_calculator_callback",
+      metadata: {
+        consent_given: true,
+        calculated_discount: calculatedSnapshot?.discountAmount || 0,
+        scholarship_percent: calculatedSnapshot?.slab.scholarshipPercent || 0,
+        payable_sem: calculatedSnapshot?.slab.payableFeeSem || currentProgram.baseTuitionSem,
+        admission_year: "2027-28",
+      },
+    };
+    try {
+      localStorage.setItem("sru_student_lead", JSON.stringify({ name: cleanName, phone: cleanPhone }));
+      setIsVerified(true);
+      await createLead(leadData);
+      setLeadSuccessMsg("Admissions callback requested! An admissions counselor will reach out to you shortly.");
+    } catch (err) {
+      console.warn("Lead registration note:", err);
+      setLeadSuccessMsg("Your inquiry was recorded. Our admissions team will reach out to you shortly.");
+    }
+  };
+
+  // WhatsApp Share handler
+  const handleWhatsAppShare = () => {
+    if (!calculatedSnapshot) return;
+    const p = calculatedSnapshot.program;
+    const score = calculatedSnapshot.enteredScore || "N/A";
+    const pct = calculatedSnapshot.slab.scholarshipPercent;
+    const semFee = calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN");
+    const annualFee = (calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN");
+    const text = `Hello SR University Admissions! I calculated my fee estimate for ${p.name} (Admissions 2027-28).\n• Score/Rank: ${score}\n• Scholarship: ${pct}%\n• Net Tuition: ₹${semFee}/sem (₹${annualFee}/year)\nPlease share further admission and counseling guidance.`;
+    window.open(`https://wa.me/918331003030?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  // Print PDF handler
+  const handlePrint = () => {
+    window.print();
   };
 
   // Matched slab info for badge
@@ -889,54 +935,6 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </div>
             </div>
           </div>
-
-          {/* If NOT verified: prompt student for Name & Mobile Number */}
-          {!isVerified && (
-            <div className="calc-auth-box">
-              <div className="calc-auth-header">
-                <ShieldCheckIcon size={15} />
-                <span>Student Verification (Required for Official Fee Calculation)</span>
-              </div>
-              <div className="calc-auth-grid">
-                <div className="calc-field">
-                  <label htmlFor="calc-student-name">Student Full Name *</label>
-                  <input
-                    id="calc-student-name"
-                    type="text"
-                    className="calc-input"
-                    placeholder="Enter student full name"
-                    value={studentName}
-                    onChange={(e) => {
-                      setStudentName(e.target.value);
-                      if (validationError) setValidationError(null);
-                    }}
-                    required
-                  />
-                </div>
-                <div className="calc-field">
-                  <label htmlFor="calc-student-phone">10-Digit Mobile Number *</label>
-                  <input
-                    id="calc-student-phone"
-                    type="tel"
-                    className="calc-input"
-                    placeholder="e.g. 9876543210"
-                    value={studentPhone}
-                    onChange={(e) => {
-                      setStudentPhone(e.target.value);
-                      if (validationError) setValidationError(null);
-                    }}
-                    maxLength={15}
-                    required
-                  />
-                </div>
-              </div>
-              {validationError && (
-                <div className="calc-error-banner">
-                  <span>{validationError}</span>
-                </div>
-              )}
-            </div>
-          )}
         </form>
 
         {/* 4. Official Fee Structure Breakdown */}
@@ -945,7 +943,10 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
             <div className="result-section-header">
               <div className="result-header-title">
                 <TrendingUpIcon size={16} />
-                <h4>Official Fee Structure & Payable Amounts</h4>
+                <div>
+                  <h4>Official Fee Structure & Payable Amounts</h4>
+                  <span className="result-source-note">2027-28 fees, as per the SR University Admissions Office</span>
+                </div>
               </div>
               <span className="result-program-badge">
                 {calculatedSnapshot.program.name}
@@ -1119,8 +1120,89 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </div>
             </div>
 
-            {/* Footer Action */}
+            {/* Optional Admissions Counselor Callback Box */}
+            <div className="calc-auth-box">
+              <div className="calc-auth-header">
+                <ShieldCheckIcon size={15} />
+                <span>Request an Admissions Counselor Callback (Optional)</span>
+              </div>
+              <p className="calc-auth-subtext">
+                Lock in this scholarship estimate and receive official counselor guidance for 2027-28 admissions.
+              </p>
+              {leadSuccessMsg ? (
+                <div className="calc-lead-success">
+                  <CheckIcon size={16} />
+                  <span>{leadSuccessMsg}</span>
+                </div>
+              ) : (
+                <div className="calc-callback-form-wrap">
+                  <div className="calc-auth-grid">
+                    <div className="calc-field">
+                      <label htmlFor="calc-student-name">Student Full Name</label>
+                      <input
+                        id="calc-student-name"
+                        type="text"
+                        className="calc-input"
+                        placeholder="Enter full name"
+                        value={studentName}
+                        onChange={(e) => {
+                          setStudentName(e.target.value);
+                          if (validationError) setValidationError(null);
+                        }}
+                      />
+                    </div>
+                    <div className="calc-field">
+                      <label htmlFor="calc-student-phone">10-Digit Mobile Number</label>
+                      <input
+                        id="calc-student-phone"
+                        type="tel"
+                        className="calc-input"
+                        placeholder="e.g. 9876543210"
+                        value={studentPhone}
+                        onChange={(e) => {
+                          setStudentPhone(e.target.value);
+                          if (validationError) setValidationError(null);
+                        }}
+                        maxLength={15}
+                      />
+                    </div>
+                  </div>
+                  <label className="calc-consent-label">
+                    <input
+                      type="checkbox"
+                      checked={consentAgreed}
+                      onChange={(e) => setConsentAgreed(e.target.checked)}
+                    />
+                    <span>I agree that SR University may contact me about admissions.</span>
+                  </label>
+                  {validationError && (
+                    <div className="calc-error-banner">
+                      <span>{validationError}</span>
+                    </div>
+                  )}
+                  <button type="button" onClick={handleRequestCallback} className="calc-callback-btn">
+                    Request Admissions Callback
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Action Buttons */}
             <div className="calc-footer-actions">
+              <button
+                type="button"
+                className="btn-whatsapp"
+                onClick={handleWhatsAppShare}
+              >
+                <span>💬 Send Estimate to WhatsApp</span>
+              </button>
+              <button
+                type="button"
+                className="btn-print"
+                onClick={handlePrint}
+              >
+                <span>🖨️ Download / Print PDF</span>
+              </button>
               <button
                 type="button"
                 className="btn-ask-buddy"

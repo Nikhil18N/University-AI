@@ -28,24 +28,24 @@ interface Props {
 
 const MINIMAL_STARTERS = [
   {
-    title: "Admissions 2026",
-    desc: "Eligibility criteria, cutoff ranks & application procedure",
-    prompt: "What is the eligibility criteria and admission process for B.Tech 2026?",
+    title: "Fees for 2027-28",
+    desc: "Official tuition breakdown, hostel fee tiers & scholarship slabs",
+    prompt: "What is the complete fee structure and hostel fee for B.Tech for 2027-28?",
   },
   {
-    title: "Fees & Scholarships",
-    desc: "Tuition breakdown, hostel fee tiers & merit scholarships",
-    prompt: "What is the complete fee structure and merit scholarship details for B.Tech?",
+    title: "Scholarship for My Marks",
+    desc: "Calculate waiver based on 10+2 marks, JEE percentile, or EAPCET rank",
+    prompt: "How much scholarship can I get for B.Tech based on my 10+2 marks or EAPCET rank?",
   },
   {
-    title: "Hostel Living & Rules",
-    desc: "Room types, mess schedule, night curfew & out-pass policies",
-    prompt: "What are the hostel room options, mess food, and curfew rules?",
+    title: "Is the Degree Valid?",
+    desc: "UGC recognition, Telangana State Act 2018 & NBA/NAAC accreditation",
+    prompt: "Is SR University degree valid for government jobs, higher education in India and abroad?",
   },
   {
-    title: "Placements & Recruiters",
-    desc: "Highest packages, placement rate & top campus hiring companies",
-    prompt: "Tell me about SR University placement records, top recruiters, and highest package",
+    title: "Book a Campus Visit",
+    desc: "170-acre green campus tour, SRiX incubation center & labs",
+    prompt: "I want to visit the SR University campus. How can I book a campus tour?",
   },
 ];
 
@@ -952,7 +952,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             onSend={handleSendMessage}
             isLoading={isLoading}
             onStop={handleStopStreaming}
-            disabled={false}
+            disabled={isLoading}
           />
         </main>
       </div>

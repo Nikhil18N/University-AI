@@ -1815,3 +1815,150 @@
   }
 }
 
+/* Agent Specific Cards Styling */
+.agent-fee-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.agent-fee-stat {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+}
+
+.agent-fee-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+}
+
+.agent-fee-stat-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 4px 0 2px 0;
+  color: var(--text-1, #0f172a);
+}
+
+.agent-fee-stat-val.bold-emerald {
+  color: #10b981;
+}
+
+.agent-fee-stat-val.bold-blue {
+  color: var(--sru-blue, #0055a4);
+}
+
+.agent-fee-stat-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.agent-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border, #e2e8f0);
+}
+
+.agent-card-source-tag {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  font-style: italic;
+}
+
+.agent-card-wa-btn {
+  background: #25D366;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.agent-card-wa-btn:hover {
+  background: #20ba5a;
+}
+
+.agent-action-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agent-action-msg {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-1, #0f172a);
+  line-height: 1.5;
+}
+
+.agent-action-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #64748b);
+  background: var(--surface-2, #f8fafc);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #e2e8f0);
+}
+
+.agent-card-map-btn {
+  font-size: 0.78rem;
+  color: var(--sru-blue, #0055a4);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.agent-contacts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.agent-contact-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--surface-2, #f8fafc);
+  color: var(--text-1, #0f172a);
+  border: 1px solid var(--border, #e2e8f0);
+  transition: all 0.18s ease;
+}
+
+.agent-contact-pill:hover {
+  transform: translateY(-1px);
+}
+
+.agent-contact-pill.wa {
+  background: rgba(37, 211, 102, 0.12);
+  color: #15803d;
+  border-color: rgba(37, 211, 102, 0.3);
+}
+
+.agent-contact-pill.primary {
+  background: var(--sru-blue, #0055a4);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+

@@ -654,6 +654,144 @@ export function ProgramsOfferedCard({ card }: CardProps) {
   );
 }
 
+export function AgentFeeCard({ card }: CardProps) {
+  const d = card.data || {};
+  const progName = d.program_name || d.program || "Academic Program";
+  const semTuition = d.net_tuition_per_sem ?? d.base_tuition_per_sem ?? 0;
+  const annualTuition = d.net_tuition_annual ?? d.base_tuition_annual ?? 0;
+  const waiver = d.scholarship_percent || 0;
+  const firstYearTotal = d.first_year_tuition_plus_onetime ?? (annualTuition + (d.one_time_fees || 0));
+
+  const handleWhatsApp = () => {
+    const text = `Hello SR University Admissions! I received this fee calculation for ${progName} (${d.admission_year || "2027-28"}). Net Tuition: ₹${semTuition.toLocaleString("en-IN")}/sem, Scholarship: ${waiver}%. Please assist me with admissions.`;
+    window.open(`https://wa.me/918331003030?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  return (
+    <div className="rich-card fee-card agent-fee-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">
+          <RupeeIcon size={14} /> Official 2027-28 Fee
+        </span>
+        <h4 className="card-title">{progName}</h4>
+      </div>
+      <div className="agent-fee-stats-grid">
+        <div className="agent-fee-stat">
+          <span className="agent-fee-stat-label">Net Tuition / Sem</span>
+          <span className="agent-fee-stat-val bold-emerald">₹{semTuition.toLocaleString("en-IN")}</span>
+          <span className="agent-fee-stat-sub">per semester</span>
+        </div>
+        <div className="agent-fee-stat">
+          <span className="agent-fee-stat-label">Merit Scholarship</span>
+          <span className="agent-fee-stat-val bold-blue">{waiver > 0 ? `${waiver}% Waiver` : "Standard Slabs"}</span>
+          <span className="agent-fee-stat-sub">official merit waiver</span>
+        </div>
+        <div className="agent-fee-stat">
+          <span className="agent-fee-stat-label">1st Year Tuition + One-Time</span>
+          <span className="agent-fee-stat-val">₹{firstYearTotal.toLocaleString("en-IN")}</span>
+          <span className="agent-fee-stat-sub">includes enrollment & admission</span>
+        </div>
+      </div>
+      <div className="agent-card-footer">
+        <span className="agent-card-source-tag">Source: {d.source || "SR University Admissions Office (2027-28)"}</span>
+        <button type="button" className="agent-card-wa-btn" onClick={handleWhatsApp}>
+          💬 WhatsApp Admissions
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function AgentCallbackCard({ card }: CardProps) {
+  const d = card.data || {};
+  return (
+    <div className="rich-card agent-action-card callback-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">
+          ✓ Callback Requested
+        </span>
+        <h4 className="card-title">Admissions Counselor Call Scheduled</h4>
+      </div>
+      <div className="agent-action-body">
+        <p className="agent-action-msg">
+          Thank you, <strong>{d.name || "Student"}</strong>. An official SR University admissions counselor will contact you on your registered mobile (ending in <strong>•••{d.phone_last4 || "••••"}</strong>).
+        </p>
+        <div className="agent-action-meta">
+          {d.preferred_time && <div><strong>Preferred Time:</strong> {d.preferred_time}</div>}
+          {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
+          <div><strong>Admissions Helpline:</strong> +91 8331003030 / 9959664400</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AgentCampusVisitCard({ card }: CardProps) {
+  const d = card.data || {};
+  return (
+    <div className="rich-card agent-action-card visit-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">
+          🏛️ Campus Tour
+        </span>
+        <h4 className="card-title">Campus Visit Scheduled</h4>
+      </div>
+      <div className="agent-action-body">
+        <p className="agent-action-msg">
+          Visit requested for <strong>{d.visit_date || "Upcoming date"}</strong> for <strong>{d.visitors || 1} visitor(s)</strong>.
+        </p>
+        <div className="agent-action-meta">
+          <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
+          <div><strong>Timings:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
+          {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
+        </div>
+        <div className="agent-card-footer">
+          <span className="agent-card-source-tag">The admissions team will confirm arrival logistics via phone.</span>
+          <a
+            href="https://maps.google.com/?q=SR+University+Warangal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="agent-card-map-btn"
+          >
+            📍 Open in Google Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AgentContactLinksCard({ card }: CardProps) {
+  const d = card.data || {};
+  return (
+    <div className="rich-card agent-action-card contact-card">
+      <div className="card-header">
+        <span className="card-badge">
+          📞 Direct Contacts
+        </span>
+        <h4 className="card-title">SR University Admissions Office</h4>
+      </div>
+      <div className="agent-contacts-row">
+        {d.phone && (
+          <a href={`tel:${d.phone}`} className="agent-contact-pill">
+            📞 Call {d.phone}
+          </a>
+        )}
+        {d.whatsapp && (
+          <a href={d.whatsapp} target="_blank" rel="noopener noreferrer" className="agent-contact-pill wa">
+            💬 WhatsApp Us
+          </a>
+        )}
+        {d.apply_online && (
+          <a href={d.apply_online} target="_blank" rel="noopener noreferrer" className="agent-contact-pill primary">
+            📝 Apply Online 2027-28
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function RenderCard({ card }: { card: any }) {
   if (!card || !card.type) return null;
 
@@ -662,6 +800,14 @@ export function RenderCard({ card }: { card: any }) {
       return <ComparisonCard card={card} />;
     case "fee_breakdown":
       return <FeeBreakdownCard card={card} />;
+    case "calculate_fee":
+      return <AgentFeeCard card={card} />;
+    case "request_counsellor_callback":
+      return <AgentCallbackCard card={card} />;
+    case "book_campus_visit":
+      return <AgentCampusVisitCard card={card} />;
+    case "get_contact_and_apply_links":
+      return <AgentContactLinksCard card={card} />;
     case "curriculum":
       return <CurriculumCard card={card} />;
     case "campus_tour":

@@ -109,7 +109,10 @@ export function sendMessageStream(
 
   (async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/chat/stream`, {
+      const useAgent = import.meta.env.VITE_USE_AGENT !== "false";
+      let streamUrl = useAgent ? `${API_BASE}/api/v1/agent/stream` : `${API_BASE}/api/v1/chat/stream`;
+
+      let res = await fetch(streamUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -119,6 +122,20 @@ export function sendMessageStream(
         }),
         signal: controller.signal,
       });
+
+      if (!res.ok && useAgent && (res.status === 404 || res.status === 405)) {
+        // Zero-downtime fallback to legacy chat stream
+        res = await fetch(`${API_BASE}/api/v1/chat/stream`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId,
+            message,
+            conversation_id: conversationId || null,
+          }),
+          signal: controller.signal,
+        });
+      }
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));

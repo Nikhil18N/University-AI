@@ -83,12 +83,15 @@ async def lifespan(fastapi_app: FastAPI):
     logger.info("Shutting down University AI Companion")
 
 
-# Create the FastAPI app
+# Create the FastAPI app (public docs disabled in production per audit security requirements)
 app = FastAPI(
     title="University AI Companion",
-    description="Conversational AI with RAG for university knowledge",
-    version="0.1.0",
+    description="Conversational AI with RAG and Function-Calling Agent for university knowledge",
+    version="0.2.0",
     lifespan=lifespan,
+    docs_url="/docs" if settings.APP_DEBUG else None,
+    redoc_url="/redoc" if settings.APP_DEBUG else None,
+    openapi_url="/openapi.json" if settings.APP_DEBUG else None,
 )
 
 # CORS
@@ -216,8 +219,74 @@ async def health_check() -> HealthResponse:
 from app.api.v1.chat import router as chat_router
 from app.api.v1.admin import router as admin_router
 from app.api.v1.lead import router as lead_router
+from app.sru_agent.router import router as agent_router
+from app.sru_agent import tools as agent_tools
+
+# Connect agent knowledge retrieval to ChromaDB
+async def agent_knowledge_search(query: str):
+    try:
+        from app.db.chroma import get_chroma_client
+        from app.services.rag_service import COLLECTION_NAME
+        client = get_chroma_client()
+        collection = client.get_or_create_collection(
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"},
+        )
+        try:
+            from app.api.v1.deps import get_embedding_provider
+            emb_prov = get_embedding_provider()
+            emb = await emb_prov.embed_single(query)
+            results = collection.query(query_embeddings=[emb], n_results=5)
+        except Exception:
+            results = collection.query(query_texts=[query], n_results=5)
+
+        docs = results.get("documents", [[]])[0] if results.get("documents") else []
+        metas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []
+        return [{"title": (m or {}).get("title", ""), "text": d} for d, m in zip(docs, metas)]
+    except Exception as err:
+        logger.warning("agent_knowledge_search fallback on error: %s", err)
+        return []
+
+# Connect agent lead saving directly to PostgreSQL
+async def agent_lead_saver(lead_data: dict):
+    from app.db.session import async_session_factory
+    from app.schemas.lead import LeadCreate
+    from app.services import lead_service
+    lead_obj = LeadCreate(**lead_data)
+    async with async_session_factory() as session:
+        created = await lead_service.create_lead(session, lead_obj)
+        return {"id": str(created.id), "status": created.status}
+
+async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str, tools_used: list):
+    try:
+        import uuid
+        from app.db.session import async_session_factory
+        from app.services import conversation_service
+        from app.sru_agent import config as agent_config
+        async with async_session_factory() as session:
+            conv_uuid = uuid.UUID(conversation_id) if conversation_id else None
+            conv = await conversation_service.get_or_create_conversation(session, session_id, conv_uuid)
+            await conversation_service.add_message(session, conv.id, "user", user_text)
+            await conversation_service.add_message(
+                session,
+                conv.id,
+                "assistant",
+                answer,
+                model=agent_config.AGENT_MODEL,
+                metadata={"tools_used": tools_used},
+            )
+            await session.commit()
+    except Exception as err:
+        logger.warning("agent_turn_logger error: %s", err)
+
+from app.sru_agent.router import set_turn_logger
+set_turn_logger(agent_turn_logger)
+agent_tools.set_knowledge_search(agent_knowledge_search)
+agent_tools.set_lead_saver(agent_lead_saver)
 
 app.include_router(chat_router)
 app.include_router(admin_router)
 app.include_router(lead_router)
+app.include_router(agent_router)
+
 
