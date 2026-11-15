@@ -111,18 +111,33 @@ async def ensure_exemplars_seeded():
         if not collection:
             return
 
-        q = "What is the eligibility criteria and admission process for B.Tech 2026?"
-        match = await svc.find_matching_exemplar(q, distance_threshold=0.20)
-        if not match:
-            ans = (
+        # Foundational B.Tech eligibility exemplar (50% cutoff)
+        q1 = "What is the eligibility criteria and admission process for B.Tech?"
+        match1 = await svc.find_matching_exemplar(q1, distance_threshold=0.20)
+        if not match1:
+            ans1 = (
                 "To join our B.Tech program, you need to have passed your 10+2 or equivalent examination with "
                 "a minimum of 50% aggregate marks in Mathematics, Physics, and Chemistry (MPC). We offer admissions based "
                 "on board marks as well as JEE Main and TG EAPCET ranks.\n\n"
                 "To help confirm your eligibility and merit scholarship slab, could you please share your 10+2 MPC percentage?"
             )
-            await svc.register_exemplar(uuid.uuid4(), q, ans)
-            await svc.register_exemplar(uuid.uuid4(), "What is the eligibility criteria and admission process for B.Tech?", ans)
-            logger.info("Auto-seeded foundational B.Tech admission verified exemplar.")
+            await svc.register_exemplar(uuid.uuid4(), q1, ans1)
+
+        # Gold standard score & fee breakdown exemplar (878/1000 score)
+        q2 = "I scored 878/1000 in intermediate. What is my fee and scholarship?"
+        match2 = await svc.find_matching_exemplar(q2, distance_threshold=0.20)
+        if not match2:
+            ans2 = (
+                "Nice score! 87.8% falls in the 80–91.9% band, so you'd get the **25% merit waiver**: "
+                "₹2,55,000/year tuition (₹1,27,500 per semester), subject to marksheet verification. Tuition rises ₹9,000 yearly.\n\n"
+                "**Verification:** bring original 10th and 12th marksheets, TC, ID/category proof, and photos.\n"
+                "**Hostel:** 3- or 4-sharing, AC or Non-AC, ₹1,15,000–₹1,35,000/year including 4 meals.\n"
+                "**Rough first-year total:** about ₹3.70–3.90 lakh (tuition + room & mess), plus laundry and refundable deposits.\n\n"
+                "Want me to compare AC vs Non-AC, or check extra concessions you may qualify for?"
+            )
+            await svc.register_exemplar(uuid.uuid4(), q2, ans2)
+            logger.info("Auto-seeded gold standard merit scholarship verified exemplar.")
     except Exception as e:
         logger.warning("Could not auto-seed exemplars: %s", e)
+
 

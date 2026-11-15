@@ -219,7 +219,7 @@ MERIT_SCHOLARSHIP_CARD = {
             "category": "30% Tuition Waiver Slab",
             "amount": "₹2,38,000 / Year (CSE)",
             "frequency": "Save ₹1,02,000 / Year",
-            "note": "Inter 92–97.9% | CBSE 90–94.9% | JEE 90–94.5%ile | TG EAPCET 2001–8000",
+            "note": "Inter 92–97.9% | CBSE 90–94.9% | JEE 90–94.99%ile | TG EAPCET 2001–8000",
         },
         {
             "category": "25% Tuition Waiver Slab",
@@ -246,7 +246,7 @@ MERIT_SCHOLARSHIP_CARD = {
             "note": "Inter 60–64.9% | CBSE 60–64.9% | JEE 50–59.9%ile",
         },
     ],
-    "scholarship_note": "Calculated on standard B.Tech CSE base tuition (₹3,40,000/yr). Slabs apply similarly across all UG disciplines.",
+    "scholarship_note": "Calculated on standard B.Tech CSE base tuition (₹3,40,000/yr). Slabs apply similarly across all UG disciplines. Tuition rises ₹9,000 yearly. Subject to marksheet verification and Admissions Office confirmation.",
 }
 
 

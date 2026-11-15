@@ -81,5 +81,34 @@ def test_url_faithfulness_catches_unsupported_portal():
 
     sanitized = sanitize_hallucinated_urls(answer, unsupported)
     assert "portal.university.edu" not in sanitized
-    assert "coordinator" in sanitized.lower()
+    assert "admissions office" in sanitized.lower()
+
+
+def test_sanitize_hallucinated_urls_preserves_currency_and_numbers():
+    from app.services.guardrail_service import (
+        sanitize_hallucinated_urls,
+        verify_url_faithfulness,
+    )
+    # Ensure fees like ₹3,000 are not matched as URLs or mangled
+    text = "Tuition fee increase is ₹3,000 per year. Apply at unauthorized-domain.org"
+    evidence = "Tuition fee increase is ₹3,000 per year."
+    is_faithful, unsupported = verify_url_faithfulness(text, evidence)
+    assert is_faithful is False
+    assert "unauthorized-domain.org" in unsupported
+    assert "3,000" not in unsupported
+
+    sanitized = sanitize_hallucinated_urls(text, unsupported)
+    assert "₹3,000" in sanitized
+    assert "3,000 for the academic coordinator" not in sanitized
+    assert "Admissions Office" in sanitized
+
+
+def test_official_domains_are_faithful():
+    from app.services.guardrail_service import verify_url_faithfulness
+
+    official_text = "Apply online at https://apply.sru.edu.in or visit https://sru.edu.in"
+    evidence = "General overview of SR University."
+    is_faithful, unsupported = verify_url_faithfulness(official_text, evidence)
+    assert is_faithful is True
+    assert unsupported == []
 

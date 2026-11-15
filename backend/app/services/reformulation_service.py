@@ -116,6 +116,9 @@ DOMAIN_SYNONYMS: dict[str, str] = {
     "yearly fee": "annual fee structure",
     "total fees": "total fee structure",
     "how much fees": "fee structure",
+    "fee strcture": "fee structure",
+    "feestructure": "fee structure",
+    "fess": "fees",
 
     # Academics / marks
     "pass marks": "minimum passing marks",
@@ -131,6 +134,16 @@ DOMAIN_SYNONYMS: dict[str, str] = {
     #       step handles these naturally.
 
     # Common informal phrases (multi-word → clear search term)
+    "can i join sru & y": "SR University admission eligibility criteria and reasons to join SRU",
+    "can i join sru & why": "SR University admission eligibility criteria and reasons to join SRU",
+    "can i join sru and y": "SR University admission eligibility criteria and reasons to join SRU",
+    "can i join sru and why": "SR University admission eligibility criteria and reasons to join SRU",
+    "can i join & y": "SR University admission eligibility criteria and reasons to join SRU",
+    "can i join & why": "SR University admission eligibility criteria and reasons to join SRU",
+    "can i join and why": "SR University admission eligibility criteria and reasons to join SRU",
+    "why sru": "reasons to join SR University key advantages",
+    "why should i join": "reasons to join SR University key advantages",
+    "why should i join sru": "reasons to join SR University key advantages",
     "when to apply": "admission application deadline",
     "how to join": "admission enrollment procedure",
     "how to get in": "admission eligibility and procedure",
@@ -216,6 +229,10 @@ TYPO_CORRECTIONS: dict[str, str] = {
     "admiission": "admission",
     "eligiility": "eligibility",
     "hostelite": "hostel student",
+    "y": "why",
+    "fess": "fees",
+    "fee strcture": "fee structure",
+    "feestructure": "fee structure",
 }
 
 # ---------------------------------------------------------------------------

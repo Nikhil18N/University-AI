@@ -64,3 +64,19 @@ async def test_reformulate_query():
         llm_provider=mock_llm,
     )
     assert reformulated == "What are the hostel curfew hours and late entry penalties?"
+
+
+def test_canonicalize_query_typos_and_shorthand():
+    from app.services.reformulation_service import canonicalize_query
+
+    # Shorthand 'y' -> 'why', 'fess' -> 'fees'
+    assert canonicalize_query("y is the curfew at that time?") == "why is the curfew at that time?"
+    assert "reasons to join" in canonicalize_query("y should I join?").lower()
+    assert "fees" in canonicalize_query("what is the fess?")
+    assert "fee structure" in canonicalize_query("tell me fee strcture")
+    assert "fee structure" in canonicalize_query("btech feestructure")
+
+    # 'Can I join SRU & y'
+    result = canonicalize_query("Can I join SRU & y")
+    assert "eligibility" in result.lower()
+    assert "reasons to join" in result.lower()

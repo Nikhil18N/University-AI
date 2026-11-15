@@ -68,9 +68,11 @@ def verify_retrieval_confidence(
 
 
 URL_PATTERN = re.compile(
-    r"(?:https?://[^\s)\]]+|portal\.[a-z0-9.-]+|(?:www\.)?[a-z0-9-]+\.(?:edu|edu\.in|com|org)/[^\s)\]]*)",
+    r"(?:https?://[^\s)\]]+|portal\.[a-z0-9.-]+\.[a-z]{2,}|(?:www\.)?[a-z0-9-]+\.(?:edu|edu\.in|ac\.in|com|org)(?:/[^\s)\]]*)?)",
     re.I,
 )
+
+OFFICIAL_ALLOWED_DOMAINS = ("sru.edu.in", "apply.sru.edu.in", "wa.me", "maps.google.com")
 
 
 def verify_url_faithfulness(
@@ -86,24 +88,34 @@ def verify_url_faithfulness(
         return True, []
 
     evidence_lower = evidence_text.lower()
-    unsupported = [
-        url for url in found_urls if url.lower() not in evidence_lower
-    ]
+    unsupported = []
+    for url in found_urls:
+        url_lower = url.lower()
+        if any(domain in url_lower for domain in OFFICIAL_ALLOWED_DOMAINS):
+            continue
+        if url_lower not in evidence_lower:
+            unsupported.append(url)
+
     return len(unsupported) == 0, unsupported
 
 
 def sanitize_hallucinated_urls(answer: str, unsupported_urls: list[str]) -> str:
-    """Replace unsupported portal links and fabricated URLs with offline contact instructions."""
+    """Replace unsupported portal links and fabricated URLs with official admissions contact instructions."""
     sanitized = answer
     for url in unsupported_urls:
-        sanitized = re.sub(
-            re.escape(url),
-            "the academic coordinator or admissions office",
-            sanitized,
-            flags=re.I,
-        )
-    # Also clean up phrases like "visit portal.university.edu" or "login at..."
+        # If preceded by at/via/on/visit/portal, replace gracefully
+        prep_pattern = re.compile(rf"\b(?:at|on|via|through|visit|portal)\s+{re.escape(url)}", re.I)
+        if prep_pattern.search(sanitized):
+            sanitized = prep_pattern.sub("the Admissions Office (0870-2818333 / info@sru.edu.in)", sanitized)
+        else:
+            sanitized = re.sub(
+                re.escape(url),
+                "the Admissions Office (0870-2818333 / info@sru.edu.in)",
+                sanitized,
+                flags=re.I,
+            )
     sanitized = re.sub(r"\blogin (?:at|to) (?:the )?", "contact the ", sanitized, flags=re.I)
     sanitized = re.sub(r"\bvisit (?:at|to) (?:the )?", "contact the ", sanitized, flags=re.I)
     return sanitized
+
 

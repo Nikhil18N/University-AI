@@ -58,3 +58,32 @@ async def test_exemplar_removal(mock_embedding_provider):
     success = await service.remove_exemplar(msg_id)
     assert success is True
     mock_collection.delete.assert_called_once_with(ids=[str(msg_id)])
+
+
+@pytest.mark.asyncio
+async def test_create_feedback_does_not_auto_promote_exemplar(mock_embedding_provider):
+    """Verify that user thumbs up (rating=1) does NOT automatically register exemplars."""
+    from unittest.mock import patch
+    from app.services.conversation_service import create_feedback
+    from app.schemas.chat import FeedbackRequest
+
+    mock_db = MagicMock()
+    mock_db.add = MagicMock()
+    async def mock_flush():
+        feedback_obj = mock_db.add.call_args[0][0]
+        feedback_obj.id = uuid.uuid4()
+    mock_db.flush = AsyncMock(side_effect=mock_flush)
+
+    request = FeedbackRequest(
+        session_id="test-session",
+        conversation_id=uuid.uuid4(),
+        message_id=uuid.uuid4(),
+        rating=1,
+        comment="Great answer!",
+    )
+
+    with patch("app.services.exemplar_service.ExemplarService.register_exemplar") as mock_register:
+        response = await create_feedback(mock_db, request, embeddings=mock_embedding_provider)
+        assert response.status == "received"
+        # register_exemplar should NOT have been called
+        mock_register.assert_not_called()

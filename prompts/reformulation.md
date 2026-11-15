@@ -21,9 +21,11 @@ Given the conversation history and a user's follow-up message, rephrase the foll
    - "syllubus / syllbus / silabus" → "syllabus"
    - "semister / semster" → "semester"
    - "libary" → "library", "faculity" → "faculty", "aplication" → "application"
-   - Informal short forms: "wht" → "what", "abt" → "about", "pls / plz" → "please", "u" → "you", "ur" → "your", "r" → "are", "2" → "to"
+   - "fess" → "fees", "fee strcture / feestructure" → "fee structure"
+   - Informal short forms: "y" → "why", "wht" → "what", "abt" → "about", "pls / plz" → "please", "u" → "you", "ur" → "your", "r" → "are", "2" → "to"
 
 4. **Translate informal / colloquial vocabulary to official university terminology:**
+   - "can i join sru & y" / "can i join & y" → "SR University admission eligibility criteria and reasons to join SRU"
    - "discount / concession / fee waiver / fee help / financial help" → "scholarship and fee concession"
    - "dorm / room / quarters / pg / paying guest / stay" → "hostel accommodation"
    - "salary / job package / avg salary / highest salary" → "placement package CTC"

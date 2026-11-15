@@ -36,6 +36,13 @@ def test_eapcet_rank_scholarship():
     assert r["scholarship_basis"] == "eapcet rank 9000"
 
 
+def test_jee_main_percentile_scholarship():
+    # 94.7 percentile falls in 90.0–94.99 slab which gets 30% scholarship
+    r = fees.calculate_fee("cse", jee_percentile=94.7)
+    assert r["scholarship_percent"] == 30
+    assert r["scholarship_basis"] == "jee percentile 94.7"
+
+
 def test_score_without_table_is_not_guessed():
     # PG has no eapcet_rank configured
     r = fees.calculate_fee("mba", eapcet_rank=500)

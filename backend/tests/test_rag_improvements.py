@@ -167,3 +167,54 @@ async def test_fast_lexical_rerank():
         assert len(async_reranked) == 3
         assert "curfew" in async_reranked[0]["content"].lower() or "hostel" in async_reranked[0]["content"].lower()
 
+
+def test_phd_filtering_for_undergrad_queries():
+    """Verify that Ph.D. regulations are deprioritized or suppressed for undergraduate queries."""
+    mock_llm = MagicMock()
+    mock_embed = MagicMock()
+
+    with patch("app.services.rag_service.chromadb.PersistentClient"):
+        rag = RAGService(llm_provider=mock_llm, embedding_provider=mock_embed)
+        chunks = [
+            {
+                "content": "Ph.D. doctoral regulations and minimum research credits.",
+                "metadata": {"title": "Ph.D. Regulations", "document_id": "phd_handbook.pdf"},
+                "distance": 0.2,
+            },
+            {
+                "content": "B.Tech CSE undergraduate tuition fee is ₹3,40,000 per year.",
+                "metadata": {"title": "SRU Fee Schedule 2027-28", "document_id": "fees_2027_28.json"},
+                "distance": 0.25,
+            },
+        ]
+        reranked = rag._fast_lexical_rerank("What is the B.Tech CSE fee?", chunks, keep_top=2)
+        # B.Tech fee schedule should be ranked top
+        assert "B.Tech CSE undergraduate" in reranked[0]["content"]
+
+
+@pytest.mark.asyncio
+async def test_clean_citation_metadata_for_markdown():
+    """Verify that non-paginated markdown chunks do not emit misleading (p. 1)."""
+    mock_llm = MagicMock()
+    mock_embed = MagicMock()
+
+    with patch("app.services.rag_service.chromadb.PersistentClient"):
+        rag = RAGService(llm_provider=mock_llm, embedding_provider=mock_embed)
+        retrieved_chunks = [
+            {
+                "content": "Hostel rules and timings.",
+                "metadata": {
+                    "document_id": "hostel_rules.md",
+                    "title": "SRU Hostel Rules",
+                    "section": "Timings",
+                    "page": 1,
+                },
+            }
+        ]
+        rag.exemplars.find_matching_exemplar = AsyncMock(return_value=None)
+        messages, sources, evidence_text = await rag.prepare_rag_request("hostel timings", "", retrieved_chunks)
+        assert len(sources) == 1
+        # page should be None so UI formats as "§ Timings" rather than "(p. 1)"
+        assert sources[0]["page"] is None
+        assert sources[0]["section"] == "Timings"
+

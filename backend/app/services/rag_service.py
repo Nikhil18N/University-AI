@@ -45,10 +45,12 @@ class RAGService:
 
     def _fast_lexical_rerank(self, query: str, chunks: list[dict], keep_top: int = 4) -> list[dict]:
         """Rerank candidate chunks using zero-network lexical overlap fused with vector distance."""
-        if len(chunks) <= keep_top:
-            return chunks
+        if not chunks:
+            return []
 
-        query_terms = set(re.findall(r"\w+", query.lower()))
+        query_lower = query.lower()
+        is_phd_query = any(t in query_lower for t in ("phd", "ph.d", "doctoral", "doctorate", "research scholar"))
+        query_terms = set(re.findall(r"\w+", query_lower))
         query_terms -= {
             "what", "is", "are", "the", "for", "in", "of", "to", "and", "a", "an",
             "how", "can", "tell", "me", "about", "sru", "university", "please", "do",
@@ -61,12 +63,25 @@ class RAGService:
             title_lower = meta.get("title", "").lower()
             section_lower = meta.get("section", "").lower()
 
+            # Suppress Ph.D. regulations for undergrad / general queries
+            if not is_phd_query and any(p in title_lower or p in section_lower for p in ("phd", "ph.d", "doctoral")):
+                continue
+
             content_hits = sum(1 for term in query_terms if term in content_lower)
             title_hits = sum(2.5 for term in query_terms if term in title_lower or term in section_lower)
             lexical_score = content_hits + title_hits
 
+            # Priority: official fee schedule / Verified Registry > Student Handbook > Marketing presentation
+            tier_boost = 0.0
+            if "verified" in title_lower or "official" in title_lower or "09_verified_sru_facts" in title_lower:
+                tier_boost += 0.8
+            elif "handbook" in title_lower or "regulations" in title_lower:
+                tier_boost += 0.3
+            elif any(m in title_lower for m in ("marketing", "presentation", "deck", "pitch", "brochure")):
+                tier_boost -= 1.0
+
             dist = c.get("distance") if c.get("distance") is not None else 0.5
-            composite_score = lexical_score * 0.4 + (1.0 - dist) * 2.0
+            composite_score = lexical_score * 0.4 + (1.0 - dist) * 2.0 + tier_boost
             scored_chunks.append((composite_score, c))
 
         scored_chunks.sort(key=lambda x: x[0], reverse=True)
@@ -131,17 +146,36 @@ class RAGService:
             or chunk["distance"] <= max_dist
         ]
 
-        # Prioritize verified registry and domain-specific terms
+        query_lower = query.lower()
+        is_phd_query = any(t in query_lower for t in ("phd", "ph.d", "doctoral", "doctorate", "research scholar"))
+
+        # Prioritize verified registry and domain-specific terms; penalize out-of-scope sources
         for chunk in chunks:
             meta = chunk.get("metadata", {})
             title = meta.get("title", "").lower()
+            section = meta.get("section", "").lower()
             content = chunk.get("content", "").lower()
+
+            # Heavy penalty for Ph.D. regulations on non-doctoral queries
+            if not is_phd_query and any(p in title or p in section for p in ("phd", "ph.d", "doctoral")):
+                if chunk.get("distance") is not None:
+                    chunk["distance"] += 0.35
+                continue
+
             bonus = 0.0
-            if "verified knowledge registry" in title or "09_verified_sru_facts" in title:
-                bonus += 0.06
-            if any(term in content for term in ["51 lpa", "50%", "60%", "triple sharing", "curfew", "deepak garg", "varada reddy"]):
+            if "verified knowledge registry" in title or "09_verified_sru_facts" in title or "official fee schedule" in title:
+                bonus += 0.08
+            elif "handbook" in title:
                 bonus += 0.04
-            if chunk.get("distance") is not None and bonus > 0:
+
+            # Demote marketing decks for fee/rule queries
+            if any(m in title for m in ("marketing", "presentation", "deck", "pitch", "brochure")):
+                bonus -= 0.12
+
+            if any(term in content for term in ["51 lpa", "50%", "60%", "triple sharing", "curfew", "deepak garg", "varada reddy"]):
+                bonus += 0.03
+
+            if chunk.get("distance") is not None:
                 chunk["distance"] = max(0.0, chunk["distance"] - bonus)
 
         # Sort by distance
@@ -190,7 +224,8 @@ class RAGService:
             meta = raw_meta if isinstance(raw_meta, dict) else {}
             section = meta.get("section", "")
             page_url = meta.get("page_url", "")
-            label = section or meta.get("title", "Unknown")
+            title = meta.get("title", "Unknown")
+            label = f"{title} (§ {section})" if section else title
             chunk_content = chunk.get("content", "")
             evidence_parts.append(
                 f"[Source {i}] {label}"
@@ -201,11 +236,15 @@ class RAGService:
             doc_key = (meta.get("document_id", ""), meta.get("section", meta.get("page", "")))
             if doc_key not in seen_docs:
                 seen_docs.add(doc_key)
+                raw_page = meta.get("page")
+                # Do not emit misleading (p. 1) for non-paginated markdown/text files
+                is_markdown = str(meta.get("document_id", "")).endswith((".md", ".txt"))
+                clean_page = None if (is_markdown and raw_page == 1) else raw_page
                 sources.append({
                     "document_id": meta.get("document_id", ""),
-                    "title": meta.get("title", "Unknown"),
+                    "title": title,
                     "section": meta.get("section", ""),
-                    "page": meta.get("page"),
+                    "page": clean_page,
                     "page_url": meta.get("page_url", ""),
                     "department": meta.get("department"),
                     "effective_date": meta.get("effective_date"),
