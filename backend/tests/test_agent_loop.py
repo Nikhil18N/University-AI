@@ -111,3 +111,36 @@ async def test_tool_loop_is_capped():
     events = await _run(client, "courses?", "s-cap")
     assert events[-1]["type"] == "done" and len(events[-1]["tools_used"]) == 4
     assert len(client.requests) == 5
+
+
+def test_agent_model_aliases_normalize_deprecated_models():
+    """Verify deprecated Gemini models are automatically upgraded to gemini-3.5-flash-lite."""
+    from app.sru_agent import config
+    assert config.MODEL_ALIASES.get("gemini-2.0-flash") == "gemini-3.5-flash-lite"
+    assert config.MODEL_ALIASES.get("gemini-2.0-flash-lite") == "gemini-3.5-flash-lite"
+    assert config.MODEL_ALIASES.get("gemini-2.5-flash") == "gemini-3.5-flash-lite"
+    assert config.AGENT_MODEL == "gemini-3.5-flash-lite"
+
+
+@pytest.mark.asyncio
+async def test_model_fallback_on_404_not_found():
+    """Verify that a 404/deprecated model error triggers immediate fallback to an active model."""
+    class FallbackClient:
+        def __init__(self):
+            self.aio = self
+            self.models = self
+            self.calls = []
+
+        async def generate_content(self, model, contents, config):
+            self.calls.append(model)
+            if len(self.calls) == 1:
+                # Simulate Google GenAI 404 NOT_FOUND error on deprecated model
+                raise Exception("404 NOT_FOUND: models/gemini-2.0-flash is no longer available")
+            return _text("Fallback model successfully answered!")
+
+    client = FallbackClient()
+    events = await _run(client, "hello", "s-fallback")
+    assert len(client.calls) >= 2
+    assert events[-1]["type"] == "done"
+    assert events[-1]["answer"] == "Fallback model successfully answered!"
+

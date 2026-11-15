@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # ---- LLM ----
     LLM_PROVIDER: str = "gemini"
     LLM_BASE_URL: str = "http://localhost:11434"
-    LLM_MODEL: str = "gemini-3.1-flash-lite"
+    LLM_MODEL: str = "gemini-3.5-flash-lite"
     LLM_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     GEMINI_API_KEYS: str = ""  # Comma-separated list of Gemini API keys for pooling/rotation

@@ -85,21 +85,34 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                 tool_config=types.ToolConfig(function_calling_config=types.FunctionCallingConfig(
                     mode="NONE" if last_round else "AUTO")),
             )
-            try:
-                resp = await client.aio.models.generate_content(
-                    model=config.AGENT_MODEL, contents=contents, config=cfg)
-            except Exception as model_err:
-                err_str = str(model_err).lower()
-                if ("not found" in err_str or "404" in err_str) and config.AGENT_MODEL != "gemini-2.0-flash":
-                    log.warning("Agent model %s failed, falling back to gemini-2.0-flash: %s", config.AGENT_MODEL, model_err)
+            models_to_try = []
+            for m in (config.AGENT_MODEL, "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-2.5-flash"):
+                if m and m not in models_to_try:
+                    models_to_try.append(m)
+
+            resp = None
+            last_err = None
+            for model_name in models_to_try:
+                try:
                     resp = await client.aio.models.generate_content(
-                        model="gemini-2.0-flash", contents=contents, config=cfg)
-                elif ("not found" in err_str or "404" in err_str) and config.AGENT_MODEL != "gemini-1.5-flash":
-                    log.warning("Falling back to gemini-1.5-flash: %s", model_err)
-                    resp = await client.aio.models.generate_content(
-                        model="gemini-1.5-flash", contents=contents, config=cfg)
-                else:
+                        model=model_name, contents=contents, config=cfg)
+                    break
+                except Exception as model_err:
+                    err_str = str(model_err).lower()
+                    if "not found" in err_str or "404" in err_str or "no longer available" in err_str:
+                        log.warning(
+                            "Agent model %s unavailable (%s), attempting next fallback model...",
+                            model_name,
+                            model_err,
+                        )
+                        last_err = model_err
+                        continue
                     raise
+
+            if resp is None:
+                if last_err:
+                    raise last_err
+                raise RuntimeError("All agent models failed to respond")
 
             calls = resp.function_calls or []
             if not calls:
