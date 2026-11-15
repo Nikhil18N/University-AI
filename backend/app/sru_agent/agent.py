@@ -66,9 +66,22 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
 
     ctx = {"session_id": session_id, "conversation_id": conversation_id,
            "profile": await memory.get_profile(session_id)}
+    history = await memory.get_history(session_id)
     contents = [types.Content(role=h["role"], parts=[types.Part.from_text(text=h["text"])])
-                for h in await memory.get_history(session_id)]
+                for h in history]
     contents.append(types.Content(role="user", parts=[types.Part.from_text(text=message)]))
+
+    # Extract assistant openings from history for anti-repetition & variation rotation
+    assistant_openings = []
+    for h in history:
+        if h.get("role") in ("model", "assistant"):
+            text = h.get("text", "")
+            for line in text.split("\n"):
+                line = line.strip()
+                if line and not line.startswith(("#", ">", "|", "```", "•", "-", "*")):
+                    assistant_openings.append(line)
+                    break
+    variant_id = (len(assistant_openings) % 6) + 1
 
     tool_decl = _tool_declarations()
     used, cards, final = [], [], ""
@@ -76,7 +89,11 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
         for round_no in range(config.AGENT_MAX_TOOL_ROUNDS + 1):
             last_round = round_no == config.AGENT_MAX_TOOL_ROUNDS
             cfg = types.GenerateContentConfig(
-                system_instruction=build_system_prompt(ctx["profile"]),
+                system_instruction=build_system_prompt(
+                    ctx["profile"],
+                    variant_id=variant_id,
+                    used_openings=assistant_openings,
+                ),
                 tools=[tool_decl],
                 temperature=0.2,
                 max_output_tokens=900,

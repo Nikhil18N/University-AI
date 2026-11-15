@@ -418,12 +418,30 @@ async def handle_chat(
             if guidance:
                 rag_context = f"{rag_context}\n\n{guidance}".strip() if rag_context else guidance
 
+            # Calculate assistant openings and variant rotation
+            assistant_openings = []
+            for msg in recent:
+                if msg.get("role") in ("assistant", "model"):
+                    content = msg.get("content", "")
+                    for line in content.split("\n"):
+                        line = line.strip()
+                        if line and not line.startswith(("#", ">", "|", "```", "•", "-", "*")):
+                            assistant_openings.append(line)
+                            break
+            calculated_variant = (len(assistant_openings) % 6) + 1
+
             answer, sources = await rag_service.query(
                 question=request.message,
                 search_query=search_query,
                 conversation_context=rag_context,
+                variant_id=calculated_variant,
+                used_openings=assistant_openings,
             )
-            logger.info("Handled via RAG pipeline (search query: '%s')", search_query[:50])
+            logger.info(
+                "Handled via RAG pipeline (search query: '%s', variant: %d)",
+                search_query[:50],
+                calculated_variant,
+            )
 
         else:
             system_prompt = prompt_service.load_prompt("system")

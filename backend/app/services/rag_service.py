@@ -21,6 +21,50 @@ logger = logging.getLogger(__name__)
 COLLECTION_NAME = "university_documents"
 
 
+def extract_used_openings_and_variant(
+    conversation_context: str,
+    variant_id: int | None = None,
+    used_openings: list[str] | str | None = None,
+) -> tuple[int, str]:
+    """Extract first lines of up to last 5 assistant messages and determine VARIANT_ID."""
+    if isinstance(used_openings, list):
+        openings_list = [op.strip() for op in used_openings if op and op.strip()]
+        openings_str = "\n".join(f"- \"{op}\"" for op in openings_list[-5:]) if openings_list else "None yet (first reply in chat)"
+        calc_variant = variant_id if variant_id is not None else ((len(openings_list) % 6) + 1)
+        return calc_variant, openings_str
+    elif isinstance(used_openings, str) and used_openings.strip():
+        calc_variant = variant_id if variant_id is not None else 1
+        return calc_variant, used_openings.strip()
+
+    if not conversation_context or not conversation_context.strip():
+        calc_variant = variant_id if variant_id is not None else 1
+        return calc_variant, "None yet (first reply in chat)"
+
+    assistant_openings = []
+    # Match blocks like "assistant: ..." or "model: ..." in conversation_context
+    blocks = re.findall(
+        r"(?:^|\n)(?:assistant|model):\s*(.*?)(?=\n(?:user|system|assistant|model):|\Z)",
+        conversation_context,
+        re.DOTALL | re.IGNORECASE,
+    )
+    for block in blocks:
+        for line in block.split("\n"):
+            line = line.strip()
+            # Skip empty lines and markdown headers/tables/callouts
+            if line and not line.startswith(("#", ">", "|", "```", "•", "-", "*")):
+                assistant_openings.append(line)
+                break
+
+    recent_openings = assistant_openings[-5:]
+    if not recent_openings:
+        openings_str = "None yet (first reply in chat)"
+    else:
+        openings_str = "\n".join(f"- \"{op}\"" for op in recent_openings)
+
+    calc_variant = variant_id if variant_id is not None else ((len(assistant_openings) % 6) + 1)
+    return calc_variant, openings_str
+
+
 class RAGService:
     """Handles retrieval-augmented generation for university questions."""
 
@@ -35,6 +79,7 @@ class RAGService:
         self.embeddings = embedding_provider
         self.exemplars = ExemplarService(embedding_provider)
         self._chroma_client = get_chroma_client()
+        self.last_query_embedding: list[float] | None = None
 
     def _get_collection(self) -> chromadb.Collection:
         """Get or create the university documents collection."""
@@ -198,18 +243,10 @@ class RAGService:
         conversation_context: str,
         retrieved_chunks: list[dict],
         precomputed_embedding: list[float] | None = None,
+        variant_id: int | None = None,
+        used_openings: list[str] | str | None = None,
     ) -> tuple[list[dict[str, str]], list[dict], str]:
-        """Format evidence and prompt for the LLM. Returns (messages, sources, evidence_text).
-
-        Args:
-            question: The user's question.
-            conversation_context: Prior conversation history for context.
-            retrieved_chunks: Chunks returned by ``retrieve()`` / ``retrieve_with_embedding()``.
-            precomputed_embedding: Optional query embedding already computed
-                during retrieval. When provided it is forwarded to
-                ``find_matching_exemplar()`` so the embedding API is not called
-                a second time.
-        """
+        """Format evidence and prompt for the LLM. Returns (messages, sources, evidence_text)."""
         if not retrieved_chunks:
             return [], [], ""
 
@@ -265,12 +302,20 @@ class RAGService:
         else:
             exemplar_block = ""
 
+        calc_variant, openings_str = extract_used_openings_and_variant(
+            conversation_context,
+            variant_id=variant_id,
+            used_openings=used_openings,
+        )
+
         rag_prompt = render_prompt(
             "rag",
             question=question,
             conversation=conversation_context,
             evidence=evidence_text,
             exemplar=exemplar_block,
+            VARIANT_ID=str(calc_variant),
+            USED_OPENINGS=openings_str,
         )
 
         messages = [
@@ -285,6 +330,8 @@ class RAGService:
         conversation_context: str,
         retrieved_chunks: list[dict],
         precomputed_embedding: list[float] | None = None,
+        variant_id: int | None = None,
+        used_openings: list[str] | str | None = None,
     ) -> tuple[str, list[dict]]:
         """Generate a grounded answer using retrieved evidence.
 
@@ -303,6 +350,8 @@ class RAGService:
             conversation_context,
             retrieved_chunks,
             precomputed_embedding=precomputed_embedding,
+            variant_id=variant_id,
+            used_openings=used_openings,
         )
         answer = await self.llm.generate(messages, temperature=0.3)
 
@@ -358,6 +407,8 @@ class RAGService:
         conversation_context: str = "",
         top_k: int | None = None,
         search_query: str | None = None,
+        variant_id: int | None = None,
+        used_openings: list[str] | str | None = None,
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         retrieval_query = search_query or question
@@ -381,5 +432,7 @@ class RAGService:
             conversation_context,
             chunks,
             precomputed_embedding=query_embedding,
+            variant_id=variant_id,
+            used_openings=used_openings,
         )
         return answer, sources
