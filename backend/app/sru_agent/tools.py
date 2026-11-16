@@ -266,14 +266,14 @@ async def tool_get_university_videos(args, ctx):
     topic = (args.get("topic") or "").strip()
     try:
         from app.api.v1.deps import get_embedding_provider
-        from app.services.video_service import get_semantic_videos, load_videos
+        from app.services.video_service import get_relevant_videos, load_videos
         provider = get_embedding_provider()
         search_text = topic or "campus life at SR University"
         emb = await provider.embed_single(search_text)
-        videos = get_semantic_videos(emb, limit=2, max_distance=0.34)
+        videos = get_relevant_videos(user_message=search_text, query_embedding=emb, is_explicit=True)
         if not videos:
-            all_vids = load_videos()
-            videos = all_vids[:2] if all_vids else []
+            campus_vids = [v for v in load_videos() if v.get("category") == "Campus Tour & Infrastructure"]
+            videos = campus_vids[:2] if campus_vids else load_videos()[:2]
         return {
             "status": "ok",
             "type": "video_recommendations",

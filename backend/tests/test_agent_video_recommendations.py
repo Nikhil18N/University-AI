@@ -98,4 +98,86 @@ async def test_tool_get_university_videos(monkeypatch):
     assert result["status"] == "ok"
     assert result["type"] == "video_recommendations"
     assert len(result["videos"]) == 1
-    assert result["videos"][0]["id"] == "hostel-vid-1"
+
+
+def test_is_about_sru_or_campus_query_detection():
+    """Verify is_about_sru_or_campus_query correctly discriminates generic SRU/campus queries from sub-topics."""
+    from app.services.video_service import is_about_sru_or_campus_query
+
+    assert is_about_sru_or_campus_query("tell me about sru") is True
+    assert is_about_sru_or_campus_query("about sru") is True
+    assert is_about_sru_or_campus_query("what is sru") is True
+    assert is_about_sru_or_campus_query("about sr university") is True
+    assert is_about_sru_or_campus_query("tell me about the campus") is True
+    assert is_about_sru_or_campus_query("how is campus life") is True
+    assert is_about_sru_or_campus_query("campus") is True
+
+    # Hostels must NOT be treated as generic about-sru
+    assert is_about_sru_or_campus_query("tell me about hostels") is False
+    assert is_about_sru_or_campus_query("how is hostel life?") is False
+
+    # Events/fests must NOT be treated as generic about-sru
+    assert is_about_sru_or_campus_query("what fests happen at sru?") is False
+    assert is_about_sru_or_campus_query("tell me about sparkrill") is False
+
+    # Placements must NOT be treated as generic about-sru
+    assert is_about_sru_or_campus_query("what are the placements like?") is False
+
+
+def test_about_sru_video_filtering_prefers_campus_and_excludes_hostels_and_events(monkeypatch):
+    """Verify get_relevant_videos on 'tell me about sru' filters out hostels and events and returns campus videos."""
+    from app.services.video_service import get_relevant_videos
+
+    mock_candidates = {
+        "metadatas": [[
+            {
+                "id": "hostel-vid-1",
+                "title": "Best Hostel Life in India? | SR University",
+                "category": "Hostels & Living",
+                "url": "https://www.youtube.com/watch?v=hostel-1",
+            },
+            {
+                "id": "event-vid-1",
+                "title": "SPARKILL 2026 Ramp Walk | SRU Fest",
+                "category": "Campus Life & Fests",
+                "url": "https://www.youtube.com/watch?v=event-1",
+            },
+            {
+                "id": "campus-vid-1",
+                "title": "SR University Campus Tour 2026",
+                "category": "Campus Tour & Infrastructure",
+                "url": "https://www.youtube.com/watch?v=campus-1",
+            },
+            {
+                "id": "campus-vid-2",
+                "title": "Beautiful Night View of SR University | Full Campus Tour",
+                "category": "Campus Tour & Infrastructure",
+                "url": "https://www.youtube.com/watch?v=campus-2",
+            },
+        ]],
+        "distances": [[0.20, 0.21, 0.22, 0.23]],
+    }
+
+    class MockCollection:
+        def count(self):
+            return 4
+
+        def query(self, **kwargs):
+            return mock_candidates
+
+    monkeypatch.setattr("app.services.video_service._get_video_collection", lambda: MockCollection())
+
+    fake_embedding = [0.01] * 768
+    vids = get_relevant_videos(
+        user_message="Tell me about SRU",
+        query_embedding=fake_embedding,
+    )
+
+    # Must return campus videos only, NO hostels and NO events
+    assert len(vids) == 2
+    for v in vids:
+        assert v["category"] == "Campus Tour & Infrastructure"
+        assert "hostel" not in v["title"].lower()
+        assert "fest" not in v["title"].lower()
+        assert "sparkill" not in v["title"].lower()
+

@@ -320,14 +320,82 @@ def should_display_videos(message: str) -> bool:
         "facility", "facilities", "amenities", "tour", "walkthrough", "glimpse", "view",
         "life at sru", "fest", "events", "activities", "placement", "placements",
         "about sru", "tell me about sru", "about sr university", "why sru",
+        "what is sru", "about sr", "know about sru", "what is sr university",
+        "tell me about the university", "describe sru", "overview of sru",
     )
     return any(k in msg for k in facility_keywords)
+
+
+_EVENT_FEST_KEYWORDS = (
+    "fest", "fests", "bathukamma", "sparkill", "sparkrill", "ramp walk",
+    "singer", "concert", "performance", "swagatam", "freshers", "celebration",
+    "celebrations", "annual day", "sports day", "cultural", "navadhara",
+)
+
+
+def is_event_or_fest_video(video: dict) -> bool:
+    """Return True if video is an event, fest, or festival celebration rather than campus tour/living."""
+    title = (video.get("title") or "").lower()
+    keywords = [str(k).lower() for k in video.get("keywords", [])]
+    if any(k in title for k in _EVENT_FEST_KEYWORDS):
+        return True
+    if any(any(k in kw for k in _EVENT_FEST_KEYWORDS) for kw in keywords):
+        return True
+    return False
+
+
+def is_about_sru_or_campus_query(message: str) -> bool:
+    """Return True if message asks generally about SRU, university overview, or campus life without focusing on a specific sub-topic like hostels, fests, or placements."""
+    msg = message.lower().strip()
+
+    # If the user specifically asks for hostels, dining, mess, rooms -> NOT a generic about-sru query
+    if any(k in msg for k in ("hostel", "hostels", "mess", "dining", "room", "rooms", "boarding", "stay", "accommodation", "food")):
+        return False
+
+    # If the user specifically asks for fests, events, celebrations, concerts -> NOT a generic about-sru query
+    if any(k in msg for k in ("fest", "fests", "event", "events", "celebration", "celebrations", "sparkrill", "sparkill", "navadhara", "bathukamma", "cultural", "ramp walk", "concert", "performance", "swagatam", "freshers", "annual day")):
+        return False
+
+    # If the user specifically asks for placements -> NOT a generic about-sru query
+    if any(k in msg for k in ("placement", "placements", "package", "packages", "salary", "job", "jobs", "career", "careers", "recruiter", "recruiters", "highest package", "average package", "placed")):
+        return False
+
+    # If the user specifically asks for sports -> NOT a generic about-sru query
+    if any(k in msg for k in ("sport", "sports", "cricket", "basketball", "athletics", "gym", "football", "badminton", "ground", "grounds")):
+        return False
+
+    # If the user specifically asks for startups / incubation -> NOT a generic about-sru query
+    if any(k in msg for k in ("startup", "startups", "srix", "incubator", "incubation", "entrepreneur", "entrepreneurship")):
+        return False
+
+    # Check for general SRU / campus / university inquiry cues
+    about_cues = (
+        "about sru", "tell me about sru", "about sr university", "about sr", "what is sru",
+        "what is sr university", "know about sru", "tell me about the university",
+        "describe sru", "overview of sru", "why sru", "why choose sru", "how is sru",
+        "life at sru", "campus life", "campus", "how is the campus", "campus tour",
+        "campus walkthrough", "see the campus", "campus facilities", "infrastructure",
+        "infra", "sru overview", "about this college", "about this university",
+        "about college", "sru details", "sru university", "join sru", "interested in sru",
+        "campus environment", "how is the university", "campus glimpse", "campus view",
+        "campus look like", "look of campus", "show campus", "walkthrough", "tour the campus",
+        "tell me about sru buddy", "tell me about this university",
+    )
+    if any(cue in msg for cue in about_cues):
+        return True
+    if msg in ("sru", "campus", "infra", "about", "university", "college", "sr university", "sru buddy"):
+        return True
+    return False
 
 
 def get_semantic_videos(
     query_embedding: list[float] | None,
     limit: int = 2,
     max_distance: float = DEFAULT_MAX_SEMANTIC_DISTANCE,
+    exclude_categories: set[str] | list[str] | None = None,
+    preferred_categories: set[str] | list[str] | None = None,
+    exclude_events: bool = False,
+    exclude_hostels: bool = False,
 ) -> list[dict]:
     """Retrieve video recommendations purely by dense vector semantic search in ChromaDB.
 
@@ -343,7 +411,7 @@ def get_semantic_videos(
         if not collection or collection.count() == 0:
             return []
 
-        n_query = min(max(limit * 4, 8), collection.count())
+        n_query = min(max(limit * 8, 30), collection.count())
         results = collection.query(
             query_embeddings=[query_embedding],
             n_results=n_query,
@@ -358,6 +426,13 @@ def get_semantic_videos(
             if not isinstance(meta, dict):
                 continue
             if dist is not None and dist <= max_distance:
+                cat = meta.get("category", "")
+                if exclude_categories and cat in exclude_categories:
+                    continue
+                if exclude_hostels and (cat == "Hostels & Living" or "hostel" in meta.get("title", "").lower()):
+                    continue
+                if exclude_events and is_event_or_fest_video(meta):
+                    continue
                 vid_id = meta.get("id") or meta.get("url", "")
                 if vid_id not in seen_ids:
                     seen_ids.add(vid_id)
@@ -368,6 +443,15 @@ def get_semantic_videos(
 
         # Sort strictly by cosine distance
         candidates.sort(key=lambda x: x[0])
+
+        # Prioritize preferred categories if specified (e.g. campus tour for about sru)
+        if preferred_categories:
+            pref = [c for c in candidates if c[1].get("category") in preferred_categories]
+            if len(pref) >= limit:
+                candidates = pref
+            else:
+                other = [c for c in candidates if c[1].get("category") not in preferred_categories]
+                candidates = pref + other
 
         # Enforce category diversity when selecting top results
         matched: list[dict] = []
@@ -426,10 +510,36 @@ def get_relevant_videos(
     is_visual_target = is_explicit or should_display_videos(user_message)
     max_dist = EXPLICIT_MAX_SEMANTIC_DISTANCE if is_visual_target else DEFAULT_MAX_SEMANTIC_DISTANCE
 
+    # Check if this is an "about sru" / general campus query
+    is_about_sru = is_about_sru_or_campus_query(user_message)
+    is_generic_video = is_explicit and not any(
+        k in msg_lower for k in (
+            "hostel", "mess", "food", "dining", "room",
+            "fest", "event", "celebration", "cultural",
+            "placement", "package", "salary", "job",
+            "sport", "startup", "srix"
+        )
+    )
+    should_prefer_campus = is_about_sru or is_generic_video
+
+    pref_cats = {"Campus Tour & Infrastructure"} if should_prefer_campus else None
+    excl_hostels = should_prefer_campus
+    excl_events = should_prefer_campus
+
     if query_embedding:
-        vids = get_semantic_videos(query_embedding, limit=limit, max_distance=max_dist)
+        vids = get_semantic_videos(
+            query_embedding,
+            limit=limit,
+            max_distance=max_dist,
+            preferred_categories=pref_cats,
+            exclude_hostels=excl_hostels,
+            exclude_events=excl_events,
+        )
         if not vids and is_explicit:
             all_vids = load_videos()
+            if should_prefer_campus:
+                campus_vids = [v for v in all_vids if v.get("category") == "Campus Tour & Infrastructure"]
+                return campus_vids[:limit] if campus_vids else all_vids[:limit]
             return all_vids[:limit] if all_vids else []
         return vids
 
@@ -444,7 +554,14 @@ def get_relevant_videos(
             if not loop.is_running():
                 embs = loop.run_until_complete(provider.embed([user_message]))
                 if embs:
-                    return get_semantic_videos(embs[0], limit=limit, max_distance=max_dist)
+                    return get_semantic_videos(
+                        embs[0],
+                        limit=limit,
+                        max_distance=max_dist,
+                        preferred_categories=pref_cats,
+                        exclude_hostels=excl_hostels,
+                        exclude_events=excl_events,
+                    )
         except Exception:
             pass
 
