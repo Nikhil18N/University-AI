@@ -140,15 +140,112 @@ async def tool_request_counsellor_callback(args, ctx):
                             {"preferred_time": args.get("preferred_time") or "any time"})
 
 
-async def tool_book_campus_visit(args, ctx):
+def parse_flexible_visit_date(date_str: str, today: date | None = None) -> date | None:
+    """Intelligently parse flexible date inputs into a concrete datetime.date.
+    Handles 'today', 'tomorrow', day with ordinals like '17th' / '17', month names like '17 Nov',
+    and standard ISO / Indian date formats (YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY).
+    """
+    if not date_str or not isinstance(date_str, str):
+        return None
+    today = today or date.today()
+    s = str(date_str).strip().lower()
+
+    # Strip conversational prefixes
+    s = re.sub(r"^(visit\s+(on\s+)?|on\s+|for\s+)", "", s).strip()
+    s = s.replace(",", " ").replace(".", " ").strip()
+
+    # Relative tokens
+    if s in ("today", "todays"):
+        return today
+    if s in ("tomorrow", "tomorrows", "tmrw"):
+        return today + timedelta(days=1)
+    if s in ("day after tomorrow", "day after tmrw"):
+        return today + timedelta(days=2)
+
+    # Standard ISO YYYY-MM-DD
     try:
-        visit = datetime.strptime(args.get("visit_date", ""), "%Y-%m-%d").date()
+        return datetime.strptime(s, "%Y-%m-%d").date()
     except ValueError:
-        return {"status": "invalid", "problem": "Visit date must be a real date. Ask which day they want."}
+        pass
+
+    # DD-MM-YYYY, DD/MM/YYYY, DD MM YYYY
+    for fmt in ("%d-%m-%Y", "%d/%m/%Y", "%d %m %Y"):
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            pass
+
+    # Clean ordinals: 17th -> 17, 1st -> 1, 2nd -> 2, 3rd -> 3
+    s_clean = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", s).strip()
+
+    for fmt in ("%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(s_clean, fmt).date()
+        except ValueError:
+            pass
+
+    month_names = {
+        "jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3,
+        "apr": 4, "april": 4, "may": 5, "june": 6, "jun": 6, "july": 7, "jul": 7,
+        "aug": 8, "august": 8, "sep": 9, "sept": 9, "september": 9, "oct": 10,
+        "october": 10, "nov": 11, "november": 11, "dec": 12, "december": 12
+    }
+    tokens = s_clean.split()
+    found_day = None
+    found_month = None
+    found_year = None
+    for t in tokens:
+        if t in month_names:
+            found_month = month_names[t]
+        elif t.isdigit():
+            val = int(t)
+            if val > 2000:
+                found_year = val
+            elif 1 <= val <= 31 and found_day is None:
+                found_day = val
+            elif 1 <= val <= 12 and found_month is None:
+                found_month = val
+
+    if found_day is not None and found_month is not None:
+        yr = found_year or today.year
+        try:
+            d = date(yr, found_month, found_day)
+            # If no year was given and date is passed by > 7 days, assume next year
+            if not found_year and d < today - timedelta(days=7):
+                d = date(yr + 1, found_month, found_day)
+            return d
+        except ValueError:
+            pass
+
+    # Bare day number (e.g., '17th', '17')
+    m = re.search(r"\b(\d{1,2})\b", s_clean)
+    if m:
+        day_val = int(m.group(1))
+        if 1 <= day_val <= 31:
+            try:
+                # If day_val is >= today.day, it refers to THIS current month
+                if day_val >= today.day:
+                    return date(today.year, today.month, day_val)
+                else:
+                    # Target next month
+                    next_month = today.month + 1 if today.month < 12 else 1
+                    next_year = today.year if today.month < 12 else today.year + 1
+                    return date(next_year, next_month, day_val)
+            except ValueError:
+                pass
+
+    return None
+
+
+async def tool_book_campus_visit(args, ctx):
+    raw_date = args.get("visit_date", "")
+    visit = parse_flexible_visit_date(raw_date)
+    if not visit:
+        return {"status": "invalid", "problem": f"Could not determine a valid date from '{raw_date}'. Please provide a date like 'tomorrow', '17th Nov', or 'YYYY-MM-DD'."}
     today = date.today()
     if visit < today or visit > today + timedelta(days=90):
-        return {"status": "invalid", "problem": f"Visit date must be between {today} and "
-                                               f"{today + timedelta(days=90)}. Ask for another date."}
+        return {"status": "invalid", "problem": f"Campus visits can only be scheduled between {today:%d %B %Y} and "
+                                               f"{(today + timedelta(days=90)):%d %B %Y}. Please choose a date within this window."}
     visitors = max(1, min(int(args.get("visitors") or 1), 10))
     return await _save_lead(args, ctx, "campus_visit",
                             {"visit_date": visit.isoformat(), "visitors": visitors,
@@ -246,7 +343,7 @@ TOOLS = {
         "description": "Sends a campus visit request to the admissions team. Needs name, phone, date and consent.",
         "parameters_json_schema": _obj({
             "name": {"type": "string"}, "phone": _PHONE,
-            "visit_date": {"type": "string", "description": "YYYY-MM-DD"},
+            "visit_date": {"type": "string", "description": "Preferred date e.g. 'YYYY-MM-DD', 'tomorrow', '17th Nov', or day number like '17th' (relative to current date)"},
             "visitors": {"type": "integer"}, "consent": _CONSENT},
             ["name", "phone", "visit_date", "consent"])}),
     "get_contact_and_apply_links": (tool_get_contact_and_apply_links, "Getting contact details", {

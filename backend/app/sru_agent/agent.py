@@ -158,11 +158,12 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                 log.info("tool=%s status=%s session=%s", call.name, result.get("status"), session_id)
                 used.append({"name": call.name, "status": result.get("status"),
                              "is_action": call.name in tools.ACTION_TOOLS})
-                if call.name in CARD_TOOLS and result.get("status") in ("calculated", "saved", "ok"):
+                is_card_ready = call.name in CARD_TOOLS and result.get("status") in ("calculated", "saved", "ok")
+                if is_card_ready:
                     cards.append({"type": call.name, "data": result})
                 yield {"type": "tool", "name": call.name, "status": "done",
                        "result_status": result.get("status"),
-                       "result": result if call.name in CARD_TOOLS else None}
+                       "result": result if is_card_ready else None}
                 result_parts.append(types.Part(function_response=types.FunctionResponse(
                     name=call.name, response=result, id=getattr(call, "id", None))))
             contents.append(types.Content(role="user", parts=result_parts))

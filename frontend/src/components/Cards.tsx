@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createLead } from "../services/api";
 import {
   ScaleIcon,
   TargetIcon,
@@ -758,36 +759,336 @@ export function AgentCallbackCard({ card }: CardProps) {
 }
 
 export function AgentCampusVisitCard({ card }: CardProps) {
-  const d = card.data || {};
+  const d = card?.data || {};
+  if (d.status === "invalid" || d.status === "failed" || (!d.reference && !d.visit_date)) {
+    return null;
+  }
+
+  let displayDate = d.visit_date || "Upcoming date";
+  if (d.visit_date && /^\d{4}-\d{2}-\d{2}$/.test(d.visit_date)) {
+    try {
+      const [yr, mo, da] = d.visit_date.split("-").map((v: string) => parseInt(v, 10));
+      const dateObj = new Date(yr, mo - 1, da);
+      displayDate = dateObj.toLocaleDateString("en-IN", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {}
+  }
+
   return (
     <div className="rich-card agent-action-card visit-card">
       <div className="card-header">
         <span className="card-badge badge-success">
-          🏛️ Campus Tour
+          ✓ Campus Tour Confirmed
         </span>
         <h4 className="card-title">Campus Visit Scheduled</h4>
       </div>
       <div className="agent-action-body">
         <p className="agent-action-msg">
-          Visit requested for <strong>{d.visit_date || "Upcoming date"}</strong> for <strong>{d.visitors || 1} visitor(s)</strong>.
+          Visit confirmed for <strong>{displayDate}</strong> for <strong>{d.visitors || 1} visitor(s)</strong>.
         </p>
         <div className="agent-action-meta">
+          {d.name && <div><strong>Visitor:</strong> {d.name}</div>}
           <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
-          <div><strong>Timings:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
+          <div><strong>Visiting Hours:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
           {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
         </div>
         <div className="agent-card-footer">
           <span className="agent-card-source-tag">The admissions team will confirm arrival logistics via phone.</span>
-          <a
-            href="https://maps.google.com/?q=SR+University+Warangal"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="agent-card-map-btn"
-          >
-            📍 Open in Google Maps
-          </a>
+          <div className="visit-action-btns">
+            <a
+              href="https://maps.google.com/?q=SR+University+Warangal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="agent-card-map-btn"
+            >
+              📍 Open in Google Maps
+            </a>
+            <a
+              href="tel:08702818333"
+              className="agent-card-call-btn"
+            >
+              📞 Call Admissions
+            </a>
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function CampusVisitBookingCard({ card }: CardProps) {
+  const d = card?.data || card || {};
+
+  // Auto-fill student details from localStorage if previously entered
+  const [name, setName] = useState(() => {
+    try {
+      const saved = localStorage.getItem("sru_student_lead");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.name) return parsed.name;
+      }
+    } catch {}
+    return "";
+  });
+
+  const [phone, setPhone] = useState(() => {
+    try {
+      const saved = localStorage.getItem("sru_student_lead");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.phone) return parsed.phone;
+      }
+    } catch {}
+    return "";
+  });
+
+  // Calculate real date limits
+  const today = new Date();
+  const formatYMD = (dt: Date) => {
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const minDateStr = formatYMD(today);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const defaultDateStr = formatYMD(tomorrow);
+
+  const maxDate = new Date(today);
+  maxDate.setDate(maxDate.getDate() + 90);
+  const maxDateStr = formatYMD(maxDate);
+
+  const [visitDate, setVisitDate] = useState(defaultDateStr);
+  const [visitors, setVisitors] = useState<number>(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmedData, setConfirmedData] = useState<{
+    reference: string;
+    visitDate: string;
+    visitors: number;
+    name: string;
+    phone: string;
+  } | null>(null);
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setErrorMsg(null);
+
+    const cleanName = name.trim();
+    const cleanPhone = phone.replace(/\D/g, "");
+
+    if (cleanName.length < 2) {
+      setErrorMsg("Please enter your name.");
+      return;
+    }
+    if (cleanPhone.length < 10) {
+      setErrorMsg("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    if (!visitDate) {
+      setErrorMsg("Please select your preferred visit date.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const lead = await createLead({
+        name: cleanName,
+        phone: cleanPhone,
+        program_interest: "Campus Visit & Guided Tour",
+        source: "campus_visit_box",
+        metadata: {
+          request_type: "campus_visit",
+          visit_date: visitDate,
+          visitors,
+          consent: true,
+        },
+      });
+
+      // Save for future turns so student doesn't have to type again
+      localStorage.setItem("sru_student_lead", JSON.stringify({ name: cleanName, phone: cleanPhone }));
+
+      const refId = lead?.id ? String(lead.id).slice(0, 8) : Math.random().toString(36).substring(2, 10).toUpperCase();
+
+      setConfirmedData({
+        reference: refId,
+        visitDate,
+        visitors,
+        name: cleanName,
+        phone: cleanPhone,
+      });
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to submit booking. Please call the admissions office.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // If confirmed, show confirmed view
+  if (confirmedData) {
+    let friendlyDate = confirmedData.visitDate;
+    try {
+      const [yr, mo, day] = confirmedData.visitDate.split("-").map((v: string) => parseInt(v, 10));
+      const dt = new Date(yr, mo - 1, day);
+      friendlyDate = dt.toLocaleDateString("en-IN", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {}
+
+    return (
+      <div className="rich-card agent-action-card visit-card visit-confirmed-box">
+        <div className="card-header">
+          <span className="card-badge badge-success">
+            ✓ Campus Visit Confirmed
+          </span>
+          <h4 className="card-title">Campus Tour Scheduled!</h4>
+        </div>
+        <div className="agent-action-body">
+          <p className="agent-action-msg">
+            Visit request confirmed for <strong>{friendlyDate}</strong> for{" "}
+            <strong>{confirmedData.visitors} visitor{confirmedData.visitors > 1 ? "s" : ""}</strong>.
+          </p>
+          <div className="agent-action-meta">
+            <div><strong>Visitor Name:</strong> {confirmedData.name}</div>
+            <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
+            <div><strong>Visiting Hours:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
+            <div><strong>Reference ID:</strong> #{confirmedData.reference}</div>
+          </div>
+          <div className="agent-card-footer">
+            <span className="agent-card-source-tag">
+              The admissions team will confirm arrival logistics via phone ({confirmedData.phone}).
+            </span>
+            <div className="visit-action-btns">
+              <a
+                href="https://maps.google.com/?q=SR+University+Warangal"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="agent-card-map-btn"
+              >
+                📍 Open in Google Maps
+              </a>
+              <a
+                href="tel:08702818333"
+                className="agent-card-call-btn"
+              >
+                📞 Call Admissions (0870-2818333)
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rich-card campus-visit-box">
+      <div className="visit-box-header">
+        <div className="visit-box-badge">
+          🏛️ Campus Visit Booking
+        </div>
+        <h4 className="visit-box-title">{d.title || "Schedule Your SR University Campus Visit"}</h4>
+        <p className="visit-box-subtitle">
+          {d.subtitle || "Experience our 170-acre lush campus, state-of-the-art AI labs, hostels & sports complex in person."}
+        </p>
+      </div>
+
+      <div className="visit-info-chips">
+        <div className="visit-info-chip">
+          <span className="chip-ico">📍</span>
+          <span>Warangal, Telangana</span>
+        </div>
+        <div className="visit-info-chip">
+          <span className="chip-ico">🕒</span>
+          <span>10:00 AM – 4:00 PM (Mon–Sat)</span>
+        </div>
+        <div className="visit-info-chip">
+          <span className="chip-ico">🎓</span>
+          <span>Guided Faculty & Lab Tour</span>
+        </div>
+      </div>
+
+      <form className="visit-box-form" onSubmit={handleSubmit}>
+        <div className="visit-fields-grid">
+          <div className="visit-form-group">
+            <label className="visit-form-label">Full Name</label>
+            <input
+              type="text"
+              className="visit-form-input"
+              placeholder="e.g. Chitikeshi Mahesh"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="visit-form-group">
+            <label className="visit-form-label">Mobile Number</label>
+            <input
+              type="tel"
+              className="visit-form-input"
+              placeholder="10-digit mobile number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              maxLength={10}
+              required
+            />
+          </div>
+
+          <div className="visit-form-group">
+            <label className="visit-form-label">Preferred Date (Next 90 Days)</label>
+            <input
+              type="date"
+              className="visit-form-input date-picker-input"
+              min={minDateStr}
+              max={maxDateStr}
+              value={visitDate}
+              onChange={(e) => setVisitDate(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="visit-form-group">
+            <label className="visit-form-label">Number of Visitors</label>
+            <div className="visitors-pill-row">
+              {[1, 2, 3, 4, 5].map((cnt) => (
+                <button
+                  type="button"
+                  key={cnt}
+                  className={`visitor-pill ${visitors === cnt ? "active" : ""}`}
+                  onClick={() => setVisitors(cnt)}
+                >
+                  {cnt === 5 ? "5+ Visitors" : cnt === 1 ? "1 Visitor" : `${cnt} Visitors`}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {errorMsg && <div className="visit-error-banner">⚠️ {errorMsg}</div>}
+
+        <div className="visit-box-footer">
+          <button
+            type="submit"
+            className="visit-submit-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "🏛️ Scheduling Your Visit..." : "🏛️ Schedule Campus Visit"}
+          </button>
+          <div className="visit-security-note">
+            🔒 By scheduling, you authorize the SRU Admissions Desk to coordinate your campus tour.
+          </div>
+        </div>
+      </form>
     </div>
   );
 }
@@ -907,6 +1208,8 @@ export function RenderCard({ card }: { card: any }) {
       return <AgentCallbackCard card={card} />;
     case "book_campus_visit":
       return <AgentCampusVisitCard card={card} />;
+    case "campus_visit_form":
+      return <CampusVisitBookingCard card={card} />;
     case "get_contact_and_apply_links":
       return <AgentContactLinksCard card={card} />;
     case "get_university_videos":

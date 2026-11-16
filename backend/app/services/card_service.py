@@ -475,6 +475,15 @@ SRU_ADVANTAGE_CARD = {
     ],
 }
 
+CAMPUS_VISIT_FORM_CARD = {
+    "type": "campus_visit_form",
+    "title": "Schedule Your SR University Campus Visit",
+    "subtitle": "Experience our 170-acre lush campus, state-of-the-art AI labs, hostels & sports complex in person.",
+    "location": "170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana",
+    "timings": "10:00 AM – 4:00 PM (Monday – Saturday)",
+    "phone": "0870-2818333",
+}
+
 CAMPUS_TOUR_CARD = {
     "type": "campus_tour",
     "title": "SR University — Next-Generation Living & Learning Campus",
@@ -940,12 +949,26 @@ def generate_cards(
     if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):
         cards.append(PLACEMENT_EXCELLENCE_CARD)
 
+    # 4b. Interactive Campus Visit Booking Box (Form card to schedule an in-person campus visit)
+    _visit_booking_triggers = (
+        "book campus tour", "schedule campus visit", "how can i book a campus tour",
+        "book a campus tour", "schedule visit", "book a visit", "book a tour",
+        "schedule a tour", "schedule tour", "tour booking", "campus visit booking",
+        "how to book a visit", "want to visit campus", "want to visit the campus",
+        "i want to visit", "how to visit the campus", "how can i visit", "can i visit the campus",
+        "plan a visit", "visit the campus in person", "see the campus in person",
+        "campus visit", "visit campus", "visit sru", "visit university",
+    )
+    is_visit_booking_query = any(k in msg_lower for k in _visit_booking_triggers) and not any(k in msg_lower for k in ("fee", "fees", "cost", "vs", "compare"))
+    if is_visit_booking_query:
+        cards.append(CAMPUS_VISIT_FORM_CARD)
+
     # 5. Campus tour card (render static spot highlights if asking for about sru, campus walkthrough/tour, or facilities)
     is_video_query = (
         is_explicit_video_query(user_message)
         and is_video_topic_query(user_message)
     )
-    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "what is sr university", "describe sru")):
+    if not is_video_query and not is_visit_booking_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "what is sr university", "describe sru")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
             # Show Campus Tour card only the 1st time in a session
             already_shown = False
