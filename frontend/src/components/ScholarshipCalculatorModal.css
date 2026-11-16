@@ -317,9 +317,36 @@
   box-sizing: border-box;
 }
 
-.calc-input:focus {
-  border-color: var(--sru-blue, #0055a4);
-  box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.2);
+.calc-input-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.calc-score-input {
+  padding-right: 36px;
+}
+
+.calc-input-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #a1a1aa);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.calc-input-clear-btn:hover {
+  color: var(--text-1, #ffffff);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .calc-eval-btn {
@@ -528,7 +555,48 @@
   margin-top: 2px;
 }
 
-/* 4. Calculation Result Box & Fee Structure */
+/* 4a. Initial Overview Card (When no marks entered yet) */
+.calc-initial-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--surface-2, #27272a);
+  border: 1px solid var(--border, #3f3f46);
+  border-radius: 12px;
+  padding: 16px;
+  animation: fadeIn 0.25s ease;
+}
+
+.calc-initial-prompt-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.1) 0%, rgba(41, 121, 226, 0.08) 100%);
+  border: 1px solid rgba(0, 85, 164, 0.3);
+  border-radius: 10px;
+}
+
+.prompt-card-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.prompt-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-1, #ffffff);
+}
+
+.prompt-card-text strong {
+  color: var(--sru-blue, #0055a4);
+  font-size: 0.86rem;
+}
+
+/* 4b. Calculation Result Box & Fee Structure */
 .calc-result-box {
   display: flex;
   flex-direction: column;
@@ -572,6 +640,31 @@
   font-size: 0.98rem;
   font-weight: 700;
   color: var(--text-1, #ffffff);
+}
+
+.result-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calc-reset-score-btn {
+  background: transparent;
+  border: 1px solid var(--border, #3f3f46);
+  color: var(--text-muted, #a1a1aa);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.calc-reset-score-btn:hover {
+  background: var(--surface-1, #18181b);
+  border-color: var(--sru-blue, #0055a4);
+  color: var(--sru-blue, #0055a4);
 }
 
 .result-program-badge {
@@ -632,6 +725,11 @@
 .fee-stat.highlight-green {
   border-color: rgba(16, 185, 129, 0.25);
   background: rgba(16, 185, 129, 0.04);
+}
+
+.fee-stat.highlight-amber {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.06);
 }
 
 .fee-stat.primary-payable {
@@ -1047,6 +1145,40 @@
   background: #ffffff;
   border-color: #cbd5e1;
   color: #475569;
+}
+
+[data-theme="light"] .calc-initial-overview {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .calc-initial-prompt-card {
+  background: linear-gradient(135deg, rgba(0, 85, 164, 0.06) 0%, rgba(41, 121, 226, 0.04) 100%);
+  border-color: rgba(0, 85, 164, 0.2);
+}
+
+[data-theme="light"] .prompt-card-text {
+  color: #0f172a;
+}
+
+[data-theme="light"] .prompt-card-text strong {
+  color: #0055a4;
+}
+
+[data-theme="light"] .calc-reset-score-btn {
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+[data-theme="light"] .calc-reset-score-btn:hover {
+  background: #ffffff;
+  color: #0055a4;
+  border-color: #0055a4;
+}
+
+[data-theme="light"] .calc-input-clear-btn:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="light"] .calc-result-box {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   CalculatorIcon,
   AwardIcon,
@@ -100,7 +100,7 @@ const PROGRAMS: ProgramConfig[] = [
       },
       {
         scholarshipPercent: 30,
-        ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", ib: "34 – 37", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" },
+        ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", ib: "34 – 37", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" },
         payableFeeSem: 119000,
         cseYearlyPayable: { yr1: 238000, yr2: 247000, yr3: 256000, yr4: 265000 },
       },
@@ -132,7 +132,7 @@ const PROGRAMS: ProgramConfig[] = [
       { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 170000 },
       { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 160000 },
       { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 150000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 140000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 140000 },
       { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 120000 },
     ],
   },
@@ -156,7 +156,7 @@ const PROGRAMS: ProgramConfig[] = [
       { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 114750 },
       { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 108000 },
       { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 101250 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 94500 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 94500 },
       { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 81000 },
     ],
   },
@@ -180,7 +180,7 @@ const PROGRAMS: ProgramConfig[] = [
       { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 85000 },
       { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 80000 },
       { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 75000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.5 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 70000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 70000 },
       { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 60000 },
     ],
   },
@@ -511,7 +511,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       ? {
           scholarshipPercent: 0,
           payableFeeSem: prog.baseTuitionSem,
-          ranges: { [exam.key]: scoreInput.trim() ? "Standard Tuition (Below Cutoff)" : "Standard Tuition (Base Fee)" },
+          ranges: { [exam.key]: scoreInput.trim() ? "Standard Tuition (Below 60% Merit Cutoff)" : "Standard Base Tuition" },
           cseYearlyPayable:
             prog.id === "btech_cse"
               ? { yr1: 340000, yr2: 349000, yr3: 358000, yr4: 367000 }
@@ -520,7 +520,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       : prog.slabs[slabIdx] || prog.slabs[0];
 
     const rangeText = isNoScholarship
-      ? (scoreInput.trim() ? "Standard Tuition (No Merit Waiver)" : "Standard Tuition (Base Fee)")
+      ? (scoreInput.trim() ? "Standard Tuition (Below 60% Merit Cutoff)" : "Standard Base Tuition")
       : (slab.ranges as any)[exam.key] ||
         slab.ranges.stateBoard ||
         `Slab ${slabIdx + 1}`;
@@ -602,40 +602,45 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     }
   };
 
-  // Initial calculation on mount - show base fee breakdown immediately without false defaults
-  useEffect(() => {
-    computeAndSaveSnapshot(
-      currentProgram,
-      currentExam,
-      "",
-      -1,
-      savedLead?.name || "",
-      savedLead?.phone || ""
-    );
-  }, []);
+  // Reset calculation when clearing score
+  const handleResetScore = () => {
+    setEnteredScore("");
+    setSelectedSlabIndex(-1);
+    setCalculatedSnapshot(null);
+    setValidationError(null);
+  };
 
-  // Handle score change live - updates fee snapshot immediately
+  // Handle score change live - updates fee snapshot immediately if valid
   const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEnteredScore(val);
+    if (!val.trim()) {
+      setSelectedSlabIndex(-1);
+      setCalculatedSnapshot(null);
+      setValidationError(null);
+      return;
+    }
     const res = matchSlabFromScore(currentProgram, currentExam.key, val);
     setSelectedSlabIndex(res.slabIndex);
 
-    // Live update snapshot immediately for all students
-    computeAndSaveSnapshot(
-      currentProgram,
-      currentExam,
-      val,
-      res.slabIndex,
-      savedLead?.name || studentName.trim(),
-      savedLead?.phone || studentPhone.trim()
-    );
+    // Live update snapshot immediately if format is recognized
+    if (res.status !== "invalid") {
+      computeAndSaveSnapshot(
+        currentProgram,
+        currentExam,
+        val,
+        res.slabIndex,
+        savedLead?.name || studentName.trim(),
+        savedLead?.phone || studentPhone.trim()
+      );
+    }
   };
 
   // Apply quick preset - updates fee snapshot immediately
   const applyPreset = (preset: QuickPreset) => {
     setEnteredScore(preset.value);
     setSelectedExamKey(preset.examKey);
+    const targetExam = currentProgram.supportedExams.find((x) => x.key === preset.examKey) || currentExam;
     const res = matchSlabFromScore(currentProgram, preset.examKey, preset.value);
     setSelectedSlabIndex(res.slabIndex);
 
@@ -644,7 +649,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
     computeAndSaveSnapshot(
       currentProgram,
-      currentProgram.supportedExams.find((x) => x.key === preset.examKey) || currentExam,
+      targetExam,
       preset.value,
       res.slabIndex,
       nameToUse,
@@ -663,17 +668,22 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       setSelectedExamKey(nextExamKey);
     }
     if (prog) {
-      const res = matchSlabFromScore(prog, nextExamKey, enteredScore);
-      setSelectedSlabIndex(res.slabIndex);
-      const nextExam = prog.supportedExams.find((x) => x.key === nextExamKey) || currentExam;
-      computeAndSaveSnapshot(
-        prog,
-        nextExam,
-        enteredScore,
-        res.slabIndex,
-        savedLead?.name || studentName.trim(),
-        savedLead?.phone || studentPhone.trim()
-      );
+      if (enteredScore.trim()) {
+        const res = matchSlabFromScore(prog, nextExamKey, enteredScore);
+        setSelectedSlabIndex(res.slabIndex);
+        const nextExam = prog.supportedExams.find((x) => x.key === nextExamKey) || currentExam;
+        computeAndSaveSnapshot(
+          prog,
+          nextExam,
+          enteredScore,
+          res.slabIndex,
+          savedLead?.name || studentName.trim(),
+          savedLead?.phone || studentPhone.trim()
+        );
+      } else {
+        setSelectedSlabIndex(-1);
+        setCalculatedSnapshot(null);
+      }
     }
   };
 
@@ -681,22 +691,32 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
   const handleExamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newExamKey = e.target.value;
     setSelectedExamKey(newExamKey);
-    const res = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
-    setSelectedSlabIndex(res.slabIndex);
-    const nextExam = activeExams.find((x) => x.key === newExamKey) || currentExam;
-    computeAndSaveSnapshot(
-      currentProgram,
-      nextExam,
-      enteredScore,
-      res.slabIndex,
-      savedLead?.name || studentName.trim(),
-      savedLead?.phone || studentPhone.trim()
-    );
+    if (enteredScore.trim()) {
+      const res = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
+      setSelectedSlabIndex(res.slabIndex);
+      const nextExam = activeExams.find((x) => x.key === newExamKey) || currentExam;
+      computeAndSaveSnapshot(
+        currentProgram,
+        nextExam,
+        enteredScore,
+        res.slabIndex,
+        savedLead?.name || studentName.trim(),
+        savedLead?.phone || studentPhone.trim()
+      );
+    } else {
+      setSelectedSlabIndex(-1);
+      setCalculatedSnapshot(null);
+    }
   };
 
-  // Form submit handler for score calculation (immediate, no name/phone required)
+  // Form submit handler for score calculation
   const handleCalculateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!enteredScore.trim()) {
+      setValidationError("Please enter your marks (out of 1000), percentage (%), or EAPCET rank, or tap a quick preset.");
+      return;
+    }
+    setValidationError(null);
     const res = matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
     setSelectedSlabIndex(res.slabIndex);
     await computeAndSaveSnapshot(
@@ -785,7 +805,9 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     if (selectedSlabIndex === -1) {
       return {
         nextSlab: currentProgram.slabs[0],
-        message: "Score 60%+ in State Board or under 18,000 in EAPCET to qualify for 20% scholarship waiver!",
+        message: enteredScore.trim()
+          ? "Score 60%+ in State Board / CBSE or under 20,000 rank in TG/AP EAPCET to qualify for a 10% to 25% scholarship waiver!"
+          : "Score 60%+ in State Board / CBSE or under 20,000 rank in TG/AP EAPCET to unlock 10% to 40% guaranteed merit scholarship waivers for all 4 years!",
       };
     }
     if (selectedSlabIndex < currentProgram.slabs.length - 1) {
@@ -801,9 +823,9 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     }
     return {
       nextSlab: null,
-      message: "🏆 Highest Merit Tier: You have qualified for the maximum official merit scholarship waiver!",
+      message: "🏆 Maximum Merit Tier: You have qualified for the highest official merit scholarship waiver (40% tuition discount)!",
     };
-  }, [selectedSlabIndex, currentProgram, currentExam]);
+  }, [selectedSlabIndex, currentProgram, currentExam, enteredScore]);
 
   return (
     <div className="scholarship-modal-backdrop" onClick={onClose}>
@@ -914,15 +936,28 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
             <div className="calc-input-button-row">
               <div className="calc-score-input-wrap">
-                <input
-                  id="calc-marks-input"
-                  type="text"
-                  className="calc-input calc-score-input"
-                  placeholder="e.g. 780 marks in Inter, 85%, or EAPCET 8500"
-                  value={enteredScore}
-                  onChange={handleScoreChange}
-                  autoFocus
-                />
+                <div className="calc-input-inner">
+                  <input
+                    id="calc-marks-input"
+                    type="text"
+                    className="calc-input calc-score-input"
+                    placeholder="e.g. 780 marks in Inter, 85%, or EAPCET 8500"
+                    value={enteredScore}
+                    onChange={handleScoreChange}
+                    autoFocus
+                  />
+                  {enteredScore && (
+                    <button
+                      type="button"
+                      className="calc-input-clear-btn"
+                      onClick={handleResetScore}
+                      title="Clear marks"
+                      aria-label="Clear marks"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
                 {scoreMatch.status === "matched" && matchedSlab && (
                   <div className="calc-matched-badge">
                     <AwardIcon size={14} />
@@ -935,13 +970,19 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                     </span>
                   </div>
                 )}
-                {scoreMatch.status === "below_criteria" && (
+                {scoreMatch.status === "below_criteria" && enteredScore.trim() && (
                   <div className="calc-matched-badge below-cutoff">
                     <InfoIcon size={14} />
                     <span>
-                      <strong>Standard Tuition (No Merit Waiver)</strong>
+                      <strong>Standard Tuition (Eligible for Admission)</strong>
                       {" • "}{scoreMatch.displayText}
+                      {" • Merit scholarship starts at 60%"}
                     </span>
+                  </div>
+                )}
+                {validationError && (
+                  <div className="calc-error-banner" style={{ marginTop: "4px" }}>
+                    <span>{validationError}</span>
                   </div>
                 )}
               </div>
@@ -971,7 +1012,129 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           </div>
         </form>
 
-        {/* 4. Official Fee Structure Breakdown */}
+        {/* 4a. State A: Initial Overview (When NO marks entered yet) */}
+        {!calculatedSnapshot && (
+          <div className="calc-initial-overview">
+            <div className="result-section-header">
+              <div className="result-header-title">
+                <TrendingUpIcon size={16} />
+                <div>
+                  <h4>Official Fee Structure & Scholarship Opportunities</h4>
+                  <span className="result-source-note">2027-28 fees, as per the SR University Admissions Office</span>
+                </div>
+              </div>
+              <span className="result-program-badge">
+                {currentProgram.name}
+              </span>
+            </div>
+
+            {/* Three-Column Base Fee Overview */}
+            <div className="fee-comparison-row">
+              <div className="fee-stat">
+                <span className="stat-label">Standard Base Tuition</span>
+                <span className="stat-val">
+                  ₹{currentProgram.baseTuitionSem.toLocaleString("en-IN")}
+                </span>
+                <span className="stat-sub">per semester (₹{(currentProgram.baseTuitionSem * 2).toLocaleString("en-IN")} / year)</span>
+              </div>
+
+              <div className="fee-stat highlight-green">
+                <span className="stat-label">Merit Scholarship Potential</span>
+                <span className="stat-val savings">
+                  Up to 40% Waiver
+                </span>
+                <span className="stat-sub">Save up to ₹{Math.round(currentProgram.baseTuitionSem * 0.8).toLocaleString("en-IN")} / year</span>
+              </div>
+
+              <div className="fee-stat primary-payable">
+                <span className="stat-label">Discounted Tuition Starts At</span>
+                <span className="stat-val payable">
+                  ₹{Math.round(currentProgram.baseTuitionSem * 0.6).toLocaleString("en-IN")}
+                </span>
+                <span className="stat-sub">per semester (with 40% waiver)</span>
+              </div>
+            </div>
+
+            {/* Friendly Callout to Enter Marks */}
+            <div className="calc-initial-prompt-card">
+              <div className="prompt-card-icon">⚡</div>
+              <div className="prompt-card-text">
+                <strong>Calculate Your Exact Scholarship Waiver:</strong>
+                <span>
+                  Enter your Intermediate marks (out of 1000), percentage (%), or EAPCET rank in the box above, or click any Quick Marks chip to see your personalized net fee, 1st-year breakdown, and 4-year tuition progression.
+                </span>
+              </div>
+            </div>
+
+            {/* Slabs Ladder in Reference Mode */}
+            <div className="calc-roadmap-section">
+              <div className="roadmap-title-row">
+                <div className="roadmap-title">
+                  <AwardIcon size={16} />
+                  <h4>How Scholarship Is Possible (Merit Slabs & Criteria)</h4>
+                </div>
+                <span className="roadmap-sub">Guaranteed by SR University Regulations</span>
+              </div>
+
+              <div className="roadmap-ladder">
+                {currentProgram.slabs.map((slab, idx) => {
+                  const rangeText = (slab.ranges as any)[currentExam.key] || slab.ranges.stateBoard || `Slab ${idx + 1}`;
+                  return (
+                    <div key={idx} className="roadmap-slab-row">
+                      <div className="slab-pct-col">
+                        <span className="slab-pct-badge">{slab.scholarshipPercent}% Waiver</span>
+                      </div>
+                      <div className="slab-criteria-col">
+                        <span className="slab-exam-label">{currentExam.label}:</span>
+                        <strong className="slab-criteria-text">{rangeText}</strong>
+                      </div>
+                      <div className="slab-payable-col">
+                        <span className="slab-payable-label">You Pay:</span>
+                        <span className="slab-payable-amt">₹{slab.payableFeeSem.toLocaleString("en-IN")}/sem</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="roadmap-upgrade-banner">
+                <div className="upgrade-icon">💡</div>
+                <div className="upgrade-text">
+                  <strong>Guaranteed Merit Slabs: </strong>
+                  <span>
+                    Students scoring 60%+ in State Board / CBSE or under 20,000 rank in TG/AP EAPCET qualify for 10% to 40% guaranteed tuition fee waivers for all 4 years.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Institutional Notes */}
+            <div className="calc-notes">
+              <div className="note-item">
+                <PinIcon size={15} />
+                <div>
+                  <strong>One-Time & Annual Charges:</strong> Enrollment Fee: ₹5,000 (one-time). Annual other fee: ₹15,000/yr | Exam fee: ₹5,000/yr | Tri-cities Bus transport: ₹30,000/yr.
+                </div>
+              </div>
+              {currentProgram.specializationFeeAnnual && (
+                <div className="note-item">
+                  <FlaskIcon size={15} />
+                  <div>
+                    <strong>Specialization Fee:</strong> ₹{currentProgram.specializationFeeAnnual.toLocaleString("en-IN")}/year applicable from 2nd year onwards for advanced tech tracks (AI&ML, Cyber Security, Data Science, Quantum AI, Robotics).
+                  </div>
+                </div>
+              )}
+              <div className="note-item special-scholarship">
+                <HeartHandIcon size={15} />
+                <div>
+                  <strong>19 Special Category Concessions:</strong> Flat annual tuition waivers of ₹50,000/yr (orphans, international sports, SRU staff children), ₹20,000/yr (differently abled over 50% disability), and ₹15,000/yr (girl students, single parent, defence/police, NCC C, SR Junior College, AP/out-of-state students, alumni siblings).
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4b. Official Fee Structure Breakdown (Only shown when marks are entered/calculated) */}
         {calculatedSnapshot && (
           <div className="calc-result-box">
             <div className="result-section-header">
@@ -982,32 +1145,42 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                   <span className="result-source-note">2027-28 fees, as per the SR University Admissions Office</span>
                 </div>
               </div>
-              <span className="result-program-badge">
-                {calculatedSnapshot.program.name}
-              </span>
+              <div className="result-header-actions">
+                <span className="result-program-badge">
+                  {calculatedSnapshot.program.name}
+                </span>
+                <button
+                  type="button"
+                  className="calc-reset-score-btn"
+                  onClick={handleResetScore}
+                  title="Test another score"
+                >
+                  ↺ Test Another Score
+                </button>
+              </div>
             </div>
 
             {/* Three-Column Fee Comparison */}
             <div className="fee-comparison-row">
               <div className="fee-stat">
-                <span className="stat-label">Standard Tuition</span>
+                <span className="stat-label">Standard Base Tuition</span>
                 <span className={`stat-val ${calculatedSnapshot.discountAmount > 0 ? "strikethrough" : ""}`}>
                   ₹{calculatedSnapshot.program.baseTuitionSem.toLocaleString("en-IN")}
                 </span>
                 <span className="stat-sub">per semester</span>
               </div>
 
-              <div className={`fee-stat ${calculatedSnapshot.discountAmount > 0 ? "highlight-green" : ""}`}>
+              <div className={`fee-stat ${calculatedSnapshot.discountAmount > 0 ? "highlight-green" : "highlight-amber"}`}>
                 <span className="stat-label">Merit Scholarship Waiver</span>
-                <span className="stat-val savings">
+                <span className={`stat-val ${calculatedSnapshot.discountAmount > 0 ? "savings" : ""}`}>
                   {calculatedSnapshot.discountAmount > 0
                     ? `-₹${calculatedSnapshot.discountAmount.toLocaleString("en-IN")}`
                     : "₹0"}
                 </span>
                 <span className="stat-sub">
                   {calculatedSnapshot.slab.scholarshipPercent > 0
-                    ? `${calculatedSnapshot.slab.scholarshipPercent}% tuition discount`
-                    : "Below minimum cutoff"}
+                    ? `${calculatedSnapshot.slab.scholarshipPercent}% tuition discount (Saves ₹${(calculatedSnapshot.discountAmount * 2).toLocaleString("en-IN")}/yr)`
+                    : "Standard tuition (Score below 60% merit cutoff)"}
                 </span>
               </div>
 
@@ -1016,7 +1189,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 <span className="stat-val payable">
                   ₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}
                 </span>
-                <span className="stat-sub">per semester</span>
+                <span className="stat-sub">per semester installment</span>
               </div>
             </div>
 
