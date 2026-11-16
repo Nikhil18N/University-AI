@@ -12,7 +12,6 @@ import {
   ShieldCheckIcon,
   CheckIcon,
   InfoIcon,
-  TrendingUpIcon,
 } from "./Icons";
 import { createLead, calculateAgentFee } from "../services/api";
 import "./ScholarshipCalculatorModal.css";
@@ -469,7 +468,9 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
   const [selectedExamKey, setSelectedExamKey] = useState<string>("stateBoard");
   const [enteredScore, setEnteredScore] = useState<string>("");
   const [selectedSlabIndex, setSelectedSlabIndex] = useState<number>(-1);
-  const [showProgramPicker, setShowProgramPicker] = useState<boolean>(false);
+  const [showSlabsPreview, setShowSlabsPreview] = useState<boolean>(false);
+  const [includeHostel, setIncludeHostel] = useState<boolean>(false);
+  const [hostelType, setHostelType] = useState<"non_ac" | "ac">("non_ac");
 
   // Optional admissions callback / lead inputs
   const [studentName, setStudentName] = useState<string>(savedLead?.name || "");
@@ -608,6 +609,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     setSelectedSlabIndex(-1);
     setCalculatedSnapshot(null);
     setValidationError(null);
+    setIncludeHostel(false);
   };
 
   // Handle score change live - updates fee snapshot immediately if valid
@@ -782,7 +784,11 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     const pct = calculatedSnapshot.slab.scholarshipPercent;
     const semFee = calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN");
     const annualFee = (calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN");
-    const text = `Hello SR University Admissions! I calculated my fee estimate for ${p.name} (Admissions 2027-28).\n• Score/Rank: ${score}\n• Scholarship: ${pct}%\n• Net Tuition: ₹${semFee}/sem (₹${annualFee}/year)\nPlease share further admission and counseling guidance.`;
+    const hostelInfo = includeHostel
+      ? `\n• Hostel (${hostelType === "ac" ? "AC" : "Non-AC"}): +₹${(hostelType === "ac" ? 125000 : 95000).toLocaleString("en-IN")}/year`
+      : "";
+    const total1stYr = ((calculatedSnapshot.slab.payableFeeSem * 2) + p.enrollmentFee + (includeHostel ? (hostelType === "ac" ? 125000 : 95000) : 0)).toLocaleString("en-IN");
+    const text = `Hello SR University Admissions! I calculated my fee estimate for ${p.name} (Admissions 2027-28).\n• Score/Rank: ${score}\n• Scholarship: ${pct}%\n• Net Tuition: ₹${semFee}/sem (₹${annualFee}/year)${hostelInfo}\n• Total 1st Year: ₹${total1stYr}\nPlease share further admission and counseling guidance.`;
     window.open(`https://wa.me/918331003030?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -859,33 +865,16 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           </div>
         )}
 
-        {/* 2. Program Selector Strip (Compact, with 1-click toggle) */}
-        <div className="calc-program-strip">
-          <div className="calc-program-summary">
-            <span className="calc-program-name">
-              <strong>{currentProgram.name}</strong>
-            </span>
-            <span className="calc-exam-tag">{currentExam.label}</span>
-          </div>
-          <button
-            type="button"
-            className="calc-toggle-prog-btn"
-            onClick={() => setShowProgramPicker(!showProgramPicker)}
-          >
-            {showProgramPicker ? "Done ▴" : "Change Program / Board ▾"}
-          </button>
-        </div>
-
-        {/* Expandable Program & Exam Dropdowns */}
-        {showProgramPicker && (
-          <div className="calc-picker-dropdowns">
-            <div className="calc-picker-field">
-              <label htmlFor="calc-prog-select">Select Academic Degree Program</label>
+        {/* 2. Modern Inline Program & Qualifying Exam Selectors */}
+        <div className="calc-selectors-grid">
+          <div className="calc-select-group">
+            <label htmlFor="calc-prog-select">Degree Program</label>
+            <div className="calc-select-wrap">
               <select
                 id="calc-prog-select"
                 value={selectedProgramId}
                 onChange={handleProgramChange}
-                className="calc-select"
+                className="calc-select-modern"
               >
                 <optgroup label="Bachelors Degrees">
                   {PROGRAMS.filter((p) => p.degreeType === "Bachelors").map((p) => (
@@ -903,14 +892,16 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 </optgroup>
               </select>
             </div>
+          </div>
 
-            <div className="calc-picker-field">
-              <label htmlFor="calc-exam-select">Select Qualifying Examination / Board</label>
+          <div className="calc-select-group">
+            <label htmlFor="calc-exam-select">Qualifying Exam / Board</label>
+            <div className="calc-select-wrap">
               <select
                 id="calc-exam-select"
                 value={currentExam.key}
                 onChange={handleExamChange}
-                className="calc-select"
+                className="calc-select-modern"
               >
                 {activeExams.map((ex) => (
                   <option key={ex.key} value={ex.key}>
@@ -920,88 +911,55 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </select>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* 3. Primary "Marks Only" Input Card */}
-        <form onSubmit={handleCalculateSubmit} className="calc-marks-form">
-          <div className="calc-marks-card">
-            <div className="calc-marks-label-row">
-              <label htmlFor="calc-marks-input" className="calc-marks-label">
-                Enter Your Marks / Score / Rank
-              </label>
-              <span className="calc-marks-instruction">
-                Enter Intermediate marks (out of 1000), percentage (%), or EAPCET rank
-              </span>
-            </div>
+        {/* 3. Hero Marks Input & Presets */}
+        <form onSubmit={handleCalculateSubmit} className="calc-input-section">
+          <div className="calc-input-box">
+            <label htmlFor="calc-marks-input" className="calc-input-label">
+              <span>Enter Your Score / Percentage / Rank</span>
+              <span className="calc-input-subtext">e.g. 850 marks in Inter, 88%, or EAPCET 4500</span>
+            </label>
 
-            <div className="calc-input-button-row">
-              <div className="calc-score-input-wrap">
-                <div className="calc-input-inner">
-                  <input
-                    id="calc-marks-input"
-                    type="text"
-                    className="calc-input calc-score-input"
-                    placeholder="e.g. 780 marks in Inter, 85%, or EAPCET 8500"
-                    value={enteredScore}
-                    onChange={handleScoreChange}
-                    autoFocus
-                  />
-                  {enteredScore && (
-                    <button
-                      type="button"
-                      className="calc-input-clear-btn"
-                      onClick={handleResetScore}
-                      title="Clear marks"
-                      aria-label="Clear marks"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-                {scoreMatch.status === "matched" && matchedSlab && (
-                  <div className="calc-matched-badge">
-                    <AwardIcon size={14} />
-                    <span>
-                      <strong>{matchedSlab.scholarshipPercent}% Scholarship Matched</strong>
-                      {" • "}{matchedRangeStr}
-                      {scoreMatch.displayText && !matchedRangeStr.includes(scoreMatch.displayText)
-                        ? ` (${scoreMatch.displayText})`
-                        : ""}
-                    </span>
-                  </div>
-                )}
-                {scoreMatch.status === "below_criteria" && enteredScore.trim() && (
-                  <div className="calc-matched-badge below-cutoff">
-                    <InfoIcon size={14} />
-                    <span>
-                      <strong>Standard Tuition (Eligible for Admission)</strong>
-                      {" • "}{scoreMatch.displayText}
-                      {" • Merit scholarship starts at 60%"}
-                    </span>
-                  </div>
-                )}
-                {validationError && (
-                  <div className="calc-error-banner" style={{ marginTop: "4px" }}>
-                    <span>{validationError}</span>
-                  </div>
+            <div className="calc-input-action-row">
+              <div className="calc-input-field-wrap">
+                <input
+                  id="calc-marks-input"
+                  type="text"
+                  className="calc-main-input"
+                  placeholder="Type marks, percentage, or rank..."
+                  value={enteredScore}
+                  onChange={handleScoreChange}
+                  autoFocus
+                />
+                {enteredScore && (
+                  <button
+                    type="button"
+                    className="calc-input-clear-btn"
+                    onClick={handleResetScore}
+                    title="Clear marks"
+                    aria-label="Clear marks"
+                  >
+                    ✕
+                  </button>
                 )}
               </div>
 
-              <button type="submit" className="calc-eval-btn">
+              <button type="submit" className="calc-submit-btn">
                 <BoltIcon size={16} />
                 <span>Calculate</span>
               </button>
             </div>
 
             {/* Quick Presets */}
-            <div className="calc-presets-bar">
-              <span className="calc-presets-title">Quick Marks:</span>
-              <div className="calc-presets-list">
+            <div className="calc-presets-row">
+              <span className="calc-presets-label">Quick Presets:</span>
+              <div className="calc-presets-chips">
                 {QUICK_PRESETS.map((preset) => (
                   <button
                     key={preset.label}
                     type="button"
-                    className={`calc-preset-chip ${enteredScore === preset.value ? "active" : ""}`}
+                    className={`calc-chip ${enteredScore === preset.value ? "active" : ""}`}
                     onClick={() => applyPreset(preset)}
                   >
                     {preset.label}
@@ -1009,299 +967,259 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 ))}
               </div>
             </div>
+
+            {scoreMatch.status === "matched" && matchedSlab && (
+              <div className="calc-matched-badge">
+                <AwardIcon size={14} />
+                <span>
+                  <strong>{matchedSlab.scholarshipPercent}% Scholarship Matched</strong>
+                  {" • "}{matchedRangeStr}
+                  {scoreMatch.displayText && !matchedRangeStr.includes(scoreMatch.displayText)
+                    ? ` (${scoreMatch.displayText})`
+                    : ""}
+                </span>
+              </div>
+            )}
+            {scoreMatch.status === "below_criteria" && enteredScore.trim() && (
+              <div className="calc-matched-badge below-cutoff">
+                <InfoIcon size={14} />
+                <span>
+                  <strong>Standard Tuition (Eligible for Admission)</strong>
+                  {" • "}{scoreMatch.displayText}
+                  {" • Merit scholarship starts at 60%"}
+                </span>
+              </div>
+            )}
+            {validationError && (
+              <div className="calc-error-banner" style={{ marginTop: "4px" }}>
+                <span>{validationError}</span>
+              </div>
+            )}
           </div>
         </form>
 
-        {/* 4a. State A: Initial Overview (When NO marks entered yet) */}
+        {/* 4a. Ultra-Minimal Empty State (Hidden completely until user enters marks) */}
         {!calculatedSnapshot && (
-          <div className="calc-initial-overview">
-            <div className="result-section-header">
-              <div className="result-header-title">
-                <TrendingUpIcon size={16} />
-                <div>
-                  <h4>Official Fee Structure & Scholarship Opportunities</h4>
-                  <span className="result-source-note">2027-28 fees, as per the SR University Admissions Office</span>
+          <div className="calc-empty-card">
+            <div className="calc-empty-icon">🎯</div>
+            <div className="calc-empty-info">
+              <h4>Enter your marks to see your personalized fee</h4>
+              <p>
+                SR University provides guaranteed 10% to 40% merit scholarships for 60%+ marks or EAPCET rank under 20,000.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="calc-toggle-slabs-btn"
+              onClick={() => setShowSlabsPreview(!showSlabsPreview)}
+            >
+              {showSlabsPreview ? "Hide Merit Slabs Table ▴" : "View Official Slabs & Criteria ▾"}
+            </button>
+
+            {showSlabsPreview && (
+              <div className="calc-slabs-preview-table">
+                <div className="slabs-table-header">
+                  <span>Merit Waiver</span>
+                  <span>{currentExam.label}</span>
+                  <span>Payable Tuition</span>
                 </div>
-              </div>
-              <span className="result-program-badge">
-                {currentProgram.name}
-              </span>
-            </div>
-
-            {/* Three-Column Base Fee Overview */}
-            <div className="fee-comparison-row">
-              <div className="fee-stat">
-                <span className="stat-label">Standard Base Tuition</span>
-                <span className="stat-val">
-                  ₹{currentProgram.baseTuitionSem.toLocaleString("en-IN")}
-                </span>
-                <span className="stat-sub">per semester (₹{(currentProgram.baseTuitionSem * 2).toLocaleString("en-IN")} / year)</span>
-              </div>
-
-              <div className="fee-stat highlight-green">
-                <span className="stat-label">Merit Scholarship Potential</span>
-                <span className="stat-val savings">
-                  Up to 40% Waiver
-                </span>
-                <span className="stat-sub">Save up to ₹{Math.round(currentProgram.baseTuitionSem * 0.8).toLocaleString("en-IN")} / year</span>
-              </div>
-
-              <div className="fee-stat primary-payable">
-                <span className="stat-label">Discounted Tuition Starts At</span>
-                <span className="stat-val payable">
-                  ₹{Math.round(currentProgram.baseTuitionSem * 0.6).toLocaleString("en-IN")}
-                </span>
-                <span className="stat-sub">per semester (with 40% waiver)</span>
-              </div>
-            </div>
-
-            {/* Friendly Callout to Enter Marks */}
-            <div className="calc-initial-prompt-card">
-              <div className="prompt-card-icon">⚡</div>
-              <div className="prompt-card-text">
-                <strong>Calculate Your Exact Scholarship Waiver:</strong>
-                <span>
-                  Enter your Intermediate marks (out of 1000), percentage (%), or EAPCET rank in the box above, or click any Quick Marks chip to see your personalized net fee, 1st-year breakdown, and 4-year tuition progression.
-                </span>
-              </div>
-            </div>
-
-            {/* Slabs Ladder in Reference Mode */}
-            <div className="calc-roadmap-section">
-              <div className="roadmap-title-row">
-                <div className="roadmap-title">
-                  <AwardIcon size={16} />
-                  <h4>How Scholarship Is Possible (Merit Slabs & Criteria)</h4>
-                </div>
-                <span className="roadmap-sub">Guaranteed by SR University Regulations</span>
-              </div>
-
-              <div className="roadmap-ladder">
                 {currentProgram.slabs.map((slab, idx) => {
                   const rangeText = (slab.ranges as any)[currentExam.key] || slab.ranges.stateBoard || `Slab ${idx + 1}`;
                   return (
-                    <div key={idx} className="roadmap-slab-row">
-                      <div className="slab-pct-col">
-                        <span className="slab-pct-badge">{slab.scholarshipPercent}% Waiver</span>
-                      </div>
-                      <div className="slab-criteria-col">
-                        <span className="slab-exam-label">{currentExam.label}:</span>
-                        <strong className="slab-criteria-text">{rangeText}</strong>
-                      </div>
-                      <div className="slab-payable-col">
-                        <span className="slab-payable-label">You Pay:</span>
-                        <span className="slab-payable-amt">₹{slab.payableFeeSem.toLocaleString("en-IN")}/sem</span>
-                      </div>
+                    <div key={idx} className="slabs-table-row">
+                      <span className="slab-badge-min">{slab.scholarshipPercent}% Waiver</span>
+                      <span className="slab-criteria-min">{rangeText}</span>
+                      <span className="slab-payable-min">₹{slab.payableFeeSem.toLocaleString("en-IN")}/sem</span>
                     </div>
                   );
                 })}
               </div>
+            )}
+          </div>
+        )}
 
-              <div className="roadmap-upgrade-banner">
-                <div className="upgrade-icon">💡</div>
-                <div className="upgrade-text">
-                  <strong>Guaranteed Merit Slabs: </strong>
-                  <span>
-                    Students scoring 60%+ in State Board / CBSE or under 20,000 rank in TG/AP EAPCET qualify for 10% to 40% guaranteed tuition fee waivers for all 4 years.
+        {/* 4b. Personalized Breakdown (Only shown when marks are entered/calculated) */}
+        {calculatedSnapshot && (
+          <div className="calc-results-container">
+            {/* Results Header / Status Bar */}
+            <div className="calc-results-header">
+              <div className="calc-status-badge-wrap">
+                {calculatedSnapshot.discountAmount > 0 ? (
+                  <div className="calc-status-badge scholarship-awarded">
+                    <AwardIcon size={16} />
+                    <span>
+                      <strong>{calculatedSnapshot.slab.scholarshipPercent}% Merit Scholarship Unlocked</strong>
+                      {" • "}{calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="calc-status-badge standard-tuition">
+                    <InfoIcon size={16} />
+                    <span>
+                      <strong>Standard Tuition (Eligible for Admission)</strong>
+                      {" • "}{calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                className="calc-reset-action"
+                onClick={handleResetScore}
+                title="Test another score"
+              >
+                ↺ Test Another Score
+              </button>
+            </div>
+
+            {/* High-Impact 2-Card Metric Display */}
+            <div className="calc-metrics-grid">
+              <div className="calc-metric-card primary-card">
+                <span className="metric-tag">Net Payable Tuition</span>
+                <div className="metric-primary-val">
+                  ₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}
+                  <span className="metric-unit"> / semester</span>
+                </div>
+                <div className="metric-sub-val">
+                  ₹{(calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN")} / year (Annual Installment)
+                </div>
+              </div>
+
+              <div className={`calc-metric-card ${calculatedSnapshot.discountAmount > 0 ? "savings-card" : "neutral-card"}`}>
+                <span className="metric-tag">
+                  {calculatedSnapshot.discountAmount > 0 ? "Merit Scholarship Savings" : "Scholarship Status"}
+                </span>
+                <div className="metric-primary-val green">
+                  {calculatedSnapshot.discountAmount > 0
+                    ? `Save ₹${(calculatedSnapshot.discountAmount * 2).toLocaleString("en-IN")}/yr`
+                    : "Standard Fee"}
+                </div>
+                <div className="metric-sub-val">
+                  {calculatedSnapshot.discountAmount > 0
+                    ? `${calculatedSnapshot.slab.scholarshipPercent}% tuition discount (₹${calculatedSnapshot.discountAmount.toLocaleString("en-IN")}/sem)`
+                    : "Scores below 60% pay standard tuition"}
+                </div>
+              </div>
+            </div>
+
+            {/* First-Year Joining Breakdown with Optional Hostel Toggle */}
+            <div className="calc-breakdown-card">
+              <div className="breakdown-card-header">
+                <strong>First Year Total Payable Breakdown (2027-28)</strong>
+                <span className="breakdown-badge">{calculatedSnapshot.program.name.split(" (")[0]}</span>
+              </div>
+
+              <div className="breakdown-lines">
+                <div className="breakdown-line">
+                  <span className="line-label">Net 1st Year Tuition Fee:</span>
+                  <span className="line-val">₹{(calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN")}</span>
+                </div>
+                <div className="breakdown-line sub">
+                  <span className="line-label">↳ Semester-wise Installment:</span>
+                  <span className="line-val">₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")} / semester</span>
+                </div>
+                <div className="breakdown-line">
+                  <span className="line-label">One-Time Enrollment Fee:</span>
+                  <span className="line-val">₹{calculatedSnapshot.program.enrollmentFee.toLocaleString("en-IN")}</span>
+                </div>
+
+                {/* Optional Hostel Accommodation Toggle */}
+                <div className="calc-hostel-option-box">
+                  <label className="hostel-toggle-label">
+                    <input
+                      type="checkbox"
+                      checked={includeHostel}
+                      onChange={(e) => setIncludeHostel(e.target.checked)}
+                      className="hostel-checkbox"
+                    />
+                    <span className="hostel-toggle-text">
+                      <strong>Include On-Campus Residential Hostel & Dining (Optional)</strong>
+                    </span>
+                  </label>
+
+                  {includeHostel && (
+                    <div className="hostel-sub-picker">
+                      <label className={`hostel-type-pill ${hostelType === "non_ac" ? "selected" : ""}`}>
+                        <input
+                          type="radio"
+                          name="hostelType"
+                          value="non_ac"
+                          checked={hostelType === "non_ac"}
+                          onChange={() => setHostelType("non_ac")}
+                        />
+                        <span>Non-AC (3/4-Sharing): +₹95,000 / year</span>
+                      </label>
+                      <label className={`hostel-type-pill ${hostelType === "ac" ? "selected" : ""}`}>
+                        <input
+                          type="radio"
+                          name="hostelType"
+                          value="ac"
+                          checked={hostelType === "ac"}
+                          onChange={() => setHostelType("ac")}
+                        />
+                        <span>AC (3/4-Sharing): +₹1,25,000 / year</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {calculatedSnapshot.program.annualIncrease && (
+                  <div className="breakdown-line sub">
+                    <span className="line-label">Tuition Increase from 2nd Year:</span>
+                    <span className="line-val">+₹{calculatedSnapshot.program.annualIncrease.toLocaleString("en-IN")} / year</span>
+                  </div>
+                )}
+
+                {/* Total 1st Year Sum */}
+                <div className="breakdown-total-row">
+                  <span className="total-label">
+                    {includeHostel ? "Total 1st Year (Tuition + Enrollment + Hostel):" : "Total 1st Year (Tuition + Enrollment):"}
+                  </span>
+                  <span className="total-val bold-emerald">
+                    ₹{((calculatedSnapshot.slab.payableFeeSem * 2) + calculatedSnapshot.program.enrollmentFee + (includeHostel ? (hostelType === "ac" ? 125000 : 95000) : 0)).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Institutional Notes */}
-            <div className="calc-notes">
-              <div className="note-item">
-                <PinIcon size={15} />
-                <div>
-                  <strong>One-Time & Annual Charges:</strong> Enrollment Fee: ₹5,000 (one-time). Annual other fee: ₹15,000/yr | Exam fee: ₹5,000/yr | Tri-cities Bus transport: ₹30,000/yr.
-                </div>
-              </div>
-              {currentProgram.specializationFeeAnnual && (
-                <div className="note-item">
-                  <FlaskIcon size={15} />
-                  <div>
-                    <strong>Specialization Fee:</strong> ₹{currentProgram.specializationFeeAnnual.toLocaleString("en-IN")}/year applicable from 2nd year onwards for advanced tech tracks (AI&ML, Cyber Security, Data Science, Quantum AI, Robotics).
-                  </div>
-                </div>
-              )}
-              <div className="note-item special-scholarship">
-                <HeartHandIcon size={15} />
-                <div>
-                  <strong>19 Special Category Concessions:</strong> Flat annual tuition waivers of ₹50,000/yr (orphans, international sports, SRU staff children), ₹20,000/yr (differently abled over 50% disability), and ₹15,000/yr (girl students, single parent, defence/police, NCC C, SR Junior College, AP/out-of-state students, alumni siblings).
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 4b. Official Fee Structure Breakdown (Only shown when marks are entered/calculated) */}
-        {calculatedSnapshot && (
-          <div className="calc-result-box">
-            <div className="result-section-header">
-              <div className="result-header-title">
-                <TrendingUpIcon size={16} />
-                <div>
-                  <h4>Official Fee Structure & Payable Amounts</h4>
-                  <span className="result-source-note">2027-28 fees, as per the SR University Admissions Office</span>
-                </div>
-              </div>
-              <div className="result-header-actions">
-                <span className="result-program-badge">
-                  {calculatedSnapshot.program.name}
-                </span>
-                <button
-                  type="button"
-                  className="calc-reset-score-btn"
-                  onClick={handleResetScore}
-                  title="Test another score"
-                >
-                  ↺ Test Another Score
-                </button>
-              </div>
-            </div>
-
-            {/* Three-Column Fee Comparison */}
-            <div className="fee-comparison-row">
-              <div className="fee-stat">
-                <span className="stat-label">Standard Base Tuition</span>
-                <span className={`stat-val ${calculatedSnapshot.discountAmount > 0 ? "strikethrough" : ""}`}>
-                  ₹{calculatedSnapshot.program.baseTuitionSem.toLocaleString("en-IN")}
-                </span>
-                <span className="stat-sub">per semester</span>
-              </div>
-
-              <div className={`fee-stat ${calculatedSnapshot.discountAmount > 0 ? "highlight-green" : "highlight-amber"}`}>
-                <span className="stat-label">Merit Scholarship Waiver</span>
-                <span className={`stat-val ${calculatedSnapshot.discountAmount > 0 ? "savings" : ""}`}>
-                  {calculatedSnapshot.discountAmount > 0
-                    ? `-₹${calculatedSnapshot.discountAmount.toLocaleString("en-IN")}`
-                    : "₹0"}
-                </span>
-                <span className="stat-sub">
-                  {calculatedSnapshot.slab.scholarshipPercent > 0
-                    ? `${calculatedSnapshot.slab.scholarshipPercent}% tuition discount (Saves ₹${(calculatedSnapshot.discountAmount * 2).toLocaleString("en-IN")}/yr)`
-                    : "Standard tuition (Score below 60% merit cutoff)"}
-                </span>
-              </div>
-
-              <div className="fee-stat primary-payable">
-                <span className="stat-label">Net Payable Tuition</span>
-                <span className="stat-val payable">
-                  ₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}
-                </span>
-                <span className="stat-sub">per semester installment</span>
-              </div>
-            </div>
-
-            {/* Total 1st Year Payable (Tuition + Enrollment) */}
-            <div className="calc-joining-breakdown">
-              <div className="joining-header">
-                <strong>First Year Payable Breakdown:</strong>
-              </div>
-              <div className="joining-row">
-                <span className="joining-item">Net 1st Year Tuition Fee:</span>
-                <span className="joining-val">₹{(calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN")}</span>
-              </div>
-              <div className="joining-row">
-                <span className="joining-item">Semester-wise Installment:</span>
-                <span className="joining-val">₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")} / semester</span>
-              </div>
-              <div className="joining-row">
-                <span className="joining-item">One-Time Enrollment Fee:</span>
-                <span className="joining-val">₹{calculatedSnapshot.program.enrollmentFee.toLocaleString("en-IN")}</span>
-              </div>
-              {calculatedSnapshot.program.annualIncrease && (
-                <div className="joining-row">
-                  <span className="joining-item">Annual Tuition Increase (from Year 2):</span>
-                  <span className="joining-val">+₹{calculatedSnapshot.program.annualIncrease.toLocaleString("en-IN")} / year</span>
-                </div>
-              )}
-              <div className="joining-row total-joining">
-                <span className="joining-item">Total 1st Year Tuition + Enrollment:</span>
-                <span className="joining-val bold-emerald">
-                  ₹{((calculatedSnapshot.slab.payableFeeSem * 2) + calculatedSnapshot.program.enrollmentFee).toLocaleString("en-IN")}
-                </span>
-              </div>
-            </div>
-
-            {/* 4-Year Tuition Progression for B.Tech CSE */}
-            {calculatedSnapshot.slab.cseYearlyPayable && (
-              <div className="progression-table-wrap">
-                <div className="progression-title">
-                  <CalendarIcon size={14} />
-                  <span>Year-by-Year Tuition Progression (Annual Base + ₹9,000 Yearly Increase):</span>
-                </div>
-                <div className="progression-grid">
-                  <div className="prog-col">
-                    <span className="prog-yr">Year 1</span>
-                    <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr1.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per year</span>
-                  </div>
-                  <div className="prog-col">
-                    <span className="prog-yr">Year 2</span>
-                    <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr2.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per year</span>
-                  </div>
-                  <div className="prog-col">
-                    <span className="prog-yr">Year 3</span>
-                    <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr3.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per year</span>
-                  </div>
-                  <div className="prog-col">
-                    <span className="prog-yr">Year 4</span>
-                    <span className="prog-val">₹{calculatedSnapshot.slab.cseYearlyPayable.yr4.toLocaleString("en-IN")}</span>
-                    <span className="prog-unit">per year</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 5. "How Scholarship Is Possible" (Full Criteria Ladder & Roadmap) */}
-            <div className="calc-roadmap-section">
-              <div className="roadmap-title-row">
-                <div className="roadmap-title">
-                  <AwardIcon size={16} />
-                  <h4>How Scholarship Is Possible (Merit Slabs & Criteria)</h4>
-                </div>
-                <span className="roadmap-sub">Guaranteed by SR University Regulations</span>
-              </div>
-
-              {/* Slabs Ladder Table */}
-              <div className="roadmap-ladder">
-                {currentProgram.slabs.map((slab, idx) => {
-                  const isCurrentMatch = idx === selectedSlabIndex;
-                  const rangeText = (slab.ranges as any)[currentExam.key] || slab.ranges.stateBoard || `Slab ${idx + 1}`;
-                  return (
-                    <div
-                      key={idx}
-                      className={`roadmap-slab-row ${isCurrentMatch ? "matched-active" : ""}`}
-                    >
-                      <div className="slab-pct-col">
-                        <span className="slab-pct-badge">{slab.scholarshipPercent}% Waiver</span>
-                        {isCurrentMatch && <span className="matched-tag">✓ Your Score Matched</span>}
-                      </div>
-                      <div className="slab-criteria-col">
-                        <span className="slab-exam-label">{currentExam.label}:</span>
-                        <strong className="slab-criteria-text">{rangeText}</strong>
-                      </div>
-                      <div className="slab-payable-col">
-                        <span className="slab-payable-label">You Pay:</span>
-                        <span className="slab-payable-amt">₹{slab.payableFeeSem.toLocaleString("en-IN")}/sem</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Next Tier Upgrade Opportunity */}
-              <div className="roadmap-upgrade-banner">
-                <div className="upgrade-icon">💡</div>
-                <div className="upgrade-text">
+            {/* Next Tier Upgrade Opportunity */}
+            {selectedSlabIndex < currentProgram.slabs.length - 1 && (
+              <div className="calc-upgrade-card">
+                <div className="upgrade-card-icon">💡</div>
+                <div className="upgrade-card-text">
                   <strong>Upgrade Opportunity: </strong>
                   <span>{nextTierInfo.message}</span>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* 4-Year Progression for B.Tech CSE */}
+            {calculatedSnapshot.slab.cseYearlyPayable && (
+              <div className="calc-progression-card">
+                <div className="progression-header">
+                  <CalendarIcon size={14} />
+                  <span>4-Year Tuition Progression (Annual Base + ₹9,000/yr escalation):</span>
+                </div>
+                <div className="progression-pill-grid">
+                  <div className="prog-pill">
+                    <span className="prog-yr">Year 1</span>
+                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr1.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="prog-pill">
+                    <span className="prog-yr">Year 2</span>
+                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr2.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="prog-pill">
+                    <span className="prog-yr">Year 3</span>
+                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr3.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="prog-pill">
+                    <span className="prog-yr">Year 4</span>
+                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr4.toLocaleString("en-IN")}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Institutional Notes Callout */}
             <div className="calc-notes">
@@ -1415,13 +1333,14 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 className="btn-ask-buddy"
                 onClick={() => {
                   onClose();
+                  const hostelText = includeHostel ? ` (including ${hostelType === "ac" ? "AC" : "Non-AC"} hostel)` : "";
                   onAskBuddy(
-                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText} which qualifies for a ${calculatedSnapshot.slab.scholarshipPercent}% merit waiver (Payable: ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem). Please share details on admission verification and hostel accommodation.`
+                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText} which qualifies for a ${calculatedSnapshot.slab.scholarshipPercent}% merit waiver (Payable: ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem)${hostelText}. Please share details on admission verification and next steps.`
                   );
                 }}
               >
                 <MessageSquareIcon size={16} />
-                <span>Ask SRU Buddy About This Fee & Scholarship</span>
+                <span>Ask SRU Buddy About This Fee</span>
               </button>
             </div>
           </div>
