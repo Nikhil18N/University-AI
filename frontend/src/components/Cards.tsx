@@ -865,7 +865,7 @@ export function CampusVisitBookingCard({ card }: CardProps) {
   maxDate.setDate(maxDate.getDate() + 90);
   const maxDateStr = formatYMD(maxDate);
 
-  const [visitDate, setVisitDate] = useState(defaultDateStr);
+  const [visitDate, setVisitDate] = useState(() => d.suggested_date || d.visit_date || defaultDateStr);
   const [visitors, setVisitors] = useState<number>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

@@ -954,10 +954,8 @@ def generate_cards(
         "book campus tour", "schedule campus visit", "how can i book a campus tour",
         "book a campus tour", "schedule visit", "book a visit", "book a tour",
         "schedule a tour", "schedule tour", "tour booking", "campus visit booking",
-        "how to book a visit", "want to visit campus", "want to visit the campus",
-        "i want to visit", "how to visit the campus", "how can i visit", "can i visit the campus",
-        "plan a visit", "visit the campus in person", "see the campus in person",
-        "campus visit", "visit campus", "visit sru", "visit university",
+        "how to book a visit", "i want to book a visit", "i want to schedule a visit",
+        "register for campus visit", "reserve a slot", "book my visit",
     )
     is_visit_booking_query = any(k in msg_lower for k in _visit_booking_triggers) and not any(k in msg_lower for k in ("fee", "fees", "cost", "vs", "compare"))
     if is_visit_booking_query:

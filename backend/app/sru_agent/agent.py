@@ -10,6 +10,7 @@ Yields small event dicts so the API can stream progress to the browser:
 """
 import logging
 import re
+from datetime import date, datetime
 
 from google import genai
 from google.genai import types
@@ -57,7 +58,6 @@ def _chunks(text: str, words_per_chunk: int = 6):
 
 async def run_agent(message: str, session_id: str, conversation_id=None, client=None):
     """Async generator of events for one student message."""
-    client = client or get_client()
     message = (message or "").strip()[:config.AGENT_MAX_MESSAGE_CHARS]
     yield {"type": "start", "conversation_id": conversation_id}
     if not message:
@@ -66,7 +66,207 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
 
     ctx = {"session_id": session_id, "conversation_id": conversation_id,
            "profile": await memory.get_profile(session_id)}
-    history = await memory.get_history(session_id)
+    history = await memory.get_history(session_id, conversation_id)
+
+    # Deterministic intent checks (Date query, Confusion, Campus visit info/booking)
+    from .intents import classify_agent_intent
+    from .tools import resolve_campus_visit_date
+
+    conv_state = await memory.get_conversation_state(session_id, conversation_id)
+    intent = classify_agent_intent(message, conv_state)
+
+    if intent == "DATE_QUERY":
+        today_human = date.today().strftime("%B %d, %Y")
+        final = f"Today is {today_human}."
+        for piece in _chunks(final):
+            yield {"type": "token", "delta": piece}
+        await memory.append_history(session_id, message, final, conversation_id)
+        yield {
+            "type": "done",
+            "conversation_id": conversation_id,
+            "answer": final,
+            "tools_used": [],
+            "model": config.AGENT_MODEL,
+            "sources": [],
+            "suggestions": ["How can I visit campus?", "What are the B.Tech CSE fees?", "Hostel rules & curfew"],
+            "cards": [],
+            "flow": None,
+        }
+        return
+
+    if intent == "CONFUSION_QUERY":
+        final = "Sorry for the confusion! I can help you with campus visit details, directions, timings, or scheduling a visit."
+        for piece in _chunks(final):
+            yield {"type": "token", "delta": piece}
+        await memory.append_history(session_id, message, final, conversation_id)
+        yield {
+            "type": "done",
+            "conversation_id": conversation_id,
+            "answer": final,
+            "tools_used": [],
+            "model": config.AGENT_MODEL,
+            "sources": [],
+            "suggestions": ["Visiting timings & guidelines", "Schedule a campus visit", "Campus location & directions"],
+            "cards": [],
+            "flow": None,
+        }
+        return
+
+    if intent == "CAMPUS_VISIT_INFO":
+        await memory.update_conversation_state(session_id, conversation_id, active_topic="campus_visit")
+        final = "Are you looking for information about visiting the SR University campus, or would you like to schedule a campus visit?"
+        for piece in _chunks(final):
+            yield {"type": "token", "delta": piece}
+        await memory.append_history(session_id, message, final, conversation_id)
+        yield {
+            "type": "done",
+            "conversation_id": conversation_id,
+            "answer": final,
+            "tools_used": [],
+            "model": config.AGENT_MODEL,
+            "sources": [],
+            "suggestions": ["I want to schedule a visit", "Campus visiting hours & location", "Can parents accompany me?"],
+            "cards": [],
+            "flow": None,
+        }
+        return
+
+    if intent == "DATE_CONFIRMATION_YES":
+        pending_date_iso = conv_state.get("pending_visit_date")
+        if pending_date_iso:
+            try:
+                dt = datetime.strptime(pending_date_iso, "%Y-%m-%d").date()
+                date_human = dt.strftime("%B %d, %Y")
+            except Exception:
+                date_human = pending_date_iso
+
+            final = f"Great! Let me help you submit a campus visit request for {date_human}."
+            for piece in _chunks(final):
+                yield {"type": "token", "delta": piece}
+
+            await memory.update_conversation_state(
+                session_id, conversation_id,
+                awaiting_date_confirmation=False,
+                confirmed_visit_date=pending_date_iso,
+                active_topic="campus_visit",
+            )
+            await memory.append_history(session_id, message, final, conversation_id)
+
+            from app.services.card_service import CAMPUS_VISIT_FORM_CARD
+            visit_card = dict(CAMPUS_VISIT_FORM_CARD)
+            visit_card["suggested_date"] = pending_date_iso
+            visit_card["title"] = f"Schedule Campus Visit — {date_human}"
+
+            yield {
+                "type": "done",
+                "conversation_id": conversation_id,
+                "answer": final,
+                "tools_used": ["confirm_visit_date"],
+                "model": config.AGENT_MODEL,
+                "sources": [],
+                "suggestions": ["What are the timings?", "Directions to campus", "Hostel tour"],
+                "cards": [visit_card],
+                "flow": None,
+            }
+            return
+
+    if intent == "DATE_CONFIRMATION_NO":
+        await memory.update_conversation_state(
+            session_id, conversation_id,
+            awaiting_date_confirmation=False,
+            pending_visit_date=None,
+            active_topic="campus_visit",
+        )
+        final = "No problem! Which date would you prefer to visit the campus?"
+        for piece in _chunks(final):
+            yield {"type": "token", "delta": piece}
+        await memory.append_history(session_id, message, final, conversation_id)
+        yield {
+            "type": "done",
+            "conversation_id": conversation_id,
+            "answer": final,
+            "tools_used": [],
+            "model": config.AGENT_MODEL,
+            "sources": [],
+            "suggestions": ["Tomorrow", "Next Monday", "This Saturday"],
+            "cards": [],
+            "flow": None,
+        }
+        return
+
+    if intent == "CAMPUS_VISIT_BOOKING_WITH_DATE":
+        res = resolve_campus_visit_date(message)
+        if res.get("date"):
+            if res.get("is_sunday"):
+                alts = res.get("alternative_suggestions", [])
+                alt_text = f" Would Saturday, {alts[0]['human']} or Monday, {alts[1]['human']} work better for you?" if len(alts) >= 2 else ""
+                final = (
+                    f"SR University campus visits are conducted Monday through Saturday (9:30 AM to 4:30 PM). "
+                    f"The campus is closed for visits on Sunday, {res['human']}.{alt_text}"
+                )
+                for piece in _chunks(final):
+                    yield {"type": "token", "delta": piece}
+                await memory.append_history(session_id, message, final, conversation_id)
+                suggs = [f"Visit on {a['human']}" for a in alts] if alts else ["Select another weekday"]
+                yield {
+                    "type": "done",
+                    "conversation_id": conversation_id,
+                    "answer": final,
+                    "tools_used": [],
+                    "model": config.AGENT_MODEL,
+                    "sources": [],
+                    "suggestions": suggs,
+                    "cards": [],
+                    "flow": None,
+                }
+                return
+
+            if res.get("is_outside_window"):
+                final = (
+                    f"Campus visits can only be scheduled within the next 90 days. "
+                    f"{res['human']} is outside this window. Please choose a date within the next 90 days "
+                    f"or contact the Admissions Office at {config.ADMISSIONS_PHONE}."
+                )
+                for piece in _chunks(final):
+                    yield {"type": "token", "delta": piece}
+                await memory.append_history(session_id, message, final, conversation_id)
+                yield {
+                    "type": "done",
+                    "conversation_id": conversation_id,
+                    "answer": final,
+                    "tools_used": [],
+                    "model": config.AGENT_MODEL,
+                    "sources": [],
+                    "suggestions": ["Choose a date this week", "Contact Admissions Office"],
+                    "cards": [],
+                    "flow": None,
+                }
+                return
+
+            # Valid date -> Ask confirmation before booking!
+            await memory.update_conversation_state(
+                session_id, conversation_id,
+                pending_visit_date=res["iso"],
+                awaiting_date_confirmation=True,
+                active_topic="campus_visit",
+            )
+            final = f"Do you mean {res['human']}?"
+            for piece in _chunks(final):
+                yield {"type": "token", "delta": piece}
+            await memory.append_history(session_id, message, final, conversation_id)
+            yield {
+                "type": "done",
+                "conversation_id": conversation_id,
+                "answer": final,
+                "tools_used": [],
+                "model": config.AGENT_MODEL,
+                "sources": [],
+                "suggestions": ["Yes", "No, different date"],
+                "cards": [],
+                "flow": None,
+            }
+            return
+
     contents = [types.Content(role=h["role"], parts=[types.Part.from_text(text=h["text"])])
                 for h in history]
     contents.append(types.Content(role="user", parts=[types.Part.from_text(text=message)]))
@@ -94,6 +294,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
 
     tool_decl = _tool_declarations()
     used, cards, final = [], [], ""
+    client = client or get_client()
     try:
         for round_no in range(config.AGENT_MAX_TOOL_ROUNDS + 1):
             last_round = round_no == config.AGENT_MAX_TOOL_ROUNDS
@@ -175,7 +376,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     final = final or FALLBACK
     for piece in _chunks(final):
         yield {"type": "token", "delta": piece}
-    await memory.append_history(session_id, message, final)
+    await memory.append_history(session_id, message, final, conversation_id)
 
     # Attach contextual cards (such as early bird application ad, fee breakdown, or video recommendations)
     try:

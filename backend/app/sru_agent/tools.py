@@ -140,49 +140,82 @@ async def tool_request_counsellor_callback(args, ctx):
                             {"preferred_time": args.get("preferred_time") or "any time"})
 
 
-def parse_flexible_visit_date(date_str: str, today: date | None = None) -> date | None:
-    """Intelligently parse flexible date inputs into a concrete datetime.date.
-    Handles 'today', 'tomorrow', day with ordinals like '17th' / '17', month names like '17 Nov',
-    and standard ISO / Indian date formats (YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY).
+def resolve_campus_visit_date(date_str: str, today: date | None = None) -> dict:
+    """Deterministically resolve and validate a campus visit date relative to today.
+    Handles relative tokens ('today', 'tomorrow'), ordinals ('17th', '17'),
+    weekdays ('next Monday', 'this Friday'), month names ('Nov 17'), and standard date formats.
+    Validates operating hours/days (SRU is closed on Sundays for visits).
     """
-    if not date_str or not isinstance(date_str, str):
-        return None
     today = today or date.today()
-    s = str(date_str).strip().lower()
+    if not date_str or not isinstance(date_str, str):
+        return {
+            "date": None, "iso": None, "human": None,
+            "is_valid": False, "is_sunday": False, "is_outside_window": False,
+            "is_ambiguous": True, "reason": "No date provided.", "alternative_suggestions": []
+        }
 
-    # Strip conversational prefixes
-    s = re.sub(r"^(visit\s+(on\s+)?|on\s+|for\s+)", "", s).strip()
+    s = str(date_str).strip().lower()
+    # Strip common conversational phrases
+    s = re.sub(r"^(i\s+want\s+to\s+visit\s+(on\s+)?|i\s+would\s+like\s+to\s+visit\s+(on\s+)?|visit\s+(on\s+)?|on\s+|for\s+)", "", s).strip()
     s = s.replace(",", " ").replace(".", " ").strip()
 
-    # Relative tokens
+    target_date: date | None = None
+
+    # 1. Relative tokens
     if s in ("today", "todays"):
-        return today
-    if s in ("tomorrow", "tomorrows", "tmrw"):
-        return today + timedelta(days=1)
-    if s in ("day after tomorrow", "day after tmrw"):
-        return today + timedelta(days=2)
+        target_date = today
+    elif s in ("tomorrow", "tomorrows", "tmrw"):
+        target_date = today + timedelta(days=1)
+    elif s in ("day after tomorrow", "day after tmrw"):
+        target_date = today + timedelta(days=2)
 
-    # Standard ISO YYYY-MM-DD
-    try:
-        return datetime.strptime(s, "%Y-%m-%d").date()
-    except ValueError:
-        pass
+    # 2. Weekday expressions (e.g. "next monday", "this friday", "on monday")
+    weekdays = {
+        "monday": 0, "mon": 0,
+        "tuesday": 1, "tue": 1, "tues": 1,
+        "wednesday": 2, "wed": 2,
+        "thursday": 3, "thu": 3, "thur": 3, "thurs": 3,
+        "friday": 4, "fri": 4,
+        "saturday": 5, "sat": 5,
+        "sunday": 6, "sun": 6,
+    }
+    m_weekday = re.search(r"\b(next|this|coming)?\s*(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun)\b", s)
+    if not target_date and m_weekday:
+        prefix, wday_name = m_weekday.group(1), m_weekday.group(2)
+        target_wday = weekdays[wday_name]
+        days_ahead = (target_wday - today.weekday()) % 7
+        if days_ahead == 0:
+            days_ahead = 7  # If today is Monday and user asks "next Monday", target next week
+        elif prefix == "next" and days_ahead < 7:
+            days_ahead += 7
+        target_date = today + timedelta(days=days_ahead)
 
-    # DD-MM-YYYY, DD/MM/YYYY, DD MM YYYY
-    for fmt in ("%d-%m-%Y", "%d/%m/%Y", "%d %m %Y"):
+    # 3. Standard ISO YYYY-MM-DD
+    if not target_date:
         try:
-            return datetime.strptime(s, fmt).date()
+            target_date = datetime.strptime(s, "%Y-%m-%d").date()
         except ValueError:
             pass
 
-    # Clean ordinals: 17th -> 17, 1st -> 1, 2nd -> 2, 3rd -> 3
+    # 4. Indian formats: DD-MM-YYYY, DD/MM/YYYY, DD MM YYYY
+    if not target_date:
+        for fmt in ("%d-%m-%Y", "%d/%m/%Y", "%d %m %Y"):
+            try:
+                target_date = datetime.strptime(s, fmt).date()
+                break
+            except ValueError:
+                pass
+
+    # 5. Clean ordinals: 17th -> 17, 1st -> 1, 2nd -> 2, 3rd -> 3
     s_clean = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", s).strip()
 
-    for fmt in ("%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(s_clean, fmt).date()
-        except ValueError:
-            pass
+    if not target_date:
+        for fmt in ("%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y"):
+            try:
+                target_date = datetime.strptime(s_clean, fmt).date()
+                break
+            except ValueError:
+                pass
 
     month_names = {
         "jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3,
@@ -190,66 +223,131 @@ def parse_flexible_visit_date(date_str: str, today: date | None = None) -> date 
         "aug": 8, "august": 8, "sep": 9, "sept": 9, "september": 9, "oct": 10,
         "october": 10, "nov": 11, "november": 11, "dec": 12, "december": 12
     }
-    tokens = s_clean.split()
-    found_day = None
-    found_month = None
-    found_year = None
-    for t in tokens:
-        if t in month_names:
-            found_month = month_names[t]
-        elif t.isdigit():
-            val = int(t)
-            if val > 2000:
-                found_year = val
-            elif 1 <= val <= 31 and found_day is None:
-                found_day = val
-            elif 1 <= val <= 12 and found_month is None:
-                found_month = val
 
-    if found_day is not None and found_month is not None:
-        yr = found_year or today.year
-        try:
-            d = date(yr, found_month, found_day)
-            # If no year was given and date is passed by > 7 days, assume next year
-            if not found_year and d < today - timedelta(days=7):
-                d = date(yr + 1, found_month, found_day)
-            return d
-        except ValueError:
-            pass
+    if not target_date:
+        tokens = s_clean.split()
+        found_day = None
+        found_month = None
+        found_year = None
+        for t in tokens:
+            if t in month_names:
+                found_month = month_names[t]
+            elif t.isdigit():
+                val = int(t)
+                if val > 2000:
+                    found_year = val
+                elif 1 <= val <= 31 and found_day is None:
+                    found_day = val
+                elif 1 <= val <= 12 and found_month is None:
+                    found_month = val
 
-    # Bare day number (e.g., '17th', '17')
-    m = re.search(r"\b(\d{1,2})\b", s_clean)
-    if m:
-        day_val = int(m.group(1))
-        if 1 <= day_val <= 31:
+        if found_day is not None and found_month is not None:
+            yr = found_year or today.year
             try:
-                # If day_val is >= today.day, it refers to THIS current month
-                if day_val >= today.day:
-                    return date(today.year, today.month, day_val)
-                else:
-                    # Target next month
-                    next_month = today.month + 1 if today.month < 12 else 1
-                    next_year = today.year if today.month < 12 else today.year + 1
-                    return date(next_year, next_month, day_val)
+                d = date(yr, found_month, found_day)
+                if not found_year and d < today - timedelta(days=7):
+                    d = date(yr + 1, found_month, found_day)
+                target_date = d
             except ValueError:
                 pass
 
-    return None
+    # 6. Bare day number or ordinal: e.g. "17th", "17", "on 17"
+    if not target_date:
+        m = re.search(r"\b(\d{1,2})\b", s_clean)
+        if m:
+            day_val = int(m.group(1))
+            if 1 <= day_val <= 31:
+                try:
+                    # If day_val >= today.day, it refers to THIS current month
+                    if day_val >= today.day:
+                        target_date = date(today.year, today.month, day_val)
+                    else:
+                        # Target next month
+                        next_month = today.month + 1 if today.month < 12 else 1
+                        next_year = today.year if today.month < 12 else today.year + 1
+                        target_date = date(next_year, next_month, day_val)
+                except ValueError:
+                    pass
+
+    if not target_date:
+        return {
+            "date": None, "iso": None, "human": None,
+            "is_valid": False, "is_sunday": False, "is_outside_window": False,
+            "is_ambiguous": True,
+            "reason": f"Could not determine a valid date from '{date_str}'. Please provide a date like 'tomorrow', '17th Nov', or 'YYYY-MM-DD'.",
+            "alternative_suggestions": []
+        }
+
+    iso_str = target_date.isoformat()
+    human_str = target_date.strftime("%B %d, %Y")
+    max_date = today + timedelta(days=90)
+
+    # Availability Validation: SR University campus visits are conducted Monday - Saturday
+    is_sunday = (target_date.weekday() == 6)
+    alt_suggestions = []
+    if is_sunday:
+        sat_alt = target_date - timedelta(days=1)
+        mon_alt = target_date + timedelta(days=1)
+        if sat_alt >= today:
+            alt_suggestions.append({"date": sat_alt, "iso": sat_alt.isoformat(), "human": sat_alt.strftime("%A, %B %d, %Y")})
+        alt_suggestions.append({"date": mon_alt, "iso": mon_alt.isoformat(), "human": mon_alt.strftime("%A, %B %d, %Y")})
+
+    is_outside = target_date < today or target_date > max_date
+
+    return {
+        "date": target_date,
+        "iso": iso_str,
+        "human": human_str,
+        "is_valid": not is_sunday and not is_outside,
+        "is_sunday": is_sunday,
+        "is_outside_window": is_outside,
+        "is_ambiguous": False,
+        "reason": None if (not is_sunday and not is_outside) else (
+            f"The campus is closed for visits on Sunday, {human_str}." if is_sunday else
+            f"Campus visits can only be scheduled within the next 90 days (between {today:%d %B %Y} and {max_date:%d %B %Y})."
+        ),
+        "alternative_suggestions": alt_suggestions,
+    }
+
+
+def parse_flexible_visit_date(date_str: str, today: date | None = None) -> date | None:
+    """Backwards-compatible wrapper returning datetime.date or None."""
+    res = resolve_campus_visit_date(date_str, today=today)
+    return res.get("date") if res.get("is_valid") else (res.get("date") if res.get("is_sunday") or res.get("is_outside_window") else None)
 
 
 async def tool_book_campus_visit(args, ctx):
     raw_date = args.get("visit_date", "")
-    visit = parse_flexible_visit_date(raw_date)
-    if not visit:
-        return {"status": "invalid", "problem": f"Could not determine a valid date from '{raw_date}'. Please provide a date like 'tomorrow', '17th Nov', or 'YYYY-MM-DD'."}
+    res = resolve_campus_visit_date(raw_date)
+    if not res.get("date"):
+        return {"status": "invalid", "problem": res.get("reason", f"Could not determine a valid date from '{raw_date}'. Please provide a date like 'tomorrow', '17th Nov', or 'YYYY-MM-DD'.")}
+    
+    if res.get("is_sunday"):
+        alts = res.get("alternative_suggestions", [])
+        alt_text = f" Would Saturday, {alts[0]['human']} or Monday, {alts[1]['human']} work for you?" if len(alts) >= 2 else ""
+        return {
+            "status": "invalid",
+            "problem": f"Campus visits are conducted Monday through Saturday (9:30 AM to 4:30 PM). SR University is closed for visits on Sunday, {res['human']}.{alt_text}"
+        }
+
     today = date.today()
-    if visit < today or visit > today + timedelta(days=90):
-        return {"status": "invalid", "problem": f"Campus visits can only be scheduled between {today:%d %B %Y} and "
-                                               f"{(today + timedelta(days=90)):%d %B %Y}. Please choose a date within this window."}
+    if res.get("is_outside_window"):
+        return {
+            "status": "invalid",
+            "problem": f"Campus visits can only be scheduled within the next 90 days. {res['human']} is outside this window. Please choose a date within 90 days or contact Admissions at {config.ADMISSIONS_PHONE}."
+        }
+
+    visit = res["date"]
     visitors = max(1, min(int(args.get("visitors") or 1), 10))
-    return await _save_lead(args, ctx, "campus_visit",
-                            {"visit_date": visit.isoformat(), "visitors": visitors,
+    result = await _save_lead(args, ctx, "campus_visit",
+                            {"visit_date": visit.isoformat(),
+                             "confirmed_date": res["human"],
+                             "visitors": visitors,
                              "note": "Request only. The admissions team will confirm the visit by phone."})
+    if result.get("status") == "saved":
+        result["confirmed_date"] = res["human"]
+        result["visit_date"] = visit.isoformat()
+    return result
 
 
 async def tool_get_contact_and_apply_links(args, ctx):
