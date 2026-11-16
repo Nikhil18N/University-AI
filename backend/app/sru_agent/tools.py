@@ -165,6 +165,30 @@ async def tool_get_contact_and_apply_links(args, ctx):
     return out
 
 
+async def tool_get_university_videos(args, ctx):
+    topic = (args.get("topic") or "").strip()
+    try:
+        from app.api.v1.deps import get_embedding_provider
+        from app.services.video_service import get_semantic_videos, load_videos
+        provider = get_embedding_provider()
+        search_text = topic or "campus life at SR University"
+        emb = await provider.embed_single(search_text)
+        videos = get_semantic_videos(emb, limit=2, max_distance=0.34)
+        if not videos:
+            all_vids = load_videos()
+            videos = all_vids[:2] if all_vids else []
+        return {
+            "status": "ok",
+            "type": "video_recommendations",
+            "title": f"Official SR University Videos: {topic}" if topic else "Official SR University Video Tours",
+            "channel_name": "SR University Official",
+            "channel_url": "https://www.youtube.com/@SRUniversity/videos",
+            "videos": videos,
+        }
+    except Exception as exc:
+        return {"status": "failed", "problem": "Could not retrieve videos right now.", "_error": str(exc)}
+
+
 def _obj(properties, required=()):
     return {"type": "object", "properties": properties, "required": list(required)}
 
@@ -229,6 +253,11 @@ TOOLS = {
         "description": "Official apply link, admissions phone, email and WhatsApp link. Use for 'how to "
                        "apply', 'contact number', or when you cannot answer something.",
         "parameters_json_schema": _obj({"topic": {"type": "string"}})}),
+    "get_university_videos": (tool_get_university_videos, "Finding official university videos", {
+        "description": "Finds official SR University YouTube videos and tours for campus life, hostels, "
+                       "placements, labs, sports, student clubs, and infrastructure. Call whenever the student "
+                       "asks to see, watch, or get videos/tours of SR University.",
+        "parameters_json_schema": _obj({"topic": {"type": "string", "description": "e.g. 'campus', 'hostel life', 'placements', 'infrastructure'"}})}),
 }
 
 # Tools that change something outside the chat (shown as 'actions' in the UI and logs).

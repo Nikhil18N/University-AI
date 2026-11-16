@@ -909,6 +909,8 @@ export function RenderCard({ card }: { card: any }) {
       return <AgentCampusVisitCard card={card} />;
     case "get_contact_and_apply_links":
       return <AgentContactLinksCard card={card} />;
+    case "get_university_videos":
+      return <VideoRecommendationsCard card={card.data?.videos ? card.data : card} />;
     case "curriculum":
       return <CurriculumCard card={card} />;
     case "campus_tour":

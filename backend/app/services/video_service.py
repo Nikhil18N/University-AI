@@ -21,7 +21,7 @@ VIDEO_SEMANTIC_COLLECTION = "university_videos_semantic"
 
 # Strict semantic distance thresholds for pure cosine similarity (1 - cosine_similarity)
 DEFAULT_MAX_SEMANTIC_DISTANCE = 0.28  # Slightly relaxed from 0.25 to improve recall
-EXPLICIT_MAX_SEMANTIC_DISTANCE = 0.33  # Relaxed when user explicitly asks for video
+EXPLICIT_MAX_SEMANTIC_DISTANCE = 0.38  # Relaxed when user explicitly asks for video
 
 # ---------------------------------------------------------------------------
 # Single source-of-truth for explicit video intent detection.
@@ -308,7 +308,7 @@ def should_display_videos(message: str) -> bool:
     # Disallow video displays on purely transactional, numerical, or regulatory queries
     disallowed_keywords = (
         "fee", "fees", "cost", "scholarship", "cutoff", "percentage", "marks", "rank",
-        "eligibility", "eligible", "syllabus", "curriculum",
+        "eligibility", "eligible", "syllabus", "curriculum", "transport", "bus", "route",
         "instagram", "attendance", "rules", "regulations", "mistake", "wrong",
     )
     if any(k in msg for k in disallowed_keywords):
@@ -316,7 +316,8 @@ def should_display_videos(message: str) -> bool:
 
     facility_keywords = (
         "campus", "campus life", "hostel", "hostels", "hostel rooms", "dining", "mess",
-        "srix", "incubator", "sports", "grounds", "labs", "infrastructure",
+        "srix", "incubator", "sports", "grounds", "labs", "infrastructure", "infra",
+        "facility", "facilities", "amenities", "tour", "walkthrough", "glimpse", "view",
         "life at sru", "fest", "events", "activities", "placement", "placements",
         "about sru", "tell me about sru", "about sr university", "why sru",
     )
@@ -422,10 +423,15 @@ def get_relevant_videos(
     if not is_explicit:
         is_explicit = is_explicit_video_query(user_message)
 
-    max_dist = EXPLICIT_MAX_SEMANTIC_DISTANCE if is_explicit else DEFAULT_MAX_SEMANTIC_DISTANCE
+    is_visual_target = is_explicit or should_display_videos(user_message)
+    max_dist = EXPLICIT_MAX_SEMANTIC_DISTANCE if is_visual_target else DEFAULT_MAX_SEMANTIC_DISTANCE
 
     if query_embedding:
-        return get_semantic_videos(query_embedding, limit=limit, max_distance=max_dist)
+        vids = get_semantic_videos(query_embedding, limit=limit, max_distance=max_dist)
+        if not vids and is_explicit:
+            all_vids = load_videos()
+            return all_vids[:limit] if all_vids else []
+        return vids
 
     # When query_embedding is not precomputed, look up using embedding provider
     if user_message:

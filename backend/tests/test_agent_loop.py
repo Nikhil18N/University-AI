@@ -48,15 +48,18 @@ async def test_fee_question_runs_tool_and_returns_numbers():
 
 @pytest.mark.asyncio
 async def test_two_tools_in_a_row_and_memory():
+    sid = "s-mem-fresh-test"
+    await memory._set(f"sru:history:{sid}", [])
+    await memory._set(f"sru:profile:{sid}", {})
     client = FakeClient([_call("remember_student_details", program_interest="cse", percent=85),
                          _call("calculate_fee", program="cse"),
                          _text("Your fee is ready.")])
-    events = await _run(client, "i got 85% and want cse", "s-mem")
+    events = await _run(client, "i got 85% and want cse", sid)
     assert [t["name"] for t in events[-1]["tools_used"]] == ["remember_student_details", "calculate_fee"]
     fee = [e for e in events if e["type"] == "tool" and e.get("result")][0]["result"]
     assert fee["scholarship_percent"] == 25  # used the remembered 85%
-    assert (await memory.get_profile("s-mem"))["percent"] == 85
-    assert len(await memory.get_history("s-mem")) == 2
+    assert (await memory.get_profile(sid))["percent"] == 85
+    assert len(await memory.get_history(sid)) == 2
 
 
 @pytest.mark.asyncio

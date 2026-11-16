@@ -976,17 +976,18 @@ def generate_cards(
     # Zero keyword matching: relevance is governed purely by ChromaDB semantic cosine distance.
     # Directly displayed for visual / campus / placement queries or when asked/confirmed.
     if query_embedding:
-        should_show_videos = is_video_query or is_video_confirmed or should_display_videos(user_message)
+        is_explicit_req = is_video_query or is_explicit_video_query(user_message)
+        should_show_videos = is_explicit_req or is_video_confirmed or should_display_videos(user_message)
         if should_show_videos:
             relevant_videos = get_relevant_videos(
                 user_message=user_message,
                 answer=answer,
                 sources=sources,
                 query_embedding=query_embedding,
-                is_explicit=is_video_query,
+                is_explicit=is_explicit_req,
             )
             if relevant_videos:
-                cards.append(create_video_card(relevant_videos, is_explicit=is_video_query))
+                cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_req))
 
     # 7. Student profile card (if board_score is known and user asked about eligibility or admission)
     if profile and profile.get("board_score"):

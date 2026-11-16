@@ -24,7 +24,7 @@ FALLBACK = (f"I'm having trouble right now. Please call the Admissions Office at
             f"{config.ADMISSIONS_PHONE} or try again in a moment.")
 # Results of these tools are sent to the browser so it can draw a card.
 CARD_TOOLS = {"calculate_fee", "check_eligibility", "request_counsellor_callback",
-              "book_campus_visit", "get_contact_and_apply_links"}
+              "book_campus_visit", "get_contact_and_apply_links", "get_university_videos"}
 
 
 def get_client():
@@ -176,14 +176,26 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
         yield {"type": "token", "delta": piece}
     await memory.append_history(session_id, message, final)
 
-    # Attach contextual cards (such as early bird application ad or fee breakdown)
+    # Attach contextual cards (such as early bird application ad, fee breakdown, or video recommendations)
     try:
         from app.services.card_service import generate_cards
+        from app.services.video_service import is_explicit_video_query, should_display_videos
+        from app.api.v1.deps import get_embedding_provider
+
+        query_embedding = None
+        if is_explicit_video_query(message) or should_display_videos(message):
+            try:
+                emb_provider = get_embedding_provider()
+                query_embedding = await emb_provider.embed_single(message)
+            except Exception as emb_err:
+                log.warning("Could not compute embedding for video lookup: %s", emb_err)
+
         contextual_cards = generate_cards(
             user_message=message,
             answer=final,
             profile=ctx.get("profile"),
             session_id=session_id,
+            query_embedding=query_embedding,
         )
         for c in contextual_cards:
             if c not in cards:
@@ -191,8 +203,21 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     except Exception as card_err:
         log.warning("Could not generate contextual cards for agent: %s", card_err)
 
+    # Generate contextual suggestions
+    suggestions = []
+    try:
+        from app.services.suggestion_service import generate_suggestions
+        suggestions = generate_suggestions(
+            intent="UNIVERSITY",
+            user_message=message,
+            answer=final,
+            profile=ctx.get("profile"),
+        )
+    except Exception as sugg_err:
+        log.warning("Could not generate suggestions for agent: %s", sugg_err)
+
     yield {"type": "done", "conversation_id": conversation_id, "answer": final,
            "tools_used": used, "model": config.AGENT_MODEL,
            # kept so the existing frontend 'done' handler does not break
-           "sources": [], "suggestions": [], "cards": cards, "flow": None}
+           "sources": [], "suggestions": suggestions, "cards": cards, "flow": None}
 
