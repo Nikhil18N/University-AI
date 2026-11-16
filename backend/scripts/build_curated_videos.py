@@ -204,17 +204,17 @@ CURATED_CONFIG = {
         "keywords": ["sports", "sports day", "athletics", "cricket", "tournament", "games", "ground", "medals"]
     },
 
-    # 9. International Programs & Study Abroad
+    # 9. International Student Experience & Study Abroad
     "xfQVXz_bBA4": {
-        "category": "International Programs",
+        "category": "International Student Experience",
         "keywords": ["international", "bangladesh", "international student", "global campus", "foreign students", "diversity"]
     },
     "VF5FgBIuWKI": {
-        "category": "International Programs",
+        "category": "International Student Experience",
         "keywords": ["international", "myanmar", "b.tech cse", "foreign student", "experience", "diversity"]
     },
     "JZpvKru8dFw": {
-        "category": "International Programs",
+        "category": "International Student Experience",
         "keywords": ["international", "zimbabwe", "africa", "international students", "living in india", "student experience"]
     },
     "QntEaaW5b34": {

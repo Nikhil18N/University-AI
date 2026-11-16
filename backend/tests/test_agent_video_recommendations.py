@@ -181,3 +181,18 @@ def test_about_sru_video_filtering_prefers_campus_and_excludes_hostels_and_event
         assert "fest" not in v["title"].lower()
         assert "sparkill" not in v["title"].lower()
 
+
+def test_international_categories_distinction():
+    """Verify IEP is in International Programs while international student stories are in International Student Experience."""
+    from app.services.video_service import load_videos
+
+    videos = load_videos(force_reload=True)
+    iep_video = next((v for v in videos if v["id"] == "QntEaaW5b34"), None)
+    assert iep_video is not None
+    assert iep_video["category"] == "International Programs"
+
+    intl_students = [v for v in videos if v["id"] in ("xfQVXz_bBA4", "VF5FgBIuWKI", "JZpvKru8dFw")]
+    assert len(intl_students) == 3
+    for v in intl_students:
+        assert v["category"] == "International Student Experience"
+
