@@ -26,24 +26,52 @@ logger = logging.getLogger(__name__)
 async def list_conversations(
     db: AsyncSession, session_id: str
 ) -> list[ConversationSummary]:
-    """List all conversations for a session, newest first."""
+    """List all non-empty conversations for a session, newest first.
+    Backfills titles for conversations whose title is stuck as 'New conversation'."""
     stmt = (
         select(Conversation)
+        .options(selectinload(Conversation.messages))
         .where(Conversation.session_id == session_id)
         .order_by(Conversation.updated_at.desc())
     )
     result = await db.execute(stmt)
     conversations = result.scalars().all()
 
-    return [
-        ConversationSummary(
-            id=c.id,
-            title=c.title,
-            created_at=c.created_at,
-            updated_at=c.updated_at,
+    summaries: list[ConversationSummary] = []
+    titles_updated = False
+
+    for c in conversations:
+        # Ignore empty conversations with 0 messages
+        if not c.messages:
+            continue
+
+        # Backfill title if stuck on "New conversation"
+        if c.title == "New conversation" or not c.title:
+            first_user_msg = next((m.content for m in c.messages if m.role == "user" and m.content), None)
+            if first_user_msg:
+                clean_title = first_user_msg.strip()
+                if len(clean_title) > 50:
+                    clean_title = clean_title[:47].rstrip() + "..."
+                if clean_title:
+                    c.title = clean_title
+                    titles_updated = True
+
+        summaries.append(
+            ConversationSummary(
+                id=c.id,
+                title=c.title,
+                created_at=c.created_at or datetime.now(timezone.utc),
+                updated_at=c.updated_at or datetime.now(timezone.utc),
+            )
         )
-        for c in conversations
-    ]
+
+    if titles_updated:
+        try:
+            await db.commit()
+        except Exception as err:
+            logger.warning("Failed to commit backfilled conversation titles: %s", err)
+
+    return summaries
 
 
 async def get_conversation(
@@ -127,6 +155,7 @@ async def get_or_create_conversation(
     db: AsyncSession,
     session_id: str,
     conversation_id: uuid.UUID | None = None,
+    title: str | None = None,
 ) -> Conversation:
     """Find an existing conversation or create a new one."""
     if conversation_id:
@@ -137,10 +166,14 @@ async def get_or_create_conversation(
         result = await db.execute(stmt)
         conv = result.scalar_one_or_none()
         if conv:
+            if title and (conv.title == "New conversation" or not conv.title):
+                conv.title = title
+                await db.flush()
             return conv
 
     # Create new conversation
-    conv = Conversation(session_id=session_id)
+    conv_title = title or "New conversation"
+    conv = Conversation(session_id=session_id, title=conv_title)
     db.add(conv)
     await db.flush()
     return conv

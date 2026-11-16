@@ -181,13 +181,13 @@
   color: #0f172a;
 }
 
-/* Beta micro-pill badge */
-.brand-beta-pill {
+/* Beta and Version micro-pill badges */
+.brand-beta-pill,
+.brand-version-pill {
   font-size: 0.64rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 1px 6px;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
   border-radius: 9999px;
   background: rgba(37, 99, 235, 0.22);
   color: #38bdf8;
@@ -195,7 +195,8 @@
   line-height: 1.3;
 }
 
-[data-theme="light"] .brand-beta-pill {
+[data-theme="light"] .brand-beta-pill,
+[data-theme="light"] .brand-version-pill {
   background: rgba(0, 85, 164, 0.09);
   color: #0055a4;
   border-color: rgba(0, 85, 164, 0.22);
@@ -291,6 +292,22 @@
 [data-theme="dark"] .mobile-popover-item:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #60a5fa;
+}
+
+.popover-version-footer {
+  margin-top: 4px;
+  padding: 8px 10px 4px 10px;
+  border-top: 1px solid var(--border, #e2e8f0);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="dark"] .popover-version-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  color: #71717a;
 }
 
 .mobile-popover-item:active {

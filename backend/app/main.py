@@ -91,7 +91,7 @@ async def lifespan(fastapi_app: FastAPI):
 app = FastAPI(
     title="University AI Companion",
     description="Conversational AI with RAG and Function-Calling Agent for university knowledge",
-    version="0.2.0",
+    version="2.5.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.APP_DEBUG else None,
     redoc_url="/redoc" if settings.APP_DEBUG else None,
@@ -263,6 +263,35 @@ async def agent_lead_saver(lead_data: dict):
         created = await lead_service.create_lead(session, lead_obj)
         return {"id": str(created.id), "status": created.status}
 
+async def agent_conversation_resolver(session_id: str, conversation_id: str | None, message: str) -> str:
+    """Resolve or create a persistent conversation before streaming starts."""
+    try:
+        import uuid
+        from app.db.session import async_session_factory
+        from app.services import conversation_service
+
+        clean_title = (message or "").strip()
+        if len(clean_title) > 50:
+            clean_title = clean_title[:47].rstrip() + "..."
+        if not clean_title:
+            clean_title = "Chat"
+
+        async with async_session_factory() as session:
+            conv_uuid = None
+            if conversation_id:
+                try:
+                    conv_uuid = uuid.UUID(conversation_id)
+                except (ValueError, TypeError):
+                    conv_uuid = None
+            conv = await conversation_service.get_or_create_conversation(
+                session, session_id, conv_uuid, title=clean_title
+            )
+            await session.commit()
+            return str(conv.id)
+    except Exception as err:
+        logger.warning("agent_conversation_resolver error: %s", err)
+        return conversation_id or ""
+
 async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str, tools_used: list):
     try:
         import uuid
@@ -271,7 +300,14 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
         from app.sru_agent import config as agent_config
         async with async_session_factory() as session:
             conv_uuid = uuid.UUID(conversation_id) if conversation_id else None
-            conv = await conversation_service.get_or_create_conversation(session, session_id, conv_uuid)
+            clean_title = (user_text or "").strip()
+            if len(clean_title) > 50:
+                clean_title = clean_title[:47].rstrip() + "..."
+            conv = await conversation_service.get_or_create_conversation(
+                session, session_id, conv_uuid, title=clean_title
+            )
+            if conv.title == "New conversation" and clean_title:
+                conv.title = clean_title
             await conversation_service.add_message(session, conv.id, "user", user_text)
             await conversation_service.add_message(
                 session,
@@ -285,8 +321,9 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
     except Exception as err:
         logger.warning("agent_turn_logger error: %s", err)
 
-from app.sru_agent.router import set_turn_logger
+from app.sru_agent.router import set_turn_logger, set_conversation_resolver
 set_turn_logger(agent_turn_logger)
+set_conversation_resolver(agent_conversation_resolver)
 agent_tools.set_knowledge_search(agent_knowledge_search)
 agent_tools.set_lead_saver(agent_lead_saver)
 

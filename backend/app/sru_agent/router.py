@@ -15,6 +15,7 @@ from .agent import run_agent
 
 router = APIRouter(prefix="/api/v1/agent", tags=["agent"])
 _on_turn_complete = None
+_conversation_resolver = None
 
 
 def set_turn_logger(fn):
@@ -22,6 +23,13 @@ def set_turn_logger(fn):
     Use it to save agent chats in your existing conversations table."""
     global _on_turn_complete
     _on_turn_complete = fn
+
+
+def set_conversation_resolver(fn):
+    """Optional. fn: async (session_id, conversation_id, message) -> str
+    Use it to resolve or create a persistent conversation before the agent stream begins."""
+    global _conversation_resolver
+    _conversation_resolver = fn
 
 
 class AgentRequest(BaseModel):
@@ -50,10 +58,20 @@ async def agent_stream(req: AgentRequest):
         if not await memory.allow_request(req.session_id):
             yield _sse({"type": "error", "detail": "Too many messages. Please wait a minute and try again."})
             return
-        async for event in run_agent(req.message, req.session_id, req.conversation_id):
+
+        conv_id = req.conversation_id
+        if _conversation_resolver:
+            try:
+                resolved = await _conversation_resolver(req.session_id, req.conversation_id, req.message)
+                if resolved:
+                    conv_id = str(resolved)
+            except Exception:
+                pass  # Fall back to req.conversation_id
+
+        async for event in run_agent(req.message, req.session_id, conv_id):
             if event["type"] == "done" and _on_turn_complete:
                 try:
-                    await _on_turn_complete(req.session_id, req.conversation_id, req.message,
+                    await _on_turn_complete(req.session_id, conv_id, req.message,
                                             event["answer"], event["tools_used"])
                 except Exception:
                     pass  # logging must never break the chat

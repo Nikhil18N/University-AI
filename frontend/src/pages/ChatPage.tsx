@@ -20,6 +20,7 @@ import {
   type ChatResponse,
 } from "../services/api";
 import { playChime, triggerConfetti } from "../utils/effects";
+import { APP_VERSION } from "../version";
 import "./ChatPage.css";
 
 interface Props {
@@ -54,6 +55,12 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const activeConvIdRef = useRef<string | null>(activeConvId);
+
+  useEffect(() => {
+    activeConvIdRef.current = activeConvId;
+  }, [activeConvId]);
+
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeToolStatus, setActiveToolStatus] = useState<string | null>(null);
@@ -250,6 +257,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       cancelStreamRef.current = null;
     }
     setStreamingMsgId(null);
+    activeConvIdRef.current = convId;
     setActiveConvId(convId);
     setError(null);
     isAtBottomRef.current = true;
@@ -273,6 +281,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       cancelStreamRef.current = null;
     }
     setStreamingMsgId(null);
+    activeConvIdRef.current = null;
     setActiveConvId(null);
     setMessages([]);
     setIsSharedView(false);
@@ -446,10 +455,12 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     const accumulatedCards: any[] = [];
 
     // 3. Initiate Server-Sent Events stream
-    const cancelFn = sendMessageStream(sessionId, text, activeConvId, {
+    const convIdToSend = activeConvIdRef.current || activeConvId;
+    const cancelFn = sendMessageStream(sessionId, text, convIdToSend, {
       onStart: (convId) => {
-        if (!activeConvId) {
+        if (convId) {
           setActiveConvId(convId);
+          activeConvIdRef.current = convId;
         }
       },
       onTool: (tool) => {
@@ -481,6 +492,11 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         setActiveToolStatus(null);
         setStreamingMsgId(null);
         cancelStreamRef.current = null;
+
+        if (data.conversation_id) {
+          setActiveConvId(data.conversation_id);
+          activeConvIdRef.current = data.conversation_id;
+        }
 
         if (soundEnabled) {
           playChime();
@@ -587,7 +603,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 tabIndex={0}
               >
                 <span className="pill-brand-name">SRU Buddy</span>
-                <span className="brand-beta-pill">Beta</span>
+                <span className="brand-version-pill">v{APP_VERSION}</span>
                 <span className="pill-down-arrow">▾</span>
               </div>
 
@@ -662,6 +678,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                       <span>Admin Console</span>
                     </button>
                   )}
+                  <div className="popover-version-footer">
+                    <span>SRU Buddy v{APP_VERSION}</span>
+                  </div>
                 </div>
               )}
             </div>

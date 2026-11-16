@@ -27,11 +27,35 @@
   padding: 0 4px;
 }
 
+.sidebar-brand-title-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .sidebar-brand-title {
   font-size: 1.28rem;
   font-weight: 700;
   color: var(--text-1, #ffffff);
   letter-spacing: -0.02em;
+}
+
+.brand-version-pill {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.22);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  line-height: 1.2;
+}
+
+[data-theme="light"] .brand-version-pill {
+  background: rgba(0, 85, 164, 0.09);
+  color: #0055a4;
+  border-color: rgba(0, 85, 164, 0.22);
 }
 
 .sidebar-search-circle-btn {
@@ -270,4 +294,21 @@
 
 .sidebar-avatar-circle-btn:hover {
   transform: scale(1.05);
+}
+
+.sidebar-version-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #71717a);
+  letter-spacing: 0.02em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+[data-theme="light"] .sidebar-version-badge {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #e2e8f0;
+  color: #64748b;
 }

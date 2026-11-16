@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ConversationSummary } from "../services/api";
+import { APP_VERSION } from "../version";
 import "./ConversationList.css";
 
 interface Props {
@@ -79,7 +80,7 @@ export default function ConversationList({
       <div className="sidebar-top-bar">
         <div className="sidebar-brand-title-box">
           <span className="sidebar-brand-title">SRU Buddy</span>
-          <span className="brand-beta-pill">Beta</span>
+          <span className="brand-version-pill">v{APP_VERSION}</span>
         </div>
 
         <button
@@ -206,6 +207,10 @@ export default function ConversationList({
           </svg>
           <span>Chat</span>
         </button>
+
+        <span className="sidebar-version-badge" title={`SR University AI Companion v${APP_VERSION}`}>
+          v{APP_VERSION}
+        </span>
 
         <a
           href="https://sru.edu.in"
