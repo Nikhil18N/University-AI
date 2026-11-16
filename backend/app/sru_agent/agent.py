@@ -373,7 +373,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
         yield {"type": "error", "detail": FALLBACK}
         return
 
-    final = final or FALLBACK
+    final = (final or "").strip() or FALLBACK
     for piece in _chunks(final):
         yield {"type": "token", "delta": piece}
     await memory.append_history(session_id, message, final, conversation_id)
@@ -392,16 +392,22 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
             except Exception as emb_err:
                 log.warning("Could not compute embedding for video lookup: %s", emb_err)
 
+        has_calculate_fee = any(c.get("type") == "calculate_fee" for c in cards)
         contextual_cards = generate_cards(
             user_message=message,
             answer=final,
             profile=ctx.get("profile"),
             session_id=session_id,
             query_embedding=query_embedding,
+            has_calculate_fee=has_calculate_fee,
         )
         for c in contextual_cards:
             if c not in cards:
+                if has_calculate_fee and c.get("type") == "fee_breakdown":
+                    continue
                 cards.append(c)
+        if has_calculate_fee:
+            cards = [c for c in cards if c.get("type") != "fee_breakdown"]
     except Exception as card_err:
         log.warning("Could not generate contextual cards for agent: %s", card_err)
 

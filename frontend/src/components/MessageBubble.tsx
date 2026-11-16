@@ -127,9 +127,15 @@ export default function MessageBubble({
         {/* Rich Interactive Cards (e.g. branch comparison, fee breakdown) */}
         {!isStreaming && role === "assistant" && cards && cards.length > 0 && (
           <div className="message-cards-container">
-            {cards.map((card, idx) => (
-              <RenderCard key={idx} card={card} />
-            ))}
+            {(() => {
+              const hasCalculateFee = cards.some((c: any) => c?.type === "calculate_fee");
+              const displayCards = hasCalculateFee
+                ? cards.filter((c: any) => c?.type !== "fee_breakdown")
+                : cards;
+              return displayCards.map((card, idx) => (
+                <RenderCard key={idx} card={card} />
+              ));
+            })()}
           </div>
         )}
 

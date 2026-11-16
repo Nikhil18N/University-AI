@@ -18,6 +18,7 @@ from . import config, fees, memory
 # ---------------------------------------------------------------- hooks ----
 _knowledge_search = None
 _lead_saver = None
+_lead_canceller = None
 
 
 def set_knowledge_search(fn):
@@ -32,11 +33,26 @@ def set_lead_saver(fn):
     _lead_saver = fn
 
 
+def set_lead_canceller(fn):
+    """fn: async (lead_id: str) -> bool. Replace the default HTTP canceller if you prefer."""
+    global _lead_canceller
+    _lead_canceller = fn
+
+
 async def _default_lead_saver(lead: dict) -> dict:
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(config.LEADS_API_URL, json=lead)
         resp.raise_for_status()
         return resp.json()
+
+
+async def _default_lead_canceller(lead_id: str) -> bool:
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.patch(
+            f"{config.LEADS_API_URL}/{lead_id}/status",
+            json={"status": "rejected", "metadata": {"do_not_contact": True}},
+        )
+        return resp.status_code in (200, 204)
 
 
 # -------------------------------------------------------------- helpers ----
@@ -86,7 +102,13 @@ async def _save_lead(args: dict, ctx: dict, request_type: str, extra: dict) -> d
     except Exception as exc:  # never show a raw error to the student
         return {"status": "failed", "problem": "Could not save the request right now.",
                 "fallback": f"Ask the student to call {config.ADMISSIONS_PHONE}.", "_error": str(exc)}
-    await memory.update_profile(ctx["session_id"], name=name, phone_saved=True)
+    lead_id = str(saved.get("id", "")) if isinstance(saved, dict) else ""
+    update_kwargs = {"name": name, "phone_saved": True}
+    if lead_id:
+        update_kwargs["last_lead_id"] = lead_id
+    await memory.update_profile(ctx["session_id"], **update_kwargs)
+    if "profile" in ctx:
+        ctx["profile"].update(update_kwargs)
     return {"status": "saved", "reference": str(saved.get("id", ""))[:8], "name": name,
             "phone_last4": phone[-4:], **extra}
 
@@ -132,12 +154,31 @@ async def tool_remember_student_details(args, ctx):
     allowed = ("name", "program_interest", "percent", "board", "eapcet_rank", "city", "is_parent", "language")
     profile = await memory.update_profile(ctx["session_id"], **{k: args.get(k) for k in allowed})
     ctx["profile"] = profile
-    return {"status": "remembered", "profile": {k: v for k, v in profile.items() if k != "phone_saved"}}
+    return {"status": "remembered", "profile": {k: v for k, v in profile.items() if k not in ("phone_saved", "last_lead_id")}}
 
 
 async def tool_request_counsellor_callback(args, ctx):
     return await _save_lead(args, ctx, "callback",
                             {"preferred_time": args.get("preferred_time") or "any time"})
+
+
+async def tool_cancel_contact_request(args, ctx):
+    profile = ctx.get("profile", {})
+    last_lead_id = profile.get("last_lead_id")
+    if not last_lead_id:
+        return {"status": "nothing_to_cancel"}
+
+    try:
+        canceller = _lead_canceller or _default_lead_canceller
+        success = await canceller(str(last_lead_id))
+        if success:
+            await memory.update_profile(ctx["session_id"], last_lead_id=None)
+            if "profile" in ctx:
+                ctx["profile"]["last_lead_id"] = None
+            return {"status": "cancelled"}
+        return {"status": "not_cancelled"}
+    except Exception as exc:
+        return {"status": "not_cancelled", "_error": str(exc)}
 
 
 def resolve_campus_visit_date(date_str: str, today: date | None = None) -> dict:
@@ -453,10 +494,14 @@ TOOLS = {
                        "placements, labs, sports, student clubs, and infrastructure. Call whenever the student "
                        "asks to see, watch, or get videos/tours of SR University.",
         "parameters_json_schema": _obj({"topic": {"type": "string", "description": "e.g. 'campus', 'hostel life', 'placements', 'infrastructure'"}})}),
+    "cancel_contact_request": (tool_cancel_contact_request, "Cancelling contact request", {
+        "description": "Cancels a previously requested counsellor callback or campus visit. Call when the "
+                       "student asks to cancel their callback/visit or says 'don't contact me'.",
+        "parameters_json_schema": _obj({"reason": {"type": "string", "description": "Optional reason for cancellation"}})}),
 }
 
 # Tools that change something outside the chat (shown as 'actions' in the UI and logs).
-ACTION_TOOLS = {"request_counsellor_callback", "book_campus_visit"}
+ACTION_TOOLS = {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request"}
 
 
 async def run_tool(name: str, args: dict, ctx: dict) -> dict:

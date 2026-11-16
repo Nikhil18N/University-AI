@@ -75,13 +75,13 @@ const PROGRAMS: ProgramConfig[] = [
     slabs: [
       {
         scholarshipPercent: 10,
-        ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" },
+        ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile", eamcet: "40001 – 60000" },
         payableFeeSem: 153000,
         cseYearlyPayable: { yr1: 306000, yr2: 315000, yr3: 324000, yr4: 333000 },
       },
       {
         scholarshipPercent: 15,
-        ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" },
+        ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile", eamcet: "20001 – 40000" },
         payableFeeSem: 144500,
         cseYearlyPayable: { yr1: 289000, yr2: 298000, yr3: 307000, yr4: 316000 },
       },
@@ -99,40 +99,16 @@ const PROGRAMS: ProgramConfig[] = [
       },
       {
         scholarshipPercent: 30,
-        ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", ib: "34 – 37", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" },
+        ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", ib: "34 – 37", jeeMains: "90 – 94.99 %ile" },
         payableFeeSem: 119000,
         cseYearlyPayable: { yr1: 238000, yr2: 247000, yr3: 256000, yr4: 265000 },
       },
       {
         scholarshipPercent: 40,
-        ranges: { stateBoard: "98% and above", cbse: "95% and above", ib: "35/45 and above", jeeMains: "95% and above", eamcet: "1 – 2000" },
+        ranges: { stateBoard: "98% and above", cbse: "95% and above", ib: "35/45 and above", jeeMains: "95% and above", eamcet: "1 – 8000" },
         payableFeeSem: 102000,
         cseYearlyPayable: { yr1: 204000, yr2: 213000, yr3: 222000, yr4: 231000 },
       },
-    ],
-  },
-  {
-    id: "btech_ai_robotics",
-    name: "B.Tech. Artificial Intelligence & Robotics",
-    degreeType: "Bachelors",
-    baseTuitionSem: 200000,
-    annualIncrease: 12000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    specializations: ["Autonomous Systems", "Industrial Robotics"],
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE / ICSE %" },
-      { key: "jeeMains", label: "JEE Mains Percentile" },
-      { key: "eamcet", label: "TG/AP EAPCET Rank" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" }, payableFeeSem: 180000 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 170000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 160000 },
-      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 150000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 140000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 120000 },
     ],
   },
   {
@@ -151,12 +127,12 @@ const PROGRAMS: ProgramConfig[] = [
       { key: "eamcet", label: "TG/AP EAPCET Rank" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" }, payableFeeSem: 121500 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 114750 },
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile", eamcet: "40001 – 60000" }, payableFeeSem: 121500 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile", eamcet: "20001 – 40000" }, payableFeeSem: 114750 },
       { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 108000 },
       { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 101250 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 94500 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 81000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile" }, payableFeeSem: 94500 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 8000" }, payableFeeSem: 81000 },
     ],
   },
   {
@@ -175,12 +151,12 @@ const PROGRAMS: ProgramConfig[] = [
       { key: "eamcet", label: "TG/AP EAPCET Rank" },
     ],
     slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile" }, payableFeeSem: 90000 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile" }, payableFeeSem: 85000 },
+      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile", eamcet: "40001 – 60000" }, payableFeeSem: 90000 },
+      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile", eamcet: "20001 – 40000" }, payableFeeSem: 85000 },
       { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 80000 },
       { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 75000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile", eamcet: "2001 – 8000" }, payableFeeSem: 70000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 2000" }, payableFeeSem: 60000 },
+      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile" }, payableFeeSem: 70000 },
+      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 8000" }, payableFeeSem: 60000 },
     ],
   },
   {
@@ -268,6 +244,49 @@ const PROGRAMS: ProgramConfig[] = [
   },
 ];
 
+
+/**
+ * Helper to determine if an exam key is evaluated as a percentage or marks out of 1000.
+ */
+function isPercentageBoard(key: string): boolean {
+  return key === "stateBoard" || key === "cbse" || key === "degree" || key === "ib" || key === "jeeMains";
+}
+
+/**
+ * Parses user input to auto-detect intended qualifying exam boards and detect ranks.
+ */
+function detectBoardFromInput(text: string): {
+  detectedExamKey?: "eamcet" | "jeeMains" | "cbse";
+  cleanedNumberStr: string;
+  isBareNumberGreaterThan1000: boolean;
+  numericVal: number | null;
+} {
+  const trimmed = text.trim();
+  const lower = trimmed.toLowerCase();
+
+  let detectedExamKey: "eamcet" | "jeeMains" | "cbse" | undefined;
+  if (/eapcet|eamcet|rank/i.test(lower)) {
+    detectedExamKey = "eamcet";
+  } else if (/jee|percentile|%ile/i.test(lower)) {
+    detectedExamKey = "jeeMains";
+  } else if (/cbse|icse/i.test(lower)) {
+    detectedExamKey = "cbse";
+  }
+
+  const numMatch = trimmed.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
+  const numericVal = numMatch ? parseFloat(numMatch[1]) : null;
+  const isFraction = trimmed.includes("/");
+  const isBareNumberGreaterThan1000 = !detectedExamKey && !isFraction && numericVal !== null && numericVal > 1000;
+
+  const cleanedNumberStr = numericVal !== null ? String(numericVal) : trimmed;
+
+  return {
+    detectedExamKey,
+    cleanedNumberStr,
+    isBareNumberGreaterThan1000,
+    numericVal,
+  };
+}
 
 /**
  * Intelligent parser & matcher for student scores and ranks.
@@ -465,6 +484,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
   // Calculated snapshot state
   const [calculatedSnapshot, setCalculatedSnapshot] = useState<CalculatedSnapshot | null>(null);
+  const [rankSuggestion, setRankSuggestion] = useState<number | null>(null);
 
   // Active program & exam
   const currentProgram = useMemo(
@@ -479,10 +499,13 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
   // Compute current score match
   const scoreMatch = useMemo(() => {
+    if (rankSuggestion !== null) {
+      return { slabIndex: -1, displayText: "", status: "invalid" as const };
+    }
     return matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
-  }, [currentProgram, currentExam.key, enteredScore]);
+  }, [currentProgram, currentExam.key, enteredScore, rankSuggestion]);
 
-  // Execute calculation snapshot (displays fee immediately, saves lead only if name & phone provided)
+  // Execute calculation snapshot (clears previous snapshot and queries backend for official figures)
   const computeAndSaveSnapshot = async (
     prog: ProgramConfig,
     exam: { key: string; label: string },
@@ -491,7 +514,12 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     nameToUse: string = "",
     phoneToUse: string = ""
   ) => {
-    const isNoScholarship = slabIdx === -1;
+    // Clear every previous result snapshot before showing new result
+    setCalculatedSnapshot(null);
+
+    const match = matchSlabFromScore(prog, exam.key, scoreInput);
+    const effectiveSlabIdx = match.slabIndex >= 0 ? match.slabIndex : slabIdx;
+    const isNoScholarship = effectiveSlabIdx === -1;
     const slab: ScholarshipSlab = isNoScholarship
       ? {
           scholarshipPercent: 0,
@@ -502,19 +530,19 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               ? { yr1: 340000, yr2: 349000, yr3: 358000, yr4: 367000 }
               : undefined,
         }
-      : prog.slabs[slabIdx] || prog.slabs[0];
+      : prog.slabs[effectiveSlabIdx] || prog.slabs[0];
 
     const rangeText = isNoScholarship
       ? (scoreInput.trim() ? "Standard Tuition (Below 60% Merit Cutoff)" : "Standard Base Tuition")
       : (slab.ranges as any)[exam.key] ||
         slab.ranges.stateBoard ||
-        `Slab ${slabIdx + 1}`;
+        `Slab ${effectiveSlabIdx + 1}`;
 
     const discount = isNoScholarship
       ? 0
       : Math.round(prog.baseTuitionSem * (slab.scholarshipPercent / 100));
 
-    const finalScoreDisplay = scoreMatch.displayText || scoreInput.trim() || rangeText;
+    const finalScoreDisplay = match.displayText || scoreInput.trim() || rangeText;
 
     // Save lead in localStorage and PostgreSQL backend if valid contact provided
     if (nameToUse && phoneToUse && phoneToUse.replace(/\D/g, "").length >= 10) {
@@ -541,25 +569,18 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       }
     }
 
-    setCalculatedSnapshot({
-      program: prog,
-      exam,
-      slab,
-      rangeText,
-      discountAmount: discount,
-      enteredScore: finalScoreDisplay,
-      studentName: nameToUse,
-      studentPhone: phoneToUse,
-    });
-
     // Query backend calculate endpoint to ensure 100% agreement with the AI agent
     try {
+      const hostelParam = includeHostel ? (hostelType === "ac" ? "ac_4" : "non_ac_4") : "none";
       const backendCalc = await calculateAgentFee({
         program: prog.id,
-        percent: scoreMatch.percentage,
+        percent: match.percentage !== undefined ? match.percentage : undefined,
         board: exam.key === "cbse" ? "cbse" : "state_board",
-        eapcet_rank: scoreMatch.rank,
+        eapcet_rank: match.rank || (exam.key === "eamcet" && match.percentage ? Math.round(match.percentage) : undefined),
+        jee_percentile: exam.key === "jeeMains" && match.percentage !== undefined ? match.percentage : undefined,
+        hostel: hostelParam,
       });
+
       if (backendCalc && backendCalc.status === "ok") {
         const netSem = parseInt(backendCalc.per_semester_after_scholarship.replace(/[^\d]/g, ""), 10) || slab.payableFeeSem;
         const discountAmt = Math.round(parseInt(backendCalc.saving_first_year.replace(/[^\d]/g, ""), 10) / 2) || discount;
@@ -576,44 +597,109 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               }
             : slab.cseYearlyPayable,
         };
-        setCalculatedSnapshot((prev) => prev ? {
-          ...prev,
+        setCalculatedSnapshot({
+          program: prog,
+          exam,
           slab: backendSlab,
+          rangeText: backendCalc.scholarship_basis || rangeText,
           discountAmount: discountAmt,
-        } : null);
+          enteredScore: finalScoreDisplay,
+          studentName: nameToUse,
+          studentPhone: phoneToUse,
+        });
+        return;
       }
     } catch {
       // Graceful fallback to optimistic client-side calculations
     }
+
+    setCalculatedSnapshot({
+      program: prog,
+      exam,
+      slab,
+      rangeText,
+      discountAmount: discount,
+      enteredScore: finalScoreDisplay,
+      studentName: nameToUse,
+      studentPhone: phoneToUse,
+    });
   };
 
   // Reset calculation when clearing score
   const handleResetScore = () => {
     setEnteredScore("");
+    setRankSuggestion(null);
     setSelectedSlabIndex(-1);
     setCalculatedSnapshot(null);
     setValidationError(null);
     setIncludeHostel(false);
   };
 
-  // Handle score change live - updates fee snapshot immediately if valid
+  // Switch to EAPCET Rank from rank prompt
+  const handleSwitchToRank = (rankNum: number) => {
+    setRankSuggestion(null);
+    setSelectedExamKey("eamcet");
+    const formatted = `Rank ${rankNum.toLocaleString("en-IN")}`;
+    setEnteredScore(formatted);
+    const eamcetExam = activeExams.find((e) => e.key === "eamcet") || { key: "eamcet", label: "TG/AP EAPCET Rank" };
+    const res = matchSlabFromScore(currentProgram, "eamcet", formatted);
+    setSelectedSlabIndex(res.slabIndex);
+    computeAndSaveSnapshot(
+      currentProgram,
+      eamcetExam,
+      formatted,
+      res.slabIndex,
+      savedLead?.name || studentName.trim(),
+      savedLead?.phone || studentPhone.trim()
+    );
+  };
+
+  // Handle score change live - parses typed text, auto-switches board, handles bare numbers > 1000
   const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEnteredScore(val);
+    setValidationError(null);
+
+    // Clear every previous snapshot immediately before showing new result
+    setCalculatedSnapshot(null);
+
     if (!val.trim()) {
+      setRankSuggestion(null);
       setSelectedSlabIndex(-1);
-      setCalculatedSnapshot(null);
-      setValidationError(null);
       return;
     }
-    const res = matchSlabFromScore(currentProgram, currentExam.key, val);
+
+    // 1. Detect keywords to auto-switch board
+    const detection = detectBoardFromInput(val);
+    let activeExamKey = selectedExamKey;
+
+    if (detection.detectedExamKey) {
+      const isSupported = currentProgram.supportedExams.some((x) => x.key === detection.detectedExamKey);
+      if (isSupported && activeExamKey !== detection.detectedExamKey) {
+        activeExamKey = detection.detectedExamKey;
+        setSelectedExamKey(activeExamKey);
+      }
+    }
+
+    // 2. Bare number > 1000 with a percentage board selected cannot be marks.
+    // Prompt to switch to EAPCET Rank and do NOT show standard fee or snapshot.
+    if (isPercentageBoard(activeExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
+      setRankSuggestion(detection.numericVal);
+      setSelectedSlabIndex(-1);
+      return;
+    }
+
+    setRankSuggestion(null);
+
+    const activeExam = currentProgram.supportedExams.find((x) => x.key === activeExamKey) || currentExam;
+    const res = matchSlabFromScore(currentProgram, activeExamKey, val);
     setSelectedSlabIndex(res.slabIndex);
 
     // Live update snapshot immediately if format is recognized
     if (res.status !== "invalid") {
       computeAndSaveSnapshot(
         currentProgram,
-        currentExam,
+        activeExam,
         val,
         res.slabIndex,
         savedLead?.name || studentName.trim(),
@@ -626,6 +712,8 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newProgId = e.target.value;
     setSelectedProgramId(newProgId);
+    setCalculatedSnapshot(null);
+    setRankSuggestion(null);
     const prog = PROGRAMS.find((p) => p.id === newProgId);
     let nextExamKey = selectedExamKey;
     if (prog && !prog.supportedExams.some((x) => x.key === selectedExamKey)) {
@@ -634,6 +722,12 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     }
     if (prog) {
       if (enteredScore.trim()) {
+        const detection = detectBoardFromInput(enteredScore);
+        if (isPercentageBoard(nextExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
+          setRankSuggestion(detection.numericVal);
+          setSelectedSlabIndex(-1);
+          return;
+        }
         const res = matchSlabFromScore(prog, nextExamKey, enteredScore);
         setSelectedSlabIndex(res.slabIndex);
         const nextExam = prog.supportedExams.find((x) => x.key === nextExamKey) || currentExam;
@@ -647,7 +741,6 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
         );
       } else {
         setSelectedSlabIndex(-1);
-        setCalculatedSnapshot(null);
       }
     }
   };
@@ -656,7 +749,15 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
   const handleExamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newExamKey = e.target.value;
     setSelectedExamKey(newExamKey);
+    setCalculatedSnapshot(null);
+    setRankSuggestion(null);
     if (enteredScore.trim()) {
+      const detection = detectBoardFromInput(enteredScore);
+      if (isPercentageBoard(newExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
+        setRankSuggestion(detection.numericVal);
+        setSelectedSlabIndex(-1);
+        return;
+      }
       const res = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
       setSelectedSlabIndex(res.slabIndex);
       const nextExam = activeExams.find((x) => x.key === newExamKey) || currentExam;
@@ -670,28 +771,54 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
       );
     } else {
       setSelectedSlabIndex(-1);
-      setCalculatedSnapshot(null);
     }
   };
 
   // Form submit handler for score calculation
   const handleCalculateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError(null);
+
     if (!enteredScore.trim()) {
-      setValidationError("Please enter your marks (out of 1000), percentage (%), or EAPCET rank, or tap a quick preset.");
+      setValidationError("Please enter your marks (out of 1000), percentage (%), or EAPCET rank.");
       return;
     }
-    setValidationError(null);
-    const res = matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
+
+    const detection = detectBoardFromInput(enteredScore);
+    let activeExamKey = selectedExamKey;
+
+    if (detection.detectedExamKey) {
+      const isSupported = currentProgram.supportedExams.some((x) => x.key === detection.detectedExamKey);
+      if (isSupported && activeExamKey !== detection.detectedExamKey) {
+        activeExamKey = detection.detectedExamKey;
+        setSelectedExamKey(activeExamKey);
+      }
+    }
+
+    if (isPercentageBoard(activeExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
+      setRankSuggestion(detection.numericVal);
+      setSelectedSlabIndex(-1);
+      setCalculatedSnapshot(null);
+      return;
+    }
+
+    setRankSuggestion(null);
+    setCalculatedSnapshot(null);
+
+    const activeExam = currentProgram.supportedExams.find((x) => x.key === activeExamKey) || currentExam;
+    const res = matchSlabFromScore(currentProgram, activeExamKey, enteredScore);
     setSelectedSlabIndex(res.slabIndex);
-    await computeAndSaveSnapshot(
-      currentProgram,
-      currentExam,
-      enteredScore,
-      res.slabIndex,
-      savedLead?.name || studentName.trim(),
-      savedLead?.phone || studentPhone.trim()
-    );
+
+    if (res.status !== "invalid") {
+      await computeAndSaveSnapshot(
+        currentProgram,
+        activeExam,
+        enteredScore,
+        res.slabIndex,
+        savedLead?.name || studentName.trim(),
+        savedLead?.phone || studentPhone.trim()
+      );
+    }
   };
 
   // Optional admissions callback / lead request handler with mandatory consent
@@ -914,7 +1041,21 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </button>
             </div>
 
-            {scoreMatch.status === "matched" && matchedSlab && (
+            {/* Inline prompt for bare number > 1000 on percentage board */}
+            {rankSuggestion !== null && (
+              <div className="calc-rank-prompt-banner">
+                <span>This looks like a rank. Switch to EAPCET Rank?</span>
+                <button
+                  type="button"
+                  className="calc-switch-rank-btn"
+                  onClick={() => handleSwitchToRank(rankSuggestion)}
+                >
+                  Switch to EAPCET Rank
+                </button>
+              </div>
+            )}
+
+            {rankSuggestion === null && scoreMatch.status === "matched" && matchedSlab && (
               <div className="calc-matched-badge">
                 <AwardIcon size={14} />
                 <span>
@@ -926,7 +1067,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 </span>
               </div>
             )}
-            {scoreMatch.status === "below_criteria" && enteredScore.trim() && (
+            {rankSuggestion === null && scoreMatch.status === "below_criteria" && enteredScore.trim() && (
               <div className="calc-matched-badge below-cutoff">
                 <InfoIcon size={14} />
                 <span>

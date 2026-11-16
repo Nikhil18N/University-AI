@@ -91,7 +91,7 @@ async def lifespan(fastapi_app: FastAPI):
 app = FastAPI(
     title="University AI Companion",
     description="Conversational AI with RAG and Function-Calling Agent for university knowledge",
-    version="2.6.0",
+    version="2.7.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.APP_DEBUG else None,
     redoc_url="/redoc" if settings.APP_DEBUG else None,
@@ -263,6 +263,29 @@ async def agent_lead_saver(lead_data: dict):
         created = await lead_service.create_lead(session, lead_obj)
         return {"id": str(created.id), "status": created.status}
 
+async def agent_lead_canceller(lead_id: str) -> bool:
+    try:
+        from datetime import datetime, timezone
+        from uuid import UUID
+        from app.db.session import async_session_factory
+        from app.models.lead import ProspectiveLead
+        lead_uuid = UUID(lead_id)
+        async with async_session_factory() as session:
+            lead = await session.get(ProspectiveLead, lead_uuid)
+            if not lead:
+                return False
+            lead.status = "rejected"
+            meta = dict(lead.metadata_ or {})
+            meta["cancelled"] = True
+            meta["do_not_contact"] = True
+            meta["cancelled_at"] = datetime.now(timezone.utc).isoformat()
+            lead.metadata_ = meta
+            await session.commit()
+            return True
+    except Exception as err:
+        logger.warning("agent_lead_canceller error: %s", err)
+        return False
+
 async def agent_conversation_resolver(session_id: str, conversation_id: str | None, message: str) -> str:
     """Resolve or create a persistent conversation before streaming starts."""
     try:
@@ -326,6 +349,7 @@ set_turn_logger(agent_turn_logger)
 set_conversation_resolver(agent_conversation_resolver)
 agent_tools.set_knowledge_search(agent_knowledge_search)
 agent_tools.set_lead_saver(agent_lead_saver)
+agent_tools.set_lead_canceller(agent_lead_canceller)
 
 app.include_router(chat_router)
 app.include_router(admin_router)
