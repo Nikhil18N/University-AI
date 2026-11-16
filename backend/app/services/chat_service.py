@@ -40,7 +40,11 @@ from app.services.guardrail_service import (
 )
 from app.services.intent_service import classify_intent
 from app.services.profile_service import build_counsellor_guidance, extract_student_profile
-from app.services.rag_service import RAGService
+from app.services.rag_service import (
+    RAGService,
+    determine_about_sru_angle,
+    is_about_sru_query,
+)
 from app.services.reformulation_service import canonicalize_query, needs_reformulation, reformulate_query
 from app.services.suggestion_service import generate_suggestions
 from app.services.video_service import (
@@ -429,6 +433,11 @@ async def handle_chat(
                             assistant_openings.append(line)
                             break
             calculated_variant = (len(assistant_openings) % 6) + 1
+            about_sru_angle = (
+                determine_about_sru_angle(rag_context, request.message)
+                if is_about_sru_query(request.message)
+                else None
+            )
 
             answer, sources = await rag_service.query(
                 question=request.message,
@@ -436,11 +445,13 @@ async def handle_chat(
                 conversation_context=rag_context,
                 variant_id=calculated_variant,
                 used_openings=assistant_openings,
+                about_sru_angle=about_sru_angle,
             )
             logger.info(
-                "Handled via RAG pipeline (search query: '%s', variant: %d)",
+                "Handled via RAG pipeline (search query: '%s', variant: %d, about_sru_angle: %s)",
                 search_query[:50],
                 calculated_variant,
+                about_sru_angle,
             )
 
         else:
@@ -497,6 +508,14 @@ async def handle_chat(
         if semantic_videos and contextual_offer_allowed and not explicit_video:
             suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
 
+        seen_card_types = set()
+        for m in recent[:-1]:
+            m_meta = m.get("metadata") if isinstance(m, dict) else {}
+            if isinstance(m_meta, dict):
+                for c in m_meta.get("cards") or []:
+                    if isinstance(c, dict) and "type" in c:
+                        seen_card_types.add(c["type"])
+
         cards = generate_cards(
             user_message=request.message,
             answer=answer,
@@ -504,6 +523,8 @@ async def handle_chat(
             sources=sources,
             query_embedding=query_embedding,
             is_video_confirmed=is_video_yes,
+            session_id=request.session_id,
+            seen_card_types=seen_card_types,
         )
 
     # Sanitize any personal staff mobile numbers from output
@@ -840,8 +861,31 @@ async def handle_chat_stream(
                         yield f"data: {json.dumps({'type': 'token', 'delta': chunk})}\n\n"
                         await asyncio.sleep(0.012)
                 else:
+                    # Calculate assistant openings, variant rotation, and about_sru_angle
+                    assistant_openings = []
+                    for msg in recent:
+                        if msg.get("role") in ("assistant", "model"):
+                            content = msg.get("content", "")
+                            for line in content.split("\n"):
+                                line = line.strip()
+                                if line and not line.startswith(("#", ">", "|", "```", "•", "-", "*")):
+                                    assistant_openings.append(line)
+                                    break
+                    calculated_variant = (len(assistant_openings) % 6) + 1
+                    about_sru_angle = (
+                        determine_about_sru_angle(rag_context, request.message)
+                        if is_about_sru_query(request.message)
+                        else None
+                    )
+
                     messages, sources, evidence_text = await rag_service.prepare_rag_request(
-                        effective_q, rag_context, chunks, precomputed_embedding=query_embedding
+                        effective_q,
+                        rag_context,
+                        chunks,
+                        precomputed_embedding=query_embedding,
+                        variant_id=calculated_variant,
+                        used_openings=assistant_openings,
+                        about_sru_angle=about_sru_angle,
                     )
                     streamed_tokens = []
                     async for token in llm_provider.stream(messages, temperature=0.3):
@@ -954,6 +998,14 @@ async def handle_chat_stream(
             if semantic_videos and contextual_offer_allowed and not explicit_video:
                 suggestions = ["🎥 Yes, watch video", "❌ No, thanks"] + [s for s in suggestions if "video" not in s.lower()][:2]
 
+            seen_card_types = set()
+            for m in recent[:-1]:
+                m_meta = m.get("metadata") if isinstance(m, dict) else {}
+                if isinstance(m_meta, dict):
+                    for c in m_meta.get("cards") or []:
+                        if isinstance(c, dict) and "type" in c:
+                            seen_card_types.add(c["type"])
+
             cards = generate_cards(
                 user_message=request.message,
                 answer=answer,
@@ -961,6 +1013,8 @@ async def handle_chat_stream(
                 sources=sources,
                 query_embedding=query_embedding,
                 is_video_confirmed=is_video_yes,
+                session_id=request.session_id,
+                seen_card_types=seen_card_types,
             )
 
         # Sanitize any personal staff mobile numbers from output

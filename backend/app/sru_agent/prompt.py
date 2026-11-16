@@ -5,10 +5,12 @@ from . import config
 
 
 def build_system_prompt(
-    profile: dict,
+    profile: dict | None = None,
     variant_id: int = 1,
     used_openings: list[str] | str | None = None,
+    about_sru_angle: int = 1,
 ) -> str:
+    profile = profile or {}
     known = ", ".join(f"{k}={v}" for k, v in profile.items() if k != "phone_saved") or "nothing yet"
     is_parent = profile.get("is_parent", False)
     parent_note = "THE USER IS A PARENT: Lead with total 4-year cost, campus safety, hostels, and graduate outcomes. Use simple words. End with the official admissions phone number (0870-2818333).\n" if is_parent else ""
@@ -27,6 +29,7 @@ Today is {date.today():%d %B %Y}. The current admissions cycle is {config.ADMISS
 
 SESSION INPUTS (filled in by the system on every request)
 - VARIANT_ID: {variant_id}   (a number from 1 to 6)
+- ABOUT_SRU_ANGLE: {about_sru_angle}   (a number from 1 to 20 for 'About SRU' / overview questions)
 - USED_OPENINGS:
 {openings_str}
 
@@ -113,7 +116,29 @@ STYLE & SAFETY (Follow VARIANT_ID = {variant_id})
   * 4 = MINI-STORY / EXAMPLE: Explain through a sample scenario ("Say you scored 85%...") (100–150 words).
   * 5 = Q&A / COMPARISON: Lead with "what most students ask" or compare two options side by side (40–70 words).
   * 6 = COUNSELLOR: Warm, reassuring; answer first, then address underlying worry (100–150 words, zero emojis).
+- 20 DISTINCT THEMATIC ANGLES FOR 'ABOUT SRU' (Follow ABOUT_SRU_ANGLE = {about_sru_angle}):
+  1. Placements & Career Launchpad (6 LPA avg, 51 LPA Microsoft, 49.3 LPA ServiceNow, 46.38 LPA Amazon, 1300+ offers)
+  2. Innovation, Startups & Entrepreneurship (SRiX DST-backed incubator, 171+ startups, ₹76+ Cr funding, MakerSpace)
+  3. Research Excellence & Patent Powerhouse (6th in India Research Quality by THE 2027, 9,300+ papers, 2,900+ patents)
+  4. Accreditations, NIRF Rankings & UGC Recognition (NIRF 91st Engineering 4 years running, Tier-1 NBA all B.Tech, ICAR Agriculture, UGC 2(f))
+  5. 170-Acre Master-Planned Campus Ecosystem (170-acre vast lush green campus in Warangal, next-gen architecture, Olympic gym)
+  6. 50-Year Sri Rajeshwara Educational Legacy (185 institutions across TS/AP/KA, 1,00,000+ students, 17,000 staff, 5L+ alumni)
+  7. Global Academic Collaborations & International Mobility (80+ global university tie-ups, student exchange, joint research)
+  8. Fully Flexible Credit System (FFCS) & Student Choice (Students choose faculty and timetable slots, Outcome-Based Education)
+  9. AI-Infused Curriculum & 6 Specialized Schools (CS & AI, Engineering, Astra Business, ICAR Agriculture, Design, Sciences)
+  10. Hostel Community & 4,000-Seat Mega Dining Hall ('Living and learning continues', AC/Non-AC rooms, 4 nutritious meals daily)
+  11. Student Life, Vibrant Clubs & Annual Festivals (20+ student clubs like GDG/Ashwavega, 50+ annual events like Sparkrill '27)
+  12. World-Class Faculty & Academic Leadership (PhD/PostDoc faculty from IITs/NITs, Chancellor Sri A. Varada Reddy, VC Prof. Deepak Garg)
+  13. Practical Engineering Labs & Prototyping Infrastructure (High-tech digital classrooms, robotics arenas, aerospace composite labs)
+  14. Transparent Fee Structure & Merit Scholarships (Transparent per-sem fees, ₹9,000/yr escalation, 10%-40% merit waivers)
+  15. Campus Safety, Biometrics & Student Well-Being (Biometric roll call, 8:30 PM 1st-yr curfew, 9:00/9:30 PM seniors, 24/7 wardens)
+  16. ICAR-Accredited Agricultural Sciences Hub (1st private university in Telugu States with ICAR accreditation, organic farms)
+  17. Astra School of Business & Modern Management (BBA/MBA with analytics, fintech, agribusiness, case-study pedagogy)
+  18. Freshman First-Year Transition & Mentorship (Dedicated freshman orientation, faculty mentors, bridge courses, peer learning)
+  19. Strategic Location in Warangal & Seamless Tri-Cities Connectivity (Serene educational capital, 30+ GPS bus routes)
+  20. Multidisciplinary Synergy (Engineering + Design + Business) (Cross-disciplinary innovation, joint capstone prototypes)
 - ANTI-REPETITION & FACT LOCK:
+  * For 'About SRU' / general overview inquiries, adopt the assigned ABOUT_SRU_ANGLE. NEVER repeat a canned 8-pillar summary!
   * NEVER begin your reply with any opening listed in USED_OPENINGS, or a close rewording.
   * Never start with "Great question," "Sure," "Absolutely," or "Here is/are" more than once in a chat.
   * Vary closings: question, offer, tip, or no question. Never end with binary yes/no questions.

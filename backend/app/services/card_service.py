@@ -764,6 +764,31 @@ PROGRAMS_OFFERED_CARD = {
 }
 
 
+# Session memory for shown cards to prevent repeating cards within the same session
+_SESSION_SHOWN_CARDS: dict[str, set[str]] = {}
+
+
+def get_session_shown_cards(session_id: str) -> set[str]:
+    """Retrieve the set of card types already shown in the given session."""
+    if not session_id:
+        return set()
+    return _SESSION_SHOWN_CARDS.setdefault(session_id, set())
+
+
+def record_session_card(session_id: str, card_type: str) -> None:
+    """Record that a card type has been shown in the session."""
+    if session_id and card_type:
+        _SESSION_SHOWN_CARDS.setdefault(session_id, set()).add(card_type)
+
+
+def clear_session_cards(session_id: str | None = None) -> None:
+    """Clear session shown cards (for testing or session reset)."""
+    if session_id:
+        _SESSION_SHOWN_CARDS.pop(session_id, None)
+    else:
+        _SESSION_SHOWN_CARDS.clear()
+
+
 def generate_cards(
     user_message: str,
     answer: str,
@@ -771,6 +796,8 @@ def generate_cards(
     sources: list[dict] | None = None,
     query_embedding: list[float] | None = None,
     is_video_confirmed: bool = False,
+    session_id: str | None = None,
+    seen_card_types: set[str] | None = None,
 ) -> list[dict]:
     """Generate structured interactive cards based on message context and student profile."""
     cards = []
@@ -918,9 +945,19 @@ def generate_cards(
         is_explicit_video_query(user_message)
         and is_video_topic_query(user_message)
     )
-    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "describe sru")):
+    if not is_video_query and any(k in msg_lower for k in ("campus tour", "campus walkthrough", "see the campus", "visit the campus", "campus facilities", "about sru", "tell me about sru", "about sr university", "why sru", "why choose sru", "campus life", "overview of sru", "tell me about the university", "what is sru", "what is sr university", "describe sru")):
         if not any(k in msg_lower for k in ("fee", "cost", "vs")):
-            cards.append(CAMPUS_TOUR_CARD)
+            # Show Campus Tour card only the 1st time in a session
+            already_shown = False
+            if session_id and "campus_tour" in get_session_shown_cards(session_id):
+                already_shown = True
+            if seen_card_types and "campus_tour" in seen_card_types:
+                already_shown = True
+
+            if not already_shown:
+                cards.append(CAMPUS_TOUR_CARD)
+                if session_id:
+                    record_session_card(session_id, "campus_tour")
 
     # 5b. SRU Advantage Comparison Card — triggered on comparison / "why SRU" intent
     _comparison_triggers = (

@@ -65,6 +65,70 @@ def extract_used_openings_and_variant(
     return calc_variant, openings_str
 
 
+ABOUT_SRU_QUERIES = (
+    "about sru", "tell me about sru", "about sr university", "describe sru",
+    "what is sru", "what is sr university", "overview of sru", "explain about sru", "tell me about the university",
+    "details about sru", "what can you tell me about sru", "who is sru", "how is sru",
+    "why sru", "why choose sru", "why should i choose sru", "about college", "about university",
+    "campus life", "campus facilities", "about campus", "about sru university"
+)
+
+ABOUT_SRU_ANGLES = [
+    "1. Placements & Career Launchpad (6 LPA avg, 51 LPA Microsoft, 49.3 LPA ServiceNow, 46.38 LPA Amazon, 1300+ offers, top MNCs)",
+    "2. Innovation, Startups & Entrepreneurship (SRiX DST-backed incubator, 171+ startups, ₹76+ Cr funding, MakerSpace)",
+    "3. Research Excellence & Patent Powerhouse (6th in India Research Quality by THE 2027, 9,300+ papers, 2,900+ patents, 159 granted)",
+    "4. Accreditations, NIRF Rankings & UGC Recognition (NIRF 91st Engineering 4 years running, Tier-1 NBA all B.Tech, ICAR Agriculture, UGC 2(f))",
+    "5. 170-Acre Master-Planned Campus Ecosystem (170-acre vast lush green campus in Warangal, next-gen architecture, Olympic gym, sports arenas)",
+    "6. 50-Year Sri Rajeshwara Educational Legacy (185 institutions across TS/AP/KA, 1,00,000+ students, 17,000 staff, 5L+ alumni)",
+    "7. Global Academic Collaborations & International Mobility (80+ global university tie-ups, student exchange, joint research, global faculty)",
+    "8. Fully Flexible Credit System (FFCS) & Student Choice (Students choose faculty and timetable slots, Outcome-Based Education, minors)",
+    "9. AI-Infused Curriculum & 6 Specialized Schools (CS & AI, Engineering, Astra Business, ICAR Agriculture, Design, Sciences; AI from Sem 1)",
+    "10. Hostel Community & 4,000-Seat Mega Dining Hall ('Living and learning continues', AC/Non-AC rooms, 4 nutritious meals daily, 24/7 security)",
+    "11. Student Life, Vibrant Clubs & Annual Festivals (20+ student clubs like GDG/Ashwavega, 50+ annual events like Sparkrill '27 & PRAGATHI 2.0)",
+    "12. World-Class Faculty & Academic Leadership (PhD/PostDoc faculty from IITs/NITs, Chancellor Sri A. Varada Reddy, VC Prof. Deepak Garg - AI pioneer)",
+    "13. Practical Engineering Labs & Prototyping Infrastructure (High-tech digital classrooms, robotics arenas, aerospace composite materials labs)",
+    "14. Transparent Fee Structure & Merit Scholarships (Transparent per-sem fees, ₹9,000/yr escalation, 10%-40% merit waivers, 19 special concessions)",
+    "15. Campus Safety, Biometrics & Student Well-Being (Biometric roll call, 8:30 PM 1st-yr curfew, 9:00/9:30 PM seniors, CCTV, health dispensary)",
+    "16. ICAR-Accredited Agricultural Sciences Hub (1st private university in Telugu States with ICAR accreditation, experiential organic farms)",
+    "17. Astra School of Business & Modern Management (BBA/MBA with analytics, fintech, agribusiness, case-study pedagogy, corporate mentoring)",
+    "18. Freshman First-Year Transition & Mentorship (Dedicated freshman orientation, faculty mentors, bridge courses, peer learning networks)",
+    "19. Strategic Location in Warangal & Seamless Tri-Cities Connectivity (Serene educational capital, 30+ GPS bus routes across Warangal/Hanamkonda/Kazipet)",
+    "20. Multidisciplinary Synergy (Engineering + Design + Business) (Cross-disciplinary innovation, joint capstone prototypes, high-impact careers)",
+]
+
+
+def is_about_sru_query(query: str) -> bool:
+    """Return True if the user query is asking for a general overview or 'About SRU'."""
+    q = query.lower().strip(" .!?,")
+    if not q:
+        return False
+    if any(q == pattern or pattern in q for pattern in ABOUT_SRU_QUERIES):
+        return True
+    has_sru_target = any(term in q for term in ("sru", "sr university", "the university", "this university"))
+    has_overview_intent = any(term in q for term in ("about", "overview", "describe", "what is", "tell me about", "why choose", "who is", "introduction", "campus"))
+    is_specific_domain = any(term in q for term in ("fee", "fees", "cost", "scholarship", "cutoff", "eligibility", "hostel fee", "bus fee", "transport fee", "placement stats"))
+    if has_sru_target and has_overview_intent and not is_specific_domain:
+        return True
+    return False
+
+
+def determine_about_sru_angle(
+    conversation_context: str,
+    query: str,
+    explicit_angle: int | None = None,
+) -> int:
+    """Determine which of the 20 distinct About SRU angles to use (1 to 20)."""
+    if explicit_angle is not None and 1 <= explicit_angle <= 20:
+        return explicit_angle
+
+    if not conversation_context or not conversation_context.strip():
+        return 1
+
+    # Count how many assistant messages appear in the conversation context to rotate angles
+    asst_turns = len(re.findall(r"(?:^|\n)(?:assistant|model):", conversation_context, re.IGNORECASE))
+    return (asst_turns % 20) + 1
+
+
 class RAGService:
     """Handles retrieval-augmented generation for university questions."""
 
@@ -245,6 +309,7 @@ class RAGService:
         precomputed_embedding: list[float] | None = None,
         variant_id: int | None = None,
         used_openings: list[str] | str | None = None,
+        about_sru_angle: int | None = None,
     ) -> tuple[list[dict[str, str]], list[dict], str]:
         """Format evidence and prompt for the LLM. Returns (messages, sources, evidence_text)."""
         if not retrieved_chunks:
@@ -308,6 +373,14 @@ class RAGService:
             used_openings=used_openings,
         )
 
+        calc_angle = about_sru_angle
+        if calc_angle is None and is_about_sru_query(question):
+            calc_angle = determine_about_sru_angle(conversation_context, question)
+        elif calc_angle is None:
+            calc_angle = 1
+
+        angle_str = ABOUT_SRU_ANGLES[(calc_angle - 1) % 20]
+
         rag_prompt = render_prompt(
             "rag",
             question=question,
@@ -316,6 +389,7 @@ class RAGService:
             exemplar=exemplar_block,
             VARIANT_ID=str(calc_variant),
             USED_OPENINGS=openings_str,
+            ABOUT_SRU_ANGLE=angle_str,
         )
 
         messages = [
@@ -332,6 +406,7 @@ class RAGService:
         precomputed_embedding: list[float] | None = None,
         variant_id: int | None = None,
         used_openings: list[str] | str | None = None,
+        about_sru_angle: int | None = None,
     ) -> tuple[str, list[dict]]:
         """Generate a grounded answer using retrieved evidence.
 
@@ -352,6 +427,7 @@ class RAGService:
             precomputed_embedding=precomputed_embedding,
             variant_id=variant_id,
             used_openings=used_openings,
+            about_sru_angle=about_sru_angle,
         )
         answer = await self.llm.generate(messages, temperature=0.3)
 
@@ -409,6 +485,7 @@ class RAGService:
         search_query: str | None = None,
         variant_id: int | None = None,
         used_openings: list[str] | str | None = None,
+        about_sru_angle: int | None = None,
     ) -> tuple[str, list[dict]]:
         """Full RAG pipeline: retrieve → generate → return answer + sources."""
         retrieval_query = search_query or question
@@ -434,5 +511,6 @@ class RAGService:
             precomputed_embedding=query_embedding,
             variant_id=variant_id,
             used_openings=used_openings,
+            about_sru_angle=about_sru_angle,
         )
         return answer, sources

@@ -82,6 +82,15 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                     assistant_openings.append(line)
                     break
     variant_id = (len(assistant_openings) % 6) + 1
+    from app.services.rag_service import determine_about_sru_angle, is_about_sru_query
+    about_sru_angle = (
+        determine_about_sru_angle(
+            "\n".join(f"{h.get('role')}: {h.get('text', '')}" for h in history),
+            message,
+        )
+        if is_about_sru_query(message)
+        else 1
+    )
 
     tool_decl = _tool_declarations()
     used, cards, final = [], [], ""
@@ -93,6 +102,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                     ctx["profile"],
                     variant_id=variant_id,
                     used_openings=assistant_openings,
+                    about_sru_angle=about_sru_angle,
                 ),
                 tools=[tool_decl],
                 temperature=0.2,
@@ -169,7 +179,12 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     # Attach contextual cards (such as early bird application ad or fee breakdown)
     try:
         from app.services.card_service import generate_cards
-        contextual_cards = generate_cards(user_message=message, answer=final, profile=ctx.get("profile"))
+        contextual_cards = generate_cards(
+            user_message=message,
+            answer=final,
+            profile=ctx.get("profile"),
+            session_id=session_id,
+        )
         for c in contextual_cards:
             if c not in cards:
                 cards.append(c)
