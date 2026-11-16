@@ -268,22 +268,6 @@ const PROGRAMS: ProgramConfig[] = [
   },
 ];
 
-interface QuickPreset {
-  label: string;
-  value: string;
-  examKey: string;
-}
-
-const QUICK_PRESETS: QuickPreset[] = [
-  { label: "780 / 1000 (Inter)", value: "780", examKey: "stateBoard" },
-  { label: "850 / 1000 (Inter)", value: "850", examKey: "stateBoard" },
-  { label: "920 / 1000 (Inter)", value: "920", examKey: "stateBoard" },
-  { label: "980 / 1000 (Inter)", value: "980", examKey: "stateBoard" },
-  { label: "Rank 1,500 (EAPCET)", value: "1500", examKey: "eamcet" },
-  { label: "Rank 5,000 (EAPCET)", value: "5000", examKey: "eamcet" },
-  { label: "Rank 15,000 (EAPCET)", value: "15000", examKey: "eamcet" },
-  { label: "CBSE 95%", value: "95%", examKey: "cbse" },
-];
 
 /**
  * Intelligent parser & matcher for student scores and ranks.
@@ -638,27 +622,6 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
     }
   };
 
-  // Apply quick preset - updates fee snapshot immediately
-  const applyPreset = (preset: QuickPreset) => {
-    setEnteredScore(preset.value);
-    setSelectedExamKey(preset.examKey);
-    const targetExam = currentProgram.supportedExams.find((x) => x.key === preset.examKey) || currentExam;
-    const res = matchSlabFromScore(currentProgram, preset.examKey, preset.value);
-    setSelectedSlabIndex(res.slabIndex);
-
-    const nameToUse = savedLead?.name || studentName.trim();
-    const phoneToUse = savedLead?.phone || studentPhone.trim();
-
-    computeAndSaveSnapshot(
-      currentProgram,
-      targetExam,
-      preset.value,
-      res.slabIndex,
-      nameToUse,
-      phoneToUse
-    );
-  };
-
   // Program change
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newProgId = e.target.value;
@@ -949,23 +912,6 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 <BoltIcon size={16} />
                 <span>Calculate</span>
               </button>
-            </div>
-
-            {/* Quick Presets */}
-            <div className="calc-presets-row">
-              <span className="calc-presets-label">Quick Presets:</span>
-              <div className="calc-presets-chips">
-                {QUICK_PRESETS.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    className={`calc-chip ${enteredScore === preset.value ? "active" : ""}`}
-                    onClick={() => applyPreset(preset)}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {scoreMatch.status === "matched" && matchedSlab && (

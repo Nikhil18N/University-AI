@@ -345,56 +345,6 @@
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
-/* Quick Presets Row */
-.calc-presets-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding-top: 4px;
-}
-
-.calc-presets-label {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--text-muted, #94a3b8);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.calc-presets-chips {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.calc-chip {
-  background: var(--surface-2, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
-  color: var(--text, #e2e8f0);
-  border-radius: 7px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.calc-chip:hover {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.35);
-  color: #60a5fa;
-  transform: translateY(-1px);
-}
-
-.calc-chip.active {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: #3b82f6;
-  color: #93c5fd;
-  font-weight: 600;
-}
-
 /* Matched Badge */
 .calc-matched-badge {
   display: flex;
@@ -1086,24 +1036,6 @@
   border-color: #0055a4;
 }
 
-[data-theme="light"] .calc-chip {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
-  color: #334155;
-}
-
-[data-theme="light"] .calc-chip:hover {
-  background: rgba(0, 85, 164, 0.08);
-  border-color: #0055a4;
-  color: #0055a4;
-}
-
-[data-theme="light"] .calc-chip.active {
-  background: rgba(0, 85, 164, 0.14);
-  border-color: #0055a4;
-  color: #0055a4;
-}
-
 [data-theme="light"] .calc-empty-card {
   background: #f8fafc;
   border-color: #cbd5e1;
@@ -1349,7 +1281,6 @@
 
   .calc-close-btn,
   .calc-submit-btn,
-  .calc-presets-row,
   .calc-auth-box,
   .calc-footer-actions,
   .calc-reset-action,
