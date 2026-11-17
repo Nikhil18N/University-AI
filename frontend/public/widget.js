@@ -39,7 +39,7 @@
     return v === null || v === undefined ? fallback : v;
   };
   var side = opt("position", "right") === "left" ? "left" : "right";
-  var color = opt("color", "#dc2626");
+  var color = opt("color", "#0055a4");
   var label = opt("label", "Ask SRU Buddy");
   var greeting = opt("greeting", "Hi! Questions about admissions 2027-28? Ask me.");
   var startOpen = opt("open", "false") === "true";
@@ -55,15 +55,15 @@
     "*{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}" +
     ".launcher{position:fixed;bottom:20px;" + side + ":20px;display:flex;align-items:center;gap:10px;" +
     "flex-direction:" + (side === "left" ? "row" : "row-reverse") + ";border:0;background:none;padding:0;cursor:pointer}" +
-    ".launcher .dot{width:62px;height:62px;border-radius:50%;background:" + color + ";display:flex;align-items:center;" +
-    "justify-content:center;box-shadow:0 8px 24px rgba(220,38,38,.4);transition:transform .15s ease;" +
-    "animation:sruPulse 2.5s infinite}" +
-    "@keyframes sruPulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.7),0 8px 24px rgba(0,0,0,.3)}70%{box-shadow:0 0 0 16px rgba(220,38,38,0),0 8px 24px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0),0 8px 24px rgba(0,0,0,.3)}}" +
-    ".launcher:hover .dot{transform:scale(1.06)}" +
-    ".launcher .dot img{width:40px;height:40px;border-radius:50%;background:#fff;object-fit:contain;padding:2px}" +
+    ".launcher .dot{width:62px;height:62px;border-radius:50%;background:" + color + ";border:3px solid #fff;display:flex;align-items:center;" +
+    "justify-content:center;box-shadow:0 8px 24px rgba(0,85,164,.45);transition:transform .15s ease;" +
+    "animation:sruPulse 2.5s infinite;padding:8px}" +
+    "@keyframes sruPulse{0%{box-shadow:0 0 0 0 rgba(41,121,226,.7),0 8px 24px rgba(0,0,0,.3)}70%{box-shadow:0 0 0 16px rgba(41,121,226,0),0 8px 24px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 0 rgba(41,121,226,0),0 8px 24px rgba(0,0,0,.3)}}" +
+    ".launcher:hover .dot{transform:scale(1.08)}" +
+    ".launcher .dot img{width:38px;height:auto;max-height:24px;object-fit:contain;display:block}" +
     ".launcher .tag{background:#fff;color:#0f172a;font-size:14px;font-weight:600;padding:9px 14px;border-radius:999px;" +
     "box-shadow:0 4px 16px rgba(15,23,42,.16);white-space:nowrap}" +
-    ".launcher:focus-visible{outline:none}.launcher:focus-visible .dot{outline:3px solid #f59e0b;outline-offset:3px}" +
+    ".launcher:focus-visible{outline:none}.launcher:focus-visible .dot{outline:3px solid #2979e2;outline-offset:3px}" +
     ".greet{position:fixed;bottom:92px;" + side + ":20px;max-width:260px;background:#fff;color:#0f172a;font-size:14px;" +
     "line-height:1.4;padding:12px 34px 12px 14px;border-radius:14px;box-shadow:0 8px 28px rgba(15,23,42,.2);cursor:pointer}" +
     ".greet button{position:absolute;top:6px;right:6px;border:0;background:none;font-size:16px;line-height:1;color:#64748b;" +
@@ -71,7 +71,7 @@
     ".panel{position:fixed;bottom:92px;" + side + ":20px;width:400px;height:min(680px,calc(100vh - 116px));" +
     "background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 18px 48px rgba(15,23,42,.32);display:none}" +
     ".panel.open{display:block}.panel iframe{width:100%;height:100%;border:0;display:block}" +
-    "@media (max-width:640px){.panel{left:0;right:0;bottom:0;top:0;width:100%;height:100%;border-radius:0}" +
+    "@media (max-width:768px){.panel{left:0;right:0;bottom:0;top:0;width:100%!important;height:100%!important;height:100dvh!important;border-radius:0!important}" +
     ".launcher .tag{display:none}.open-mobile .launcher,.open-mobile .greet{display:none}}" +
     "@media (prefers-reduced-motion:reduce){.launcher .dot{transition:none}}";
 
@@ -89,7 +89,7 @@
   launcher.setAttribute("aria-expanded", "false");
   launcher.setAttribute("aria-controls", "sru-buddy-panel");
   launcher.innerHTML =
-    '<span class="dot"><img alt="" src="' + base + '/sru-crest.png"></span>' +
+    '<span class="dot"><img alt="SRU" src="' + base + '/sru-logo-white.png"></span>' +
     (label ? '<span class="tag"></span>' : "");
   if (label) launcher.querySelector(".tag").textContent = label;
   wrap.appendChild(launcher);

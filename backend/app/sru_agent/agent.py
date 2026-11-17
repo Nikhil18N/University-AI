@@ -40,7 +40,7 @@ CARD_TOOLS = {"calculate_fee", "check_eligibility", "request_counsellor_callback
 # When one of these ran, the answer is about this student's own numbers, so the generic
 # "B.Tech CSE fee" table from card_service must not be shown underneath it.
 _FEE_TOOLS = {"calculate_fee", "compare_programs", "get_program_info", "get_special_concessions"}
-_FALLBACK_MODELS = ("gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-2.5-flash")
+_FALLBACK_MODELS = ("gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash")
 # Campus visits: SRU Buddy never books or confirms one (admissions brief, Nov 2026). It points to the
 # admissions team (sru.edu.in/visit-us) and can pass the student's number on as a callback request.
 def _visit_guide(date_text: str | None = None) -> str:

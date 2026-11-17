@@ -154,6 +154,10 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 6px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Suggestion Chips */

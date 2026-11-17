@@ -64,7 +64,15 @@ class Settings(BaseSettings):
         else (Path(__file__).resolve().parent.parent / "uploads")
     )
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {
+        "env_file": [
+            ".env",
+            str(Path(__file__).resolve().parent.parent / ".env"),
+            str(Path(__file__).resolve().parent.parent.parent / ".env"),
+        ],
+        "env_file_encoding": "utf-8",
+        "extra": "ignore",
+    }
 
     def admin_key_is_default(self) -> bool:
         """True while ADMIN_API_KEY is missing or still the placeholder shipped in the source code."""

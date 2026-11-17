@@ -1,4 +1,9 @@
-export const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+export const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+    ? `${window.location.protocol}//${window.location.hostname}:8080`
+    : "http://localhost:8080")
+).replace(/\/$/, "");
 
 /** Where the chat runs: the full website ("web") or the embeddable widget ("widget").
  * Sent with each message so the admin console can tell them apart. */

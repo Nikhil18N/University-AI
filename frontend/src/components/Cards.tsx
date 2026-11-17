@@ -289,7 +289,6 @@ export function VideoRecommendationsCard({ card }: { card: any }) {
               target="_blank"
               rel="noopener noreferrer"
               className="yt-card-item"
-              title={`Watch: ${vid.title}`}
               style={{ animationDelay: `${idx * 80}ms` } as React.CSSProperties}
             >
               <div className="yt-thumb-wrapper">
@@ -421,12 +420,14 @@ export function PlacementHighlightsCard({ card }: CardProps) {
 
   return (
     <div className="rich-card placement-card">
-      <div className="card-header">
+      <div className="card-header placement-card-header">
         <span className="card-badge placement-badge">
           <AwardIcon size={14} /> Placement Excellence
         </span>
-        <h4 className="card-title">{card.title}</h4>
-        {card.subtitle && <p className="card-subtitle">{card.subtitle}</p>}
+        <div className="card-header-titles">
+          <h4 className="card-title">{card.title}</h4>
+          {card.subtitle && <p className="card-subtitle">{card.subtitle}</p>}
+        </div>
       </div>
 
       {/* Official 3 Superstars Banner Image */}
