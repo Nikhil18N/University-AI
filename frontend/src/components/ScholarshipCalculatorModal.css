@@ -371,38 +371,6 @@
   padding: 4px 6px;
 }
 
-.calc-rank-prompt-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 0.82rem;
-  color: #38bdf8;
-  background: rgba(14, 165, 233, 0.12);
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(14, 165, 233, 0.3);
-  animation: fadeIn 0.18s ease;
-  margin-top: 6px;
-}
-
-.calc-switch-rank-btn {
-  background: #0284c7;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.calc-switch-rank-btn:hover {
-  background: #0369a1;
-}
-
 /* 4a. Ultra-Minimal Empty State (Hidden fee structure until marks entered) */
 .calc-empty-card {
   display: flex;
