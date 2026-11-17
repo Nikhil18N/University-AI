@@ -1,7 +1,7 @@
 {
   "status": "ok",
   "academic_year": "2027-28",
-  "source": "SR University Official Fee Structure & Merit Scholarship Circular 2027-28",
+  "source": "SR University Official Fee Structure & Merit Scholarship fee card, Academic Year 2027-28",
   "one_time": {
     "enrollment_fee": 5000,
     "application_fee": 1100
@@ -26,68 +26,69 @@
   "hostel_deposits": {
     "caution_deposit": 5000,
     "laundry_per_year": 5000,
-    "electricity_deposit_ac": 5000
+    "electricity_deposit_non_ac": 5000,
+    "electricity_deposit_ac": 10000
   },
   "special_concessions": [
     {
-      "key": "sibling",
-      "label": "Real brother or sister on rolls in SRU in 2027-28",
-      "amount": 15000
+      "key": "orphan",
+      "label": "Students who have lost both parents",
+      "amount": 50000
     },
     {
-      "key": "only_girl_child_telangana",
-      "label": "Only girl child from Telangana",
-      "amount": 15000
+      "key": "sports_international",
+      "label": "International-level sports achievers",
+      "amount": 50000
     },
     {
-      "key": "girl_child_outside_telangana",
-      "label": "Girl child from outside Telangana",
-      "amount": 15000
+      "key": "staff_child",
+      "label": "Children of regular SR University employees",
+      "amount": 50000
     },
     {
-      "key": "single_parent",
-      "label": "Only one parent alive or divorced",
-      "amount": 15000
+      "key": "disability",
+      "label": "Students with 50% or above disability",
+      "amount": 20000
     },
     {
       "key": "defence",
-      "label": "Defence / CRPF / martyr family",
+      "label": "Children of Defence personnel, CRPF personnel and martyrs",
       "amount": 15000
     },
     {
       "key": "state_police",
-      "label": "Child of State Police of any state",
+      "label": "Children of State Police personnel",
       "amount": 15000
     },
     {
       "key": "sr_junior_college",
-      "label": "SR Junior College student",
+      "label": "Students of SR Junior College",
       "amount": 15000
     },
     {
       "key": "alumni",
-      "label": "SRU old student, child of old student, or sibling of old student",
+      "label": "SRU alumni, their children and siblings",
       "amount": 15000
     },
     {
       "key": "ncc_c",
-      "label": "NCC C certificate holder",
+      "label": "NCC 'C' certificate holders",
       "amount": 15000
     },
     {
       "key": "non_local",
-      "label": "Student from outside Telangana and Andhra Pradesh",
+      "label": "Students from states other than Telangana and Andhra Pradesh",
       "amount": 15000
     },
     {
       "key": "sports_national",
-      "label": "Sports: National level representation",
+      "label": "National-level sports achievers",
       "amount": 15000
     },
     {
-      "key": "chancellor_recommendation",
-      "label": "Chancellor / Pro Chancellor recommendation",
-      "amount": 10000
+      "key": "single_parent",
+      "label": "Students with a single living parent / divorced parents",
+      "amount": 15000
     },
     {
       "key": "lateral_entry",
@@ -96,18 +97,18 @@
     },
     {
       "key": "padma_gallantry",
-      "label": "Children of Padma Awards / J&K migrants / Gallantry Awards",
+      "label": "Children of Padma awardees, J&K migrant families and Gallantry award recipients",
       "amount": 15000
     },
     {
-      "key": "sports_international",
-      "label": "Sports: International level representation",
-      "amount": 50000
+      "key": "only_girl_child_telangana",
+      "label": "Only girl child from Telangana",
+      "amount": 15000
     },
     {
-      "key": "orphan",
-      "label": "Both parents not alive",
-      "amount": 50000
+      "key": "sibling",
+      "label": "Sibling (brother or sister) currently enrolled at SR University (2027-28)",
+      "amount": 15000
     },
     {
       "key": "international",
@@ -120,20 +121,15 @@
       "amount": 15000
     },
     {
-      "key": "staff_child",
-      "label": "Children of regular SRU staff",
-      "amount": 50000
-    },
-    {
-      "key": "disability",
-      "label": "More than 50% disability",
-      "amount": 20000
+      "key": "girl_child_outside_telangana",
+      "label": "Girl students from states other than Telangana",
+      "amount": 15000
     }
   ],
   "programs": [
     {
       "id": "btech_cse",
-      "name": "B.Tech CSE and allied (AI & ML, Data Science, Cyber Security)",
+      "name": "B.Tech CSE (AIML, Data Science, Cyber Security, Robotics and Automation, Quantum AI)",
       "level": "ug",
       "tuition_per_year": 340000,
       "tuition_per_semester": 170000,
@@ -342,7 +338,7 @@
     },
     {
       "id": "btech_ai_robotics",
-      "name": "B.Tech Artificial Intelligence & Robotics",
+      "name": "B.Tech in AI and Robotics",
       "level": "ug",
       "tuition_per_year": 400000,
       "tuition_per_semester": 200000,
@@ -551,7 +547,7 @@
     },
     {
       "id": "btech_ece",
-      "name": "B.Tech ECE (AIML / VLSI / Robotics)",
+      "name": "B.Tech ECE (AIML, VLSI, Robotics and Automation)",
       "level": "ug",
       "tuition_per_year": 270000,
       "tuition_per_semester": 135000,
@@ -760,7 +756,7 @@
     },
     {
       "id": "btech_eee",
-      "name": "B.Tech EEE (Renewable Energy / EV / Robotics)",
+      "name": "B.Tech Electrical and Electronics Engineering (Electrical Vehicles, Renewable Energy)",
       "level": "ug",
       "tuition_per_year": 200000,
       "tuition_per_semester": 100000,
@@ -969,7 +965,7 @@
     },
     {
       "id": "btech_mech",
-      "name": "B.Tech Mechanical Engineering (Robotics / Smart Manufacturing)",
+      "name": "B.Tech Mechanical Engineering (Robotics and Automation, Smart Manufacturing)",
       "level": "ug",
       "tuition_per_year": 200000,
       "tuition_per_semester": 100000,
@@ -1394,7 +1390,7 @@
       "yearly_increase": 6000,
       "duration_years": 4,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate (confirm required subjects with the Admissions Office)",
+      "eligibility": "10+2 / Intermediate with PCM or PCB",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -1603,7 +1599,7 @@
       "yearly_increase": 6000,
       "duration_years": 4,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate (confirm required subjects with the Admissions Office)",
+      "eligibility": "10+2 / Intermediate (required subjects are confirmed by the Admissions Office)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -1805,14 +1801,14 @@
     },
     {
       "id": "btech_engg_physics",
-      "name": "B.Tech Engineering Physics / Applied Chemistry",
+      "name": "B.Tech Engineering Physics with AI, Robotics & Space / B.Tech Applied Chemistry in AI, NanoRobotics & Drug Discovery",
       "level": "ug",
       "tuition_per_year": 200000,
       "tuition_per_semester": 100000,
       "yearly_increase": 6000,
       "duration_years": 4,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "eligibility": "10+2 / Intermediate with PCM (PCM or PCB for Applied Chemistry)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -2014,7 +2010,7 @@
     },
     {
       "id": "btech_iep",
-      "name": "B.Tech IEP (International Engineering Program)",
+      "name": "B.Tech International Engineering Programme (IEP)",
       "level": "ug",
       "tuition_per_year": 340000,
       "tuition_per_semester": 170000,
@@ -2223,14 +2219,14 @@
     },
     {
       "id": "bsc_agri",
-      "name": "B.Sc. (Hons.) Agriculture (ICAR-Accredited)",
+      "name": "B.Sc Agriculture (ICAR-accredited)",
       "level": "ug",
       "tuition_per_year": 200000,
       "tuition_per_semester": 100000,
       "yearly_increase": 6000,
       "duration_years": 4,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate with BiPC / MPC",
+      "eligibility": "10+2 / Intermediate with PCB (BiPC); a 2-year agriculture or seed technology diploma with first class is also accepted",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -2439,7 +2435,7 @@
       "yearly_increase": 6000,
       "duration_years": 4,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -2641,14 +2637,14 @@
     },
     {
       "id": "bba",
-      "name": "BBA (General Management)",
+      "name": "BBA",
       "level": "ug",
       "tuition_per_year": 150000,
       "tuition_per_semester": 75000,
       "yearly_increase": 4000,
       "duration_years": 3,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -2850,14 +2846,14 @@
     },
     {
       "id": "bsc_hospitality",
-      "name": "B.Sc Hospitality and Event Management",
+      "name": "B.Sc in Hospitality and Event Management",
       "level": "ug",
       "tuition_per_year": 150000,
       "tuition_per_semester": 75000,
       "yearly_increase": 4000,
       "duration_years": null,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -3059,14 +3055,14 @@
     },
     {
       "id": "bba_specialised",
-      "name": "BBA specialised (Finance, Operations, HR, Business Analytics, Marketing)",
+      "name": "BBA (Finance, Operations, HR, Business Analytics, Marketing)",
       "level": "ug",
       "tuition_per_year": 200000,
       "tuition_per_semester": 100000,
       "yearly_increase": 6000,
       "duration_years": 3,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -3268,14 +3264,14 @@
     },
     {
       "id": "bca",
-      "name": "BCA Hons (Bachelor of Computer Applications)",
+      "name": "BCA (Hons.)",
       "level": "ug",
       "tuition_per_year": 150000,
       "tuition_per_semester": 75000,
       "yearly_increase": 4000,
       "duration_years": 3,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate with Mathematics",
+      "eligibility": "10+2 / Intermediate (required subjects are confirmed by the Admissions Office)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -3477,14 +3473,14 @@
     },
     {
       "id": "bsc_cs",
-      "name": "B.Sc Computer Science Hons",
+      "name": "B.Sc. Computer Science (Hons.)",
       "level": "ug",
       "tuition_per_year": 150000,
       "tuition_per_semester": 75000,
       "yearly_increase": 4000,
       "duration_years": 3,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate with Mathematics",
+      "eligibility": "10+2 / Intermediate (required subjects are confirmed by the Admissions Office)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -3686,14 +3682,14 @@
     },
     {
       "id": "bsc_maths_ai",
-      "name": "B.Sc Hons Mathematics and AI",
+      "name": "B.Sc. (Hons.) in Mathematics and AI",
       "level": "ug",
       "tuition_per_year": 100000,
       "tuition_per_semester": 50000,
       "yearly_increase": 3000,
-      "duration_years": null,
+      "duration_years": 3,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate with Mathematics",
+      "eligibility": "10+2 / Intermediate (required subjects are confirmed by the Admissions Office)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -3895,14 +3891,14 @@
     },
     {
       "id": "bcom",
-      "name": "B.Com",
+      "name": "B.Com.",
       "level": "ug",
       "tuition_per_year": 100000,
       "tuition_per_semester": 50000,
       "yearly_increase": 3000,
       "duration_years": null,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4109,9 +4105,9 @@
       "tuition_per_year": 100000,
       "tuition_per_semester": 50000,
       "yearly_increase": 3000,
-      "duration_years": null,
+      "duration_years": 3,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4318,9 +4314,9 @@
       "tuition_per_year": 100000,
       "tuition_per_semester": 50000,
       "yearly_increase": 3000,
-      "duration_years": null,
+      "duration_years": 4,
       "minimum_percent": 50,
-      "eligibility": "10+2 / Intermediate, any stream",
+      "eligibility": "10+2 / Intermediate with PCM or PCB",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4529,7 +4525,7 @@
       "yearly_increase": 9000,
       "duration_years": 2,
       "minimum_percent": 50,
-      "eligibility": "Any recognized Bachelor's degree (50% aggregate)",
+      "eligibility": "A recognised Bachelor's degree",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4620,14 +4616,14 @@
     },
     {
       "id": "mba_agri",
-      "name": "MBA Agri Business Management",
+      "name": "MBA in Agri Business Management",
       "level": "pg",
       "tuition_per_year": 200000,
       "tuition_per_semester": 100000,
       "yearly_increase": 6000,
       "duration_years": 2,
       "minimum_percent": 50,
-      "eligibility": "Any recognized Bachelor's degree (50% aggregate)",
+      "eligibility": "B.Sc. / B.Tech. in the corresponding discipline",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4718,14 +4714,14 @@
     },
     {
       "id": "mca",
-      "name": "MCA (Master of Computer Applications)",
+      "name": "MCA",
       "level": "pg",
       "tuition_per_year": 150000,
       "tuition_per_semester": 75000,
       "yearly_increase": 4000,
       "duration_years": 2,
       "minimum_percent": 50,
-      "eligibility": "BCA / B.Sc / B.Com / B.A with Mathematics at 10+2 or degree level",
+      "eligibility": "A recognised Bachelor's degree (required subjects are confirmed by the Admissions Office)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4816,14 +4812,14 @@
     },
     {
       "id": "mtech",
-      "name": "M.Tech (CSE, Data Science, AIML, VLSI, Embedded Systems and others)",
+      "name": "M.Tech (CSE, Data Science, AIML, Electronic Design Technology, VLSI, Embedded Systems, Advanced Manufacturing Systems, Thermal Engineering, Construction Technology & Management, Power Electronics)",
       "level": "pg",
       "tuition_per_year": 100000,
       "tuition_per_semester": 50000,
       "yearly_increase": 3000,
       "duration_years": 2,
       "minimum_percent": 50,
-      "eligibility": "B.Tech / B.E. in a relevant engineering discipline",
+      "eligibility": "B.Tech. / B.E. in the corresponding discipline (M.Sc. / MCA holders are also considered)",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {
@@ -4914,14 +4910,14 @@
     },
     {
       "id": "msc",
-      "name": "M.Sc (Computer Science and Agricultural Sciences)",
+      "name": "M.Sc (Computer Science, Agronomy, Genetics & Plant Breeding, Agriculture Extension Education, Agriculture Economics, Plant Pathology, Horticulture, Soil Science)",
       "level": "pg",
       "tuition_per_year": 100000,
       "tuition_per_semester": 50000,
       "yearly_increase": 3000,
       "duration_years": 2,
       "minimum_percent": 50,
-      "eligibility": "Bachelor's degree in a relevant discipline",
+      "eligibility": "B.Sc. / B.Tech. in the corresponding discipline",
       "specialization_fee_per_year_from_year2": 0,
       "exams": [
         {

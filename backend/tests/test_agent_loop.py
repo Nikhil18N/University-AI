@@ -104,7 +104,8 @@ async def test_model_error_gives_friendly_message():
     class Broken(FakeClient):
         async def generate_content(self, **kw):
             raise RuntimeError("boom")
-    events = await _run(Broken([]), "hello", "s-err")
+    # (not "hello": greetings are now answered without calling the model)
+    events = await _run(Broken([]), "tell me about the library", "s-err")
     assert events[-1]["type"] == "error" and "boom" not in events[-1]["detail"]
 
 
@@ -142,7 +143,7 @@ async def test_model_fallback_on_404_not_found():
             return _text("Fallback model successfully answered!")
 
     client = FallbackClient()
-    events = await _run(client, "hello", "s-fallback")
+    events = await _run(client, "tell me about the library", "s-fallback")
     assert len(client.calls) >= 2
     assert events[-1]["type"] == "done"
     assert events[-1]["answer"] == "Fallback model successfully answered!"

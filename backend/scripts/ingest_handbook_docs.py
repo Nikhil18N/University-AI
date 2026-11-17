@@ -93,6 +93,13 @@ HANDBOOK_DOCS = [
         "department": "Admissions & Marketing",
         "effective_date": datetime(2026, 10, 30, tzinfo=timezone.utc),
     },
+    {
+        "file": "11_official_website_facts_nov2026.md",
+        "title": "SRU Official Website Facts (checked 17 Nov 2026)",
+        "document_type": "registry",
+        "department": "Admissions & University Administration",
+        "effective_date": datetime(2026, 11, 17, tzinfo=timezone.utc),
+    },
 ]
 
 

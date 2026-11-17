@@ -25,7 +25,7 @@ from datetime import date, datetime
 from google import genai
 from google.genai import types
 
-from . import config, fees, intents, memory, tools
+from . import config, fees, intents, knowledge, memory, tools
 from .prompt import build_system_prompt
 
 log = logging.getLogger("sru_agent")
@@ -69,10 +69,15 @@ class _KeyRing:
             self._clients[key] = genai.Client(api_key=key)
         return self._clients[key]
 
-    def rate_limited(self, key: str) -> str:
+    def rate_limited(self, key: str, cooldown: float | None = None) -> str:
         """Rest this key for a while; returns the key to use next (may be the same one)."""
         pool = self._get_pool()
-        return pool.mark_rate_limited(key) if pool else key
+        return pool.mark_rate_limited(key, cooldown) if pool else key
+
+    def all_resting(self) -> bool:
+        """True when every key is waiting out a limit (no point calling the model right now)."""
+        pool = self._get_pool()
+        return bool(pool) and pool.active_keys_count == 0
 
     def worked(self, key: str):
         pool = self._get_pool()
@@ -114,19 +119,36 @@ def _error_kind(exc: Exception) -> str:
     if code == 429 or "429" in text or "resource_exhausted" in text or "resource exhausted" in text \
             or "quota" in text or "rate limit" in text:
         return "rate"
+    if isinstance(exc, (ConnectionError, OSError)) or "connecterror" in type(exc).__name__.lower() \
+            or "connection" in text or "timed out" in text or "name resolution" in text:
+        return "busy"  # the network or Google is unreachable: wait, then answer without the model
     if code in (500, 502, 503, 504) or isinstance(exc, (asyncio.TimeoutError, TimeoutError)) \
             or any(w in text for w in ("503", "unavailable", "overloaded", "deadline exceeded", "internal error")):
         return "busy"
     return "fatal"
 
 
+class ModelUnavailable(Exception):
+    """Every key has used up its quota: answer without the model instead of making students wait."""
+
+
+def _is_daily_limit(exc: Exception) -> bool:
+    text = str(exc).lower().replace(" ", "").replace("_", "")
+    return "perday" in text or "daily" in text or "requestsperday" in text
+
+
 async def _generate(contents, cfg, link: dict):
     """One model call that survives a retired model, a rate-limited key and a busy server.
 
     `link` carries the connection for this student message: a fixed client (tests) or the
-    current key, plus the model that last worked.
+    current key, plus the model that last worked. This function and _KeyRing are the only code
+    that talks to the AI provider: moving to a paid Gemini plan needs only new keys in the
+    environment; another provider needs only a replacement for this function.
     """
     attempt = 0
+    if not link["fixed"] and _ring.all_resting():
+        link["error_kind"] = "rate"
+        raise ModelUnavailable("all Gemini keys are resting after a rate limit")
     while True:
         client = link["fixed"] or _ring.client(link["key"])
         model = link["models"][link["model_idx"]]
@@ -139,7 +161,7 @@ async def _generate(contents, cfg, link: dict):
                 _ring.worked(link["key"])
             return resp
         except Exception as exc:
-            kind = _error_kind(exc)
+            kind = link["error_kind"] = _error_kind(exc)
             if kind == "model" and link["model_idx"] + 1 < len(link["models"]):
                 log.warning("Agent model %s unavailable (%s), trying the next model", model, exc)
                 link["model_idx"] += 1
@@ -149,7 +171,11 @@ async def _generate(contents, cfg, link: dict):
             wait = config.AGENT_RETRY_DELAYS[attempt]
             attempt += 1
             if kind == "rate" and not link["fixed"]:
-                new_key = _ring.rate_limited(link["key"])
+                # A per-day limit will not clear in a few seconds: rest that key for an hour.
+                daily = _is_daily_limit(exc)
+                new_key = _ring.rate_limited(link["key"], config.AGENT_DAILY_LIMIT_COOLDOWN if daily else None)
+                if _ring.all_resting() and (daily or _ring.size() > 1):
+                    raise ModelUnavailable(str(exc)[:200]) from exc
                 if new_key != link["key"]:
                     link["key"], wait = new_key, 0.2  # a fresh key: go again almost at once
             log.warning("Model call %s (%s); retry %d in %.1fs", kind, str(exc)[:120], attempt, wait)
@@ -236,7 +262,7 @@ def _saved_text(kind: str, result: dict, preferred_time: str | None = None) -> s
         when = f" (preferred time: {preferred_time})" if preferred_time else ""
         return (f"Thank you, {first}. Your callback request {again} (reference **{ref}**). An admissions "
                 f"counsellor will call you on the number ending {last4}{when}. "
-                f"To cancel it, just say \"cancel the callback\".")
+                f"To cancel it, say \"cancel the callback\"; if the number is wrong, say \"change my number\".")
     if status == "invalid":
         return result.get("problem") or "Some details were not valid. Please check and send them again."
     return (f"Sorry, I could not save your request just now. Please call the Admissions Office at "
@@ -288,7 +314,7 @@ def _claims_cancelled(text: str) -> bool:
     return any(_CANCEL_CLAIM.search(s) and not _NEGATED.search(s) for s in re.split(r"(?<=[.!?\n])\s*", text))
 
 
-_FEE_WORDS = re.compile(r"\b(?:fee|fees|fess|tuition|cost|scholarship|how\s+much|per\s+sem)\b", re.IGNORECASE)
+_FEE_WORDS = re.compile(r"\b(?:fee|fees|fess|feez|tuition|cost|schol\w*|waiver|how\s+much|per\s+sem)\b", re.IGNORECASE)
 
 
 def _offline_fee_reply(message: str, ctx: dict):
@@ -320,6 +346,109 @@ def _offline_fee_reply(message: str, ctx: dict):
               f"Many students are chatting right now, so this is a quick answer from the fee table. For anything "
               f"else, please ask again in a minute or call {config.ADMISSIONS_PHONE}."]
     return "\n".join(lines), fee
+
+
+_SCORE_WORDS = r"(?:eapcet|eamcet|emcet|emact|eamect|eamcent)"
+_FEE_KEYS = ("program", "academic_year", "scholarship_percent", "scholarship_basis_text", "scores_considered",
+             "tuition_first_year", "tuition_first_year_after_scholarship", "per_semester_after_scholarship",
+             "one_time_enrollment_fee", "other_yearly_fees", "hostel", "hostel_options_per_year",
+             "sem1_total_payable", "total_per_semester", "first_year_total_payable", "yearly_increase",
+             "next_scholarship_slab", "notes")
+
+
+def _fee_args_from_message(message: str, profile: dict):
+    """If the message is a plain fee / scholarship question the code can work out by itself,
+    return the calculate_fee arguments; otherwise None (the model decides)."""
+    low = message.lower()
+    if not _FEE_WORDS.search(message) or re.search(r"\b(?:vs|versus|compare|difference|cheaper|concession)\b", low):
+        return None
+    in_message = fees.find_program(message)
+    program = in_message or profile.get("program_interest")
+    if not program or not fees.find_program(str(program)):
+        return None
+    args = {"program": in_message or str(program)}
+    m = re.search(r"(?<![\d.])(\d{2}(?:\.\d+)?)\s*(?:%|percent)", low)
+    marks = re.search(r"(?<!\d)(\d{3,4})\s*(?:marks|/\s*1000|out\s+of\s+1000)", low)
+    if m and float(m.group(1)) <= 100:
+        args["percent"] = float(m.group(1))
+    elif marks and int(marks.group(1)) <= 1000:
+        args["percent"] = round(int(marks.group(1)) / 10, 2)
+    m = re.search(rf"\b{_SCORE_WORDS}\b\D{{0,25}}(\d[\d,]{{0,6}})\b|\brank\D{{0,12}}(\d[\d,]{{0,6}})\b"
+                  rf"|(\d[\d,]{{0,6}})\s*(?:rank|in\s+{_SCORE_WORDS})\b", low)
+    if m:
+        args["eapcet_rank"] = int((m.group(1) or m.group(2) or m.group(3)).replace(",", ""))
+    m = re.search(r"\bjee\D{0,25}(\d{1,2}(?:\.\d+)?)\b|(\d{1,2}(?:\.\d+)?)\s*(?:percentile|%ile)", low)
+    if m:
+        args["jee_percentile"] = float(m.group(1) or m.group(2))
+    if re.search(r"\b(?:cbse|icse)\b", low):
+        args["board"] = "cbse"
+    if "hostel" in low:
+        if re.search(r"\bnon[\s-]?ac\b", low):
+            kind = "non_ac"
+        elif re.search(r"\bac\b|a/c|air[\s-]?condition", low):
+            kind = "ac"
+        else:
+            return None  # which hostel? let the model ask or explain the options
+        args["hostel"] = f"{kind}_{'3' if re.search(r'(?<!\d)3[\s-]?(?:shar|bed|person|member)', low) else '4'}"
+    return args
+
+
+def _handbook_context(message: str) -> str:
+    """Handbook passages for this message, found by keyword search (no AI call)."""
+    try:
+        found = knowledge.search(message, k=3, min_score=5.0)
+    except Exception:
+        return ""
+    if not found:
+        return ""
+    top = found[0]["score"]
+    parts = [f"[{f['title'].split(' > ')[-1]}]\n{f['text'][:750]}" for f in found if f["score"] >= 0.55 * top]
+    return "\n\n".join(parts)
+
+
+def _offline_knowledge_reply(message: str):
+    """The most relevant handbook passage, shown as it is, for when the model cannot be reached."""
+    try:
+        found = knowledge.search(message, k=1, min_score=7.0)
+    except Exception:
+        found = []
+    if not found:
+        return None
+    text = re.sub(r"\[FACT-ID:[^\]]*\]\s*|\[STATUS:[^\]]*\]\s*|\[SOURCE:[^\]]*\]\s*", "", found[0]["text"]).strip()
+    if len(text) > 900:
+        text = text[:900].rsplit("\n", 1)[0] + "\n..."
+    return (f"I cannot reach my AI model right now (the free limit for today has been used), so here is the "
+            f"matching part of the SR University handbook, **{found[0]['title'].split(' > ')[-1]}**:\n\n{text}\n\n"
+            f"I can still calculate fees and scholarships, and arrange a callback or a campus visit. "
+            f"For anything else, please call the Admissions Office at {config.ADMISSIONS_PHONE}.")
+
+
+_LIMIT_REPLY = (f"Many students are using SRU Buddy right now and the free AI limit has been reached, so I cannot "
+                f"answer that question at the moment. I can still do these without it: calculate a fee or "
+                f"scholarship (for example \"CSE fee with 85%\"), arrange a counsellor callback (\"call me\"), or "
+                f"book a campus visit. You can also call the Admissions Office at {config.ADMISSIONS_PHONE}.")
+
+_SMALL_TALK = {
+    "greeting": ("Hello{name}! 👋 I'm SRU Buddy, the admissions assistant of SR University. Ask me about courses, "
+                 "fees, scholarships, hostels or placements.",
+                 "Hello again{name}! 👋 What would you like to know about SR University today?"),
+    "how_are_you": ("I'm doing well, thank you{name}! Ready to help with anything about SR University admissions. "
+                    "What would you like to know?",) * 2,
+    "thanks": ("You're welcome{name}! If you have more questions about SR University, just ask.",) * 2,
+    "bye": (f"Goodbye{{name}}! All the best. You can come back any time, and the Admissions Office is on "
+            f"{config.ADMISSIONS_PHONE}.",) * 2,
+    "who_are_you": (f"I'm SRU Buddy, the AI admissions assistant of SR University, Warangal. I can work out your fee "
+                    f"and scholarship, check eligibility, compare courses, book a campus visit and arrange a "
+                    f"counsellor callback. I'm an AI, so the Admissions Office ({config.ADMISSIONS_PHONE}) gives "
+                    f"the final confirmation.",) * 2,
+}
+_SMALL_TALK_CHIPS = ["B.Tech CSE fees", "Scholarship for my marks", "Hostel details", "Book a campus visit"]
+
+
+def _cache_key(message: str) -> str:
+    import hashlib
+    norm = re.sub(r"[^a-z0-9 ]+", " ", message.lower())
+    return "sru:answer:" + hashlib.sha1(" ".join(norm.split()).encode()).hexdigest()
 
 
 # -------------------------------------------------------------------- the agent ----
@@ -361,6 +490,16 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
             yield ev
         return
 
+    # Greetings and thanks need no model call.
+    chat = intents.small_talk(message) if intent not in ("DATE_CONFIRMATION_YES", "DATE_CONFIRMATION_NO") else None
+    if chat:
+        seen_before = any(h.get("role") in ("model", "assistant") for h in history)
+        name_bit = f", {_first_name(profile['name'])}" if profile.get("name") else ""
+        text = _SMALL_TALK[chat][1 if seen_before else 0].format(name=name_bit)
+        async for ev in _say(text, message, session_id, conversation_id, suggestions=_SMALL_TALK_CHIPS):
+            yield ev
+        return
+
     # ---- 2. "Don't call me" / "cancel my visit": run the cancel tool, report what really happened
     pending = conv_state.get("pending_action")
     has_open_request = bool(profile.get("last_lead_id"))
@@ -381,9 +520,44 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
             yield ev
         return
 
-    # ---- 3. Callback / campus visit requests: save them as soon as name + number are known ----
+    # ---- 2b. "Change my number" / "my number is ...": one place for the number, everywhere ------
     phone = tools.find_phone(message)
     asked_for_call = intents.is_callback_request(message)
+    wants_update = intents.is_number_update(message) or (pending == "update_number" and bool(phone))
+    if wants_update and not asked_for_call and intent not in ("DATE_CONFIRMATION_YES", "DATE_CONFIRMATION_NO"):
+        if phone:
+            result = await _run_action("update_contact_details", {"phone": phone}, ctx, used, cards)
+            for ev in _tool_events("update_contact_details", result):
+                yield ev
+            await clear_pending()
+            last4 = result.get("phone_last4")
+            if result.get("status") == "updated":
+                text = f"Done. Your mobile number is now the one ending {last4}."
+                if result.get("saved_request_updated"):
+                    text += f" Your saved request (reference **{result.get('reference')}**) has the new number too."
+                text += " You can see or change it any time from the menu under My details."
+            elif result.get("status") == "unchanged":
+                text = f"That is already the number I have for you (ending {last4}). Nothing needed to change."
+            else:
+                text = (f"Sorry, I could not update your number just now. Please try again in a minute or call "
+                        f"the Admissions Office at {config.ADMISSIONS_PHONE}.")
+        else:
+            wrong = tools.find_bad_phone(message, min_digits=5)
+            await set_state(pending_action="update_number", pending_turns=0)
+            text = (f"\"{wrong}\" does not look like a valid 10-digit mobile number. Please type the correct one."
+                    if wrong else
+                    "Sure. Please type your new 10-digit mobile number here and I will update it. You can also "
+                    "change it yourself from the menu under My details.")
+        async for ev in _say(text, message, session_id, conversation_id, used, cards,
+                             ["B.Tech CSE fees", "Scholarship slabs", "Hostel details"]):
+            yield ev
+        return
+    if phone and intents.is_number_statement(message) and not asked_for_call:
+        # "my mobile number is ...": remember it (and fix a saved request) before answering
+        await _run_action("update_contact_details", {"phone": phone}, ctx, used, cards)
+        profile = ctx["profile"]
+
+    # ---- 3. Callback / campus visit requests: save them as soon as name + number are known ----
     bad_phone = None if phone else tools.find_bad_phone(message, min_digits=5 if asked_for_call else 8)
     # A bare "Ravi Kumar" counts as a name only when the agent has just asked for one.
     last_reply = next((h.get("text", "") for h in reversed(history) if h.get("role") in ("model", "assistant")), "")
@@ -398,7 +572,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
         action = "callback"
     elif visit_words and (phone or bad_phone or pending == "campus_visit"):
         action = "campus_visit"
-    elif pending and intent not in ("DATE_CONFIRMATION_YES", "DATE_CONFIRMATION_NO") and \
+    elif pending in ("callback", "campus_visit") and intent not in ("DATE_CONFIRMATION_YES", "DATE_CONFIRMATION_NO") and \
             (phone or bad_phone or name or (pending == "campus_visit" and intent == "CAMPUS_VISIT_BOOKING_WITH_DATE")):
         action = pending
     elif phone:
@@ -406,7 +580,9 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
 
     action_note = None
     if action:
-        use_phone = phone or conv_state.get("pending_phone")
+        # A number the student gave earlier (in the chat or in My details) is used as it is: they
+        # are not asked for it again. The reply names its last four digits so a wrong one is noticed.
+        use_phone = phone or conv_state.get("pending_phone") or tools.clean_phone(profile.get("phone") or "")
         use_name = name or profile.get("name") or conv_state.get("pending_name")
         visit = None
         if action == "campus_visit":
@@ -562,14 +738,43 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
         else:
             await set_state(pending_turns=turns)
 
+    # The same first question (often a suggestion button) from a student we know nothing about
+    # gets the saved answer instead of a new model call.
+    personal = any(profile.get(k) not in (None, "") for k in memory.PUBLIC_PROFILE_KEYS)
+    cacheable = (client is None and config.AGENT_ANSWER_CACHE_SECONDS > 0 and not history and not personal
+                 and not pending and not action_note and not tools.find_phone(message))
+    if cacheable:
+        saved = await memory.get_cached_answer(_cache_key(message), config.AGENT_ANSWER_CACHE_SECONDS)
+        if saved:
+            async for ev in _say(saved["answer"], message, session_id, conversation_id,
+                                 saved.get("used", []), saved.get("cards", []), saved.get("suggestions", [])):
+                yield ev
+            return
+
+    # Do the look-ups the code can do for free, so the model can usually answer in ONE call:
+    # the fee calculation for a plain fee question, and the handbook passages for everything else.
+    prefetched_fee = None
+    fee_args = _fee_args_from_message(message, profile) if not action_note else None
+    if fee_args:
+        fee_result = await tools.run_tool("calculate_fee", fee_args, ctx)
+        if fee_result.get("status") == "ok":
+            prefetched_fee = fee_result
+    fee_note = None
+    if prefetched_fee:
+        import json as _json
+        fee_note = _json.dumps({k: prefetched_fee[k] for k in _FEE_KEYS if prefetched_fee.get(k) is not None},
+                               ensure_ascii=False)
+    passages = "" if prefetched_fee else _handbook_context(message)
+
     models = []
     for m in (config.AGENT_MODEL, *_FALLBACK_MODELS):
         if m and m not in models:
             models.append(m)
     tool_decl = _tool_declarations()
     final = ""
+    link = {"fixed": client, "key": None, "models": models, "model_idx": 0, "error_kind": None}
     try:
-        link = {"fixed": client, "key": None if client else _ring.next_key(), "models": models, "model_idx": 0}
+        link["key"] = None if client else _ring.next_key()
         if link["fixed"] is None and not link["key"]:
             link["fixed"] = get_client()
         for round_no in range(config.AGENT_MAX_TOOL_ROUNDS + 1):
@@ -577,7 +782,8 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
             cfg = types.GenerateContentConfig(
                 system_instruction=build_system_prompt(
                     ctx["profile"], variant_id=variant_id, used_openings=assistant_openings,
-                    about_sru_angle=about_sru_angle, pending_action=pending, action_note=action_note),
+                    about_sru_angle=about_sru_angle, pending_action=pending, action_note=action_note,
+                    handbook_passages=passages, fee_result=fee_note),
                 tools=[tool_decl],
                 temperature=0.2,
                 max_output_tokens=900,
@@ -610,6 +816,9 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                 used.append({"name": call.name, "status": result.get("status"),
                              "is_action": call.name in tools.ACTION_TOOLS})
                 is_card_ready = call.name in CARD_TOOLS and result.get("status") in ("calculated", "saved", "ok")
+                if call.name == "calculate_fee":
+                    prefetched_fee = None  # the model asked for its own calculation: show that one
+                    cards[:] = [c for c in cards if c.get("type") != "calculate_fee"]
                 if is_card_ready:
                     cards.append({"type": call.name, "data": result})
                 yield {"type": "tool", "name": call.name, "status": "done",
@@ -618,8 +827,12 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                 result_parts.append(types.Part(function_response=types.FunctionResponse(
                     name=call.name, response=result, id=getattr(call, "id", None))))
             contents.append(types.Content(role="user", parts=result_parts))
-    except Exception:
-        log.exception("agent failed for session %s", session_id)
+    except Exception as exc:
+        if link.get("error_kind") in ("rate", "busy"):
+            # expected on the free tier: one line in the log, not a stack trace
+            log.warning("model unavailable (%s) for session %s: %s", link["error_kind"], session_id, str(exc)[:160])
+        else:
+            log.exception("agent failed for session %s", session_id)
         if canned_action_text:  # the request itself was saved; say so even though the model failed
             async for ev in _say(canned_action_text, message, session_id, conversation_id, used, cards):
                 yield ev
@@ -635,8 +848,21 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                                      [{"type": "calculate_fee", "data": fee}]):
                     yield ev
                 return
+        if link.get("error_kind") in ("rate", "busy"):
+            # The AI limit is reached: give the handbook passage if one fits, else say what still works.
+            text = (None if used else _offline_knowledge_reply(message)) or _LIMIT_REPLY
+            async for ev in _say(text, message, session_id, conversation_id, used, cards,
+                                 ["CSE fee with 85%", "Call me", "Book a campus visit"]):
+                yield ev
+            return
         yield {"type": "error", "detail": FALLBACK}
         return
+
+    if prefetched_fee:  # the model answered from the calculation the code had already done
+        used.append({"name": "calculate_fee", "status": "ok", "is_action": False})
+        cards.append({"type": "calculate_fee", "data": prefetched_fee})
+        for ev in _tool_events("calculate_fee", prefetched_fee):
+            yield ev
 
     # ---- 6. Honesty checks: the words must match what the tools actually did ------------------
     statuses = {(t["name"], t["status"]) for t in used}
@@ -671,31 +897,20 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     # ---- 7. Cards and follow-up suggestions ---------------------------------------------------
     try:
         from app.services.card_service import generate_cards
-        from app.services.video_service import is_explicit_video_query, should_display_videos
-        from app.api.v1.deps import get_embedding_provider
 
+        # Videos are matched on their own titles and keywords (video_service.get_keyword_videos),
+        # so no embedding call is spent here.
         query_embedding = None
-        if is_explicit_video_query(message) or should_display_videos(message):
-            try:
-                emb_provider = get_embedding_provider()
-                query_embedding = await emb_provider.embed_single(message)
-            except Exception as emb_err:
-                log.warning("Could not compute embedding for video lookup: %s", emb_err)
 
-        has_calculate_fee = any(c.get("type") == "calculate_fee" for c in cards)
         contextual_cards = generate_cards(
             user_message=message, answer=final, profile=ctx.get("profile"),
-            session_id=session_id, query_embedding=query_embedding)
+            session_id=session_id, query_embedding=query_embedding, keyword_videos=True)
         personalised = any(t["name"] in _FEE_TOOLS for t in used)
         for c in contextual_cards:
             if personalised and c.get("type") == "fee_breakdown":
                 continue  # the student already has their own numbers; no generic table underneath
             if c not in cards:
-                if has_calculate_fee and c.get("type") == "fee_breakdown":
-                    continue
                 cards.append(c)
-        if has_calculate_fee:
-            cards = [c for c in cards if c.get("type") != "fee_breakdown"]
     except Exception as card_err:
         log.warning("Could not generate contextual cards for agent: %s", card_err)
 
@@ -707,4 +922,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     except Exception as sugg_err:
         log.warning("Could not generate suggestions for agent: %s", sugg_err)
 
+    if cacheable and final != FALLBACK and not any(t["is_action"] for t in used):
+        await memory.set_cached_answer(_cache_key(message), {
+            "answer": final, "used": used, "cards": cards, "suggestions": suggestions})
     yield _done(conversation_id, final, used, cards, suggestions)

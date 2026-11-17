@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ShieldCheckIcon, CloseIcon, BoltIcon } from "./Icons";
 import { createLead } from "../services/api";
+import { getSessionId } from "../hooks/useSession";
+import { saveStudentDetails } from "../utils/studentProfile";
 import "./LeadAuthModal.css";
 
 interface Props {
@@ -59,10 +61,8 @@ export default function LeadAuthModal({
     setIsSubmitting(true);
 
     try {
-      localStorage.setItem(
-        "sru_student_lead",
-        JSON.stringify({ name: cleanName, phone: phone.trim() })
-      );
+      // One place for the student's details: this browser, the chat agent and "My details".
+      await saveStudentDetails(getSessionId(), { name: cleanName, phone: phone.trim() });
 
       await createLead({
         name: cleanName,

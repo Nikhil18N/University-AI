@@ -4756,9 +4756,13 @@
 "total_per_semester": "₹60,000",
 "sem1_total_payable": "₹65,000",
 "first_year_total_payable": "₹1,25,000",
-"full_course_total": null
+"full_course_total": "₹3,74,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4773,9 +4777,13 @@
 "total_per_semester": "₹1,17,500",
 "sem1_total_payable": "₹1,22,500",
 "first_year_total_payable": "₹2,40,000",
-"full_course_total": null
+"full_course_total": "₹7,19,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4790,9 +4798,13 @@
 "total_per_semester": "₹1,22,500",
 "sem1_total_payable": "₹1,27,500",
 "first_year_total_payable": "₹2,50,000",
-"full_course_total": null
+"full_course_total": "₹7,49,000"
 },
-"years": []
+"years": [
+"₹90,000",
+"₹93,000",
+"₹96,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4807,9 +4819,13 @@
 "total_per_semester": "₹52,500",
 "sem1_total_payable": "₹57,500",
 "first_year_total_payable": "₹1,10,000",
-"full_course_total": null
+"full_course_total": "₹3,29,000"
 },
-"years": []
+"years": [
+"₹85,000",
+"₹88,000",
+"₹91,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4824,9 +4840,13 @@
 "total_per_semester": "₹1,07,500",
 "sem1_total_payable": "₹1,12,500",
 "first_year_total_payable": "₹2,20,000",
-"full_course_total": null
+"full_course_total": "₹6,59,000"
 },
-"years": []
+"years": [
+"₹80,000",
+"₹83,000",
+"₹86,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4841,9 +4861,13 @@
 "total_per_semester": "₹1,15,000",
 "sem1_total_payable": "₹1,20,000",
 "first_year_total_payable": "₹2,35,000",
-"full_course_total": null
+"full_course_total": "₹7,04,000"
 },
-"years": []
+"years": [
+"₹75,000",
+"₹78,000",
+"₹81,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4859,9 +4883,13 @@
 "total_per_semester": "₹45,000",
 "sem1_total_payable": "₹50,000",
 "first_year_total_payable": "₹95,000",
-"full_course_total": null
+"full_course_total": "₹2,84,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4876,9 +4904,13 @@
 "total_per_semester": "₹97,500",
 "sem1_total_payable": "₹1,02,500",
 "first_year_total_payable": "₹2,00,000",
-"full_course_total": null
+"full_course_total": "₹5,99,000"
 },
-"years": []
+"years": [
+"₹60,000",
+"₹63,000",
+"₹66,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4893,9 +4925,13 @@
 "total_per_semester": "₹1,07,500",
 "sem1_total_payable": "₹1,12,500",
 "first_year_total_payable": "₹2,20,000",
-"full_course_total": null
+"full_course_total": "₹6,59,000"
 },
-"years": []
+"years": [
+"₹60,000",
+"₹63,000",
+"₹66,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4910,9 +4946,13 @@
 "total_per_semester": "₹47,500",
 "sem1_total_payable": "₹52,500",
 "first_year_total_payable": "₹1,00,000",
-"full_course_total": null
+"full_course_total": "₹2,99,000"
 },
-"years": []
+"years": [
+"₹75,000",
+"₹78,000",
+"₹81,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4927,9 +4967,13 @@
 "total_per_semester": "₹1,17,500",
 "sem1_total_payable": "₹1,22,500",
 "first_year_total_payable": "₹2,40,000",
-"full_course_total": null
+"full_course_total": "₹7,19,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4944,9 +4988,13 @@
 "total_per_semester": "₹1,12,500",
 "sem1_total_payable": "₹1,17,500",
 "first_year_total_payable": "₹2,30,000",
-"full_course_total": null
+"full_course_total": "₹6,89,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000"
+]
 },
 {
 "program": "bsc_maths_ai",
@@ -4961,9 +5009,13 @@
 "total_per_semester": "₹45,000",
 "sem1_total_payable": "₹50,000",
 "first_year_total_payable": "₹95,000",
-"full_course_total": null
+"full_course_total": "₹2,84,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000"
+]
 },
 {
 "program": "bcom",
@@ -5198,9 +5250,13 @@
 "total_per_semester": "₹60,000",
 "sem1_total_payable": "₹65,000",
 "first_year_total_payable": "₹1,25,000",
-"full_course_total": null
+"full_course_total": "₹3,74,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5215,9 +5271,13 @@
 "total_per_semester": "₹1,17,500",
 "sem1_total_payable": "₹1,22,500",
 "first_year_total_payable": "₹2,40,000",
-"full_course_total": null
+"full_course_total": "₹7,19,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5232,9 +5292,13 @@
 "total_per_semester": "₹1,22,500",
 "sem1_total_payable": "₹1,27,500",
 "first_year_total_payable": "₹2,50,000",
-"full_course_total": null
+"full_course_total": "₹7,49,000"
 },
-"years": []
+"years": [
+"₹90,000",
+"₹93,000",
+"₹96,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5249,9 +5313,13 @@
 "total_per_semester": "₹52,500",
 "sem1_total_payable": "₹57,500",
 "first_year_total_payable": "₹1,10,000",
-"full_course_total": null
+"full_course_total": "₹3,29,000"
 },
-"years": []
+"years": [
+"₹85,000",
+"₹88,000",
+"₹91,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5266,9 +5334,13 @@
 "total_per_semester": "₹1,07,500",
 "sem1_total_payable": "₹1,12,500",
 "first_year_total_payable": "₹2,20,000",
-"full_course_total": null
+"full_course_total": "₹6,59,000"
 },
-"years": []
+"years": [
+"₹80,000",
+"₹83,000",
+"₹86,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5283,9 +5355,13 @@
 "total_per_semester": "₹1,15,000",
 "sem1_total_payable": "₹1,20,000",
 "first_year_total_payable": "₹2,35,000",
-"full_course_total": null
+"full_course_total": "₹7,04,000"
 },
-"years": []
+"years": [
+"₹75,000",
+"₹78,000",
+"₹81,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5301,9 +5377,13 @@
 "total_per_semester": "₹45,000",
 "sem1_total_payable": "₹50,000",
 "first_year_total_payable": "₹95,000",
-"full_course_total": null
+"full_course_total": "₹2,84,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5318,9 +5398,13 @@
 "total_per_semester": "₹97,500",
 "sem1_total_payable": "₹1,02,500",
 "first_year_total_payable": "₹2,00,000",
-"full_course_total": null
+"full_course_total": "₹5,99,000"
 },
-"years": []
+"years": [
+"₹60,000",
+"₹63,000",
+"₹66,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5335,9 +5419,13 @@
 "total_per_semester": "₹1,07,500",
 "sem1_total_payable": "₹1,12,500",
 "first_year_total_payable": "₹2,20,000",
-"full_course_total": null
+"full_course_total": "₹6,59,000"
 },
-"years": []
+"years": [
+"₹60,000",
+"₹63,000",
+"₹66,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5352,9 +5440,13 @@
 "total_per_semester": "₹47,500",
 "sem1_total_payable": "₹52,500",
 "first_year_total_payable": "₹1,00,000",
-"full_course_total": null
+"full_course_total": "₹2,99,000"
 },
-"years": []
+"years": [
+"₹75,000",
+"₹78,000",
+"₹81,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5369,9 +5461,13 @@
 "total_per_semester": "₹1,17,500",
 "sem1_total_payable": "₹1,22,500",
 "first_year_total_payable": "₹2,40,000",
-"full_course_total": null
+"full_course_total": "₹7,19,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5386,9 +5482,13 @@
 "total_per_semester": "₹1,12,500",
 "sem1_total_payable": "₹1,17,500",
 "first_year_total_payable": "₹2,30,000",
-"full_course_total": null
+"full_course_total": "₹6,89,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000"
+]
 },
 {
 "program": "bsc_physics",
@@ -5403,9 +5503,13 @@
 "total_per_semester": "₹45,000",
 "sem1_total_payable": "₹50,000",
 "first_year_total_payable": "₹95,000",
-"full_course_total": null
+"full_course_total": "₹2,84,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5419,9 +5523,14 @@
 "total_per_semester": "₹60,000",
 "sem1_total_payable": "₹65,000",
 "first_year_total_payable": "₹1,25,000",
-"full_course_total": null
+"full_course_total": "₹5,03,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000",
+"₹1,09,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5436,9 +5545,14 @@
 "total_per_semester": "₹1,17,500",
 "sem1_total_payable": "₹1,22,500",
 "first_year_total_payable": "₹2,40,000",
-"full_course_total": null
+"full_course_total": "₹9,63,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000",
+"₹1,09,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5453,9 +5567,14 @@
 "total_per_semester": "₹1,22,500",
 "sem1_total_payable": "₹1,27,500",
 "first_year_total_payable": "₹2,50,000",
-"full_course_total": null
+"full_course_total": "₹10,03,000"
 },
-"years": []
+"years": [
+"₹90,000",
+"₹93,000",
+"₹96,000",
+"₹99,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5470,9 +5589,14 @@
 "total_per_semester": "₹52,500",
 "sem1_total_payable": "₹57,500",
 "first_year_total_payable": "₹1,10,000",
-"full_course_total": null
+"full_course_total": "₹4,43,000"
 },
-"years": []
+"years": [
+"₹85,000",
+"₹88,000",
+"₹91,000",
+"₹94,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5487,9 +5611,14 @@
 "total_per_semester": "₹1,07,500",
 "sem1_total_payable": "₹1,12,500",
 "first_year_total_payable": "₹2,20,000",
-"full_course_total": null
+"full_course_total": "₹8,83,000"
 },
-"years": []
+"years": [
+"₹80,000",
+"₹83,000",
+"₹86,000",
+"₹89,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5504,9 +5633,14 @@
 "total_per_semester": "₹1,15,000",
 "sem1_total_payable": "₹1,20,000",
 "first_year_total_payable": "₹2,35,000",
-"full_course_total": null
+"full_course_total": "₹9,43,000"
 },
-"years": []
+"years": [
+"₹75,000",
+"₹78,000",
+"₹81,000",
+"₹84,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5522,9 +5656,14 @@
 "total_per_semester": "₹45,000",
 "sem1_total_payable": "₹50,000",
 "first_year_total_payable": "₹95,000",
-"full_course_total": null
+"full_course_total": "₹3,83,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000",
+"₹79,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5539,9 +5678,14 @@
 "total_per_semester": "₹97,500",
 "sem1_total_payable": "₹1,02,500",
 "first_year_total_payable": "₹2,00,000",
-"full_course_total": null
+"full_course_total": "₹8,03,000"
 },
-"years": []
+"years": [
+"₹60,000",
+"₹63,000",
+"₹66,000",
+"₹69,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5556,9 +5700,14 @@
 "total_per_semester": "₹1,07,500",
 "sem1_total_payable": "₹1,12,500",
 "first_year_total_payable": "₹2,20,000",
-"full_course_total": null
+"full_course_total": "₹8,83,000"
 },
-"years": []
+"years": [
+"₹60,000",
+"₹63,000",
+"₹66,000",
+"₹69,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5573,9 +5722,14 @@
 "total_per_semester": "₹47,500",
 "sem1_total_payable": "₹52,500",
 "first_year_total_payable": "₹1,00,000",
-"full_course_total": null
+"full_course_total": "₹4,03,000"
 },
-"years": []
+"years": [
+"₹75,000",
+"₹78,000",
+"₹81,000",
+"₹84,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5590,9 +5744,14 @@
 "total_per_semester": "₹1,17,500",
 "sem1_total_payable": "₹1,22,500",
 "first_year_total_payable": "₹2,40,000",
-"full_course_total": null
+"full_course_total": "₹9,63,000"
 },
-"years": []
+"years": [
+"₹1,00,000",
+"₹1,03,000",
+"₹1,06,000",
+"₹1,09,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5607,9 +5766,14 @@
 "total_per_semester": "₹1,12,500",
 "sem1_total_payable": "₹1,17,500",
 "first_year_total_payable": "₹2,30,000",
-"full_course_total": null
+"full_course_total": "₹9,23,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000",
+"₹79,000"
+]
 },
 {
 "program": "bsc_chemistry",
@@ -5624,9 +5788,14 @@
 "total_per_semester": "₹45,000",
 "sem1_total_payable": "₹50,000",
 "first_year_total_payable": "₹95,000",
-"full_course_total": null
+"full_course_total": "₹3,83,000"
 },
-"years": []
+"years": [
+"₹70,000",
+"₹73,000",
+"₹76,000",
+"₹79,000"
+]
 },
 {
 "program": "mba",

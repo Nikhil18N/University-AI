@@ -54,6 +54,11 @@ AGENT_MAX_CONCURRENCY = int(os.getenv("AGENT_MAX_CONCURRENCY", "6"))
 AGENT_RETRY_DELAYS = tuple(float(x) for x in os.getenv("AGENT_RETRY_DELAYS", "1.5,4,8").split(",") if x.strip())
 AGENT_CALL_TIMEOUT = float(os.getenv("AGENT_CALL_TIMEOUT", "30"))
 AGENT_KEY_COOLDOWN_SECONDS = float(os.getenv("AGENT_KEY_COOLDOWN_SECONDS", "45"))
+# A key that hit its PER-DAY limit is rested this long before it is tried again:
+AGENT_DAILY_LIMIT_COOLDOWN = float(os.getenv("AGENT_DAILY_LIMIT_COOLDOWN", "3600"))
+# The same first question from different students (for example a suggestion button) is answered
+# from a saved copy for this many seconds instead of calling the model again. 0 switches it off.
+AGENT_ANSWER_CACHE_SECONDS = int(os.getenv("AGENT_ANSWER_CACHE_SECONDS", "21600"))
 
 REDIS_URL = os.getenv("REDIS_URL") or _default_redis
 

@@ -9,6 +9,8 @@ import LeadAuthModal from "../components/LeadAuthModal";
 import { CalculatorIcon } from "../components/Icons";
 import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
+import SettingsModal from "../components/SettingsModal";
+import { applyServerProfile, syncStudentDetails } from "../utils/studentProfile";
 import {
   sendMessageStream,
   listConversations,
@@ -75,6 +77,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [showLeadAuthModal, setShowLeadAuthModal] = useState<boolean>(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [pendingAuthMessage, setPendingAuthMessage] = useState<string | null>(null);
   const [authReason, setAuthReason] = useState<string | undefined>(undefined);
 
@@ -115,6 +118,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   // Load conversations on mount & check for shared link (?chat=... or #s=...)
   useEffect(() => {
     loadConversations();
+    // Make this browser and the server agree on the student's name and mobile number.
+    void syncStudentDetails(sessionId);
 
     async function checkSharedLink() {
       try {
@@ -497,6 +502,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           setActiveConvId(data.conversation_id);
           activeConvIdRef.current = data.conversation_id;
         }
+        // A name or number given in the chat reaches "My details" at once.
+        applyServerProfile(data.profile);
 
         if (soundEnabled) {
           playChime();
@@ -519,7 +526,9 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             m.id === assistantMsgId
               ? {
                   ...m,
-                  id: data.message_id,
+                  // Agent replies have no message id. Keeping the placeholder id avoids several
+                  // messages sharing the key "undefined", which made React shuffle the chat.
+                  id: data.message_id || m.id,
                   content: data.answer || accumulatedContent,
                   sources: data.sources?.length ? data.sources : undefined,
                   suggestions: data.suggestions?.length ? data.suggestions : undefined,
@@ -666,6 +675,16 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                     <span className="popover-icon">{soundEnabled ? "🔊" : "🔇"}</span>
                     <span>{soundEnabled ? "Sound: On" : "Sound: Muted"}</span>
                   </button>
+                  <button
+                    className="mobile-popover-item"
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      setShowSettings(true);
+                    }}
+                  >
+                    <span className="popover-icon">👤</span>
+                    <span>My details</span>
+                  </button>
                   {onOpenAdmin && (
                     <button
                       className="mobile-popover-item"
@@ -784,6 +803,16 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   aria-label="Toggle audio"
                 >
                   {soundEnabled ? "🔊" : "🔇"}
+                </button>
+
+                {/* My details (settings) */}
+                <button
+                  className="header-icon-btn"
+                  onClick={() => setShowSettings(true)}
+                  title="My details"
+                  aria-label="My details"
+                >
+                  👤
                 </button>
 
                 {/* Admin console */}
@@ -1022,6 +1051,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       )}
 
       {/* Prospective Student Authentication Modal */}
+      <SettingsModal isOpen={showSettings} sessionId={sessionId} onClose={() => setShowSettings(false)} />
+
       <LeadAuthModal
         isOpen={showLeadAuthModal}
         onClose={() => {

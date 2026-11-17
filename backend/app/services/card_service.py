@@ -44,13 +44,19 @@ BTECH_ACADEMIC_FEE_CARD = {
             "note": "Annual base tuition ₹3,40,000 (+₹9k/yr increase); up to 40% merit scholarship",
         },
         {
+            "category": "Tuition Fee (B.Tech AI & Robotics)",
+            "amount": "₹2,00,000 / Sem",
+            "frequency": "₹4,00,000 / Year",
+            "note": "Annual base tuition ₹4,00,000 (+₹12k/yr increase)",
+        },
+        {
             "category": "Tuition Fee (B.Tech ECE)",
             "amount": "₹1,35,000 / Sem",
             "frequency": "₹2,70,000 / Year",
             "note": "Annual base tuition ₹2,70,000 (+₹8k/yr increase)",
         },
         {
-            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE)",
+            "category": "Tuition Fee (B.Tech Core: Mech / Civil / EEE / Biotech)",
             "amount": "₹1,00,000 / Sem",
             "frequency": "₹2,00,000 / Year",
             "note": "Annual base tuition ₹2,00,000 (+₹6k/yr increase)",
@@ -61,24 +67,35 @@ BTECH_ACADEMIC_FEE_CARD = {
             "frequency": "One-time (Year 1)",
             "note": "Mandatory enrollment component",
         },
+        {
+            "category": "Other & Exam Fees",
+            "amount": "₹20,000 / Year",
+            "frequency": "Annual",
+            "note": "₹15,000 other fee + ₹5,000 exam fee",
+        },
+        {
+            "category": "CSE Specialization Fee (Year 2+)",
+            "amount": "₹30,000 / Year",
+            "frequency": "From 2nd Year Onwards",
+            "note": "Applicable for AIML, Data Science, Cyber Security, AR/VR, Robotics",
+        },
     ],
-    "scholarship_note": "Merit scholarships up to 40% are available based on board marks, JEE Main, or TG EAPCET ranks. 2027-28 fees, as per Admissions Office.",
+    "scholarship_note": "Merit scholarships offer 10% to 40% tuition reduction based on board marks, JEE Main, or TG EAPCET ranks.",
 }
-
 
 # Alias for backwards compatibility
 FEE_BREAKDOWN_CARD = BTECH_ACADEMIC_FEE_CARD
 
 BTECH_CSE_SEMESTER_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "Fees before scholarship — B.Tech CSE (2027-28)",
+    "title": "B.Tech CSE Total Per-Semester Estimated Fee Breakdown (Official 2027-28)",
     "currency": "INR",
     "items": [
         {
             "category": "1st Semester Tuition Fee (B.Tech CSE)",
             "amount": "₹1,70,000",
             "frequency": "Semester 1",
-            "note": "Base tuition (₹3,40,000/yr). Merit scholarships up to 40% available based on board marks or entrance rank",
+            "note": "Base tuition (₹3,40,000/yr). Up to 40% merit scholarship waiver available",
         },
         {
             "category": "2nd Semester Tuition Fee (B.Tech CSE)",
@@ -117,19 +134,19 @@ BTECH_CSE_SEMESTER_FEE_CARD = {
             "note": "Applicable from 3rd semester for AI & ML, Data Science, Cyber Security tracks",
         },
     ],
-    "scholarship_note": "Merit scholarships up to 40% are available based on your board marks or entrance rank. Hostel is optional & separate (₹1,15,000 to ₹1,35,000/yr). 2027-28 fees, as per Admissions Office.",
+    "scholarship_note": "Merit scholarships provide 10% to 40% tuition fee waiver (up to ₹68,000/sem saved; net tuition ₹1,02,000/sem; total regular sem ₹1,12,000/sem). Hostel is optional & separate (₹1,15,000 to ₹1,35,000/yr). 2027-28 fees, as per Admissions Office.",
 }
 
 BTECH_CSE_WITH_HOSTEL_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "Fees before scholarship — B.Tech CSE with Hostel (2027-28)",
+    "title": "B.Tech CSE Fee + Hostel Per-Semester Total Breakdown (Official 2027-28)",
     "currency": "INR",
     "items": [
         {
             "category": "1st Semester Tuition Fee (B.Tech CSE)",
             "amount": "₹1,70,000",
             "frequency": "Semester 1",
-            "note": "Base tuition (₹3,40,000/yr). Merit scholarships up to 40% available based on board marks or entrance rank",
+            "note": "Base tuition (₹3,40,000/yr). Up to 40% merit scholarship waiver available",
         },
         {
             "category": "2nd Semester Tuition Fee (B.Tech CSE)",
@@ -168,7 +185,7 @@ BTECH_CSE_WITH_HOSTEL_FEE_CARD = {
             "note": "Regular combined total + one-time enrollment fee (₹5,000)",
         },
     ],
-    "scholarship_note": "Merit scholarships up to 40% are available based on your board marks or entrance rank. 2027-28 fees, as per Admissions Office.",
+    "scholarship_note": "With 40% merit scholarship, net tuition is ₹1,02,000/sem, bringing the combined regular per-semester total to ₹1,74,500/sem. 2027-28 fees, as per Admissions Office.",
 }
 
 # Alias for backwards compatibility
@@ -807,7 +824,7 @@ def generate_cards(
     is_video_confirmed: bool = False,
     session_id: str | None = None,
     seen_card_types: set[str] | None = None,
-    has_calculate_fee: bool = False,
+    keyword_videos: bool = False,
 ) -> list[dict]:
     """Generate structured interactive cards based on message context and student profile."""
     cards = []
@@ -879,6 +896,7 @@ def generate_cards(
         )
     ) and not is_admission_fee_query
 
+
     is_fee_with_hostel_query = any(k in msg_lower for k in (
         "with hostel", "including hostel", "plus hostel", "hostel and tuition",
         "tuition and hostel", "both tuition and hostel", "and hostel fee", "add hostel",
@@ -892,10 +910,7 @@ def generate_cards(
         any(k in msg_lower for k in ("btech", "b.tech")) and any(k in msg_lower for k in ("fee", "fees", "tuition", "cost", "scholarship"))
     )
 
-    # If calculate_fee tool was already executed in this turn, suppress legacy fee cards so only 1 fee card is shown.
-    if has_calculate_fee:
-        pass
-    elif is_transport_fee_query:
+    if is_transport_fee_query:
         cards.append(TRANSPORT_FEE_CARD)
     elif is_fee_with_hostel_query:
         # User explicitly asked to include hostel in the fee breakdown
@@ -912,15 +927,13 @@ def generate_cards(
     elif is_cse_fee_query:
         # User asked for CSE fee WITHOUT hostel (hostel not added)
         cards.append(BTECH_CSE_SEMESTER_FEE_CARD)
-    elif any(k in msg_lower for k in ("all branches", "all programs", "all engineering", "other branches", "programs fee", "b.tech programs", "different branches", "complete fee structure")):
-        cards.append(BTECH_ACADEMIC_FEE_CARD)
     elif is_btech_fee_query:
-        cards.append(BTECH_CSE_SEMESTER_FEE_CARD)
+        cards.append(BTECH_ACADEMIC_FEE_CARD)
     elif any(k in msg_lower for k in ("fee", "fees", "tuition", "cost of study", "how much is the fee")):
         # Only attach general breakdown if user explicitly asked for program fee structure / breakdown
         if any(k in msg_lower for k in ("structure", "complete fee", "breakdown", "all fees", "details", "academic", "tuition")):
             if not any(k in msg_lower for k in ("transport", "bus", "hostel", "mess", "exam")):
-                cards.append(BTECH_CSE_SEMESTER_FEE_CARD)
+                cards.append(BTECH_ACADEMIC_FEE_CARD)
 
 
     # 2b. Sponsored Early Bird Application Ad Card (media_1794676975023.png reference)
@@ -1012,6 +1025,18 @@ def generate_cards(
                 query_embedding=query_embedding,
                 is_explicit=is_explicit_req,
             )
+            if relevant_videos:
+                cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_req))
+    elif keyword_videos:
+        # No embedding (the agent does not spend an AI call on videos): match on the videos' own
+        # titles, categories and keywords instead.
+        is_explicit_req = is_video_query or is_explicit_video_query(user_message)
+        if is_explicit_req or is_video_confirmed or should_display_videos(user_message):
+            from app.services.video_service import get_keyword_videos, is_about_sru_or_campus_query
+            relevant_videos = get_keyword_videos(
+                user_message, limit=2, prefer_campus=is_about_sru_or_campus_query(user_message))
+            if not relevant_videos and is_explicit_req:
+                relevant_videos = get_keyword_videos("campus tour", limit=2)
             if relevant_videos:
                 cards.append(create_video_card(relevant_videos, is_explicit=is_explicit_req))
 

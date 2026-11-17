@@ -10,7 +10,7 @@ from . import config
 
 # Change this whenever the wording below changes, so a chat log can be matched to the prompt
 # that produced it (AGENTS.md rule 13: prompts are versioned).
-PROMPT_VERSION = "2026-11-17.1"
+PROMPT_VERSION = "2026-11-17.2"
 
 _HIDDEN_PROFILE_KEYS = ("phone_saved", "last_lead_id", "last_lead_key", "last_lead_type", "last_fee")
 
@@ -45,6 +45,8 @@ def build_system_prompt(
     about_sru_angle: int = 1,
     pending_action: str | None = None,
     action_note: str | None = None,
+    handbook_passages: str | None = None,
+    fee_result: str | None = None,
 ) -> str:
     profile = profile or {}
     known = ", ".join(f"{k}={v}" for k, v in profile.items()
@@ -56,6 +58,15 @@ def build_system_prompt(
     pending_note = (_PENDING_NOTES.get(pending_action or "", "") + "\n") if pending_action else ""
     if action_note:
         pending_note = f"ALREADY DONE IN THIS TURN: {action_note}\n"
+    looked_up = ""
+    if fee_result:
+        looked_up += ("\nFEE CALCULATION ALREADY DONE FOR THIS MESSAGE (the calculate_fee result; the fee card is "
+                      "shown to the student automatically). Answer from it. Call calculate_fee again ONLY if the "
+                      f"student asked for something different (another course, hostel, other marks):\n{fee_result}\n")
+    if handbook_passages:
+        looked_up += ("\nHANDBOOK PASSAGES ALREADY FOUND FOR THIS MESSAGE. If they answer the question, answer "
+                      "from them now WITHOUT calling search_university_info. If they do not, search with other "
+                      f"words:\n{handbook_passages}\n")
 
     if isinstance(used_openings, list):
         openings_list = [op.strip() for op in used_openings if op and op.strip()]
@@ -79,10 +90,17 @@ SESSION INPUTS
 
 WHAT YOU ALREADY KNOW ABOUT THIS STUDENT: {known}
 Use it. Never ask again for something listed here.
-{parent_note}{pending_note}
+The details above belong to the person you are chatting with, unless they said they are asking for
+someone else (a brother, a daughter). Never move them onto another person. "What is my number / my marks?"
+-> answer from the details above.
+{parent_note}{pending_note}{looked_up}
 TOOLS FIRST (never answer these from memory)
 - Any fee, scholarship, total cost or per-semester amount -> calculate_fee. Quote its numbers exactly, say
   "{config.ADMISSION_YEAR} fees, as per the Admissions Office", and say whether an amount is per semester or per year.
+  scores_considered shows what EACH score earns by itself; only the best one applies. If the student asks
+  about one score ("only based on my EAMCET rank"), answer for THAT score first, with the note given for it
+  (for example an EAPCET rank above 20,000 earns no rank scholarship), then mention their best scholarship.
+  Never say scholarships are based on only one kind of score.
   Pass hostel ONLY if the student asked for hostel. If they said "AC" or "Non-AC" without sharing type,
   use 4-sharing and mention the 3-sharing price from hostel_options_per_year.
 - "Can I join?" with marks -> check_eligibility. Eligibility, duration, tuition or scholarship slabs of a
@@ -93,6 +111,8 @@ TOOLS FIRST (never answer these from memory)
 - Any other SRU fact (hostel rules, placements, documents, dates, transport, refund) -> search_university_info.
   Answer only from what it returns. If it has nothing, say you do not have it confirmed and give
   {config.ADMISSIONS_PHONE} / {config.ADMISSIONS_EMAIL}.
+- A new or corrected mobile number or name -> update_contact_details (it also fixes Settings > My details and
+  any saved request). Without the new number, ask them to type it or to use the menu: My details.
 - Name, city, language, or "I am a parent" -> remember_student_details, in the same turn as your other tool
   calls. calculate_fee and check_eligibility already remember the course and marks you pass to them.
 - You may call several tools before answering. After a fee or eligibility answer offer ONE next step:
@@ -112,7 +132,9 @@ ACTIONS THAT SAVE DATA (request_counsellor_callback, book_campus_visit, cancel_c
 CRITICAL ACCURACY & TRUST RULES
 1. NEVER PROMISE OR GUARANTEE SEATS: never say 'seat confirm ga vastundi' or 'you can definitely secure admission'.
    Say they are eligible to apply and that admission depends on seat availability and document verification.
-2. NO INVENTED NUMBERS: never state a fee, scholarship %, date, phone number, cutoff or placement figure that did
+2. NOT IN THE OFFICIAL SOURCES: the list of documents needed at admission, the refund policy, payment dates,
+   cut-off ranks and rules for keeping a scholarship in later years. Say the Admissions Office confirms these.
+2b. NO INVENTED NUMBERS: never state a fee, scholarship %, date, phone number, cutoff or placement figure that did
    not come from a tool result or the VERIFIED FACTS below.
 3. Scholarships are "subject to marksheet verification". Never promise a scholarship or a job.
 4. Never claim the student said something unless it is in the conversation above.

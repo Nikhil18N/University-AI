@@ -1,54 +1,49 @@
-# Read me first: audited version 2.7.0 (17 Nov 2026)
+# Read me first: version 2.8.0 (audit round 2, 17 Nov 2026)
 
-This folder is the SRU Buddy project after a full audit. Every earlier feature is kept.
+This delivery is built on **v2.7.0**, the version you already merged and that is live.
+Every earlier feature is kept.
 
-**What to read:** `docs/24-agent-audit-nov-2026.md` (what was wrong, what changed, how to deploy,
-what the university still has to confirm).
+**What to read:** `docs/25-audit-round-2-nov-2026.md` (what was wrong, what changed, what was
+checked on sru.edu.in, what the university has to decide).
 
-## How to use this delivery
-
-You received one zip with three things:
+## What is in the zip
 
 | In the zip | What it is | Use it when |
 |---|---|---|
-| `University-AI/` | The complete project, clean (no `venv`, `node_modules`, build output or secret files) | You want to start from this copy |
-| `CHANGES_ONLY/` | Only the 35 files that were added or changed, in their folders | You want to copy the changes over your own working copy |
-| `audit-changes.patch` | The same changes as a git patch against commit `bc25aeb` | You prefer `git apply audit-changes.patch` on a new branch |
+| `CHANGES_ONLY/` | Only the files added or changed since v2.7.0, in their folders | **Easiest merge:** copy this folder over your project and say "replace" |
+| `audit-round2.patch` | The same changes as a git patch against v2.7.0 | You prefer `git apply --3way audit-round2.patch` on a new branch |
+| `University-AI/` | The complete project, clean (no `venv`, `node_modules`, build output, secret files) | You want to compare, or start from this copy |
 
-Your own `.env` files are **not** in the zip (they contain passwords). Keep using the ones on your
-machine, and add the new settings listed at the bottom of `backend/.env.example`.
+If you changed any of the same files yourselves after merging v2.7.0, use the patch with
+`--3way` (git shows you the conflicts) instead of copying over.
 
-## After copying
+Your own `.env` files are not in the zip. No new setting is required; optional ones are at the
+end of `backend/.env.example`. No database migration is needed.
+
+## After merging
 
 ```bash
-# backend
 cd backend
 pip install -r requirements.txt
-pytest                      # 431 pass with PostgreSQL running
+python scripts/export_fee_config.py     # regenerates the calculator copy and the handbook fee pages
+pytest                                  # 467 pass with PostgreSQL running
 
-# frontend
 cd ../frontend
 npm install
-npm test                    # calculator checked against the backend, 3,438 checks
+npm test                                # 3,477 checks
 npm run build
 ```
 
-## Three things only you can do
-
-1. **Change the passwords and keys** that were inside the zip you shared (Gemini key, database
-   password, Redis URL, admin key, Vercel token). Treat them as exposed.
-2. **Gemini capacity:** put several keys from separate Google projects in `GEMINI_API_KEYS`, or
-   move to a paid tier. The code now uses every key and retries, but it cannot create quota.
-3. **Confirm the nine points** in section 5 of `docs/24-agent-audit-nov-2026.md` with the
-   Admissions Office.
+Then deploy backend (Render) and frontend (Vercel) as usual, and run the six-line check in
+section 5 of `docs/25-audit-round-2-nov-2026.md`.
 
 ## To change a fee later
 
-Edit `backend/app/sru_agent/fees_2027_28.json` only. Then:
+Edit `backend/app/sru_agent/fees_2027_28.json` only, then run
+`python scripts/export_fee_config.py` in `backend/`. The chat, the calculator, the fee cards
+and the handbook pages all come from that one file. Tests fail if you forget.
 
-```bash
-cd backend && python scripts/export_fee_config.py && pytest
-cd ../frontend && npm test && npm run build
-```
+## To add knowledge
 
-The chat, the calculator and the fee cards all read that one file.
+Put a `.md` file in `backend/data/handbook/` **and** the same file in `data/handbook/`, add it to
+`HANDBOOK_DOCS` in `backend/scripts/ingest_handbook_docs.py`, and restart. The agent reads it at once.

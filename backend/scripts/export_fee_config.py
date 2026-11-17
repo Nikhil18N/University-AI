@@ -1,4 +1,5 @@
-"""Write the calculator's bundled copy of the fee table.
+"""Publish the fee file everywhere it is used: the calculator's bundled copy, the frontend's
+check cases, and the fee pages of the handbook (the agent's knowledge base).
 
     cd backend && python scripts/export_fee_config.py
 
@@ -59,3 +60,6 @@ if __name__ == "__main__":
     CASES_TARGET.write_text(render_cases(), encoding="utf-8")
     print(f"Wrote {TARGET.relative_to(BACKEND.parent)} ({len(fees.fee_config()['programs'])} programs)")
     print(f"Wrote {CASES_TARGET.relative_to(BACKEND.parent)} ({len(json.loads(render_cases()))} checked answers)")
+    from scripts import handbook_from_fees
+    for path in handbook_from_fees.write_all():
+        print(f"Wrote {path.relative_to(BACKEND.parent)}")

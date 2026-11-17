@@ -35,7 +35,10 @@ class Conversation(Base):
     # Relationships
     messages: Mapped[list["Message"]] = relationship(
         "Message", back_populates="conversation", cascade="all, delete-orphan",
-        order_by="Message.created_at",
+        # A question and its answer can carry the same timestamp (saved in one transaction), so the
+        # role breaks the tie: "user" sorts before "assistant". Without it a reopened chat could
+        # show the answer above its question.
+        order_by="(Message.created_at, Message.role.desc())",
     )
 
     def __repr__(self) -> str:

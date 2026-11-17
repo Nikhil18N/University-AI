@@ -20,6 +20,7 @@ from . import config, fees, memory
 _knowledge_search = None
 _lead_saver = None
 _lead_canceller = None
+_lead_updater = None
 
 
 def set_knowledge_search(fn):
@@ -34,6 +35,12 @@ def set_lead_saver(fn):
     _lead_saver = fn
 
 
+def set_lead_updater(fn):
+    """fn: async (lead_id: str, name: str | None, phone: str | None) -> bool"""
+    global _lead_updater
+    _lead_updater = fn
+
+
 def set_lead_canceller(fn):
     """fn: async (lead_id: str, reason: str) -> bool (True when the lead was marked do-not-contact)."""
     global _lead_canceller
@@ -45,15 +52,6 @@ async def _default_lead_saver(lead: dict) -> dict:
         resp = await client.post(config.LEADS_API_URL, json=lead)
         resp.raise_for_status()
         return resp.json()
-
-
-async def _default_lead_canceller(lead_id: str) -> bool:
-    async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.patch(
-            f"{config.LEADS_API_URL}/{lead_id}/status",
-            json={"status": "rejected", "metadata": {"do_not_contact": True}},
-        )
-        return resp.status_code in (200, 204)
 
 
 # -------------------------------------------------------------- helpers ----
@@ -138,7 +136,7 @@ async def _save_lead(args: dict, ctx: dict, request_type: str, extra: dict) -> d
     lead_id = str((saved or {}).get("id", ""))
     label = "campus visit" if request_type == "campus_visit" else "callback"
     ctx["profile"] = await memory.update_profile(
-        ctx["session_id"], name=name, phone_saved=True, last_lead_id=lead_id,
+        ctx["session_id"], name=name, phone=phone, phone_saved=True, last_lead_id=lead_id,
         last_lead_type=request_type, last_lead_key=lead_key,
         open_request=f"{label} request saved, reference {lead_id[:8]}")
     return {"status": "saved", "reference": lead_id[:8], "name": name,
@@ -146,6 +144,40 @@ async def _save_lead(args: dict, ctx: dict, request_type: str, extra: dict) -> d
 
 
 _LEAD_PROFILE_KEYS = ("last_lead_id", "last_lead_type", "last_lead_key", "open_request", "phone_saved")
+
+
+async def tool_update_contact_details(args, ctx):
+    """Change the student's saved name and / or mobile number everywhere it is kept: the profile the
+    chat uses, Settings > My details, and any callback / visit request already saved."""
+    profile = ctx.get("profile") or await memory.get_profile(ctx["session_id"])
+    name = (args.get("name") or "").strip()[:80] or None
+    phone = None
+    if args.get("phone"):
+        phone = clean_phone(args["phone"])
+        if not phone:
+            return {"status": "invalid", "problem": "That does not look like a valid 10-digit Indian mobile "
+                                                    "number. Ask the student to type it again."}
+    if not name and not phone:
+        return {"status": "nothing_to_update", "ask_student": "Ask for the new 10-digit mobile number (or name)."}
+    changed = {k: v for k, v in (("name", name), ("phone", phone)) if v and profile.get(k) != v}
+    lead_updated = False
+    if changed and profile.get("last_lead_id") and _lead_updater is not None:
+        try:
+            lead_updated = bool(await _lead_updater(str(profile["last_lead_id"]), changed.get("name"),
+                                                    changed.get("phone")))
+        except Exception as exc:
+            return {"status": "failed", "note": "Could not update the saved request right now. Do NOT say it "
+                    f"was updated. Ask the student to call {config.ADMISSIONS_PHONE}.", "_error": str(exc)}
+    extra = {}
+    if phone and profile.get("last_lead_key"):
+        kind, _old, rest = (str(profile["last_lead_key"]).split(":", 2) + ["", ""])[:3]
+        extra["last_lead_key"] = f"{kind}:{phone[-4:]}:{rest}"
+    ctx["profile"] = await memory.update_profile(ctx["session_id"], name=name, phone=phone, **extra)
+    return {"status": "updated" if changed else "unchanged",
+            "name": ctx["profile"].get("name"), "phone_last4": (ctx["profile"].get("phone") or "")[-4:],
+            "saved_request_updated": lead_updated,
+            **({"reference": str(profile["last_lead_id"])[:8]} if lead_updated else {}),
+            "note": "The student's details in Settings > My details now show the same values."}
 
 
 async def tool_cancel_contact_request(args, ctx):
@@ -208,7 +240,7 @@ def _fee_summary(fee: dict) -> dict:
     return {
         "program": fee.get("program"), "academic_year": fee.get("academic_year"),
         "scholarship_percent": fee.get("scholarship_percent"),
-        "scholarship_basis": fee.get("scholarship_basis"),
+        "scholarship_basis": fee.get("scholarship_basis_text") or fee.get("scholarship_basis"),
         "tuition_first_year": fee.get("tuition_first_year"),
         "tuition_after_scholarship": fee.get("tuition_first_year_after_scholarship"),
         "hostel": hostel.get("type"), "hostel_per_year": hostel.get("per_year"),
@@ -294,6 +326,8 @@ async def tool_search_university_info(args, ctx):
 async def tool_remember_student_details(args, ctx):
     allowed = ("name", "program_interest", "percent", "board", "eapcet_rank", "jee_percentile",
                "ib_score", "city", "is_parent", "language")
+    if args.get("phone") and clean_phone(args["phone"]):
+        await memory.update_profile(ctx["session_id"], phone=clean_phone(args["phone"]))
     profile = await memory.update_profile(ctx["session_id"], **{k: args.get(k) for k in allowed})
     ctx["profile"] = profile
     hidden = ("phone_saved", "last_lead_id", "last_lead_key", "last_lead_type", "last_fee")
@@ -524,12 +558,10 @@ async def tool_get_contact_and_apply_links(args, ctx):
 async def tool_get_university_videos(args, ctx):
     topic = (args.get("topic") or "").strip()
     try:
-        from app.api.v1.deps import get_embedding_provider
-        from app.services.video_service import get_relevant_videos, load_videos
-        provider = get_embedding_provider()
-        search_text = topic or "campus life at SR University"
-        emb = await provider.embed_single(search_text)
-        videos = get_relevant_videos(user_message=search_text, query_embedding=emb, is_explicit=True)
+        from app.services.video_service import get_keyword_videos, load_videos
+        search_text = topic or "campus tour"
+        # Matched on each video's own title, category and keywords: relevant, and no AI call.
+        videos = get_keyword_videos(search_text, limit=2, prefer_campus=not topic)
         if not videos:
             campus_vids = [v for v in load_videos() if v.get("category") == "Campus Tour & Infrastructure"]
             videos = campus_vids[:2] if campus_vids else load_videos()[:2]
@@ -630,6 +662,13 @@ TOOLS = {
             "visit_date": {"type": "string", "description": "Preferred date e.g. 'YYYY-MM-DD', 'tomorrow', '17th Nov', or day number like '17th' (relative to current date)"},
             "visitors": {"type": "integer"}, "consent": _CONSENT},
             ["name", "phone", "visit_date", "consent"])}),
+    "update_contact_details": (tool_update_contact_details, "Updating your details", {
+        "description": "Changes the student's saved name and/or mobile number (their profile, Settings > "
+                       "My details, and any saved callback or visit request). Use when they say 'my new "
+                       "number is ...', 'change my number', 'my name is spelt ...'. Say it is updated only "
+                       "if this tool returns status 'updated'.",
+        "parameters_json_schema": _obj({"name": {"type": "string"},
+                                        "phone": {"type": "string", "description": "New 10-digit mobile number."}})}),
     "cancel_contact_request": (tool_cancel_contact_request, "Cancelling your request", {
         "description": "Withdraws the callback or campus visit request saved from this chat. Call it when "
                        "the student says 'don't call me', 'cancel the callback', 'cancel my visit'. "
@@ -649,14 +688,11 @@ TOOLS = {
                        "placements, labs, sports, student clubs, and infrastructure. Call whenever the student "
                        "asks to see, watch, or get videos/tours of SR University.",
         "parameters_json_schema": _obj({"topic": {"type": "string", "description": "e.g. 'campus', 'hostel life', 'placements', 'infrastructure'"}})}),
-    "cancel_contact_request": (tool_cancel_contact_request, "Cancelling contact request", {
-        "description": "Cancels a previously requested counsellor callback or campus visit. Call when the "
-                       "student asks to cancel their callback/visit or says 'don't contact me'.",
-        "parameters_json_schema": _obj({"reason": {"type": "string", "description": "Optional reason for cancellation"}})}),
 }
 
 # Tools that change something outside the chat (shown as 'actions' in the UI and logs).
-ACTION_TOOLS = {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request"}
+ACTION_TOOLS = {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request",
+                "update_contact_details"}
 
 
 async def run_tool(name: str, args: dict, ctx: dict) -> dict:

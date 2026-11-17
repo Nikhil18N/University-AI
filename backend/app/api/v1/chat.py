@@ -75,6 +75,10 @@ async def send_message_stream(
     redis: Any = Depends(get_redis),
 ) -> StreamingResponse:
     """Send a chat message and stream tokens via Server-Sent Events (SSE)."""
+    # Same per-student limit as the agent endpoint: this route also spends Gemini quota.
+    from app.sru_agent import memory as agent_memory
+    if not await agent_memory.allow_request(f"chat:{request.session_id}"):
+        raise HTTPException(status_code=429, detail="Too many messages. Please wait a minute and try again.")
     return StreamingResponse(
         chat_service.handle_chat_stream(db, request, llm, rag, redis_client=redis),
         media_type="text/event-stream",

@@ -120,23 +120,55 @@ def _scores(percent=None, board="state_board", eapcet_rank=None, jee_percentile=
     return scores
 
 
+def _score_text(kind: str, value, level: str = "ug") -> str:
+    """'Intermediate 85%', 'EAPCET rank 40,000' ... for showing a score back to the student."""
+    if kind == "eapcet_rank":
+        return f"EAPCET rank {int(value):,}"
+    if kind == "jee_percentile":
+        return f"JEE Main {value:g} percentile"
+    if kind == "ib":
+        return f"IB score {value:g}/45"
+    if level == "pg":
+        return f"qualifying degree {value:g}%"
+    return f"{'CBSE/ICSE' if kind == 'cbse' else 'Intermediate'} {value:g}%"
+
+
+def _no_slab_reason(kind: str, table: list) -> str:
+    """Why a score earned no scholarship, in words a student understands."""
+    if kind == "eapcet_rank":
+        worst = max(s["max"] for s in table)
+        return f"rank-based scholarships cover EAPCET ranks 1 to {int(worst):,} only"
+    lowest = min(s["min"] for s in table)
+    unit = {"jee_percentile": " percentile", "ib": " (IB score)"}.get(kind, "%")
+    return f"merit scholarship starts at {lowest:g}{unit}"
+
+
 def scholarship_for(program_key, percent=None, board="state_board",
                     eapcet_rank=None, jee_percentile=None, ib_score=None) -> dict:
-    """Best scholarship across the scores given. Never guesses a missing table."""
+    """Best scholarship across the scores given, plus what EACH score earns by itself.
+    Never guesses a missing table."""
     data = load_data()
     prog = data["programs"][program_key]
+    level = prog.get("level", "ug")
     slab_set = data["slab_sets"].get(prog["slab_set"], {})
-    best, basis, missing = 0, None, []
-    for kind, value in _scores(percent, board, eapcet_rank, jee_percentile, ib_score,
-                               prog.get("level", "ug")):
+    best, basis, basis_text, missing, considered = 0, None, None, [], []
+    for kind, value in _scores(percent, board, eapcet_rank, jee_percentile, ib_score, level):
         table = slab_set.get(kind) or []
+        label = _score_text(kind, value, level)
         if not table:
             missing.append(kind)
+            considered.append({"score": label, "scholarship_percent": 0,
+                               "note": "this score is not used for scholarships in this program"})
             continue
         pct = _match_slab(table, value)
+        entry = {"score": label, "scholarship_percent": pct}
+        if not pct:
+            entry["note"] = _no_slab_reason(kind, table)
+        considered.append(entry)
         if pct > best:
-            best, basis = pct, f"{kind.replace('_', ' ')} {value:g}"
-    return {"percent": best, "basis": basis, "not_configured": missing}
+            best, basis, basis_text = pct, f"{kind.replace('_', ' ')} {value:g}", label
+    return {"percent": best, "basis": basis, "basis_text": basis_text, "not_configured": missing,
+            "considered": considered}
 
 
 def _exam_label(kind: str, prog: dict) -> str:
@@ -204,11 +236,11 @@ def check_eligibility(program: str, percent: float) -> dict:
     }
     band = prog.get("fee_band_min_percent")
     if generic:
-        result["note"] = ("For CSE and ECE the fee circular lists fees from 55%; "
+        result["note"] = ("For CSE and ECE the fee card lists fees from 55%; "
                           "for 50-54.9% ask the Admissions Office to confirm.")
     elif eligible and band and pct < band:
         result["confirm_with_admissions"] = (
-            f"The fee circular lists {prog['name']} fees from {band}% marks. For {pct:g}% the "
+            f"The fee card lists {prog['name']} fees from {band}% marks. For {pct:g}% the "
             f"Admissions Office must confirm admission and the applicable fee.")
     return result
 
@@ -248,7 +280,7 @@ def program_info(program: str) -> dict:
         "reminder": "Admission depends on seat availability and document verification.",
     }
     if prog.get("fee_band_min_percent"):
-        info["note"] = (f"The fee circular lists fees for this program from "
+        info["note"] = (f"The fee card lists fees for this program from "
                         f"{prog['fee_band_min_percent']}% marks; below that, the Admissions Office confirms.")
     if prog.get("duration_years") is None:
         info["duration_note"] = "Course duration is not in the fee file. Do not state one."
@@ -328,6 +360,9 @@ def calculate_fee(program: str, percent=None, board="state_board", eapcet_rank=N
         "program": prog["name"],
         "scholarship_percent": pct,
         "scholarship_basis": sch["basis"],
+        "scholarship_basis_text": sch["basis_text"],
+        # What each score earns by itself. The best one is applied; scholarships are not added together.
+        "scores_considered": sch["considered"],
         "tuition_first_year": inr(base),
         "tuition_first_year_after_scholarship": inr(per_year[0]["_net"]),
         "per_semester_after_scholarship": per_year[0]["per_semester"],
@@ -388,10 +423,18 @@ def calculate_fee(program: str, percent=None, board="state_board", eapcet_rank=N
                                "Another score (board %, JEE, EAPCET) may still qualify.")
     band = prog.get("fee_band_min_percent")
     if percent is not None and band and float(percent) < band:
-        result["notes"].append(f"The circular lists {prog['name']} fees from {band}% marks; for a lower "
+        result["notes"].append(f"The fee card lists {prog['name']} fees from {band}% marks; for a lower "
                                f"percentage the Admissions Office must confirm admission and fee.")
+    if ib_score is not None and 30 <= float(ib_score) <= 37 and data.get("ib_overlap_note"):
+        result["notes"].append(data["ib_overlap_note"])
     result["notes"].append("Scholarship is subject to marksheet verification; continuation rules are set by the university.")
     return result
+
+
+def rankings() -> dict:
+    """Rankings and accreditations exactly as printed on the official fee card."""
+    data = load_data()
+    return {"status": "ok", "source": data["source"], "rankings": data.get("rankings", [])}
 
 
 def compare_programs(program_a: str, program_b: str, **score) -> dict:

@@ -53,7 +53,9 @@ async def test_agent_video_recommendations_contextual_card(monkeypatch):
     assert "video_recommendations" in card_types
     vid_card = next(c for c in cards if c.get("type") == "video_recommendations")
     assert len(vid_card["videos"]) >= 1
-    assert vid_card["videos"][0]["id"] == "campus-vid-1"
+    # The agent now picks videos by their own category / keywords (no embedding call), from the
+    # real catalogue: a campus question must get campus-tour videos.
+    assert all("Campus Tour" in v["category"] for v in vid_card["videos"])
     assert len(done.get("suggestions", [])) > 0
 
 
@@ -97,7 +99,10 @@ async def test_tool_get_university_videos(monkeypatch):
     result = await tools.tool_get_university_videos({"topic": "hostel life"}, {})
     assert result["status"] == "ok"
     assert result["type"] == "video_recommendations"
-    assert len(result["videos"]) == 1
+    # Videos are now matched on their own titles / keywords (no embedding call): every video
+    # returned for "hostel life" must be a hostel video from the real catalogue.
+    assert 1 <= len(result["videos"]) <= 2
+    assert all("Hostel" in v["category"] for v in result["videos"])
 
 
 def test_is_about_sru_or_campus_query_detection():

@@ -156,6 +156,28 @@ _VISIT_REQUEST_PATTERN = re.compile(
 )
 
 
+_NUMBER_UPDATE_PATTERN = re.compile(
+    r"\b(?:change|update|replace|correct|edit|modify)\b.{0,40}\b(?:number|mobile|phone|contact)\b"
+    r"|\b(?:number|mobile|phone)\b.{0,25}\b(?:changed|is\s+wrong|was\s+wrong|incorrect)\b"
+    r"|\b(?:my\s+)?new\s+(?:mobile\s+|phone\s+|contact\s+)?(?:number|no\b)"
+    r"|\b(?:update|change|edit)\b.{0,25}\b(?:settings?|profile|my\s+details)\b",
+    re.IGNORECASE,
+)
+_NUMBER_STATEMENT_PATTERN = re.compile(
+    r"\b(?:my|this\s+is\s+my|here\s+is\s+my)\s+(?:new\s+)?(?:mobile|phone|contact|whatsapp|cell)?\s*"
+    r"(?:number|no\.?|num)\b", re.IGNORECASE)
+
+
+def is_number_update(message: str) -> bool:
+    """'change my number', 'my new number is ...', 'update it in the settings'."""
+    return bool(_NUMBER_UPDATE_PATTERN.search(message or ""))
+
+
+def is_number_statement(message: str) -> bool:
+    """'my mobile number is 98...' (the student is telling us their number)."""
+    return bool(_NUMBER_STATEMENT_PATTERN.search(message or ""))
+
+
 def is_cancel_contact(message: str, has_open_request: bool = False) -> bool:
     """True for 'don't call me', 'cancel the callback', 'cancel my visit' (and bare 'cancel' when a
     request is open or being arranged)."""
@@ -270,3 +292,30 @@ def extract_visitors(message: str):
     m = re.search(r"\b(\d{1,2})\s*(?:people|persons?|members?|of\s+us|visitors?|guests?)\b", message or "",
                   re.IGNORECASE)
     return int(m.group(1)) if m else None
+
+
+_BUDDY = r"(?:\s+(?:sru\s*_?\s*buddy|buddy|sru|there|bro|sir|mam|madam|team|dear|man|anna|akka))*"
+_SMALL_TALK_PATTERNS = (
+    ("greeting", re.compile(r"^(?:hi+|hello+|hey+|hlo+|helo|namaste|namaskaram|vanakkam|"
+                            r"good\s+(?:morning|afternoon|evening))" + _BUDDY + r"[\s!.]*$", re.IGNORECASE)),
+    ("how_are_you", re.compile(r"^(?:(?:hi+|hello+|hey+)[\s,]+)?(?:how\s+(?:are|r)\s+(?:you|u)(?:\s+doing)?|"
+                               r"how\s+is\s+it\s+going|what'?s\s+up|wass?up)" + _BUDDY + r"[\s?!.]*$", re.IGNORECASE)),
+    ("thanks", re.compile(r"^(?:ok(?:ay)?[\s,]+)?(?:thanks?(?:\s+a\s+lot)?|thank\s*(?:you|u)(?:\s+so\s+much|\s+very\s+much)?|"
+                          r"thx|tq|ty)" + _BUDDY + r"[\s!.]*$", re.IGNORECASE)),
+    ("bye", re.compile(r"^(?:ok(?:ay)?[\s,]+)?(?:bye+|good\s*bye|see\s+(?:you|u)|good\s+night)" + _BUDDY + r"[\s!.]*$",
+                       re.IGNORECASE)),
+    ("who_are_you", re.compile(r"^(?:who\s+(?:are|r)\s+(?:you|u)|what\s+(?:are|r)\s+(?:you|u)|"
+                               r"what\s+can\s+(?:you|u)\s+do|what\s+is\s+sru\s*_?\s*buddy|"
+                               r"are\s+(?:you|u)\s+(?:a\s+|an\s+)?(?:bot|human|ai|real|robot))" + r"[\s?!.]*$", re.IGNORECASE)),
+)
+
+
+def small_talk(message: str):
+    """'greeting', 'how_are_you', 'thanks', 'bye' or 'who_are_you' when the message is ONLY that."""
+    msg = (message or "").strip()
+    if len(msg) > 60:
+        return None
+    for kind, pattern in _SMALL_TALK_PATTERNS:
+        if pattern.match(msg):
+            return kind
+    return None

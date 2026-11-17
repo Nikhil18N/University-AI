@@ -60,9 +60,19 @@ async def lifespan(fastapi_app: FastAPI):
 
     # Verify or auto-seed ChromaDB documents in background
     import asyncio
-    from app.services.auto_seed import ensure_documents_seeded
+    from app.services.auto_seed import ensure_documents_seeded, refresh_handbook_if_changed
 
-    asyncio.create_task(ensure_documents_seeded())
+    async def _prepare_knowledge():
+        # The agent's own handbook search reads the files directly: ready at once, no AI calls.
+        try:
+            from app.sru_agent import knowledge
+            logger.info("Handbook keyword index ready: %d passages.", knowledge.reload())
+        except Exception as err:
+            logger.warning("Handbook keyword index could not be built: %s", err)
+        await ensure_documents_seeded()        # vector index, only when it is empty
+        await refresh_handbook_if_changed()    # vector index, when handbook files were edited
+
+    asyncio.create_task(_prepare_knowledge())
 
     # Initialize optional Redis client for response caching
     fastapi_app.state.redis = None
@@ -97,7 +107,7 @@ async def lifespan(fastapi_app: FastAPI):
 app = FastAPI(
     title="University AI Companion",
     description="Conversational AI with RAG and Function-Calling Agent for university knowledge",
-    version="2.7.0",
+    version="2.8.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.APP_DEBUG else None,
     redoc_url="/redoc" if settings.APP_DEBUG else None,
@@ -236,6 +246,20 @@ from app.sru_agent import tools as agent_tools
 
 # Connect agent knowledge retrieval to ChromaDB
 async def agent_knowledge_search(query: str):
+    """Handbook search for the agent.
+
+    1. Keyword search over the handbook files on disk (no AI call, always up to date, works on a
+       cold start and when the Gemini quota is used up).
+    2. Only if that finds nothing: the vector index (covers documents uploaded through the admin
+       console; costs one embedding call).
+    """
+    try:
+        from app.sru_agent import knowledge
+        found = knowledge.search(query, k=4, min_score=3.0)
+        if found:
+            return [{"title": f["title"], "text": f["text"][:1800], "source": f["source"]} for f in found]
+    except Exception as err:
+        logger.warning("keyword handbook search failed: %s", err)
     try:
         from app.db.chroma import get_chroma_client
         from app.services.rag_service import COLLECTION_NAME
@@ -307,9 +331,14 @@ async def agent_conversation_resolver(session_id: str, conversation_id: str | No
         logger.warning("agent_conversation_resolver error: %s", err)
         return conversation_id or ""
 
-async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str, tools_used: list):
+async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str,
+                            tools_used: list, cards: list | None = None, suggestions: list | None = None,
+                            started_at=None):
+    """Save one agent turn so a reopened chat looks exactly as it did live: the question first
+    (stamped when it was asked), then the answer with its cards and follow-up suggestions."""
     try:
         import uuid
+        from datetime import datetime, timedelta, timezone
         from app.db.session import async_session_factory
         from app.services import conversation_service
         from app.sru_agent import config as agent_config
@@ -323,14 +352,19 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
             )
             if conv.title == "New conversation" and clean_title:
                 conv.title = clean_title
-            await conversation_service.add_message(session, conv.id, "user", user_text)
+            finished_at = datetime.now(timezone.utc)
+            asked_at = started_at or finished_at
+            if asked_at >= finished_at:
+                asked_at = finished_at - timedelta(milliseconds=1)
+            await conversation_service.add_message(session, conv.id, "user", user_text, created_at=asked_at)
             await conversation_service.add_message(
                 session,
                 conv.id,
                 "assistant",
                 answer,
                 model=agent_config.AGENT_MODEL,
-                metadata={"tools_used": tools_used},
+                metadata={"tools_used": tools_used, "cards": cards or [], "suggestions": suggestions or []},
+                created_at=finished_at,
             )
             await session.commit()
     except Exception as err:
@@ -342,6 +376,14 @@ set_conversation_resolver(agent_conversation_resolver)
 agent_tools.set_knowledge_search(agent_knowledge_search)
 agent_tools.set_lead_saver(agent_lead_saver)
 agent_tools.set_lead_canceller(agent_lead_canceller)
+
+# Keep student profiles and chat context in PostgreSQL as well, so they survive restarts and the
+# 24-hour cache, and so Settings > My details always shows what the chat knows.
+from app.services import agent_profile_store
+from app.sru_agent import memory as agent_memory
+agent_memory.set_profile_store(agent_profile_store.load_profile, agent_profile_store.save_profile)
+agent_memory.set_history_loader(agent_profile_store.load_history)
+agent_tools.set_lead_updater(agent_profile_store.update_lead_contact)
 
 app.include_router(chat_router)
 app.include_router(admin_router)

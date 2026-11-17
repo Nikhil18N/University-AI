@@ -4,9 +4,11 @@
     app.include_router(agent_router)
 """
 import json
+import logging
+from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -14,6 +16,7 @@ from . import config, fees, memory
 from .agent import run_agent
 
 router = APIRouter(prefix="/api/v1/agent", tags=["agent"])
+log = logging.getLogger("sru_agent")
 _on_turn_complete = None
 _conversation_resolver = None
 
@@ -23,6 +26,16 @@ def set_turn_logger(fn):
     Use it to save agent chats in your existing conversations table."""
     global _on_turn_complete
     _on_turn_complete = fn
+
+
+async def _log_turn(session_id, conv_id, message, event, started_at):
+    """Call the turn logger with the cards and suggestions too; older 5-argument loggers still work."""
+    try:
+        await _on_turn_complete(session_id, conv_id, message, event["answer"], event["tools_used"],
+                                cards=event.get("cards") or [], suggestions=event.get("suggestions") or [],
+                                started_at=started_at)
+    except TypeError:
+        await _on_turn_complete(session_id, conv_id, message, event["answer"], event["tools_used"])
 
 
 def set_conversation_resolver(fn):
@@ -70,13 +83,19 @@ async def agent_stream(req: AgentRequest):
             except Exception:
                 pass  # Fall back to req.conversation_id
 
+        started_at = datetime.now(timezone.utc)
         async for event in run_agent(req.message, req.session_id, conv_id):
+            if event["type"] == "done":
+                # What the chat now knows about the student, so Settings > My details stays in step.
+                try:
+                    event["profile"] = memory.public_profile(await memory.get_profile(req.session_id))
+                except Exception:
+                    event["profile"] = {}
             if event["type"] == "done" and _on_turn_complete:
                 try:
-                    await _on_turn_complete(req.session_id, conv_id, req.message,
-                                            event["answer"], event["tools_used"])
+                    await _log_turn(req.session_id, conv_id, req.message, event, started_at)
                 except Exception:
-                    pass  # logging must never break the chat
+                    log.exception("could not save the chat turn")  # logging must never break the chat
             yield _sse(event)
 
     return StreamingResponse(events(), media_type="text/event-stream",
@@ -93,6 +112,47 @@ async def calculate(req: FeeRequest):
 @router.get("/programs")
 async def programs():
     return fees.list_programs()
+
+
+class ProfileUpdate(BaseModel):
+    session_id: str = Field(..., min_length=8, max_length=64)
+    name: Optional[str] = Field(default=None, max_length=80)
+    phone: Optional[str] = Field(default=None, max_length=20)
+    program_interest: Optional[str] = Field(default=None, max_length=120)
+
+
+@router.get("/profile")
+async def get_profile(session_id: str = Query(..., min_length=8, max_length=64)):
+    """What the agent knows about this student (name, mobile number, course, marks).
+    Settings > My details shows exactly this, so the chat and the settings cannot disagree."""
+    return {"status": "ok", "profile": memory.public_profile(await memory.get_profile(session_id))}
+
+
+@router.put("/profile")
+async def update_profile(body: ProfileUpdate):
+    """Save details edited in Settings > My details. The mobile number is also corrected on any
+    callback / visit request already saved from this browser."""
+    from . import tools
+
+    ctx = {"session_id": body.session_id, "profile": await memory.get_profile(body.session_id)}
+    if body.name or body.phone:
+        result = await tools.run_tool("update_contact_details",
+                                      {"name": body.name, "phone": body.phone}, ctx)
+        if result.get("status") == "invalid":
+            raise HTTPException(status_code=422, detail="Please enter a valid 10-digit mobile number.")
+        if result.get("status") == "failed":
+            raise HTTPException(status_code=503, detail="Could not save right now. Please try again.")
+    if body.program_interest:
+        await memory.update_profile(body.session_id, program_interest=body.program_interest.strip())
+    return {"status": "ok", "profile": memory.public_profile(await memory.get_profile(body.session_id))}
+
+
+@router.delete("/profile")
+async def forget_profile(session_id: str = Query(..., min_length=8, max_length=64)):
+    """Settings > Forget my details: the agent forgets this student. Saved callback / visit
+    requests stay with the Admissions Office; say 'cancel my callback' in the chat to withdraw one."""
+    await memory.clear_profile(session_id)
+    return {"status": "ok", "profile": {}}
 
 
 @router.get("/fee-config")

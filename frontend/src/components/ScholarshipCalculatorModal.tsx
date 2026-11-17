@@ -25,6 +25,8 @@ import {
   scholarshipStartText,
 } from "../utils/feeCalculator";
 import type { Estimate, FeeConfig } from "../utils/feeCalculator";
+import { getSessionId } from "../hooks/useSession";
+import { saveStudentDetails } from "../utils/studentProfile";
 import "./ScholarshipCalculatorModal.css";
 
 /*
@@ -246,7 +248,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
     setCallbackError(null);
     try {
-      localStorage.setItem("sru_student_lead", JSON.stringify({ name: cleanName, phone: cleanPhone }));
+      await saveStudentDetails(getSessionId(), { name: cleanName, phone: cleanPhone });
       setIsVerified(true);
       await createLead({
         name: cleanName,

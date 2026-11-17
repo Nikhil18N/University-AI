@@ -185,3 +185,17 @@ GET  /api/v1/agent/fee-config    # everything the Fee & Scholarship Calculator d
 `POST /api/v1/leads` is limited to 30 requests per minute per address (HTTP 429 above that).
 Admin routes return HTTP 503 while `ADMIN_API_KEY` is the placeholder and `APP_DEBUG=false`.
 See `docs/24-agent-audit-nov-2026.md`.
+
+## Student profile endpoints (v2.8.0)
+
+```http
+GET    /api/v1/agent/profile?session_id=...     # what the agent knows: name, phone, course, marks
+PUT    /api/v1/agent/profile                    # {session_id, name?, phone?, program_interest?}
+DELETE /api/v1/agent/profile?session_id=...     # forget this student
+```
+
+`PUT` validates the mobile number (422 when it is not a 10-digit Indian mobile number) and also
+corrects it on a callback / visit request already saved from that browser. The `done` event of
+`POST /api/v1/agent/stream` now carries `profile` (the same object) and the saved message carries
+`cards` and `suggestions`, so a reopened chat looks the same. `POST /api/v1/chat/stream` returns
+429 above 20 messages a minute per session. See `docs/25-audit-round-2-nov-2026.md`.

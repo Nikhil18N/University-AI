@@ -109,3 +109,25 @@ Full details: `docs/24-agent-audit-nov-2026.md`.
   lead on every keystroke; official hostel prices; first-year total includes other and exam fees.
 - **Security:** placeholder admin key refused outside debug; public leads endpoint rate limited.
 - **Kept:** every existing feature and all 360 earlier tests still pass.
+
+
+---
+
+## v2.8.0 (17 Nov 2026): audit round 2
+
+Full details: `docs/25-audit-round-2-nov-2026.md`.
+
+- **Fee card PDF:** fee file re-checked against the official 2027-28 fee card (19 concessions,
+  AC electricity deposit, programme names, rankings). The handbook's fee pages are now generated
+  from the fee file; the wrong "verified" fee facts and invented concessions are gone.
+- **Knowledge without AI calls:** keyword search over the handbook files (`sru_agent/knowledge.py`);
+  the vector index refreshes when handbook files change; new page of facts checked on sru.edu.in.
+- **Free Gemini tier:** greetings 0 calls, fee and handbook questions 1 call, repeated first
+  questions from a saved copy, daily limits recognised, a useful answer when no key is available.
+- **Chat consistency:** question always above its answer (also for old chats), cards and
+  suggestions restored on reopening, stable message ids, context read back after a restart.
+- **My details:** one profile per student (`/api/v1/agent/profile`), a settings panel, and
+  "change my number" in the chat updates the profile and the saved request.
+- **Scholarship by score:** each score's own scholarship is reported (EAPCET rank above 20,000).
+- **Videos:** matched by topic from their own keywords, no AI call.
+- **Cards:** "requested" instead of "confirmed", one set of visit hours, official helpline.

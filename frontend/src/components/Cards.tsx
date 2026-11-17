@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { createLead } from "../services/api";
+import { getSessionId } from "../hooks/useSession";
+import { saveStudentDetails } from "../utils/studentProfile";
 import {
   ScaleIcon,
   TargetIcon,
@@ -743,7 +745,7 @@ export function AgentCallbackCard({ card }: CardProps) {
         <span className="card-badge badge-success">
           ✓ Callback Requested
         </span>
-        <h4 className="card-title">Admissions Counselor Call Scheduled</h4>
+        <h4 className="card-title">Admissions Counsellor Callback Requested</h4>
       </div>
       <div className="agent-action-body">
         <p className="agent-action-msg">
@@ -752,7 +754,7 @@ export function AgentCallbackCard({ card }: CardProps) {
         <div className="agent-action-meta">
           {d.preferred_time && <div><strong>Preferred Time:</strong> {d.preferred_time}</div>}
           {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
-          <div><strong>Admissions Helpline:</strong> +91 8331003030 / 9959664400</div>
+          <div><strong>Admissions Helpline:</strong> 0870-2818333 / +91 8331003030</div>
         </div>
       </div>
     </div>
@@ -783,18 +785,19 @@ export function AgentCampusVisitCard({ card }: CardProps) {
     <div className="rich-card agent-action-card visit-card">
       <div className="card-header">
         <span className="card-badge badge-success">
-          ✓ Campus Tour Confirmed
+          ✓ Visit Request Sent
         </span>
-        <h4 className="card-title">Campus Visit Scheduled</h4>
+        <h4 className="card-title">Campus Visit Requested</h4>
       </div>
       <div className="agent-action-body">
         <p className="agent-action-msg">
-          Visit confirmed for <strong>{displayDate}</strong> for <strong>{d.visitors || 1} visitor(s)</strong>.
+          Visit requested for <strong>{displayDate}</strong> for <strong>{d.visitors || 1} visitor(s)</strong>. The
+          admissions team will call you to confirm the time.
         </p>
         <div className="agent-action-meta">
           {d.name && <div><strong>Visitor:</strong> {d.name}</div>}
           <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
-          <div><strong>Visiting Hours:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
+          <div><strong>Visiting Hours:</strong> 9:30 AM – 4:30 PM (Monday – Saturday)</div>
           {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
         </div>
         <div className="agent-card-footer">
@@ -914,7 +917,7 @@ export function CampusVisitBookingCard({ card }: CardProps) {
       });
 
       // Save for future turns so student doesn't have to type again
-      localStorage.setItem("sru_student_lead", JSON.stringify({ name: cleanName, phone: cleanPhone }));
+      void saveStudentDetails(getSessionId(), { name: cleanName, phone: cleanPhone });
 
       const refId = lead?.id ? String(lead.id).slice(0, 8) : Math.random().toString(36).substring(2, 10).toUpperCase();
 
@@ -950,19 +953,19 @@ export function CampusVisitBookingCard({ card }: CardProps) {
       <div className="rich-card agent-action-card visit-card visit-confirmed-box">
         <div className="card-header">
           <span className="card-badge badge-success">
-            ✓ Campus Visit Confirmed
+            ✓ Visit Request Sent
           </span>
-          <h4 className="card-title">Campus Tour Scheduled!</h4>
+          <h4 className="card-title">Campus Visit Requested</h4>
         </div>
         <div className="agent-action-body">
           <p className="agent-action-msg">
-            Visit request confirmed for <strong>{friendlyDate}</strong> for{" "}
+            Visit requested for <strong>{friendlyDate}</strong> for{" "}
             <strong>{confirmedData.visitors} visitor{confirmedData.visitors > 1 ? "s" : ""}</strong>.
           </p>
           <div className="agent-action-meta">
             <div><strong>Visitor Name:</strong> {confirmedData.name}</div>
             <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
-            <div><strong>Visiting Hours:</strong> 10:00 AM – 4:00 PM (Monday – Saturday)</div>
+            <div><strong>Visiting Hours:</strong> 9:30 AM – 4:30 PM (Monday – Saturday)</div>
             <div><strong>Reference ID:</strong> #{confirmedData.reference}</div>
           </div>
           <div className="agent-card-footer">

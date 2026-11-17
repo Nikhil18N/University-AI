@@ -480,6 +480,68 @@ def get_semantic_videos(
         return []
 
 
+# ---- Keyword matching (no AI call) ----------------------------------------------------------
+# The semantic search above needs a Gemini embedding for every question and for every video at
+# start-up. When that quota is used up there are no vectors, and an explicit "show me a video"
+# used to fall back to the first two videos in the file, whatever they were about. This matcher
+# works from each video's own title, category and keywords, so a relevant video is always found.
+_TOPIC_CATEGORIES = (
+    (("hostel", "mess", "food", "dining", "room", "accommodation", "stay", "living"), "Hostels & Living"),
+    (("placement", "placed", "package", "salary", "job", "lpa", "recruit", "career", "internship"), "Placements & Careers"),
+    (("agri", "agriculture", "farm", "icar"), "School of Agriculture"),
+    (("mba", "bba", "business", "management", "astra"), "MBA & Business"),
+    (("fest", "event", "cultural", "sparkrill", "navadhara", "swagatam", "freshers", "celebration"), "Campus Life & Fests"),
+    (("sport", "sports", "games", "athletic"), "Sports & Activities"),
+    (("startup", "srix", "innovation", "incubat", "project expo", "entrepreneur"), "Startups & Innovation"),
+    (("international student", "foreign student", "from abroad"), "International Students"),
+    (("iep", "study abroad", "usa", "international program", "twinning"), "International Programs"),
+    (("parent", "review", "testimonial", "experience", "student voice", "why sru", "why choose"), "Testimonials & Reviews"),
+    (("cse", "computer", "ai", "aiml", "machine learning", "robotics", "coding", "hackathon", "technology"), "CS, AI & Technology"),
+    (("campus", "tour", "infrastructure", "building", "library", "lab", "about sru", "night view", "green"), "Campus Tour & Infrastructure"),
+)
+_VIDEO_STOP = frozenset("a an the of in on at to for from with and or is are me my show video videos watch see "
+                        "any some about sru sr university please can you i want tell give link clip".split())
+
+
+def get_keyword_videos(text: str, limit: int = 2, prefer_campus: bool = False) -> list[dict]:
+    """Videos whose title, category or keywords match the request. No AI call, never irrelevant:
+    returns [] when nothing matches (the caller decides on a campus-tour fallback)."""
+    low = " " + re.sub(r"[^a-z0-9& ]+", " ", (text or "").lower()) + " "
+    words = [w for w in low.split() if w not in _VIDEO_STOP and len(w) > 1]
+    wanted = {cat for cues, cat in _TOPIC_CATEGORIES if any(f" {c}" in low for c in cues)}
+    if prefer_campus and not wanted:
+        wanted = {"Campus Tour & Infrastructure"}
+    scored = []
+    for order, video in enumerate(load_videos()):
+        category = (video.get("category") or "")
+        title = (video.get("title") or "").lower()
+        keywords = " ".join(k.lower() for k in (video.get("keywords") or []))
+        score = 0.0
+        if any(category.startswith(w[:14]) or w.startswith(category[:14]) for w in wanted):
+            score += 4
+        for w in words:
+            if f" {w}" in " " + keywords:
+                score += 2
+            if f" {w}" in " " + title:
+                score += 1
+        if prefer_campus and is_event_or_fest_video(video):
+            score -= 3
+        if "/shorts/" in (video.get("url") or ""):
+            score -= 0.5          # prefer full videos over shorts when equally relevant
+        if score >= 2:
+            scored.append((-score, order, video))
+    scored.sort(key=lambda item: item[:2])
+    seen, out = set(), []
+    for _score, _order, video in scored:
+        if video.get("url") in seen:
+            continue
+        seen.add(video.get("url"))
+        out.append(video)
+        if len(out) >= limit:
+            break
+    return out
+
+
 def get_relevant_videos(
     user_message: str = "",
     answer: str = "",
@@ -536,6 +598,9 @@ def get_relevant_videos(
             exclude_events=excl_events,
         )
         if not vids and is_explicit:
+            matched = get_keyword_videos(user_message, limit=limit, prefer_campus=should_prefer_campus)
+            if matched:
+                return matched
             all_vids = load_videos()
             if should_prefer_campus:
                 campus_vids = [v for v in all_vids if v.get("category") == "Campus Tour & Infrastructure"]
@@ -565,6 +630,10 @@ def get_relevant_videos(
         except Exception:
             pass
 
+    # No embedding available (quota used up, or deliberately not requested to save a model call):
+    # match on the videos' own titles and keywords. Only when the student wants to SEE something.
+    if is_visual_target:
+        return get_keyword_videos(user_message, limit=limit, prefer_campus=should_prefer_campus)
     return []
 
 

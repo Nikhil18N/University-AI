@@ -53,6 +53,10 @@ def test_merit_scholarship_slabs(score, expected):
 def test_best_of_marks_and_rank_is_used():
     fee = fees.calculate_fee("cse", percent=72, eapcet_rank=1500)
     assert fee["scholarship_percent"] == 40 and "eapcet rank 1500" in fee["scholarship_basis"]
+    assert fee["scholarship_basis_text"] == "EAPCET rank 1,500"
+    # each score is reported by itself, so "what do I get on my rank alone?" has an answer
+    assert fee["scores_considered"] == [{"score": "Intermediate 72%", "scholarship_percent": 20},
+                                        {"score": "EAPCET rank 1,500", "scholarship_percent": 40}]
 
 
 def test_calculator_api_and_agent_tool_give_the_same_numbers(api):

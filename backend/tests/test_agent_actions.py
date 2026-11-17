@@ -336,8 +336,8 @@ async def test_no_generic_fee_table_under_a_personalised_answer():
 
 @pytest.mark.asyncio
 async def test_generic_fee_table_still_shown_when_no_fee_tool_ran():
-    client = ScriptedClient([_text("B.Tech CSE tuition is listed below.")])
-    _, done = await _run("What is the fee breakdown for B.Tech CSE per semester?", "act-cards-generic", client)
+    client = ScriptedClient([_text("Hostel fees are listed below.")])
+    _, done = await _run("What is the hostel fee?", "act-cards-generic", client)
     assert "fee_breakdown" in [c.get("type") for c in done["cards"]]
 
 
@@ -351,7 +351,7 @@ async def test_program_info_concessions_compare_and_share_tools():
     sports = await tools.run_tool("get_special_concessions", {"category": "state level sports"}, ctx)
     assert sports["status"] == "ok"
     assert {c["category"] for c in sports["matching"]} == {
-        "Sports: National level representation", "Sports: International level representation"}
+        "National-level sports achievers", "International-level sports achievers"}
 
     both = await tools.run_tool("compare_programs", {"program_a": "cse", "program_b": "ece", "percent": 85}, ctx)
     assert [c["tuition_first_year_after_scholarship"] for c in both["comparison"]] == ["₹2,55,000", "₹2,02,500"]
@@ -370,7 +370,8 @@ def test_every_tool_declaration_is_accepted_by_the_sdk():
     names = {f.name for f in decl.function_declarations}
     assert {"cancel_contact_request", "get_program_info", "get_special_concessions", "compare_programs",
             "share_fee_estimate"} <= names
-    assert tools.ACTION_TOOLS == {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request"}
+    assert tools.ACTION_TOOLS == {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request",
+                                  "update_contact_details"}
 
 
 # --------------------------------------------------------------------- load ----
@@ -410,6 +411,7 @@ async def test_rate_limited_key_rotates_to_the_next_key(no_waiting, monkeypatch)
             return _text("Answered on the second key.")
 
     ring = agent._KeyRing()
+    monkeypatch.setattr(config, "AGENT_ANSWER_CACHE_SECONDS", 0)  # each student must reach the model here
     monkeypatch.setattr(config, "GEMINI_API_KEYS", ["key-A", "key-B"])
     monkeypatch.setattr(ring, "client", lambda key: KeyClient(key))
     monkeypatch.setattr(agent, "_ring", ring)
@@ -432,9 +434,12 @@ async def test_fee_question_is_still_answered_when_the_model_is_unreachable(no_w
     assert done["type"] == "done"
     assert "₹2,55,000" in done["answer"] and "25% merit scholarship" in done["answer"]
     assert done["cards"][0]["type"] == "calculate_fee"
-    # a non-fee question still reports the problem, so the website can fall back
-    events, last = await _run("tell me about placements", "act-offline-2", Down())
-    assert last["type"] == "error"
+    # a handbook question gets the matching handbook passage instead of an error
+    _, last = await _run("what are the hostel in-time rules?", "act-offline-2", Down())
+    assert last["type"] == "done" and "handbook" in last["answer"] and "In-Time" in last["answer"]
+    # anything else: an honest message about what still works, never a blank or a crash
+    _, last = await _run("zzz qqq xyzzy", "act-offline-3", Down())
+    assert last["type"] == "done" and "free AI limit" in last["answer"]
 
 
 @pytest.mark.asyncio

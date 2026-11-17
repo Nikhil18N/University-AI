@@ -27,6 +27,43 @@ def _find_data_path(rel_path: str) -> Path | None:
     return None
 
 
+def _handbook_fingerprint(handbook_dir: Path) -> str:
+    import hashlib
+    digest = hashlib.sha256()
+    for path in sorted(handbook_dir.glob("*.md")):
+        digest.update(path.name.encode())
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+async def refresh_handbook_if_changed() -> bool:
+    """Re-index the handbook when its files changed since the vector index was built.
+
+    The vector index is only seeded when it is empty, so an edited handbook file used to leave the
+    OLD text in the index for ever. A fingerprint of the handbook files is kept beside the index;
+    when it no longer matches, the handbook documents are replaced. Best effort: if the embedding
+    quota is exhausted the old index stays and this is retried on the next start. (The admissions
+    agent does not depend on it: it reads the handbook files directly.)
+    """
+    handbook_dir = settings.PROJECT_ROOT / "data" / "handbook"
+    if not handbook_dir.is_dir():
+        return False
+    marker = Path(settings.CHROMA_PERSIST_DIR or "./chroma_data") / "handbook.sha256"
+    fingerprint = _handbook_fingerprint(handbook_dir)
+    try:
+        if marker.exists() and marker.read_text(encoding="utf-8").strip() == fingerprint:
+            return False
+        logger.info("Handbook files changed since the last indexing; refreshing the vector index...")
+        from scripts.ingest_handbook_docs import ingest_handbook
+        await ingest_handbook()
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.write_text(fingerprint, encoding="utf-8")
+        return True
+    except Exception as err:
+        logger.warning("Handbook re-index skipped (will retry on next start): %s", err)
+        return False
+
+
 async def ensure_documents_seeded() -> int:
     """Check if ChromaDB collection has documents; if empty, ingest automatically."""
     try:
@@ -77,6 +114,12 @@ async def ensure_documents_seeded() -> int:
 
             await ingest_handbook()
             logger.info("Auto-seeded handbook markdown documents.")
+            try:  # remember which handbook text is in the index (see refresh_handbook_if_changed)
+                marker = Path(settings.CHROMA_PERSIST_DIR or "./chroma_data") / "handbook.sha256"
+                marker.parent.mkdir(parents=True, exist_ok=True)
+                marker.write_text(_handbook_fingerprint(settings.PROJECT_ROOT / "data" / "handbook"), encoding="utf-8")
+            except Exception as marker_err:
+                logger.warning("Could not record the handbook fingerprint: %s", marker_err)
 
         # Ensure semantic video vectors are synced in ChromaDB
         try:

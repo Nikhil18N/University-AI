@@ -187,8 +187,13 @@ async def add_message(
     model: str | None = None,
     sources: list[dict] | None = None,
     metadata: dict | None = None,
+    created_at: datetime | None = None,
 ) -> Message:
-    """Add a message to a conversation."""
+    """Add a message to a conversation.
+
+    Pass `created_at` when a question and its answer are saved together: the database default is
+    the transaction time, which would give both the same timestamp.
+    """
     msg = Message(
         conversation_id=conversation_id,
         role=role,
@@ -197,6 +202,8 @@ async def add_message(
         sources=sources,
         metadata_=metadata,
     )
+    if created_at is not None:
+        msg.created_at = created_at
     db.add(msg)
     await db.flush()
     return msg
@@ -209,7 +216,7 @@ async def get_recent_messages(
     stmt = (
         select(Message)
         .where(Message.conversation_id == conversation_id)
-        .order_by(Message.created_at.desc())
+        .order_by(Message.created_at.desc(), Message.role.asc())
         .limit(limit)
     )
     result = await db.execute(stmt)
@@ -236,7 +243,7 @@ async def get_all_user_messages(
     stmt = (
         select(Message)
         .where(Message.conversation_id == conversation_id, Message.role == "user")
-        .order_by(Message.created_at.asc())
+        .order_by(Message.created_at.asc(), Message.role.desc())
         .limit(limit)
     )
     result = await db.execute(stmt)

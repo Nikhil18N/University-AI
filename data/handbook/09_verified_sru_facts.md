@@ -47,6 +47,7 @@
   - **Leadership at SR University**:
     * **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976.
     * **Pro-Chancellor**: **Sri A. Madhukar Reddy** — General Secretary of Sri Rajeshwara Educational Society, championed 170-acre campus and SRiX.
+    * **Vice-Chancellor**: **Prof. Deepak Garg** — AI Professor & pioneer, former Bennett/Thapar Dean, led leadingindia.ai (1M+ students skilled), 160 papers, 1,600+ citations.
     * **Pro Vice-Chancellor**: **Dr. V. Mahesh**
     * **Registrar**: **Dr. P. Venkata Ramana Rao**
     * **Operations & Growth**: **Dr. R. Archana Reddy**
@@ -69,93 +70,69 @@
 
 ---
 
-## 3. Tuition Fee Structure & Payment Policies
+<!-- FEES:BEGIN (generated from fees_2027_28.json, do not edit by hand) -->
+## 3. Tuition Fee Structure (2027-28)
 
-- **[FACT-ID: FEE-001] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Program-Specific Scoping Rule**: When asked about fees, ONLY state the fee for the specific program or branch requested (e.g. B.Tech CSE, ECE, Core, MBA, MCA, Hostel). Never dump all unrelated degrees together. If the user asks generally ("what is the fee?"), ask them which program they are interested in.
-  - **B.Tech Computer Science & Engineering (CSE) & CSE Allied (AIML, Data Science, Cyber Security, Robotics, Quantum AI)**:
-    - Base Tuition Fee: **₹3,40,000 / year** (Payable as ₹1,70,000 per semester or ₹3,40,000 annually).
-    - Yearly Fee Increase: **₹9,000 per year** (Year 1: ₹3,40,000 | Year 2: ₹3,49,000 | Year 3: ₹3,58,000 | Year 4: ₹3,67,000).
-  - **B.Tech in Artificial Intelligence & Robotics**:
-    - Base Tuition Fee: **₹4,00,000 / year** (+₹12,000 yearly increase).
-  - **B.Tech in Electronics & Communication Engineering (ECE)**:
-    - Base Tuition Fee: **₹2,70,000 / year** (+₹8,000 yearly increase).
-  - **B.Tech Core Engineering (Biotechnology, Mechanical, Civil, EEE, Food Technology)**:
-    - Base Tuition Fee: **₹2,00,000 / year** (+₹6,000 yearly increase).
-  - **B.Tech International Engineering Program (IEP)**:
-    - Base Tuition Fee: **₹3,40,000 / year** (+₹10,000 yearly increase).
-  - **B.Des (Interior & Fashion Design)**: **₹2,10,000 / year** (+₹6,000 yearly increase).
-  - **B.Sc. (Hons) Agriculture**: **₹2,00,000 / year** (+₹6,000 yearly increase).
-  - **BBA / B.Sc. Hospitality & Hotel Administration**: **₹1,50,000 / year** (+₹4,000 yearly increase).
-  - **BBA (Business Analytics, FinTech, Digital Marketing)**: **₹2,00,000 / year** (+₹6,000 yearly increase).
-  - **BCA (Hons) / B.Sc. Computer Science (Hons)**: **₹1,50,000 / year** (+₹4,000 yearly increase).
-  - **B.Com / B.Sc. (Physics, Chemistry, Maths)**: **₹1,00,000 / year** (+₹3,000 yearly increase).
-  - **Postgraduate Programs (Per Year)**:
-    - **MBA**: **₹3,00,000 / year** (+₹10,000 yearly increase).
-    - **MCA**: **₹1,50,000 / year** (+₹4,000 yearly increase).
-    - **M.Tech**: **₹1,50,000 / year** (+₹4,000 yearly increase).
-    - **M.Sc. Agriculture**: **₹2,00,000 / year** (+₹6,000 yearly increase).
-    - **M.Sc. Programs (General/Others)**: **₹80,000 / year** (+₹2,000 yearly increase).
-  - **Additional Annual Components & One-Time Fees**:
-    - Enrollment Fee: **₹5,000** (one-time admission component).
-    - Other Fee (Wi-Fi, cultural, placements, ERP): **₹15,000 / year**.
-    - Exam Fee: **₹5,000 / year**.
-    - Bus Transport Fee: **₹30,000 / year** for tri-cities bus routes (Warangal, Hanamkonda, Kazipet).
-    - Specialization Fee (from Year 2 onwards for specialized domains): **₹30,000 / year**.
-    - Application Processing Fee: **₹1,100**.
-    - Electricity Deposit (Hostel): Non-AC: **₹5,000** | AC: **₹10,000**.
-  - **Strict Fee Category Scoping Rule**: When asked about a specific fee (transport, hostel, tuition, exam, or admission), return ONLY that specific fee. Never cross-contaminate or dump unrequested fees.
+- **[FACT-ID: FEE-001] [STATUS: VERIFIED] [SOURCE: official 2027-28 fee card, via fees_2027_28.json]**
+  - **Scoping rule**: when asked about a fee, state only the fee for the program or item asked about.
+  - **Undergraduate programs (tuition per year)**:
+  - **B.Tech CSE (AIML, Data Science, Cyber Security, Robotics and Automation, Quantum AI)**: **₹3,40,000 per year** (₹1,70,000 per semester); increases by ₹9,000 every year for every student.
+  - **B.Tech in AI and Robotics**: **₹4,00,000 per year** (₹2,00,000 per semester); increases by ₹12,000 every year for every student.
+  - **B.Tech ECE (AIML, VLSI, Robotics and Automation)**: **₹2,70,000 per year** (₹1,35,000 per semester); increases by ₹8,000 every year for every student.
+  - **B.Tech Electrical and Electronics Engineering (Electrical Vehicles, Renewable Energy)**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Tech Mechanical Engineering (Robotics and Automation, Smart Manufacturing)**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Tech Civil Engineering**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Tech Biotechnology with AI**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Tech Food Technology**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Tech Engineering Physics with AI, Robotics & Space / B.Tech Applied Chemistry in AI, NanoRobotics & Drug Discovery**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Tech International Engineering Programme (IEP)**: **₹3,40,000 per year** (₹1,70,000 per semester); increases by ₹10,000 every year for every student.
+  - **B.Sc Agriculture (ICAR-accredited)**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **B.Des (Design)**: **₹2,10,000 per year** (₹1,05,000 per semester); increases by ₹6,000 every year for every student.
+  - **BBA**: **₹1,50,000 per year** (₹75,000 per semester); increases by ₹4,000 every year for every student.
+  - **B.Sc in Hospitality and Event Management**: **₹1,50,000 per year** (₹75,000 per semester); increases by ₹4,000 every year for every student.
+  - **BBA (Finance, Operations, HR, Business Analytics, Marketing)**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **BCA (Hons.)**: **₹1,50,000 per year** (₹75,000 per semester); increases by ₹4,000 every year for every student.
+  - **B.Sc. Computer Science (Hons.)**: **₹1,50,000 per year** (₹75,000 per semester); increases by ₹4,000 every year for every student.
+  - **B.Sc. (Hons.) in Mathematics and AI**: **₹1,00,000 per year** (₹50,000 per semester); increases by ₹3,000 every year for every student.
+  - **B.Com.**: **₹1,00,000 per year** (₹50,000 per semester); increases by ₹3,000 every year for every student.
+  - **B.Sc Physics**: **₹1,00,000 per year** (₹50,000 per semester); increases by ₹3,000 every year for every student.
+  - **B.Sc Chemistry**: **₹1,00,000 per year** (₹50,000 per semester); increases by ₹3,000 every year for every student.
+  - **Postgraduate programs (tuition per year)**:
+  - **MBA (Finance, Operations, HR, Business Analytics, Marketing)**: **₹3,00,000 per year** (₹1,50,000 per semester); increases by ₹9,000 every year for every student.
+  - **MBA in Agri Business Management**: **₹2,00,000 per year** (₹1,00,000 per semester); increases by ₹6,000 every year for every student.
+  - **MCA**: **₹1,50,000 per year** (₹75,000 per semester); increases by ₹4,000 every year for every student.
+  - **M.Tech (CSE, Data Science, AIML, Electronic Design Technology, VLSI, Embedded Systems, Advanced Manufacturing Systems, Thermal Engineering, Construction Technology & Management, Power Electronics)**: **₹1,00,000 per year** (₹50,000 per semester); increases by ₹3,000 every year for every student.
+  - **M.Sc (Computer Science, Agronomy, Genetics & Plant Breeding, Agriculture Extension Education, Agriculture Economics, Plant Pathology, Horticulture, Soil Science)**: **₹1,00,000 per year** (₹50,000 per semester); increases by ₹3,000 every year for every student.
+  - **Other fees**: enrolment fee ₹5,000 (one-time); other academic / university charges ₹15,000 per year; examination fee (first year) ₹5,000; application form fee ₹1,100; transportation ₹30,000 per year (varies with distance); specialisation fee ₹30,000 per year from the second year where applicable; Ph.D. fee ₹70,000 per year; hostel electricity deposit ₹5,000 (Non-AC) / ₹10,000 (AC).
+  - There is no separate admission fee on the 2027-28 fee card.
 
 ---
 
-## 4. Merit Scholarships & Special Category Concessions
+## 4. Merit Scholarships & Special Category Concessions (2027-28)
 
-- **[FACT-ID: FEE-002] [STATUS: VERIFIED] [SOURCE: 08_admissions_fees_scholarships_and_eligibility.md]**
-  - **Undergraduate Merit Scholarship Slabs**:
-    - **10% Tuition Scholarship**:
-      - Eligibility: Intermediate / State Board: **60% – 64.9%** | CBSE/ICSE: **60% – 64.9%** | JEE Mains: **50 – 59.9 Percentile**.
-      - B.Tech CSE Annual Fee after waiver: **₹3,06,000 / year** (Save ₹34,000).
-    - **15% Tuition Scholarship**:
-      - Eligibility: Intermediate / State Board: **65% – 69.9%** | CBSE/ICSE: **65% – 69.9%** | JEE Mains: **60 – 69.9 Percentile**.
-      - B.Tech CSE Annual Fee after waiver: **₹2,89,000 / year** (Save ₹51,000).
-    - **20% Tuition Scholarship**:
-      - Eligibility: Intermediate / State Board: **70% – 79.9%** | CBSE/ICSE: **70% – 79.9%** | IB Diploma: **24 – 29** | JEE Mains: **70 – 79.9 Percentile**.
-      - B.Tech CSE Annual Fee after waiver: **₹2,72,000 / year** (Save ₹68,000).
-    - **25% Tuition Scholarship**:
-      - Eligibility: Intermediate / State Board: **80% – 91.9%** | CBSE/ICSE: **80% – 89.9%** | IB Diploma: **30 – 33** | JEE Mains: **80 – 89.9 Percentile** | TG/AP EAPCET Rank: **8,001 – 20,000**.
-      - B.Tech CSE Annual Fee after waiver: **₹2,55,000 / year** (Save ₹85,000).
-    - **30% Tuition Scholarship**:
-      - Eligibility: Intermediate / State Board: **92% – 97.9%** | CBSE/ICSE: **90% – 94.9%** | IB Diploma: **34 – 37** | JEE Mains: **90 – 94.5 Percentile** | TG/AP EAPCET Rank: **2,001 – 8,000**.
-      - B.Tech CSE Annual Fee after waiver: **₹2,38,000 / year** (Save ₹1,02,000).
-    - **40% Tuition Scholarship**:
-      - Eligibility: Intermediate / State Board: **≥ 98%** | CBSE/ICSE: **≥ 95%** | IB Diploma: **≥ 38/45** | JEE Mains: **≥ 95 Percentile** | TG/AP EAPCET Rank: **1 – 2,000**.
-      - B.Tech CSE Annual Fee after waiver: **₹2,04,000 / year** (Save ₹1,36,000).
-  - **PG Merit Scholarship Slabs (M.Tech, MBA, MCA, M.Sc)**:
-    - 10% (UG 60–69.9% / CAT/MAT 60–69.9) | 15% (UG 70–79.9% / CAT/MAT 70–79.9) | 20% (UG 80–89.9% / CAT/MAT 80–89.9) | 25% (UG ≥ 90% / CAT/MAT ≥ 90).
-  - **20 Special Category Concessions (Flat Annual Tuition Waivers)**:
-    - **₹50,000 / year Waiver**:
-      1. Sports International Representation.
-      2. Orphan Students (Both parents deceased).
-      3. Regular SRU Staff Children.
-    - **₹20,000 / year Waiver**:
-      4. Differently Abled Students (More than 50% physical disability).
-    - **₹15,000 / year Waiver**:
-      5. Girl Child (All female students).
-      6. Single Parent Child.
-      7. Children of Defence / Armed Forces & Police Personnel.
-      8. SR Junior College Alumni.
-      9. SRU Alumni / Real Sibling studying concurrently at SRU.
-      10. NCC 'C' Certificate Holders.
-      11. Non-Local / Out-of-State Students (Outside Telangana).
-      12. Sports National Representation.
-      13. Lateral Entry Diploma Students.
-      14. Padma / J&K / Gallantry Awardees or Children.
-      15. Andhra Pradesh Students.
-      16. International Students.
-      17. North East Domicile Students.
-      18. Teachers/Educators Children.
-      19. COVID Affected Bereaved Students.
-      20. Wards of University Partner Organizations.
+- **[FACT-ID: FEE-002] [STATUS: VERIFIED] [SOURCE: official 2027-28 fee card, via fees_2027_28.json]**
+  - Only the best single scholarship applies; scholarships are never added together. The scholarship is applied to the standard fee and is subject to marksheet verification.
+  - **Undergraduate merit scholarship slabs**:
+    - **10% scholarship**: Intermediate / State Board %: 60 – 64.9% | CBSE / ICSE %: 60 – 64.9% | JEE Main percentile: 50 – 59.9 %ile | TG / AP EAPCET rank: not applicable | IB Diploma score (out of 45): not applicable
+    - **15% scholarship**: Intermediate / State Board %: 65 – 69.9% | CBSE / ICSE %: 65 – 69.9% | JEE Main percentile: 60 – 69.9 %ile | TG / AP EAPCET rank: not applicable | IB Diploma score (out of 45): not applicable
+    - **20% scholarship**: Intermediate / State Board %: 70 – 79.9% | CBSE / ICSE %: 70 – 79.9% | JEE Main percentile: 70 – 79.9 %ile | TG / AP EAPCET rank: not applicable | IB Diploma score (out of 45): 24 – 29
+    - **25% scholarship**: Intermediate / State Board %: 80 – 91.9% | CBSE / ICSE %: 80 – 89.9% | JEE Main percentile: 80 – 89.9 %ile | TG / AP EAPCET rank: 8,001 – 20,000 | IB Diploma score (out of 45): 30 – 33
+    - **30% scholarship**: Intermediate / State Board %: 92 – 97.9% | CBSE / ICSE %: 90 – 94.9% | JEE Main percentile: 90 – 94.9 %ile | TG / AP EAPCET rank: 2,001 – 8,000 | IB Diploma score (out of 45): 34 – 37
+    - **40% scholarship**: Intermediate / State Board %: 98% and above | CBSE / ICSE %: 95% and above | JEE Main percentile: 95 %ile and above | TG / AP EAPCET rank: 1 – 2,000 | IB Diploma score (out of 45): 38 and above
+  - An EAPCET rank above 20,000 earns no rank-based scholarship (the student's board %, JEE or IB score may still earn one).
+  - **Postgraduate merit scholarship slabs (percentage in the qualifying degree)**:
+    - **10% scholarship**: 60 – 64.9%
+    - **15% scholarship**: 65 – 69.9%
+    - **20% scholarship**: 70 – 79.9%
+    - **25% scholarship**: 80 – 91.9%
+    - **30% scholarship**: 92 – 97.9%
+    - **40% scholarship**: 98% and above
+  - **19 special category concessions (per year, all courses, subject to document verification)**:
+    - **₹50,000 per year**: Students who have lost both parents; International-level sports achievers; Children of regular SR University employees.
+    - **₹20,000 per year**: Students with 50% or above disability.
+    - **₹15,000 per year**: Children of Defence personnel, CRPF personnel and martyrs; Children of State Police personnel; Students of SR Junior College; SRU alumni, their children and siblings; NCC 'C' certificate holders; Students from states other than Telangana and Andhra Pradesh; National-level sports achievers; Students with a single living parent / divorced parents; Lateral entry students; Children of Padma awardees, J&K migrant families and Gallantry award recipients; Only girl child from Telangana; Sibling (brother or sister) currently enrolled at SR University (2027-28); International students; Students from Andhra Pradesh; Girl students from states other than Telangana.
+  - State-level sports is NOT on the list. There is no concession for "all girl students", North-East domicile, teachers' children, COVID-affected students or partner organisations: those are not on the fee card.
+<!-- FEES:END -->
 
 ---
 
@@ -221,8 +198,8 @@
   - **Hostel Fee Structure (Annual Room & Mess)**:
     - **4 Person Occupancy (Non-AC)**: **₹1,15,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
     - **3 Person Occupancy (Non-AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Laundry: ₹5,000).
-    - **4 Person Occupancy (AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Electricity Deposit: ₹5,000, Laundry: ₹5,000).
-    - **3 Person Occupancy (AC)**: **₹1,35,000 / year** (Caution: ₹5,000, Electricity Deposit: ₹5,000, Laundry: ₹5,000).
+    - **4 Person Occupancy (AC)**: **₹1,25,000 / year** (Caution: ₹5,000, Electricity Deposit: ₹10,000, Laundry: ₹5,000).
+    - **3 Person Occupancy (AC)**: **₹1,35,000 / year** (Caution: ₹5,000, Electricity Deposit: ₹10,000, Laundry: ₹5,000).
     - *Caution deposit is one-time refundable.* AC electricity is metered through prepaid meters.
   - **Furniture Allotted**: Individual bed, mattress, study desk, chair, and wardrobe.
   - **Hot Water Hours**: 7:00 AM – 9:00 AM and 7:00 PM – 9:00 PM daily.

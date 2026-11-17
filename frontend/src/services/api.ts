@@ -1,4 +1,4 @@
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+export const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
 
 /**
  * API client for the University AI Companion backend.
@@ -17,7 +17,10 @@ export interface SourceReference {
 
 export interface ChatResponse {
   conversation_id: string;
-  message_id: string;
+  /** Present for the legacy chat pipeline; the agent's replies carry no message id. */
+  message_id?: string;
+  /** What the agent now knows about the student (name, mobile number...), sent with every agent reply. */
+  profile?: Record<string, unknown>;
   answer: string;
   sources: SourceReference[];
   suggestions?: string[];
