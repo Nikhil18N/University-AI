@@ -88,3 +88,24 @@ The following newer features on `main` remain **100% active and untouched**:
 - ✅ Dynamic IST greeting calculation.
 - ✅ Staff contact number sanitization (scrubbing personal mobiles).
 - ✅ Async SQLAlchemy database pooler configurations.
+
+
+---
+
+## v2.7.0 (17 Nov 2026): agent audit and fixes
+
+Full details: `docs/24-agent-audit-nov-2026.md`.
+
+- **Fees:** one source of truth (`backend/app/sru_agent/fees_2027_28.json`, rebuilt from the official
+  circular). The calculator, the fee cards and the agent all read it. Yearly increase is flat.
+- **Agent actions:** callback and campus-visit requests are saved as soon as name and number are
+  known; "don't call me" really cancels (lead status `do_not_contact`); the agent can no longer say
+  "saved" or "cancelled" unless a tool did it.
+- **New tools:** `get_program_info`, `compare_programs`, `get_special_concessions`,
+  `cancel_contact_request`, `share_fee_estimate`.
+- **Load:** all Gemini keys are used with rotation and retry, at most 6 model calls at once, prompt
+  56% smaller, fee questions answered from the fee file when the model is unreachable.
+- **Calculator:** rewritten on the fee table; understands "EAPCET 9000" whatever is selected; no
+  lead on every keystroke; official hostel prices; first-year total includes other and exam fees.
+- **Security:** placeholder admin key refused outside debug; public leads endpoint rate limited.
+- **Kept:** every existing feature and all 360 earlier tests still pass.

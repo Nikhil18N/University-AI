@@ -46,6 +46,22 @@ async def _set(key, value):
         except Exception:
             pass
     _local[key] = (time.time() + TTL_SECONDS, value)
+    _sweep()
+
+
+_writes = 0
+
+
+def _sweep(every: int = 500):
+    """Without Redis the server keeps chats in its own memory; drop the expired ones now and then
+    so a long-running server does not slowly fill up."""
+    global _writes
+    _writes += 1
+    if _writes % every:
+        return
+    now = time.time()
+    for key in [k for k, item in _local.items() if item[0] < now]:
+        _local.pop(key, None)
 
 
 async def get_profile(session_id: str) -> dict:
@@ -108,8 +124,9 @@ async def clear_conversation_state(session_id: str, conversation_id: str | None 
     _local.pop(key, None)
 
 
-async def allow_request(session_id: str) -> bool:
-    """Simple rate limit: N messages per minute per student."""
+async def allow_request(session_id: str, limit: int | None = None) -> bool:
+    """Simple rate limit: N messages per minute per student (or per `limit` when given)."""
+    limit = limit or config.AGENT_RATE_LIMIT_PER_MIN
     key = f"sru:rate:{session_id}:{int(time.time() // 60)}"
     r = _client()
     if r:
@@ -117,10 +134,20 @@ async def allow_request(session_id: str) -> bool:
             count = await r.incr(key)
             if count == 1:
                 await r.expire(key, 90)
-            return count <= config.AGENT_RATE_LIMIT_PER_MIN
+            return count <= limit
         except Exception:
             pass
     item = _local.get(key)
     count = (item[1] if item else 0) + 1
     _local[key] = (time.time() + 90, count)
-    return count <= config.AGENT_RATE_LIMIT_PER_MIN
+    _sweep()
+    return count <= limit
+
+
+async def remove_profile_keys(session_id: str, *keys) -> dict:
+    """Forget specific facts about a student (update_profile only ever adds)."""
+    profile = await get_profile(session_id)
+    for key in keys:
+        profile.pop(key, None)
+    await _set(f"sru:profile:{session_id}", profile)
+    return profile

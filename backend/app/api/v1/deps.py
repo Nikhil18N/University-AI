@@ -1,5 +1,6 @@
 """Dependencies for API routes."""
 
+import secrets
 from typing import Any
 from fastapi import Depends, Header, HTTPException, Request, status
 
@@ -46,8 +47,17 @@ def get_rag_service(
 async def verify_admin_key(
     x_admin_key: str = Header(..., alias="X-Admin-Key"),
 ) -> str:
-    """Verify the admin API key from request header."""
-    if x_admin_key != settings.ADMIN_API_KEY:
+    """Verify the admin API key from request header.
+
+    The placeholder key that ships in the source code is public, so outside local debugging
+    (APP_DEBUG=false) it is refused: the admin panel stays locked until a real key is set.
+    """
+    if settings.admin_key_is_default() and not settings.APP_DEBUG:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Admin access is disabled until ADMIN_API_KEY is set on the server.",
+        )
+    if not secrets.compare_digest(x_admin_key.encode(), (settings.ADMIN_API_KEY or "").encode()):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid admin API key",

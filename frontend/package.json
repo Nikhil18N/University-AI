@@ -1,13 +1,15 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "2.6.0",
+  "version": "2.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:calc": "node scripts/test-fee-calculator.mjs",
+    "test": "npm run test:calc"
   },
   "dependencies": {
     "react": "^19.2.8",

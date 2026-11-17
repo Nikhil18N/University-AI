@@ -603,7 +603,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                 tabIndex={0}
               >
                 <span className="pill-brand-name">SRU Buddy</span>
-                <span className="brand-version-pill">v{APP_VERSION}</span>
+                <span className="brand-version-pill" title={`SRU Buddy v${APP_VERSION} (beta)`}>BETA</span>
                 <span className="pill-down-arrow">▾</span>
               </div>
 

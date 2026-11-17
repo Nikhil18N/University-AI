@@ -46,6 +46,8 @@ class FeeRequest(BaseModel):
     jee_percentile: Optional[float] = Field(default=None, ge=0, le=100)
     hostel: str = "none"
     specialization: bool = False
+    ib_score: Optional[int] = Field(default=None, ge=0, le=45)
+    transport: bool = False
 
 
 def _sse(event: dict) -> str:
@@ -91,3 +93,11 @@ async def calculate(req: FeeRequest):
 @router.get("/programs")
 async def programs():
     return fees.list_programs()
+
+
+@router.get("/fee-config")
+async def fee_config():
+    """Everything the Fee & Scholarship Calculator needs to draw itself: programs, the exams each
+    one accepts, scholarship slabs, hostel and one-time fees. Read from the same fee file the
+    agent uses, so the calculator never carries its own copy of the numbers."""
+    return fees.fee_config()

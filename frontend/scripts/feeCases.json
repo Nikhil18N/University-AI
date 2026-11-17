@@ -1,0 +1,6931 @@
+[
+{
+"program": "btech_cse",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,80,000",
+"sem1_total_payable": "₹1,85,000",
+"first_year_total_payable": "₹3,65,000",
+"full_course_total": "₹14,99,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,49,000",
+"₹3,58,000",
+"₹3,67,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,37,500",
+"sem1_total_payable": "₹2,42,500",
+"first_year_total_payable": "₹4,80,000",
+"full_course_total": "₹19,59,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,49,000",
+"₹3,58,000",
+"₹3,67,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,06,000",
+"per_semester_after_scholarship": "₹1,53,000",
+"saving_first_year": "₹34,000",
+"total_per_semester": "₹2,30,500",
+"sem1_total_payable": "₹2,35,500",
+"first_year_total_payable": "₹4,66,000",
+"full_course_total": "₹19,03,000"
+},
+"years": [
+"₹3,06,000",
+"₹3,15,000",
+"₹3,24,000",
+"₹3,33,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,89,000",
+"per_semester_after_scholarship": "₹1,44,500",
+"saving_first_year": "₹51,000",
+"total_per_semester": "₹1,54,500",
+"sem1_total_payable": "₹1,59,500",
+"first_year_total_payable": "₹3,14,000",
+"full_course_total": "₹12,95,000"
+},
+"years": [
+"₹2,89,000",
+"₹2,98,000",
+"₹3,07,000",
+"₹3,16,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,72,000",
+"per_semester_after_scholarship": "₹1,36,000",
+"saving_first_year": "₹68,000",
+"total_per_semester": "₹2,03,500",
+"sem1_total_payable": "₹2,08,500",
+"first_year_total_payable": "₹4,12,000",
+"full_course_total": "₹16,87,000"
+},
+"years": [
+"₹2,72,000",
+"₹2,81,000",
+"₹2,90,000",
+"₹2,99,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,55,000",
+"per_semester_after_scholarship": "₹1,27,500",
+"saving_first_year": "₹85,000",
+"total_per_semester": "₹2,05,000",
+"sem1_total_payable": "₹2,10,000",
+"first_year_total_payable": "₹4,15,000",
+"full_course_total": "₹16,99,000"
+},
+"years": [
+"₹2,55,000",
+"₹2,64,000",
+"₹2,73,000",
+"₹2,82,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,38,000",
+"per_semester_after_scholarship": "₹1,19,000",
+"saving_first_year": "₹1,02,000",
+"total_per_semester": "₹1,29,000",
+"sem1_total_payable": "₹1,34,000",
+"first_year_total_payable": "₹2,63,000",
+"full_course_total": "₹10,91,000"
+},
+"years": [
+"₹2,38,000",
+"₹2,47,000",
+"₹2,56,000",
+"₹2,65,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,04,000",
+"per_semester_after_scholarship": "₹1,02,000",
+"saving_first_year": "₹1,36,000",
+"total_per_semester": "₹1,69,500",
+"sem1_total_payable": "₹1,74,500",
+"first_year_total_payable": "₹3,44,000",
+"full_course_total": "₹14,15,000"
+},
+"years": [
+"₹2,04,000",
+"₹2,13,000",
+"₹2,22,000",
+"₹2,31,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,04,000",
+"per_semester_after_scholarship": "₹1,02,000",
+"saving_first_year": "₹1,36,000",
+"total_per_semester": "₹1,79,500",
+"sem1_total_payable": "₹1,84,500",
+"first_year_total_payable": "₹3,64,000",
+"full_course_total": "₹14,95,000"
+},
+"years": [
+"₹2,04,000",
+"₹2,13,000",
+"₹2,22,000",
+"₹2,31,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,55,000",
+"per_semester_after_scholarship": "₹1,27,500",
+"saving_first_year": "₹85,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,59,000"
+},
+"years": [
+"₹2,55,000",
+"₹2,64,000",
+"₹2,73,000",
+"₹2,82,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,37,500",
+"sem1_total_payable": "₹2,42,500",
+"first_year_total_payable": "₹4,80,000",
+"full_course_total": "₹19,59,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,49,000",
+"₹3,58,000",
+"₹3,67,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,38,000",
+"per_semester_after_scholarship": "₹1,19,000",
+"saving_first_year": "₹1,02,000",
+"total_per_semester": "₹1,96,500",
+"sem1_total_payable": "₹2,01,500",
+"first_year_total_payable": "₹3,98,000",
+"full_course_total": "₹16,31,000"
+},
+"years": [
+"₹2,38,000",
+"₹2,47,000",
+"₹2,56,000",
+"₹2,65,000"
+]
+},
+{
+"program": "btech_cse",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,38,000",
+"per_semester_after_scholarship": "₹1,19,000",
+"saving_first_year": "₹1,02,000",
+"total_per_semester": "₹1,29,000",
+"sem1_total_payable": "₹1,34,000",
+"first_year_total_payable": "₹2,63,000",
+"full_course_total": "₹10,91,000"
+},
+"years": [
+"₹2,38,000",
+"₹2,47,000",
+"₹2,56,000",
+"₹2,65,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹4,00,000",
+"per_semester_after_scholarship": "₹2,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,10,000",
+"sem1_total_payable": "₹2,15,000",
+"first_year_total_payable": "₹4,25,000",
+"full_course_total": "₹17,57,000"
+},
+"years": [
+"₹4,00,000",
+"₹4,12,000",
+"₹4,24,000",
+"₹4,36,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹4,00,000",
+"per_semester_after_scholarship": "₹2,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,67,500",
+"sem1_total_payable": "₹2,72,500",
+"first_year_total_payable": "₹5,40,000",
+"full_course_total": "₹22,17,000"
+},
+"years": [
+"₹4,00,000",
+"₹4,12,000",
+"₹4,24,000",
+"₹4,36,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹3,60,000",
+"per_semester_after_scholarship": "₹1,80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹2,57,500",
+"sem1_total_payable": "₹2,62,500",
+"first_year_total_payable": "₹5,20,000",
+"full_course_total": "₹21,37,000"
+},
+"years": [
+"₹3,60,000",
+"₹3,72,000",
+"₹3,84,000",
+"₹3,96,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,80,000",
+"sem1_total_payable": "₹1,85,000",
+"first_year_total_payable": "₹3,65,000",
+"full_course_total": "₹15,17,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,52,000",
+"₹3,64,000",
+"₹3,76,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹3,20,000",
+"per_semester_after_scholarship": "₹1,60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹2,27,500",
+"sem1_total_payable": "₹2,32,500",
+"first_year_total_payable": "₹4,60,000",
+"full_course_total": "₹18,97,000"
+},
+"years": [
+"₹3,20,000",
+"₹3,32,000",
+"₹3,44,000",
+"₹3,56,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹1,00,000",
+"total_per_semester": "₹2,27,500",
+"sem1_total_payable": "₹2,32,500",
+"first_year_total_payable": "₹4,60,000",
+"full_course_total": "₹18,97,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,12,000",
+"₹3,24,000",
+"₹3,36,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹2,80,000",
+"per_semester_after_scholarship": "₹1,40,000",
+"saving_first_year": "₹1,20,000",
+"total_per_semester": "₹1,50,000",
+"sem1_total_payable": "₹1,55,000",
+"first_year_total_payable": "₹3,05,000",
+"full_course_total": "₹12,77,000"
+},
+"years": [
+"₹2,80,000",
+"₹2,92,000",
+"₹3,04,000",
+"₹3,16,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹2,40,000",
+"per_semester_after_scholarship": "₹1,20,000",
+"saving_first_year": "₹1,60,000",
+"total_per_semester": "₹1,87,500",
+"sem1_total_payable": "₹1,92,500",
+"first_year_total_payable": "₹3,80,000",
+"full_course_total": "₹15,77,000"
+},
+"years": [
+"₹2,40,000",
+"₹2,52,000",
+"₹2,64,000",
+"₹2,76,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹2,40,000",
+"per_semester_after_scholarship": "₹1,20,000",
+"saving_first_year": "₹1,60,000",
+"total_per_semester": "₹1,97,500",
+"sem1_total_payable": "₹2,02,500",
+"first_year_total_payable": "₹4,00,000",
+"full_course_total": "₹16,57,000"
+},
+"years": [
+"₹2,40,000",
+"₹2,52,000",
+"₹2,64,000",
+"₹2,76,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹1,00,000",
+"total_per_semester": "₹1,60,000",
+"sem1_total_payable": "₹1,65,000",
+"first_year_total_payable": "₹3,25,000",
+"full_course_total": "₹13,57,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,12,000",
+"₹3,24,000",
+"₹3,36,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹4,00,000",
+"per_semester_after_scholarship": "₹2,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,67,500",
+"sem1_total_payable": "₹2,72,500",
+"first_year_total_payable": "₹5,40,000",
+"full_course_total": "₹22,17,000"
+},
+"years": [
+"₹4,00,000",
+"₹4,12,000",
+"₹4,24,000",
+"₹4,36,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹2,80,000",
+"per_semester_after_scholarship": "₹1,40,000",
+"saving_first_year": "₹1,20,000",
+"total_per_semester": "₹2,17,500",
+"sem1_total_payable": "₹2,22,500",
+"first_year_total_payable": "₹4,40,000",
+"full_course_total": "₹18,17,000"
+},
+"years": [
+"₹2,80,000",
+"₹2,92,000",
+"₹3,04,000",
+"₹3,16,000"
+]
+},
+{
+"program": "btech_ai_robotics",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹4,00,000",
+"tuition_first_year_after_scholarship": "₹2,80,000",
+"per_semester_after_scholarship": "₹1,40,000",
+"saving_first_year": "₹1,20,000",
+"total_per_semester": "₹1,50,000",
+"sem1_total_payable": "₹1,55,000",
+"first_year_total_payable": "₹3,05,000",
+"full_course_total": "₹12,77,000"
+},
+"years": [
+"₹2,80,000",
+"₹2,92,000",
+"₹3,04,000",
+"₹3,16,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,70,000",
+"per_semester_after_scholarship": "₹1,35,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,45,000",
+"sem1_total_payable": "₹1,50,000",
+"first_year_total_payable": "₹2,95,000",
+"full_course_total": "₹12,13,000"
+},
+"years": [
+"₹2,70,000",
+"₹2,78,000",
+"₹2,86,000",
+"₹2,94,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,70,000",
+"per_semester_after_scholarship": "₹1,35,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,02,500",
+"sem1_total_payable": "₹2,07,500",
+"first_year_total_payable": "₹4,10,000",
+"full_course_total": "₹16,73,000"
+},
+"years": [
+"₹2,70,000",
+"₹2,78,000",
+"₹2,86,000",
+"₹2,94,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,43,000",
+"per_semester_after_scholarship": "₹1,21,500",
+"saving_first_year": "₹27,000",
+"total_per_semester": "₹1,99,000",
+"sem1_total_payable": "₹2,04,000",
+"first_year_total_payable": "₹4,03,000",
+"full_course_total": "₹16,45,000"
+},
+"years": [
+"₹2,43,000",
+"₹2,51,000",
+"₹2,59,000",
+"₹2,67,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,29,500",
+"per_semester_after_scholarship": "₹1,14,750",
+"saving_first_year": "₹40,500",
+"total_per_semester": "₹1,24,750",
+"sem1_total_payable": "₹1,29,750",
+"first_year_total_payable": "₹2,54,500",
+"full_course_total": "₹10,51,000"
+},
+"years": [
+"₹2,29,500",
+"₹2,37,500",
+"₹2,45,500",
+"₹2,53,500"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,16,000",
+"per_semester_after_scholarship": "₹1,08,000",
+"saving_first_year": "₹54,000",
+"total_per_semester": "₹1,75,500",
+"sem1_total_payable": "₹1,80,500",
+"first_year_total_payable": "₹3,56,000",
+"full_course_total": "₹14,57,000"
+},
+"years": [
+"₹2,16,000",
+"₹2,24,000",
+"₹2,32,000",
+"₹2,40,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,02,500",
+"per_semester_after_scholarship": "₹1,01,250",
+"saving_first_year": "₹67,500",
+"total_per_semester": "₹1,78,750",
+"sem1_total_payable": "₹1,83,750",
+"first_year_total_payable": "₹3,62,500",
+"full_course_total": "₹14,83,000"
+},
+"years": [
+"₹2,02,500",
+"₹2,10,500",
+"₹2,18,500",
+"₹2,26,500"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹1,89,000",
+"per_semester_after_scholarship": "₹94,500",
+"saving_first_year": "₹81,000",
+"total_per_semester": "₹1,04,500",
+"sem1_total_payable": "₹1,09,500",
+"first_year_total_payable": "₹2,14,000",
+"full_course_total": "₹8,89,000"
+},
+"years": [
+"₹1,89,000",
+"₹1,97,000",
+"₹2,05,000",
+"₹2,13,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹1,62,000",
+"per_semester_after_scholarship": "₹81,000",
+"saving_first_year": "₹1,08,000",
+"total_per_semester": "₹1,48,500",
+"sem1_total_payable": "₹1,53,500",
+"first_year_total_payable": "₹3,02,000",
+"full_course_total": "₹12,41,000"
+},
+"years": [
+"₹1,62,000",
+"₹1,70,000",
+"₹1,78,000",
+"₹1,86,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹1,62,000",
+"per_semester_after_scholarship": "₹81,000",
+"saving_first_year": "₹1,08,000",
+"total_per_semester": "₹1,58,500",
+"sem1_total_payable": "₹1,63,500",
+"first_year_total_payable": "₹3,22,000",
+"full_course_total": "₹13,21,000"
+},
+"years": [
+"₹1,62,000",
+"₹1,70,000",
+"₹1,78,000",
+"₹1,86,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,02,500",
+"per_semester_after_scholarship": "₹1,01,250",
+"saving_first_year": "₹67,500",
+"total_per_semester": "₹1,11,250",
+"sem1_total_payable": "₹1,16,250",
+"first_year_total_payable": "₹2,27,500",
+"full_course_total": "₹9,43,000"
+},
+"years": [
+"₹2,02,500",
+"₹2,10,500",
+"₹2,18,500",
+"₹2,26,500"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹2,70,000",
+"per_semester_after_scholarship": "₹1,35,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,02,500",
+"sem1_total_payable": "₹2,07,500",
+"first_year_total_payable": "₹4,10,000",
+"full_course_total": "₹16,73,000"
+},
+"years": [
+"₹2,70,000",
+"₹2,78,000",
+"₹2,86,000",
+"₹2,94,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹1,89,000",
+"per_semester_after_scholarship": "₹94,500",
+"saving_first_year": "₹81,000",
+"total_per_semester": "₹1,72,000",
+"sem1_total_payable": "₹1,77,000",
+"first_year_total_payable": "₹3,49,000",
+"full_course_total": "₹14,29,000"
+},
+"years": [
+"₹1,89,000",
+"₹1,97,000",
+"₹2,05,000",
+"₹2,13,000"
+]
+},
+{
+"program": "btech_ece",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,70,000",
+"tuition_first_year_after_scholarship": "₹1,89,000",
+"per_semester_after_scholarship": "₹94,500",
+"saving_first_year": "₹81,000",
+"total_per_semester": "₹1,04,500",
+"sem1_total_payable": "₹1,09,500",
+"first_year_total_payable": "₹2,14,000",
+"full_course_total": "₹8,89,000"
+},
+"years": [
+"₹1,89,000",
+"₹1,97,000",
+"₹2,05,000",
+"₹2,13,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_eee",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_mech",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_civil",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_biotech",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_food_tech",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_engg_physics",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,80,000",
+"sem1_total_payable": "₹1,85,000",
+"first_year_total_payable": "₹3,65,000",
+"full_course_total": "₹15,05,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,50,000",
+"₹3,60,000",
+"₹3,70,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,37,500",
+"sem1_total_payable": "₹2,42,500",
+"first_year_total_payable": "₹4,80,000",
+"full_course_total": "₹19,65,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,50,000",
+"₹3,60,000",
+"₹3,70,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,06,000",
+"per_semester_after_scholarship": "₹1,53,000",
+"saving_first_year": "₹34,000",
+"total_per_semester": "₹2,30,500",
+"sem1_total_payable": "₹2,35,500",
+"first_year_total_payable": "₹4,66,000",
+"full_course_total": "₹19,09,000"
+},
+"years": [
+"₹3,06,000",
+"₹3,16,000",
+"₹3,26,000",
+"₹3,36,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,89,000",
+"per_semester_after_scholarship": "₹1,44,500",
+"saving_first_year": "₹51,000",
+"total_per_semester": "₹1,54,500",
+"sem1_total_payable": "₹1,59,500",
+"first_year_total_payable": "₹3,14,000",
+"full_course_total": "₹13,01,000"
+},
+"years": [
+"₹2,89,000",
+"₹2,99,000",
+"₹3,09,000",
+"₹3,19,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,72,000",
+"per_semester_after_scholarship": "₹1,36,000",
+"saving_first_year": "₹68,000",
+"total_per_semester": "₹2,03,500",
+"sem1_total_payable": "₹2,08,500",
+"first_year_total_payable": "₹4,12,000",
+"full_course_total": "₹16,93,000"
+},
+"years": [
+"₹2,72,000",
+"₹2,82,000",
+"₹2,92,000",
+"₹3,02,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,55,000",
+"per_semester_after_scholarship": "₹1,27,500",
+"saving_first_year": "₹85,000",
+"total_per_semester": "₹2,05,000",
+"sem1_total_payable": "₹2,10,000",
+"first_year_total_payable": "₹4,15,000",
+"full_course_total": "₹17,05,000"
+},
+"years": [
+"₹2,55,000",
+"₹2,65,000",
+"₹2,75,000",
+"₹2,85,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,38,000",
+"per_semester_after_scholarship": "₹1,19,000",
+"saving_first_year": "₹1,02,000",
+"total_per_semester": "₹1,29,000",
+"sem1_total_payable": "₹1,34,000",
+"first_year_total_payable": "₹2,63,000",
+"full_course_total": "₹10,97,000"
+},
+"years": [
+"₹2,38,000",
+"₹2,48,000",
+"₹2,58,000",
+"₹2,68,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,04,000",
+"per_semester_after_scholarship": "₹1,02,000",
+"saving_first_year": "₹1,36,000",
+"total_per_semester": "₹1,69,500",
+"sem1_total_payable": "₹1,74,500",
+"first_year_total_payable": "₹3,44,000",
+"full_course_total": "₹14,21,000"
+},
+"years": [
+"₹2,04,000",
+"₹2,14,000",
+"₹2,24,000",
+"₹2,34,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,04,000",
+"per_semester_after_scholarship": "₹1,02,000",
+"saving_first_year": "₹1,36,000",
+"total_per_semester": "₹1,79,500",
+"sem1_total_payable": "₹1,84,500",
+"first_year_total_payable": "₹3,64,000",
+"full_course_total": "₹15,01,000"
+},
+"years": [
+"₹2,04,000",
+"₹2,14,000",
+"₹2,24,000",
+"₹2,34,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,55,000",
+"per_semester_after_scholarship": "₹1,27,500",
+"saving_first_year": "₹85,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,65,000"
+},
+"years": [
+"₹2,55,000",
+"₹2,65,000",
+"₹2,75,000",
+"₹2,85,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹3,40,000",
+"per_semester_after_scholarship": "₹1,70,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,37,500",
+"sem1_total_payable": "₹2,42,500",
+"first_year_total_payable": "₹4,80,000",
+"full_course_total": "₹19,65,000"
+},
+"years": [
+"₹3,40,000",
+"₹3,50,000",
+"₹3,60,000",
+"₹3,70,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,38,000",
+"per_semester_after_scholarship": "₹1,19,000",
+"saving_first_year": "₹1,02,000",
+"total_per_semester": "₹1,96,500",
+"sem1_total_payable": "₹2,01,500",
+"first_year_total_payable": "₹3,98,000",
+"full_course_total": "₹16,37,000"
+},
+"years": [
+"₹2,38,000",
+"₹2,48,000",
+"₹2,58,000",
+"₹2,68,000"
+]
+},
+{
+"program": "btech_iep",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,40,000",
+"tuition_first_year_after_scholarship": "₹2,38,000",
+"per_semester_after_scholarship": "₹1,19,000",
+"saving_first_year": "₹1,02,000",
+"total_per_semester": "₹1,29,000",
+"sem1_total_payable": "₹1,34,000",
+"first_year_total_payable": "₹2,63,000",
+"full_course_total": "₹10,97,000"
+},
+"years": [
+"₹2,38,000",
+"₹2,48,000",
+"₹2,58,000",
+"₹2,68,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹9,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000",
+"₹1,98,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹8,01,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000",
+"₹1,88,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000",
+"₹1,78,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹12,61,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹10,61,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹11,41,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000",
+"₹1,68,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹13,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000",
+"₹2,18,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹12,21,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bsc_agri",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹2,10,000",
+"per_semester_after_scholarship": "₹1,05,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": "₹9,61,000"
+},
+"years": [
+"₹2,10,000",
+"₹2,16,000",
+"₹2,22,000",
+"₹2,28,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹2,10,000",
+"per_semester_after_scholarship": "₹1,05,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,72,500",
+"sem1_total_payable": "₹1,77,500",
+"first_year_total_payable": "₹3,50,000",
+"full_course_total": "₹14,21,000"
+},
+"years": [
+"₹2,10,000",
+"₹2,16,000",
+"₹2,22,000",
+"₹2,28,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,89,000",
+"per_semester_after_scholarship": "₹94,500",
+"saving_first_year": "₹21,000",
+"total_per_semester": "₹1,72,000",
+"sem1_total_payable": "₹1,77,000",
+"first_year_total_payable": "₹3,49,000",
+"full_course_total": "₹14,17,000"
+},
+"years": [
+"₹1,89,000",
+"₹1,95,000",
+"₹2,01,000",
+"₹2,07,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,78,500",
+"per_semester_after_scholarship": "₹89,250",
+"saving_first_year": "₹31,500",
+"total_per_semester": "₹99,250",
+"sem1_total_payable": "₹1,04,250",
+"first_year_total_payable": "₹2,03,500",
+"full_course_total": "₹8,35,000"
+},
+"years": [
+"₹1,78,500",
+"₹1,84,500",
+"₹1,90,500",
+"₹1,96,500"
+]
+},
+{
+"program": "bdes",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,68,000",
+"per_semester_after_scholarship": "₹84,000",
+"saving_first_year": "₹42,000",
+"total_per_semester": "₹1,51,500",
+"sem1_total_payable": "₹1,56,500",
+"first_year_total_payable": "₹3,08,000",
+"full_course_total": "₹12,53,000"
+},
+"years": [
+"₹1,68,000",
+"₹1,74,000",
+"₹1,80,000",
+"₹1,86,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,57,500",
+"per_semester_after_scholarship": "₹78,750",
+"saving_first_year": "₹52,500",
+"total_per_semester": "₹1,56,250",
+"sem1_total_payable": "₹1,61,250",
+"first_year_total_payable": "₹3,17,500",
+"full_course_total": "₹12,91,000"
+},
+"years": [
+"₹1,57,500",
+"₹1,63,500",
+"₹1,69,500",
+"₹1,75,500"
+]
+},
+{
+"program": "bdes",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,47,000",
+"per_semester_after_scholarship": "₹73,500",
+"saving_first_year": "₹63,000",
+"total_per_semester": "₹83,500",
+"sem1_total_payable": "₹88,500",
+"first_year_total_payable": "₹1,72,000",
+"full_course_total": "₹7,09,000"
+},
+"years": [
+"₹1,47,000",
+"₹1,53,000",
+"₹1,59,000",
+"₹1,65,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,26,000",
+"per_semester_after_scholarship": "₹63,000",
+"saving_first_year": "₹84,000",
+"total_per_semester": "₹1,30,500",
+"sem1_total_payable": "₹1,35,500",
+"first_year_total_payable": "₹2,66,000",
+"full_course_total": "₹10,85,000"
+},
+"years": [
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000",
+"₹1,44,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,26,000",
+"per_semester_after_scholarship": "₹63,000",
+"saving_first_year": "₹84,000",
+"total_per_semester": "₹1,40,500",
+"sem1_total_payable": "₹1,45,500",
+"first_year_total_payable": "₹2,86,000",
+"full_course_total": "₹11,65,000"
+},
+"years": [
+"₹1,26,000",
+"₹1,32,000",
+"₹1,38,000",
+"₹1,44,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,57,500",
+"per_semester_after_scholarship": "₹78,750",
+"saving_first_year": "₹52,500",
+"total_per_semester": "₹88,750",
+"sem1_total_payable": "₹93,750",
+"first_year_total_payable": "₹1,82,500",
+"full_course_total": "₹7,51,000"
+},
+"years": [
+"₹1,57,500",
+"₹1,63,500",
+"₹1,69,500",
+"₹1,75,500"
+]
+},
+{
+"program": "bdes",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹2,10,000",
+"per_semester_after_scholarship": "₹1,05,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,72,500",
+"sem1_total_payable": "₹1,77,500",
+"first_year_total_payable": "₹3,50,000",
+"full_course_total": "₹14,21,000"
+},
+"years": [
+"₹2,10,000",
+"₹2,16,000",
+"₹2,22,000",
+"₹2,28,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,47,000",
+"per_semester_after_scholarship": "₹73,500",
+"saving_first_year": "₹63,000",
+"total_per_semester": "₹1,51,000",
+"sem1_total_payable": "₹1,56,000",
+"first_year_total_payable": "₹3,07,000",
+"full_course_total": "₹12,49,000"
+},
+"years": [
+"₹1,47,000",
+"₹1,53,000",
+"₹1,59,000",
+"₹1,65,000"
+]
+},
+{
+"program": "bdes",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,10,000",
+"tuition_first_year_after_scholarship": "₹1,47,000",
+"per_semester_after_scholarship": "₹73,500",
+"saving_first_year": "₹63,000",
+"total_per_semester": "₹83,500",
+"sem1_total_payable": "₹88,500",
+"first_year_total_payable": "₹1,72,000",
+"full_course_total": "₹7,09,000"
+},
+"years": [
+"₹1,47,000",
+"₹1,53,000",
+"₹1,59,000",
+"₹1,65,000"
+]
+},
+{
+"program": "bba",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹5,27,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bba",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹8,72,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bba",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,35,000",
+"per_semester_after_scholarship": "₹67,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹1,45,000",
+"sem1_total_payable": "₹1,50,000",
+"first_year_total_payable": "₹2,95,000",
+"full_course_total": "₹8,87,000"
+},
+"years": [
+"₹1,35,000",
+"₹1,39,000",
+"₹1,43,000"
+]
+},
+{
+"program": "bba",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,27,500",
+"per_semester_after_scholarship": "₹63,750",
+"saving_first_year": "₹22,500",
+"total_per_semester": "₹73,750",
+"sem1_total_payable": "₹78,750",
+"first_year_total_payable": "₹1,52,500",
+"full_course_total": "₹4,59,500"
+},
+"years": [
+"₹1,27,500",
+"₹1,31,500",
+"₹1,35,500"
+]
+},
+{
+"program": "bba",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹7,82,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,24,000",
+"₹1,28,000"
+]
+},
+{
+"program": "bba",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹1,33,750",
+"sem1_total_payable": "₹1,38,750",
+"first_year_total_payable": "₹2,72,500",
+"full_course_total": "₹8,19,500"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500",
+"₹1,20,500"
+]
+},
+{
+"program": "bba",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹3,92,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bba",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": "₹6,92,000"
+},
+"years": [
+"₹90,000",
+"₹94,000",
+"₹98,000"
+]
+},
+{
+"program": "bba",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": "₹7,52,000"
+},
+"years": [
+"₹90,000",
+"₹94,000",
+"₹98,000"
+]
+},
+{
+"program": "bba",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹66,250",
+"sem1_total_payable": "₹71,250",
+"first_year_total_payable": "₹1,37,500",
+"full_course_total": "₹4,14,500"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500",
+"₹1,20,500"
+]
+},
+{
+"program": "bba",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹8,72,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bba",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹1,30,000",
+"sem1_total_payable": "₹1,35,000",
+"first_year_total_payable": "₹2,65,000",
+"full_course_total": "₹7,97,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bba",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹3,92,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bsc_hospitality",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,35,000",
+"per_semester_after_scholarship": "₹67,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹1,45,000",
+"sem1_total_payable": "₹1,50,000",
+"first_year_total_payable": "₹2,95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,27,500",
+"per_semester_after_scholarship": "₹63,750",
+"saving_first_year": "₹22,500",
+"total_per_semester": "₹73,750",
+"sem1_total_payable": "₹78,750",
+"first_year_total_payable": "₹1,52,500",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹1,33,750",
+"sem1_total_payable": "₹1,38,750",
+"first_year_total_payable": "₹2,72,500",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹66,250",
+"sem1_total_payable": "₹71,250",
+"first_year_total_payable": "₹1,37,500",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹1,30,000",
+"sem1_total_payable": "₹1,35,000",
+"first_year_total_payable": "₹2,65,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_hospitality",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bba_specialised",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹6,83,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹10,28,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹10,28,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000",
+"₹1,92,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹5,93,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000",
+"₹1,82,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹9,08,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000",
+"₹1,72,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹9,38,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹5,03,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹7,88,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹8,48,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000",
+"₹1,32,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹5,33,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000",
+"₹1,62,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹10,28,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000",
+"₹2,12,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹9,08,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000"
+]
+},
+{
+"program": "bba_specialised",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹5,03,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000",
+"₹1,52,000"
+]
+},
+{
+"program": "bca",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹5,27,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bca",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹8,72,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bca",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,35,000",
+"per_semester_after_scholarship": "₹67,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹1,45,000",
+"sem1_total_payable": "₹1,50,000",
+"first_year_total_payable": "₹2,95,000",
+"full_course_total": "₹8,87,000"
+},
+"years": [
+"₹1,35,000",
+"₹1,39,000",
+"₹1,43,000"
+]
+},
+{
+"program": "bca",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,27,500",
+"per_semester_after_scholarship": "₹63,750",
+"saving_first_year": "₹22,500",
+"total_per_semester": "₹73,750",
+"sem1_total_payable": "₹78,750",
+"first_year_total_payable": "₹1,52,500",
+"full_course_total": "₹4,59,500"
+},
+"years": [
+"₹1,27,500",
+"₹1,31,500",
+"₹1,35,500"
+]
+},
+{
+"program": "bca",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹7,82,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,24,000",
+"₹1,28,000"
+]
+},
+{
+"program": "bca",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹1,33,750",
+"sem1_total_payable": "₹1,38,750",
+"first_year_total_payable": "₹2,72,500",
+"full_course_total": "₹8,19,500"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500",
+"₹1,20,500"
+]
+},
+{
+"program": "bca",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹3,92,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bca",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": "₹6,92,000"
+},
+"years": [
+"₹90,000",
+"₹94,000",
+"₹98,000"
+]
+},
+{
+"program": "bca",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": "₹7,52,000"
+},
+"years": [
+"₹90,000",
+"₹94,000",
+"₹98,000"
+]
+},
+{
+"program": "bca",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹66,250",
+"sem1_total_payable": "₹71,250",
+"first_year_total_payable": "₹1,37,500",
+"full_course_total": "₹4,14,500"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500",
+"₹1,20,500"
+]
+},
+{
+"program": "bca",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹8,72,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bca",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹1,30,000",
+"sem1_total_payable": "₹1,35,000",
+"first_year_total_payable": "₹2,65,000",
+"full_course_total": "₹7,97,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bca",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹3,92,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹5,27,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹8,72,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,35,000",
+"per_semester_after_scholarship": "₹67,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹1,45,000",
+"sem1_total_payable": "₹1,50,000",
+"first_year_total_payable": "₹2,95,000",
+"full_course_total": "₹8,87,000"
+},
+"years": [
+"₹1,35,000",
+"₹1,39,000",
+"₹1,43,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,27,500",
+"per_semester_after_scholarship": "₹63,750",
+"saving_first_year": "₹22,500",
+"total_per_semester": "₹73,750",
+"sem1_total_payable": "₹78,750",
+"first_year_total_payable": "₹1,52,500",
+"full_course_total": "₹4,59,500"
+},
+"years": [
+"₹1,27,500",
+"₹1,31,500",
+"₹1,35,500"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹7,82,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,24,000",
+"₹1,28,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹1,33,750",
+"sem1_total_payable": "₹1,38,750",
+"first_year_total_payable": "₹2,72,500",
+"full_course_total": "₹8,19,500"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500",
+"₹1,20,500"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹3,92,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": "₹6,92,000"
+},
+"years": [
+"₹90,000",
+"₹94,000",
+"₹98,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": "₹7,52,000"
+},
+"years": [
+"₹90,000",
+"₹94,000",
+"₹98,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹66,250",
+"sem1_total_payable": "₹71,250",
+"first_year_total_payable": "₹1,37,500",
+"full_course_total": "₹4,14,500"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500",
+"₹1,20,500"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹8,72,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000",
+"₹1,58,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹1,30,000",
+"sem1_total_payable": "₹1,35,000",
+"first_year_total_payable": "₹2,65,000",
+"full_course_total": "₹7,97,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bsc_cs",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹3,92,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000",
+"₹1,13,000"
+]
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹10,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹85,000",
+"per_semester_after_scholarship": "₹42,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹52,500",
+"sem1_total_payable": "₹57,500",
+"first_year_total_payable": "₹1,10,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹80,000",
+"per_semester_after_scholarship": "₹40,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹97,500",
+"sem1_total_payable": "₹1,02,500",
+"first_year_total_payable": "₹2,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹47,500",
+"sem1_total_payable": "₹52,500",
+"first_year_total_payable": "₹1,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_maths_ai",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹10,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹85,000",
+"per_semester_after_scholarship": "₹42,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹52,500",
+"sem1_total_payable": "₹57,500",
+"first_year_total_payable": "₹1,10,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹80,000",
+"per_semester_after_scholarship": "₹40,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹97,500",
+"sem1_total_payable": "₹1,02,500",
+"first_year_total_payable": "₹2,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹47,500",
+"sem1_total_payable": "₹52,500",
+"first_year_total_payable": "₹1,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bcom",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹10,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹85,000",
+"per_semester_after_scholarship": "₹42,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹52,500",
+"sem1_total_payable": "₹57,500",
+"first_year_total_payable": "₹1,10,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹80,000",
+"per_semester_after_scholarship": "₹40,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹97,500",
+"sem1_total_payable": "₹1,02,500",
+"first_year_total_payable": "₹2,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹47,500",
+"sem1_total_payable": "₹52,500",
+"first_year_total_payable": "₹1,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_physics",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹10,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹85,000",
+"per_semester_after_scholarship": "₹42,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹52,500",
+"sem1_total_payable": "₹57,500",
+"first_year_total_payable": "₹1,10,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹80,000",
+"per_semester_after_scholarship": "₹40,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹97,500",
+"sem1_total_payable": "₹1,02,500",
+"first_year_total_payable": "₹2,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹47,500",
+"sem1_total_payable": "₹52,500",
+"first_year_total_payable": "₹1,00,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "bsc_chemistry",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": null
+},
+"years": []
+},
+{
+"program": "mba",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,60,000",
+"sem1_total_payable": "₹1,65,000",
+"first_year_total_payable": "₹3,25,000",
+"full_course_total": "₹6,54,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,17,500",
+"sem1_total_payable": "₹2,22,500",
+"first_year_total_payable": "₹4,40,000",
+"full_course_total": "₹8,84,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹2,70,000",
+"per_semester_after_scholarship": "₹1,35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹2,12,500",
+"sem1_total_payable": "₹2,17,500",
+"first_year_total_payable": "₹4,30,000",
+"full_course_total": "₹8,64,000"
+},
+"years": [
+"₹2,70,000",
+"₹2,79,000"
+]
+},
+{
+"program": "mba",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹2,55,000",
+"per_semester_after_scholarship": "₹1,27,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹1,37,500",
+"sem1_total_payable": "₹1,42,500",
+"first_year_total_payable": "₹2,80,000",
+"full_course_total": "₹5,64,000"
+},
+"years": [
+"₹2,55,000",
+"₹2,64,000"
+]
+},
+{
+"program": "mba",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹2,40,000",
+"per_semester_after_scholarship": "₹1,20,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,87,500",
+"sem1_total_payable": "₹1,92,500",
+"first_year_total_payable": "₹3,80,000",
+"full_course_total": "₹7,64,000"
+},
+"years": [
+"₹2,40,000",
+"₹2,49,000"
+]
+},
+{
+"program": "mba",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹2,25,000",
+"per_semester_after_scholarship": "₹1,12,500",
+"saving_first_year": "₹75,000",
+"total_per_semester": "₹1,90,000",
+"sem1_total_payable": "₹1,95,000",
+"first_year_total_payable": "₹3,85,000",
+"full_course_total": "₹7,74,000"
+},
+"years": [
+"₹2,25,000",
+"₹2,34,000"
+]
+},
+{
+"program": "mba",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹2,10,000",
+"per_semester_after_scholarship": "₹1,05,000",
+"saving_first_year": "₹90,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": "₹4,74,000"
+},
+"years": [
+"₹2,10,000",
+"₹2,19,000"
+]
+},
+{
+"program": "mba",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹1,20,000",
+"total_per_semester": "₹1,57,500",
+"sem1_total_payable": "₹1,62,500",
+"first_year_total_payable": "₹3,20,000",
+"full_course_total": "₹6,44,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,89,000"
+]
+},
+{
+"program": "mba",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,27,500",
+"sem1_total_payable": "₹2,32,500",
+"first_year_total_payable": "₹4,60,000",
+"full_course_total": "₹9,24,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,60,000",
+"sem1_total_payable": "₹1,65,000",
+"first_year_total_payable": "₹3,25,000",
+"full_course_total": "₹6,54,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,17,500",
+"sem1_total_payable": "₹2,22,500",
+"first_year_total_payable": "₹4,40,000",
+"full_course_total": "₹8,84,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹2,27,500",
+"sem1_total_payable": "₹2,32,500",
+"first_year_total_payable": "₹4,60,000",
+"full_course_total": "₹9,24,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹3,00,000",
+"tuition_first_year_after_scholarship": "₹3,00,000",
+"per_semester_after_scholarship": "₹1,50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,60,000",
+"sem1_total_payable": "₹1,65,000",
+"first_year_total_payable": "₹3,25,000",
+"full_course_total": "₹6,54,000"
+},
+"years": [
+"₹3,00,000",
+"₹3,09,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹4,51,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,80,000",
+"per_semester_after_scholarship": "₹90,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹1,80,000",
+"₹1,86,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,70,000",
+"per_semester_after_scholarship": "₹85,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹95,000",
+"sem1_total_payable": "₹1,00,000",
+"first_year_total_payable": "₹1,95,000",
+"full_course_total": "₹3,91,000"
+},
+"years": [
+"₹1,70,000",
+"₹1,76,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,60,000",
+"per_semester_after_scholarship": "₹80,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹1,47,500",
+"sem1_total_payable": "₹1,52,500",
+"first_year_total_payable": "₹3,00,000",
+"full_course_total": "₹6,01,000"
+},
+"years": [
+"₹1,60,000",
+"₹1,66,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹50,000",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹6,21,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,56,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,40,000",
+"per_semester_after_scholarship": "₹70,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹80,000",
+"sem1_total_payable": "₹85,000",
+"first_year_total_payable": "₹1,65,000",
+"full_course_total": "₹3,31,000"
+},
+"years": [
+"₹1,40,000",
+"₹1,46,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹80,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹5,21,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,26,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,77,500",
+"sem1_total_payable": "₹1,82,500",
+"first_year_total_payable": "₹3,60,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹4,51,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,67,500",
+"sem1_total_payable": "₹1,72,500",
+"first_year_total_payable": "₹3,40,000",
+"full_course_total": "₹6,81,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,77,500",
+"sem1_total_payable": "₹1,82,500",
+"first_year_total_payable": "₹3,60,000",
+"full_course_total": "₹7,21,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mba_agri",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹2,00,000",
+"tuition_first_year_after_scholarship": "₹2,00,000",
+"per_semester_after_scholarship": "₹1,00,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,10,000",
+"sem1_total_payable": "₹1,15,000",
+"first_year_total_payable": "₹2,25,000",
+"full_course_total": "₹4,51,000"
+},
+"years": [
+"₹2,00,000",
+"₹2,06,000"
+]
+},
+{
+"program": "mca",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹3,49,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mca",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹5,79,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mca",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,35,000",
+"per_semester_after_scholarship": "₹67,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹1,45,000",
+"sem1_total_payable": "₹1,50,000",
+"first_year_total_payable": "₹2,95,000",
+"full_course_total": "₹5,89,000"
+},
+"years": [
+"₹1,35,000",
+"₹1,39,000"
+]
+},
+{
+"program": "mca",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,27,500",
+"per_semester_after_scholarship": "₹63,750",
+"saving_first_year": "₹22,500",
+"total_per_semester": "₹73,750",
+"sem1_total_payable": "₹78,750",
+"first_year_total_payable": "₹1,52,500",
+"full_course_total": "₹3,04,000"
+},
+"years": [
+"₹1,27,500",
+"₹1,31,500"
+]
+},
+{
+"program": "mca",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,20,000",
+"per_semester_after_scholarship": "₹60,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹5,19,000"
+},
+"years": [
+"₹1,20,000",
+"₹1,24,000"
+]
+},
+{
+"program": "mca",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,12,500",
+"per_semester_after_scholarship": "₹56,250",
+"saving_first_year": "₹37,500",
+"total_per_semester": "₹1,33,750",
+"sem1_total_payable": "₹1,38,750",
+"first_year_total_payable": "₹2,72,500",
+"full_course_total": "₹5,44,000"
+},
+"years": [
+"₹1,12,500",
+"₹1,16,500"
+]
+},
+{
+"program": "mca",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,05,000",
+"per_semester_after_scholarship": "₹52,500",
+"saving_first_year": "₹45,000",
+"total_per_semester": "₹62,500",
+"sem1_total_payable": "₹67,500",
+"first_year_total_payable": "₹1,30,000",
+"full_course_total": "₹2,59,000"
+},
+"years": [
+"₹1,05,000",
+"₹1,09,000"
+]
+},
+{
+"program": "mca",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹60,000",
+"total_per_semester": "₹1,12,500",
+"sem1_total_payable": "₹1,17,500",
+"first_year_total_payable": "₹2,30,000",
+"full_course_total": "₹4,59,000"
+},
+"years": [
+"₹90,000",
+"₹94,000"
+]
+},
+{
+"program": "mca",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹6,19,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mca",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹3,49,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mca",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,42,500",
+"sem1_total_payable": "₹1,47,500",
+"first_year_total_payable": "₹2,90,000",
+"full_course_total": "₹5,79,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mca",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,52,500",
+"sem1_total_payable": "₹1,57,500",
+"first_year_total_payable": "₹3,10,000",
+"full_course_total": "₹6,19,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mca",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,50,000",
+"tuition_first_year_after_scholarship": "₹1,50,000",
+"per_semester_after_scholarship": "₹75,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹85,000",
+"sem1_total_payable": "₹90,000",
+"first_year_total_payable": "₹1,75,000",
+"full_course_total": "₹3,49,000"
+},
+"years": [
+"₹1,50,000",
+"₹1,54,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": "₹2,48,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": "₹4,78,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹10,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": "₹4,98,000"
+},
+"years": [
+"₹90,000",
+"₹93,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹85,000",
+"per_semester_after_scholarship": "₹42,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹52,500",
+"sem1_total_payable": "₹57,500",
+"first_year_total_payable": "₹1,10,000",
+"full_course_total": "₹2,18,000"
+},
+"years": [
+"₹85,000",
+"₹88,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹80,000",
+"per_semester_after_scholarship": "₹40,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": "₹4,38,000"
+},
+"years": [
+"₹80,000",
+"₹83,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": "₹4,68,000"
+},
+"years": [
+"₹75,000",
+"₹78,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": "₹1,88,000"
+},
+"years": [
+"₹70,000",
+"₹73,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹97,500",
+"sem1_total_payable": "₹1,02,500",
+"first_year_total_payable": "₹2,00,000",
+"full_course_total": "₹3,98,000"
+},
+"years": [
+"₹60,000",
+"₹63,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹5,18,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": "₹2,48,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": "₹4,78,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹5,18,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "mtech",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": "₹2,48,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "none",
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": "₹2,48,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "non_ac_4",
+"percent": 55,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": "₹4,78,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "ac_3",
+"percent": 62,
+"expect": {
+"scholarship_percent": 10,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹90,000",
+"per_semester_after_scholarship": "₹45,000",
+"saving_first_year": "₹10,000",
+"total_per_semester": "₹1,22,500",
+"sem1_total_payable": "₹1,27,500",
+"first_year_total_payable": "₹2,50,000",
+"full_course_total": "₹4,98,000"
+},
+"years": [
+"₹90,000",
+"₹93,000"
+]
+},
+{
+"program": "msc",
+"hostel": "none",
+"percent": 67.5,
+"expect": {
+"scholarship_percent": 15,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹85,000",
+"per_semester_after_scholarship": "₹42,500",
+"saving_first_year": "₹15,000",
+"total_per_semester": "₹52,500",
+"sem1_total_payable": "₹57,500",
+"first_year_total_payable": "₹1,10,000",
+"full_course_total": "₹2,18,000"
+},
+"years": [
+"₹85,000",
+"₹88,000"
+]
+},
+{
+"program": "msc",
+"hostel": "non_ac_4",
+"percent": 75,
+"expect": {
+"scholarship_percent": 20,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹80,000",
+"per_semester_after_scholarship": "₹40,000",
+"saving_first_year": "₹20,000",
+"total_per_semester": "₹1,07,500",
+"sem1_total_payable": "₹1,12,500",
+"first_year_total_payable": "₹2,20,000",
+"full_course_total": "₹4,38,000"
+},
+"years": [
+"₹80,000",
+"₹83,000"
+]
+},
+{
+"program": "msc",
+"hostel": "ac_3",
+"percent": 85,
+"expect": {
+"scholarship_percent": 25,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹75,000",
+"per_semester_after_scholarship": "₹37,500",
+"saving_first_year": "₹25,000",
+"total_per_semester": "₹1,15,000",
+"sem1_total_payable": "₹1,20,000",
+"first_year_total_payable": "₹2,35,000",
+"full_course_total": "₹4,68,000"
+},
+"years": [
+"₹75,000",
+"₹78,000"
+]
+},
+{
+"program": "msc",
+"hostel": "none",
+"percent": 93,
+"board": "cbse",
+"expect": {
+"scholarship_percent": 30,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹70,000",
+"per_semester_after_scholarship": "₹35,000",
+"saving_first_year": "₹30,000",
+"total_per_semester": "₹45,000",
+"sem1_total_payable": "₹50,000",
+"first_year_total_payable": "₹95,000",
+"full_course_total": "₹1,88,000"
+},
+"years": [
+"₹70,000",
+"₹73,000"
+]
+},
+{
+"program": "msc",
+"hostel": "non_ac_4",
+"percent": 99,
+"expect": {
+"scholarship_percent": 40,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹60,000",
+"per_semester_after_scholarship": "₹30,000",
+"saving_first_year": "₹40,000",
+"total_per_semester": "₹97,500",
+"sem1_total_payable": "₹1,02,500",
+"first_year_total_payable": "₹2,00,000",
+"full_course_total": "₹3,98,000"
+},
+"years": [
+"₹60,000",
+"₹63,000"
+]
+},
+{
+"program": "msc",
+"hostel": "ac_3",
+"eapcet_rank": 1500,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹5,18,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "none",
+"eapcet_rank": 9000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": "₹2,48,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "non_ac_4",
+"eapcet_rank": 45000,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,17,500",
+"sem1_total_payable": "₹1,22,500",
+"first_year_total_payable": "₹2,40,000",
+"full_course_total": "₹4,78,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "ac_3",
+"jee_percentile": 92.4,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹1,27,500",
+"sem1_total_payable": "₹1,32,500",
+"first_year_total_payable": "₹2,60,000",
+"full_course_total": "₹5,18,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+},
+{
+"program": "msc",
+"hostel": "none",
+"ib_score": 36,
+"expect": {
+"scholarship_percent": 0,
+"tuition_first_year": "₹1,00,000",
+"tuition_first_year_after_scholarship": "₹1,00,000",
+"per_semester_after_scholarship": "₹50,000",
+"saving_first_year": "₹0",
+"total_per_semester": "₹60,000",
+"sem1_total_payable": "₹65,000",
+"first_year_total_payable": "₹1,25,000",
+"full_course_total": "₹2,48,000"
+},
+"years": [
+"₹1,00,000",
+"₹1,03,000"
+]
+}
+]

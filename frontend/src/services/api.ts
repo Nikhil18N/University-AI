@@ -97,8 +97,10 @@ export interface AgentFeeParams {
   board?: string;
   eapcet_rank?: number;
   jee_percentile?: number;
+  ib_score?: number;
   hostel?: string;
   specialization?: boolean;
+  transport?: boolean;
 }
 
 export interface AgentFeeResult {
@@ -107,6 +109,7 @@ export interface AgentFeeResult {
   source: string;
   data_status: string;
   program: string;
+  program_key?: string;
   scholarship_percent: number;
   scholarship_basis?: string;
   tuition_first_year: string;
@@ -115,7 +118,12 @@ export interface AgentFeeResult {
   saving_first_year: string;
   one_time_enrollment_fee: string;
   other_yearly_fees: string;
-  hostel?: { type?: string; per_year?: string } | null;
+  other_fees_per_semester?: string;
+  hostel?: { type?: string; per_year?: string; per_semester?: string } | null;
+  transport_per_year?: string | null;
+  total_per_semester?: string;
+  sem1_total_payable?: string;
+  next_scholarship_slab?: { scholarship_percent: number; requires: string; extra_saving_first_year: string } | null;
   first_year_total_payable: string;
   yearly_increase: string;
   duration_years?: number;
@@ -125,21 +133,40 @@ export interface AgentFeeResult {
   notes: string[];
 }
 
-export async function calculateAgentFee(params: AgentFeeParams): Promise<AgentFeeResult> {
+const numberOrNull = (value: number | undefined): number | null =>
+  value !== undefined && value !== null && !isNaN(value) ? value : null;
+
+/**
+ * The same fee calculation the chat agent uses (backend/app/sru_agent/fees.py).
+ * The calculator shows these numbers, so the chat and the calculator can never disagree.
+ */
+export async function calculateAgentFee(params: AgentFeeParams, signal?: AbortSignal): Promise<AgentFeeResult> {
   const res = await fetch(`${API_BASE}/api/v1/agent/calculate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    signal,
     body: JSON.stringify({
       program: params.program,
-      percent: params.percent !== undefined && !isNaN(params.percent) ? params.percent : null,
+      percent: numberOrNull(params.percent),
       board: params.board || "state_board",
-      eapcet_rank: params.eapcet_rank || null,
-      jee_percentile: params.jee_percentile || null,
+      eapcet_rank: numberOrNull(params.eapcet_rank),
+      jee_percentile: numberOrNull(params.jee_percentile),
+      ib_score: numberOrNull(params.ib_score),
       hostel: params.hostel || "none",
       specialization: Boolean(params.specialization),
+      transport: Boolean(params.transport),
     }),
   });
   return await handleResponse<AgentFeeResult>(res, "Failed to calculate fee");
+}
+
+/**
+ * Programs, scholarship slabs, hostel and one-time fees for the Fee & Scholarship Calculator,
+ * read live from the official fee file on the backend.
+ */
+export async function fetchFeeConfig<T = unknown>(signal?: AbortSignal): Promise<T> {
+  const res = await fetch(`${API_BASE}/api/v1/agent/fee-config`, { signal });
+  return await handleResponse<T>(res, "Failed to load fee table");
 }
 
 /**
