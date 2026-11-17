@@ -506,48 +506,45 @@ def parse_flexible_visit_date(date_str: str, today: date | None = None) -> date 
     return res.get("date") if res.get("is_valid") else (res.get("date") if res.get("is_sunday") or res.get("is_outside_window") else None)
 
 
-async def tool_book_campus_visit(args, ctx):
-    raw_date = args.get("visit_date", "")
-    res = resolve_campus_visit_date(raw_date)
-    if not res.get("date"):
-        return {"status": "invalid", "problem": res.get("reason", f"Could not determine a valid date from '{raw_date}'. Please provide a date like 'tomorrow', '17th Nov', or 'YYYY-MM-DD'.")}
-    
-    if res.get("is_past"):
-        return {"status": "invalid", "problem": res["reason"]}
+def campus_visit_contacts() -> dict:
+    """Who arranges a campus visit (SRU Buddy never books or confirms one)."""
+    text = urllib.parse.quote("Hi, I would like to visit the SR University campus.")
+    return {"phone": f"{config.ADMISSIONS_PHONE} / 0870-2818311", "mobile": config.CAMPUS_VISIT_PHONE,
+            "whatsapp": f"https://wa.me/{config.CAMPUS_VISIT_WHATSAPP}?text={text}",
+            "email": config.ADMISSIONS_EMAIL, "visit_page": config.CAMPUS_VISIT_URL,
+            "address": config.CAMPUS_ADDRESS}
 
-    if res.get("is_sunday"):
-        alts = res.get("alternative_suggestions", [])
-        alt_text = (" Would " + " or ".join(a["human"] for a in alts) + " work for you?") if alts else ""
-        return {
-            "status": "invalid",
-            "problem": f"Campus visits are conducted Monday through Saturday (9:30 AM to 4:30 PM). SR University is closed for visits on Sunday, {res['human']}.{alt_text}"
-        }
 
-    if res.get("is_outside_window"):
-        return {
-            "status": "invalid",
-            "problem": f"Campus visits can only be scheduled within the next 90 days. {res['human']} is outside this window. Please choose a date within 90 days or contact Admissions at {config.ADMISSIONS_PHONE}."
-        }
-
-    visit = res["date"]
+async def tool_request_campus_visit_callback(args, ctx):
+    """Pass a student's wish to visit the campus to the admissions team as a CALLBACK request.
+    Nothing is booked or confirmed: the admissions team calls the student to arrange a visit."""
+    preferred = str(args.get("preferred_date") or "").strip()[:60]
     try:
         visitors = max(1, min(int(args.get("visitors") or 1), 10))
     except (TypeError, ValueError):
         visitors = 1
-    result = await _save_lead(args, ctx, "campus_visit",
-                            {"visit_date": visit.isoformat(),
-                             "confirmed_date": res["human"],
-                             "visitors": visitors,
-                             "note": "Request only. The admissions team will confirm the visit by phone."})
+    extra = {"visitors": visitors,
+             "note": "Campus visit enquiry. NOT booked or confirmed: please call the student to arrange it."}
+    if preferred:
+        extra["preferred_date"] = preferred
+    result = await _save_lead(args, ctx, "campus_visit", extra)
     if result.get("status") == "saved":
-        result["confirmed_date"] = res["human"]
-        result["visit_date"] = visit.isoformat()
+        result["contacts"] = campus_visit_contacts()
     return result
+
+
+async def tool_book_campus_visit(args, ctx):
+    """Kept for older callers: visits are no longer booked, only passed on as a callback request."""
+    args = dict(args or {})
+    args.setdefault("preferred_date", args.pop("visit_date", "") or "")
+    return await tool_request_campus_visit_callback(args, ctx)
 
 
 async def tool_get_contact_and_apply_links(args, ctx):
     out = {"status": "ok", "apply_online": config.APPLY_URL, "phone": config.ADMISSIONS_PHONE,
-           "email": config.ADMISSIONS_EMAIL}
+           "email": config.ADMISSIONS_EMAIL, "fee_calculator": config.FEE_PORTAL_URL}
+    if re.search(r"visit|tour|campus", str(args.get("topic") or ""), re.IGNORECASE):
+        out["campus_visit"] = campus_visit_contacts()
     if config.ADMISSIONS_WHATSAPP:
         text = urllib.parse.quote("Hi, I have a question about SR University admissions: "
                                   + (args.get("topic") or ""))
@@ -575,6 +572,14 @@ async def tool_get_university_videos(args, ctx):
         }
     except Exception as exc:
         return {"status": "failed", "problem": "Could not retrieve videos right now.", "_error": str(exc)}
+
+
+async def tool_find_faculty(args, ctx):
+    from . import faculty
+    query = str(args.get("query") or "").strip()
+    if not query and not args.get("department") and not args.get("role"):
+        return {"status": "ok", "kind": "overview", **faculty.overview()}
+    return faculty.search(query, str(args.get("department") or ""), str(args.get("role") or ""))
 
 
 def _obj(properties, required=()):
@@ -654,14 +659,16 @@ TOOLS = {
             "name": {"type": "string"}, "phone": _PHONE, "program_interest": {"type": "string"},
             "preferred_time": {"type": "string", "description": "e.g. 'tomorrow evening'"},
             "consent": _CONSENT}, ["name", "phone", "consent"])}),
-    "book_campus_visit": (tool_book_campus_visit, "Requesting your campus visit", {
-        "description": "Sends a campus visit request to the admissions team. Needs name, phone and date. "
-                       "A student who asked to book a visit has agreed to be contacted about it (consent=true).",
-        "parameters_json_schema": _obj({
-            "name": {"type": "string"}, "phone": _PHONE,
-            "visit_date": {"type": "string", "description": "Preferred date e.g. 'YYYY-MM-DD', 'tomorrow', '17th Nov', or day number like '17th' (relative to current date)"},
-            "visitors": {"type": "integer"}, "consent": _CONSENT},
-            ["name", "phone", "visit_date", "consent"])}),
+    "request_campus_visit_callback": (tool_request_campus_visit_callback, "Passing your visit request to admissions", {
+        "description": "Passes a student's wish to visit the campus to the admissions team, who call back to "
+                       "arrange it. This does NOT book or confirm a visit or a date. Needs name, a valid "
+                       "10-digit mobile number and consent.",
+        "parameters_json_schema": _obj({"name": {"type": "string"}, "phone": {"type": "string"},
+                                        "consent": _CONSENT,
+                                        "preferred_date": {"type": "string", "description": "Only if the student "
+                                                           "mentioned one; it is passed on, not confirmed."},
+                                        "visitors": {"type": "integer"}},
+                                       ["name", "phone", "consent"])}),
     "update_contact_details": (tool_update_contact_details, "Updating your details", {
         "description": "Changes the student's saved name and/or mobile number (their profile, Settings > "
                        "My details, and any saved callback or visit request). Use when they say 'my new "
@@ -683,6 +690,17 @@ TOOLS = {
         "description": "Official apply link, admissions phone, email and WhatsApp link. Use for 'how to "
                        "apply', 'contact number', or when you cannot answer something.",
         "parameters_json_schema": _obj({"topic": {"type": "string"}})}),
+    "find_faculty": (tool_find_faculty, "Looking up faculty profiles", {
+        "description": "Official SR University faculty profiles (sru.edu.in/faculty): deans, heads of department, "
+                       "professors by name, department, research area or subject; qualifications, experience and "
+                       "profile links. Call for ANY question about faculty, professors, teachers, HOD, dean, "
+                       "or who teaches / researches something. Never name a faculty member from memory.",
+        "parameters_json_schema": _obj({
+            "query": {"type": "string", "description": "The student's question or a name / topic, e.g. "
+                                                       "'head of CSE', 'Dr Sheshikala', 'VLSI', 'machine learning'"},
+            "department": {"type": "string", "description": "Optional: cse, ece, eee, mech, civil, mba, agriculture, "
+                                                            "physics, chemistry, maths, english, biotech"},
+            "role": {"type": "string", "description": "Optional: 'dean' or 'head'"}})}),
     "get_university_videos": (tool_get_university_videos, "Finding official university videos", {
         "description": "Finds official SR University YouTube videos and tours for campus life, hostels, "
                        "placements, labs, sports, student clubs, and infrastructure. Call whenever the student "
@@ -691,7 +709,7 @@ TOOLS = {
 }
 
 # Tools that change something outside the chat (shown as 'actions' in the UI and logs).
-ACTION_TOOLS = {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request",
+ACTION_TOOLS = {"request_counsellor_callback", "request_campus_visit_callback", "cancel_contact_request",
                 "update_contact_details"}
 
 

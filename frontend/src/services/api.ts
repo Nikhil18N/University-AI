@@ -1,5 +1,12 @@
 export const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
 
+/** Where the chat runs: the full website ("web") or the embeddable widget ("widget").
+ * Sent with each message so the admin console can tell them apart. */
+let CHANNEL: "web" | "widget" = "web";
+export function setChannel(channel: "web" | "widget") {
+  CHANNEL = channel;
+}
+
 /**
  * API client for the University AI Companion backend.
  * No authentication — all requests use session_id for tracking.
@@ -201,6 +208,7 @@ export function sendMessageStream(
           session_id: sessionId,
           message,
           conversation_id: conversationId || null,
+          channel: CHANNEL,
         }),
         signal: controller.signal,
       });

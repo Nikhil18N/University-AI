@@ -222,6 +222,10 @@ january february march april june july august september october november decembe
 cse ece eee mech civil btech mtech mba bba bca mca bsc msc engineering course fee fees hostel
 scholarship admission admissions counsellor counselor team sru university inter intermediate
 rank marks percent percentage eapcet eamcet jee cbse people persons members friends
+bus buses route routes transport placement placements library timings timing faculty professor professors
+hod dean details detail information info location address directions food mess sports ragging refund
+documents document apply application loan lab labs wifi college ranking rankings nirf reach how what where
+when why which who fee structure syllabus curriculum seats seat cutoff exam exams result results
 """.split())
 _NAME_INTRO = re.compile(
     r"(?:\bmy\s+name\s+is|\bname\s*(?:is|:|-)|\bname\s+(?=[A-Za-z])|\bmyself\b|\bnaa\s+peru\b|"

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SRU Buddy widget: demo page</title>
+    <meta name="robots" content="noindex" />
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; color: #0f172a; line-height: 1.6; }
+      code, pre { background: #f1f5f9; border-radius: 6px; }
+      pre { padding: 12px; overflow-x: auto; }
+    </style>
+  </head>
+  <body>
+    <h1>SRU Buddy widget: demo page</h1>
+    <p>This page stands in for any SR University web page. The chat bubble in the corner is the widget version of
+      SRU Buddy: the same assistant as the website, in a compact window.</p>
+    <h2>Add it to a page</h2>
+    <p>Paste this one line just before <code>&lt;/body&gt;</code>:</p>
+    <pre><code>&lt;script src="https://university-ai-companion.vercel.app/widget.js" defer&gt;&lt;/script&gt;</code></pre>
+    <p>Optional: <code>data-position="left"</code>, <code>data-color="#1d4ed8"</code>,
+      <code>data-label="Ask SRU Buddy"</code>, <code>data-greeting="..."</code>, <code>data-open="true"</code>.
+      From JavaScript: <code>SRUBuddy.open()</code>, <code>SRUBuddy.close()</code>.</p>
+    <p><button type="button" onclick="SRUBuddy.open()">Open the chat from a button on the page</button></p>
+    <script src="/widget.js" defer></script>
+  </body>
+</html>

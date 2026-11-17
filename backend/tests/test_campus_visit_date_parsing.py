@@ -48,7 +48,7 @@ def test_parse_flexible_visit_date_invalid_gibberish():
 
 
 @pytest.mark.asyncio
-async def test_tool_book_campus_visit_with_relative_date():
+async def test_visit_wish_is_passed_on_with_the_preferred_date_not_booked():
     saved = []
     async def mock_saver(lead):
         saved.append(lead)
@@ -56,47 +56,49 @@ async def test_tool_book_campus_visit_with_relative_date():
 
     tools.set_lead_saver(mock_saver)
     try:
-        # Today is date.today() (e.g. 2026-11-16)
-        # Passing "tomorrow"
         r = await tools.run_tool(
-            "book_campus_visit",
-            {"name": "Chitikeshi Mahesh", "phone": "7013295712", "visit_date": "tomorrow", "consent": True},
+            "request_campus_visit_callback",
+            {"name": "Chitikeshi Mahesh", "phone": "7013295712", "preferred_date": "tomorrow", "consent": True},
             {"session_id": "s-visit", "profile": {}}
         )
-        assert r["status"] == "saved"
-        assert r["reference"] == "visit-re"
-        assert len(saved) == 1
-        expected_date = (date.today() + timedelta(days=1)).isoformat()
-        assert saved[0]["metadata"]["visit_date"] == expected_date
-        assert saved[0]["name"] == "Chitikeshi Mahesh"
-        assert saved[0]["phone"] == "7013295712"
+        assert r["status"] == "saved" and r["reference"] == "visit-re"
+        meta = saved[0]["metadata"]
+        assert meta["request_type"] == "campus_visit" and meta["preferred_date"] == "tomorrow"
+        assert "visit_date" not in meta and "NOT booked" in meta["note"]
+        assert r["contacts"]["mobile"] == "+91 70750 10336"
     finally:
         tools.set_lead_saver(None)
 
 
 @pytest.mark.asyncio
-async def test_tool_book_campus_visit_outside_window_rejected():
-    # 2027-05-17 is > 90 days from Nov 2026
-    r = await tools.run_tool(
-        "book_campus_visit",
-        {"name": "Chitikeshi Mahesh", "phone": "7013295712", "visit_date": "2027-05-17", "consent": True},
-        {"session_id": "s-visit", "profile": {}}
-    )
-    assert r["status"] == "invalid"
-    assert "Campus visits can only be scheduled" in r["problem"]
+async def test_old_book_campus_visit_function_only_passes_the_wish_on():
+    saved = []
+    async def mock_saver(lead):
+        saved.append(lead)
+        return {"id": "visit-ref-99999"}
+    tools.set_lead_saver(mock_saver)
+    try:
+        r = await tools.tool_book_campus_visit(
+            {"name": "Chitikeshi Mahesh", "phone": "7013295712", "visit_date": "2027-05-17", "consent": True},
+            {"session_id": "s-visit-old", "profile": {}})
+        assert r["status"] == "saved" and saved[0]["metadata"]["preferred_date"] == "2027-05-17"
+    finally:
+        tools.set_lead_saver(None)
 
 
-def test_campus_visit_booking_card_trigger():
-    """Verify that user asking how to book a campus tour triggers the interactive CAMPUS_VISIT_FORM_CARD."""
+def test_campus_visit_question_shows_whom_to_contact_not_a_booking_form():
+    """'How can I book a campus tour?' shows the admissions contacts (no booking form: SRU Buddy
+    never books or confirms visits)."""
     cards = generate_cards(
         user_message="I want to visit the SR University campus. How can I book a campus tour?",
         answer="You are welcome to visit our 170-acre campus in Warangal.",
     )
-    assert any(c.get("type") == "campus_visit_form" for c in cards)
-    visit_card = next(c for c in cards if c.get("type") == "campus_visit_form")
+    assert not any(c.get("type") == "campus_visit_form" for c in cards)
+    visit_card = next(c for c in cards if c.get("type") == "campus_visit_contact")
     assert visit_card == CAMPUS_VISIT_FORM_CARD
-    assert "Warangal" in visit_card["location"]
-    # Static tour card should be suppressed in favor of interactive booking card
+    assert "Warangal" in visit_card["address"] and visit_card["mobile"] == "+91 70750 10336"
+    assert "timings" not in visit_card
+    # Static tour card should be suppressed in favour of the visit contacts
     assert not any(c.get("type") == "campus_tour" for c in cards)
 
 

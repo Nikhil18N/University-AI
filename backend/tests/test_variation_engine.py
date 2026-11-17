@@ -123,6 +123,6 @@ def test_build_system_prompt_agent_variation():
     )
     assert "VARIANT_ID: 2" in prompt
     assert '- "Hello there!"' in prompt
-    assert "VARIATION ENGINE STYLES:" in prompt
+    assert "TONE (VARIANT_ID" in prompt
     assert "2 = FRIENDLY SENIOR" in prompt
     assert "FACT LOCK" in prompt

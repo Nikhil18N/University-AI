@@ -228,47 +228,62 @@ async def test_other_question_in_the_same_message_is_still_answered(leads):
 
 # ------------------------------------------------------------- campus visit ----
 @pytest.mark.asyncio
-async def test_visit_with_all_details_in_one_message_is_booked(leads):
+async def test_visit_with_all_details_is_passed_on_not_booked(leads):
+    """Admissions brief (Nov 2026): SRU Buddy never books or confirms a visit. With a name and number
+    it passes the wish on as a callback request, and says plainly that it is not a booking."""
     visit = _next_weekday()
     client = ScriptedClient()
     _, done = await _run(f"Book a campus visit on {visit.isoformat()} for 3 people. Ravi Kumar 9876543210",
                          "act-visit-one", client)
     assert client.requests == [] and len(leads["saved"]) == 1
     meta = leads["saved"][0]["metadata"]
-    assert meta["request_type"] == "campus_visit" and meta["visit_date"] == visit.isoformat() and meta["visitors"] == 3
-    assert done["tools_used"] == [{"name": "book_campus_visit", "status": "saved", "is_action": True}]
-    assert visit.strftime("%B %d, %Y") in done["answer"] and "lead0001" in done["answer"]
+    assert meta["request_type"] == "campus_visit" and "visit_date" not in meta and meta["visitors"] == 3
+    assert meta["preferred_date"] == visit.strftime("%B %d, %Y") and "NOT booked" in meta["note"]
+    assert done["tools_used"] == [{"name": "request_campus_visit_callback", "status": "saved", "is_action": True}]
+    assert "not a booking" in done["answer"] and "lead0001" in done["answer"]
+    assert "confirmed" not in done["answer"].lower().replace("confirm the day", "")
 
 
 @pytest.mark.asyncio
-async def test_visit_with_a_past_date_gets_a_clear_reply_not_a_blank_one(leads):
+async def test_visit_with_a_past_date_is_passed_on_without_the_date(leads):
     client = ScriptedClient()
     _, done = await _run("I want to visit the campus on 2026-01-05. My name is Ravi Kumar, phone 9876543210",
                          "act-visit-past", client)
-    assert done["type"] == "done" and leads["saved"] == []
-    assert "has already passed" in done["answer"] and "Which other date" in done["answer"]
-    assert "Ask the student" not in done["answer"]  # no instructions meant for the model leak to the student
-    assert done["tools_used"][0] == {"name": "book_campus_visit", "status": "invalid", "is_action": True}
+    assert done["type"] == "done" and len(leads["saved"]) == 1
+    assert "preferred_date" not in leads["saved"][0]["metadata"]
+    assert "not a booking" in done["answer"]
 
 
 @pytest.mark.asyncio
-async def test_visit_details_typed_after_confirming_the_date(leads):
+async def test_visit_request_gets_the_admissions_contacts_and_no_booking(leads):
     sid, conv = "act-visit-typed", "conv-visit-typed"
     visit = _next_weekday(5)
     _, done = await _run(f"I want to visit on {visit.isoformat()}", sid, conversation_id=conv)
-    assert done["answer"] == f"Do you mean {visit.strftime('%B %d, %Y')}?"
-    _, done = await _run("yes", sid, conversation_id=conv)
-    assert any(c.get("type") == "campus_visit_form" for c in done["cards"])
-    # Instead of filling the form, the student types the details in the chat.
+    answer = done["answer"]
+    assert "can't book or confirm" in answer and "70750 10336" in answer and "0870-2818333" in answer
+    assert visit.strftime("%B %d, %Y") in answer
+    assert not any(c.get("type") == "campus_visit_form" for c in done["cards"])
+    assert any(c.get("type") == "get_contact_and_apply_links" for c in done["cards"])
+    assert "9:30" not in answer and "4:30" not in answer  # no visiting hours are quoted
+    # The student types their details: the request is passed on, nothing is booked.
     _, done = await _run("Sneha Reddy 9876500011", sid, conversation_id=conv)
-    assert len(leads["saved"]) == 1
-    assert leads["saved"][0]["metadata"]["visit_date"] == visit.isoformat()
-    assert done["tools_used"][0]["status"] == "saved"
+    assert len(leads["saved"]) == 1 and leads["saved"][0]["metadata"]["request_type"] == "campus_visit"
+    assert done["tools_used"][0]["status"] == "saved" and "not a booking" in done["answer"]
+
+
+@pytest.mark.asyncio
+async def test_ask_admissions_to_call_me_after_visit_guidance(leads):
+    sid, conv = "act-visit-chip", "conv-visit-chip"
+    await _run("I want to book a campus visit", sid, conversation_id=conv)
+    _, done = await _run("Ask admissions to call me", sid, conversation_id=conv)
+    assert "full name and 10-digit mobile number" in done["answer"] and leads["saved"] == []
+    _, done = await _run("Kiran Rao 9876500022", sid, conversation_id=conv)
+    assert leads["saved"][0]["metadata"]["request_type"] == "campus_visit"
 
 
 @pytest.mark.asyncio
 async def test_detailed_visit_question_is_not_hijacked_by_the_canned_question():
-    client = ScriptedClient([_text("Yes, parents are welcome. Visits run Monday to Saturday, 9:30 AM to 4:30 PM.")])
+    client = ScriptedClient([_text("Yes, parents are welcome. Please confirm the timings with the admissions team.")])
     _, done = await _run("can my parents also come for the campus visit and what are the timings?", "act-visit-info", client)
     assert len(client.requests) == 1
     assert "parents are welcome" in done["answer"]
@@ -328,7 +343,8 @@ def test_phone_helpers():
 async def test_no_generic_fee_table_under_a_personalised_answer():
     client = ScriptedClient([_call("calculate_fee", program="cse", percent=85),
                              _text("With 85% you get 25%. Tuition is ₹2,55,000 for 2027-28.")])
-    _, done = await _run("What is the fee breakdown for B.Tech CSE per semester? I got 85%", "act-cards", client)
+    _, done = await _run("What is the fee breakdown for B.Tech CSE per semester? I got 85% in state board, "
+                         "no entrance exam", "act-cards", client)
     kinds = [c.get("type") for c in done["cards"]]
     assert "calculate_fee" in kinds
     assert "fee_breakdown" not in kinds
@@ -369,9 +385,10 @@ def test_every_tool_declaration_is_accepted_by_the_sdk():
     decl = agent._tool_declarations()
     names = {f.name for f in decl.function_declarations}
     assert {"cancel_contact_request", "get_program_info", "get_special_concessions", "compare_programs",
-            "share_fee_estimate"} <= names
-    assert tools.ACTION_TOOLS == {"request_counsellor_callback", "book_campus_visit", "cancel_contact_request",
-                                  "update_contact_details"}
+            "share_fee_estimate", "find_faculty", "request_campus_visit_callback"} <= names
+    assert "book_campus_visit" not in names  # visits are never booked by the agent (Nov 2026 brief)
+    assert tools.ACTION_TOOLS == {"request_counsellor_callback", "request_campus_visit_callback",
+                                  "cancel_contact_request", "update_contact_details"}
 
 
 # --------------------------------------------------------------------- load ----
@@ -430,7 +447,7 @@ async def test_fee_question_is_still_answered_when_the_model_is_unreachable(no_w
         async def generate_content(self, model, contents, config):
             raise _ApiError(429, "429 RESOURCE_EXHAUSTED")
 
-    _, done = await _run("cse fee with 85% in inter", "act-offline", Down())
+    _, done = await _run("cse fee with 85% in inter, state board, no JEE or EAPCET", "act-offline", Down())
     assert done["type"] == "done"
     assert "₹2,55,000" in done["answer"] and "25% merit scholarship" in done["answer"]
     assert done["cards"][0]["type"] == "calculate_fee"

@@ -86,6 +86,13 @@ async def lifespan(fastapi_app: FastAPI):
 
     yield
 
+    # Finish the chat saves still running in the background (at most 10 seconds).
+    try:
+        from app.sru_agent import memory as _agent_memory
+        await asyncio.wait_for(_agent_memory.flush(), timeout=10)
+    except Exception:
+        pass
+
     # Cleanup
     if getattr(fastapi_app.state, "redis", None) is not None:
         try:
@@ -107,7 +114,7 @@ async def lifespan(fastapi_app: FastAPI):
 app = FastAPI(
     title="University AI Companion",
     description="Conversational AI with RAG and Function-Calling Agent for university knowledge",
-    version="2.9.0",
+    version="3.0.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.APP_DEBUG else None,
     redoc_url="/redoc" if settings.APP_DEBUG else None,
@@ -323,12 +330,35 @@ async def agent_lead_canceller(lead_id: str, reason: str = "") -> bool:
         lead = await lead_service.cancel_lead(session, uuid.UUID(str(lead_id)), reason)
         return lead is not None
 
+_known_conversations: dict = {}   # (session_id, conversation_id) -> True, for this server process
+_creating_conversations: dict = {}  # conversation_id -> task creating its database row
+
+
+def _remember_conversation(session_id: str, conversation_id: str):
+    if len(_known_conversations) > 20000:
+        _known_conversations.clear()
+    _known_conversations[(session_id, conversation_id)] = True
+
+
+async def _create_conversation_row(session_id: str, conv_uuid, title: str):
+    from app.db.session import async_session_factory
+    from app.models.conversation import Conversation
+    async with async_session_factory() as session:
+        session.add(Conversation(id=conv_uuid, session_id=session_id, title=title))
+        await session.commit()
+
+
 async def agent_conversation_resolver(session_id: str, conversation_id: str | None, message: str) -> str:
-    """Resolve or create a persistent conversation before streaming starts."""
+    """Resolve or create a persistent conversation before streaming starts.
+
+    Fast paths (no database trip before the answer starts):
+    - a new chat gets its id at once; its row is written in the background, and the turn logger
+      waits for that write before saving the messages;
+    - a chat this server already resolved for this student is not checked again.
+    """
     try:
         import uuid
-        from app.db.session import async_session_factory
-        from app.services import conversation_service
+        from app.sru_agent import config as agent_config, memory as agent_memory
 
         clean_title = (message or "").strip()
         if len(clean_title) > 50:
@@ -336,17 +366,36 @@ async def agent_conversation_resolver(session_id: str, conversation_id: str | No
         if not clean_title:
             clean_title = "Chat"
 
+        conv_uuid = None
+        if conversation_id:
+            try:
+                conv_uuid = uuid.UUID(conversation_id)
+            except (ValueError, TypeError):
+                conv_uuid = None
+        if conv_uuid and (session_id, str(conv_uuid)) in _known_conversations:
+            return str(conv_uuid)
+
+        if conv_uuid is None and agent_config.AGENT_LOCAL_CACHE and agent_config.AGENT_BACKGROUND_WRITES:
+            new_id = uuid.uuid4()
+            task = agent_memory.in_background(
+                _create_conversation_row(session_id, new_id, clean_title), "conversation create")
+            if task is not None:
+                _creating_conversations[str(new_id)] = task
+                task.add_done_callback(lambda _t, k=str(new_id): _creating_conversations.pop(k, None))
+                _remember_conversation(session_id, str(new_id))
+                agent_memory.seed_new_conversation(session_id, str(new_id))
+                return str(new_id)
+
+        from app.db.session import async_session_factory
+        from app.services import conversation_service
         async with async_session_factory() as session:
-            conv_uuid = None
-            if conversation_id:
-                try:
-                    conv_uuid = uuid.UUID(conversation_id)
-                except (ValueError, TypeError):
-                    conv_uuid = None
             conv = await conversation_service.get_or_create_conversation(
                 session, session_id, conv_uuid, title=clean_title
             )
             await session.commit()
+            if conv_uuid is None or conv.id != conv_uuid:
+                agent_memory.seed_new_conversation(session_id, str(conv.id))
+            _remember_conversation(session_id, str(conv.id))
             return str(conv.id)
     except Exception as err:
         logger.warning("agent_conversation_resolver error: %s", err)
@@ -354,7 +403,7 @@ async def agent_conversation_resolver(session_id: str, conversation_id: str | No
 
 async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str,
                             tools_used: list, cards: list | None = None, suggestions: list | None = None,
-                            started_at=None):
+                            started_at=None, channel: str | None = None):
     """Save one agent turn so a reopened chat looks exactly as it did live: the question first
     (stamped when it was asked), then the answer with its cards and follow-up suggestions."""
     try:
@@ -363,6 +412,12 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
         from app.db.session import async_session_factory
         from app.services import conversation_service
         from app.sru_agent import config as agent_config
+        creating = _creating_conversations.get(str(conversation_id)) if conversation_id else None
+        if creating is not None:
+            try:
+                await creating  # the row of a brand-new chat is still being written
+            except Exception:
+                pass
         async with async_session_factory() as session:
             conv_uuid = uuid.UUID(conversation_id) if conversation_id else None
             clean_title = (user_text or "").strip()
@@ -387,7 +442,8 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
                 "assistant",
                 answer,
                 model=agent_config.AGENT_MODEL,
-                metadata={"tools_used": tools_used, "cards": cards or [], "suggestions": suggestions or []},
+                metadata={"tools_used": tools_used, "cards": cards or [], "suggestions": suggestions or [],
+                          **({"channel": channel} if channel else {})},
                 created_at=finished_at,
             )
             await session.commit()

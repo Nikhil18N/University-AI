@@ -154,3 +154,25 @@ Full details: `docs/26-production-readiness-nov-2026.md`. Gemini API unchanged.
   zoom allowed, reduced motion.
 - **Keep-awake GitHub Action** (needs the `BACKEND_URL` variable).
 - Tests: 470 passed with PostgreSQL; 3,477 fee calculator checks.
+
+## v3.0.0 (17 Nov 2026): admissions brief (fees, faculty, widget, visits, speed)
+
+Full details: `docs/27-admissions-brief-nov-2026.md`. Gemini API unchanged; fee card unchanged.
+
+- **Fee enquiries:** `sru_agent/fee_intake.py` asks for missing programme / branch, board, marks and
+  JEE / EAPCET (only when they change the answer, each at most once, without an AI call), then
+  calculates; answers point to sru.edu.in/fee-scholarship.
+- **Follow-up chips:** `sru_agent/followups.py`, topic from the tool used and the question (not the
+  answer); course-aware; never repeats the question.
+- **Faculty:** 340 official profiles (`faculty_directory.json`), `find_faculty` tool, faculty card,
+  refresh scripts `fetch_faculty_directory.py` and `build_faculty_directory.py`.
+- **Strengths and formatting:** sourced "Why SRU" block, content-driven formatting, prompt 23% shorter;
+  handbook page 12.
+- **Widget:** `frontend/public/widget.js` + `?mode=widget` + `widget-demo.html`; messages tagged
+  `channel` web / widget.
+- **Campus visits:** never booked or confirmed; official contacts + optional callback request
+  (`request_campus_visit_callback`); booking form, date confirmation and `book_campus_visit` removed.
+- **Speed:** in-memory profile / context with background writes, parallel reads, no database trip
+  to start a new chat, chat saved after the answer, Gemini streaming, MINIMAL thinking, shorter
+  retries. Measured: first word for "hi" 2.9 s -> 0.9 s; 1-second AI answer complete 3.3 s -> 1.0 s.
+- Tests: 511 passed with PostgreSQL; 3,477 fee calculator checks.

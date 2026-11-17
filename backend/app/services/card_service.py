@@ -492,14 +492,22 @@ SRU_ADVANTAGE_CARD = {
     ],
 }
 
-CAMPUS_VISIT_FORM_CARD = {
-    "type": "campus_visit_form",
-    "title": "Schedule Your SR University Campus Visit",
-    "subtitle": "Experience our 170-acre lush campus, state-of-the-art AI labs, hostels & sports complex in person.",
-    "location": "170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana",
-    "timings": "10:00 AM – 4:00 PM (Monday – Saturday)",
-    "phone": "0870-2818333",
+# Campus visits are arranged by the admissions team (sru.edu.in/visit-us); SRU Buddy never books or
+# confirms one (admissions brief, Nov 2026). This card shows whom to contact; it has no booking form.
+CAMPUS_VISIT_CONTACT_CARD = {
+    "type": "campus_visit_contact",
+    "title": "Plan your campus visit with the admissions team",
+    "subtitle": "Visits are arranged and confirmed by the SR University admissions team. Please contact them "
+                "before you travel.",
+    "address": "SR University, Ananthasagar, Hasanparthy, Warangal Urban 506371, Telangana",
+    "phone": "0870-2818333 / 0870-2818311",
+    "mobile": "+91 70750 10336",
+    "whatsapp": "https://wa.me/917075010336?text=Hi%2C%20I%20would%20like%20to%20visit%20the%20SR%20University%20campus.",
+    "email": "info@sru.edu.in",
+    "visit_page": "https://sru.edu.in/visit-us",
 }
+# Older name, kept so existing imports keep working.
+CAMPUS_VISIT_FORM_CARD = CAMPUS_VISIT_CONTACT_CARD
 
 CAMPUS_TOUR_CARD = {
     "type": "campus_tour",
@@ -968,7 +976,7 @@ def generate_cards(
     if any(k in msg_lower for k in ("placement", "placements", "highest package", "average package", "recruiters", "job offers", "internship", "internships", "superstar", "highest offer", "salary", "ctc", "highest ctc", "jobs", "career", "companies visiting", "recruitment")):
         cards.append(PLACEMENT_EXCELLENCE_CARD)
 
-    # 4b. Interactive Campus Visit Booking Box (Form card to schedule an in-person campus visit)
+    # 4b. Campus visit: whom to contact (no booking form; visits are arranged by the admissions team)
     _visit_booking_triggers = (
         "book campus tour", "schedule campus visit", "how can i book a campus tour",
         "book a campus tour", "schedule visit", "book a visit", "book a tour",
@@ -978,7 +986,7 @@ def generate_cards(
     )
     is_visit_booking_query = any(k in msg_lower for k in _visit_booking_triggers) and not any(k in msg_lower for k in ("fee", "fees", "cost", "vs", "compare"))
     if is_visit_booking_query:
-        cards.append(CAMPUS_VISIT_FORM_CARD)
+        cards.append(CAMPUS_VISIT_CONTACT_CARD)
 
     # 5. Campus tour card (render static spot highlights if asking for about sru, campus walkthrough/tour, or facilities)
     is_video_query = (

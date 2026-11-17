@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ChatPage from "./pages/ChatPage";
 import AdminPage from "./pages/AdminPage";
+import { setChannel } from "./services/api";
 import "./index.css";
 
 /**
@@ -21,7 +22,18 @@ function staffMode(): boolean {
   }
 }
 
+/** The embeddable widget (public/widget.js) opens this app with ?mode=widget. */
+function isWidgetMode(): boolean {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("mode") === "widget" || /^\/widget\/?$/.test(window.location.pathname);
+  } catch {
+    return false;
+  }
+}
+
 function App() {
+  const widget = isWidgetMode();
   const [isStaff, setIsStaff] = useState<boolean>(staffMode);
   const [view, setView] = useState<"chat" | "admin">(() =>
     /^#\/?admin\b/i.test(window.location.hash) ? "admin" : "chat"
@@ -44,6 +56,11 @@ function App() {
     }
     setView("chat");
   };
+
+  if (widget) {
+    setChannel("widget");
+    return <ChatPage variant="widget" />;
+  }
 
   return view === "admin" ? (
     <AdminPage onBackToChat={backToChat} />

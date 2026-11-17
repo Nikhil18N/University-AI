@@ -108,8 +108,10 @@ async def test_list_conversations_filters_empty_and_backfills_titles():
 
 @pytest.mark.asyncio
 async def test_agent_conversation_resolver_end_to_end():
-    """Verify agent_conversation_resolver creates and returns a valid UUID string and reuses it."""
+    """Verify agent_conversation_resolver creates and returns a valid UUID string and reuses it
+    (the database path, used when background writes are switched off)."""
     from app.main import agent_conversation_resolver
+    from app.sru_agent import config as agent_config
 
     mock_conv = Conversation(
         id=uuid.uuid4(), session_id="sess-end-to-end", title="What is the NIRF rank of SRU?"
@@ -120,7 +122,8 @@ async def test_agent_conversation_resolver_end_to_end():
         mock_session.__aenter__.return_value = mock_session
         mock_factory.return_value = mock_session
 
-        with patch("app.services.conversation_service.get_or_create_conversation", return_value=mock_conv) as mock_get_or_create:
+        with patch("app.services.conversation_service.get_or_create_conversation", return_value=mock_conv) as mock_get_or_create, \
+                patch.object(agent_config, "AGENT_BACKGROUND_WRITES", False):
             resolved_id = await agent_conversation_resolver(
                 "sess-end-to-end", None, "What is the NIRF rank of SRU?"
             )
@@ -164,6 +167,8 @@ async def test_agent_stream_invokes_conversation_resolver_and_propagates_conv_id
             events = []
             async for chunk in stream_resp.body_iterator:
                 events.append(chunk)
+            from app.sru_agent import memory as agent_memory
+            await agent_memory.flush()  # the turn is saved in the background, after the answer
 
             # Check that turn logger was called with resolved_conv_id
             assert len(recorded_turns) == 1

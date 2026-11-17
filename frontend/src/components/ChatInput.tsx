@@ -15,7 +15,8 @@ const QUICK_ACTIONS = [
   { label: "B.Tech fees and scholarships", prompt: "What are the B.Tech fees and merit scholarships for 2027-28?" },
   { label: "Hostel rules and in-times", prompt: "What are the hostel rules, mess and in-time for first-year students?" },
   { label: "Placements", prompt: "Tell me about SR University placement records and top recruiters" },
-  { label: "Book a campus visit", prompt: "I want to book a campus visit" },
+  { label: "Our faculty", prompt: "Tell me about the faculty at SR University" },
+  { label: "Plan a campus visit", prompt: "I would like to visit the campus" },
 ];
 
 // Voice typing uses the browser's own speech recognition (Chrome, Edge, Android, Safari 14.1+).

@@ -100,6 +100,13 @@ HANDBOOK_DOCS = [
         "department": "Admissions & University Administration",
         "effective_date": datetime(2026, 11, 17, tzinfo=timezone.utc),
     },
+    {
+        "file": "12_strengths_faculty_and_visits_nov2026.md",
+        "title": "SRU Strengths, Faculty and Campus Visits (checked 17 Nov 2026)",
+        "document_type": "registry",
+        "department": "Admissions & University Administration",
+        "effective_date": datetime(2026, 11, 17, tzinfo=timezone.utc),
+    },
 ]
 
 

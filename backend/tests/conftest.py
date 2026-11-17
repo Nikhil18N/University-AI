@@ -14,6 +14,8 @@ def _agent_memory_stays_in_the_test():
     memory.set_profile_store(None, None)
     memory.set_history_loader(None)
     memory._local.clear()
+    memory._hot.clear()
+    memory._pending_writes.clear()
     r = memory._client()
     if r:
         try:
@@ -23,6 +25,8 @@ def _agent_memory_stays_in_the_test():
             pass
     yield
     memory._local.clear()
+    memory._hot.clear()
+    memory._pending_writes.clear()
     r = memory._client()
     if r:
         try:

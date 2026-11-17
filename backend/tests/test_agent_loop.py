@@ -37,7 +37,7 @@ async def _run(client, message, session):
 async def test_fee_question_runs_tool_and_returns_numbers():
     client = FakeClient([_call("calculate_fee", program="cse", percent=92),
                          _text("With 92% you get 30%. Tuition is ₹2,38,000 for 2027-28.")])
-    events = await _run(client, "92% cse fee?", "s-fee")
+    events = await _run(client, "92% cse fee? state board, no entrance exam", "s-fee")
     tool_done = [e for e in events if e["type"] == "tool" and e["status"] == "done"][0]
     assert tool_done["result"]["tuition_first_year_after_scholarship"] == "₹2,38,000"
     # the tool result was sent back to the model on the second request
@@ -90,12 +90,15 @@ async def test_callback_needs_consent_then_saves():
 
 
 @pytest.mark.asyncio
-async def test_bad_phone_and_past_date_are_rejected():
+async def test_bad_phone_is_rejected_and_visits_are_never_booked():
     r = await tools.run_tool("request_counsellor_callback", {"name": "A B", "phone": "12345", "consent": True},
                              {"session_id": "s-x", "profile": {}})
     assert r["status"] == "invalid"
     r = await tools.run_tool("book_campus_visit", {"name": "A B", "phone": "9876543210", "consent": True,
                                                    "visit_date": "2020-01-01"}, {"session_id": "s-x", "profile": {}})
+    assert r["status"] == "unknown_tool"  # the model cannot book a visit any more
+    r = await tools.run_tool("request_campus_visit_callback", {"name": "A B", "phone": "12345", "consent": True},
+                             {"session_id": "s-x", "profile": {}})
     assert r["status"] == "invalid"
 
 

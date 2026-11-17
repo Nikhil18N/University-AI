@@ -51,8 +51,15 @@ AGENT_RATE_LIMIT_PER_MIN = int(os.getenv("AGENT_RATE_LIMIT_PER_MIN", "20"))
 # Load handling: how many model calls may run at the same moment (the rest wait their turn),
 # how long to wait before retrying a busy / rate-limited call, and how long one call may take.
 AGENT_MAX_CONCURRENCY = int(os.getenv("AGENT_MAX_CONCURRENCY", "6"))
-AGENT_RETRY_DELAYS = tuple(float(x) for x in os.getenv("AGENT_RETRY_DELAYS", "1.5,4,8").split(",") if x.strip())
-AGENT_CALL_TIMEOUT = float(os.getenv("AGENT_CALL_TIMEOUT", "30"))
+# Shorter waits than before (1.5, 4, 8 s): with several keys the next key is tried at once anyway,
+# and a student would rather get the quick fee-table answer than wait 13 seconds.
+AGENT_RETRY_DELAYS = tuple(float(x) for x in os.getenv("AGENT_RETRY_DELAYS", "1,2.5").split(",") if x.strip())
+AGENT_CALL_TIMEOUT = float(os.getenv("AGENT_CALL_TIMEOUT", "25"))
+# Thinking makes Gemini 3 models slower. MINIMAL (or LOW where a model has no MINIMAL) is right for
+# an admissions assistant whose facts come from tools; DEFAULT leaves the model's own setting.
+AGENT_THINKING_LEVEL = os.getenv("AGENT_THINKING_LEVEL", "MINIMAL")
+# Send the answer to the browser while Gemini is still writing it (first words ~1-2 s sooner).
+AGENT_STREAM = os.getenv("AGENT_STREAM", "true").strip().lower() in ("1", "true", "yes", "on")
 AGENT_KEY_COOLDOWN_SECONDS = float(os.getenv("AGENT_KEY_COOLDOWN_SECONDS", "45"))
 # A key that hit its PER-DAY limit is rested this long before it is tried again:
 AGENT_DAILY_LIMIT_COOLDOWN = float(os.getenv("AGENT_DAILY_LIMIT_COOLDOWN", "3600"))
@@ -61,6 +68,15 @@ AGENT_DAILY_LIMIT_COOLDOWN = float(os.getenv("AGENT_DAILY_LIMIT_COOLDOWN", "3600
 AGENT_ANSWER_CACHE_SECONDS = int(os.getenv("AGENT_ANSWER_CACHE_SECONDS", "21600"))
 
 REDIS_URL = os.getenv("REDIS_URL") or _default_redis
+
+def _flag(name: str, default: str) -> bool:
+    return os.getenv(name, default).strip().lower() in ("1", "true", "yes", "on")
+
+# Speed (see memory.py): keep each student's profile / chat context in this server's memory and
+# write Redis and the database in the background. Right for ONE server process; set
+# AGENT_LOCAL_CACHE=false if you run several (uvicorn --workers N or several instances).
+AGENT_LOCAL_CACHE = _flag("AGENT_LOCAL_CACHE", "true")
+AGENT_BACKGROUND_WRITES = _flag("AGENT_BACKGROUND_WRITES", "true")
 
 # Where leads are saved. Default = the backend's own existing endpoint.
 LEADS_API_URL = os.getenv("LEADS_API_URL", "http://127.0.0.1:8000/api/v1/leads")
@@ -71,4 +87,12 @@ ADMISSIONS_PHONE = os.getenv("ADMISSIONS_PHONE", "0870-2818333")
 ADMISSIONS_EMAIL = os.getenv("ADMISSIONS_EMAIL", "info@sru.edu.in")
 # Digits only, with country code, e.g. 9198XXXXXXXX.
 ADMISSIONS_WHATSAPP = os.getenv("ADMISSIONS_WHATSAPP", "918331003030")
+# Campus visits are arranged by the admissions team (sru.edu.in/visit-us, checked 17 Nov 2026).
+# SRU Buddy never books or confirms a visit; it shares these contacts or passes on a callback request.
+CAMPUS_VISIT_PHONE = os.getenv("CAMPUS_VISIT_PHONE", "+91 70750 10336")
+CAMPUS_VISIT_WHATSAPP = os.getenv("CAMPUS_VISIT_WHATSAPP", "917075010336")
+CAMPUS_VISIT_URL = os.getenv("CAMPUS_VISIT_URL", "https://sru.edu.in/visit-us")
+CAMPUS_ADDRESS = os.getenv("CAMPUS_ADDRESS", "SR University, Ananthasagar, Hasanparthy, Warangal Urban 506371, Telangana")
+FEE_PORTAL_URL = os.getenv("FEE_PORTAL_URL", "https://sru.edu.in/fee-scholarship/")
+FACULTY_URL = "https://sru.edu.in/faculty/"
 

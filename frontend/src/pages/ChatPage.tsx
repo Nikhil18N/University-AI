@@ -37,6 +37,18 @@ import "./ChatPage.css";
 
 interface Props {
   onOpenAdmin?: () => void;
+  /** "widget": the compact version shown inside the embeddable chat bubble (public/widget.js).
+   * Same chat, same backend, same cards: only the frame around the conversation differs. */
+  variant?: "full" | "widget";
+}
+
+/** Tell the page that embeds the widget to close it (public/widget.js listens for this). */
+function closeWidget() {
+  try {
+    window.parent?.postMessage({ type: "sru-buddy:close" }, "*");
+  } catch {
+    /* not embedded */
+  }
 }
 
 const MINIMAL_STARTERS = [
@@ -56,13 +68,14 @@ const MINIMAL_STARTERS = [
     prompt: "Is SR University degree valid for government jobs, higher education in India and abroad?",
   },
   {
-    title: "Book a Campus Visit",
-    desc: "170-acre green campus tour, SRiX incubation center & labs",
-    prompt: "I want to visit the SR University campus. How can I book a campus tour?",
+    title: "Plan a Campus Visit",
+    desc: "Whom to contact to arrange a visit to the 170-acre Warangal campus",
+    prompt: "I would like to visit the SR University campus. Whom should I contact?",
   },
 ];
 
-export default function ChatPage({ onOpenAdmin }: Props) {
+export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
+  const isWidget = variant === "widget";
   const sessionId = getSessionId();
 
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
@@ -79,7 +92,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   // Responsive sidebar: closed by default on mobile (< 768px), open on desktop
-  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+  const [sidebarOpen, setSidebarOpen] = useState(() => variant !== "widget" && window.innerWidth > 768);
 
   // Modals & Popovers
   const [showShareModal, setShowShareModal] = useState(false);
@@ -575,7 +588,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
   }
 
   return (
-    <div className={`chat-page theme-${theme}`}>
+    <div className={`chat-page theme-${theme}${isWidget ? " chat-page--widget" : ""}`}>
       {/* Mobile Drawer Backdrop */}
       {sidebarOpen && (
         <div
@@ -589,6 +602,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       <div className="chat-layout-wrapper">
         {/* Sliding Sidebar */}
         {/* Sliding Sidebar */}
+        {!isWidget && (
         <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
           <ConversationList
             conversations={conversations}
@@ -600,10 +614,58 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             onTriggerPrompt={handleSendMessage}
           />
         </aside>
+        )}
 
         {/* Main Canvas */}
         <main className="chat-main">
           {/* Header (Matching Image 1: Circle Left [=], Center Pill, Circle Right [✎]) */}
+          {isWidget ? (
+            <header className="widget-header">
+              <img src="/sru-logo.png" alt="" className="widget-header-logo" />
+              <div className="widget-header-text">
+                <span className="widget-header-title">SRU Buddy</span>
+                <span className="widget-header-sub">SR University admissions · 2027-28</span>
+              </div>
+              <div className="widget-header-actions">
+                <button
+                  className="widget-icon-btn"
+                  onClick={() => setIsCalculatorOpen(true)}
+                  aria-label="Fee and scholarship calculator"
+                  title="Fee & Scholarship Calculator"
+                >
+                  <CalculatorIcon size={18} />
+                </button>
+                {messages.length > 0 && (
+                  <button className="widget-icon-btn" onClick={handleNewChat} aria-label="New chat" title="New chat">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
+                  </button>
+                )}
+                <a
+                  className="widget-icon-btn"
+                  href="/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open SRU Buddy in a new tab"
+                  title="Open full screen"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M15 3h6v6" />
+                    <path d="M10 14 21 3" />
+                    <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+                  </svg>
+                </a>
+                <button className="widget-icon-btn" onClick={closeWidget} aria-label="Close chat" title="Close">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </div>
+            </header>
+          ) : (
           <header className="chat-header">
             {/* Left circular toggle button (Image 1) */}
             <div className="header-left">
@@ -870,6 +932,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               </button>
             </div>
           </header>
+          )}
 
           {/* Messages Canvas */}
           <div
