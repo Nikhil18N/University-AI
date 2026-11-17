@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShieldCheckIcon, CloseIcon, BoltIcon } from "./Icons";
+import { ShieldCheckIcon, CloseIcon } from "./Icons";
 import { createLead } from "../services/api";
 import { getSessionId } from "../hooks/useSession";
 import { saveStudentDetails } from "../utils/studentProfile";
@@ -69,6 +69,7 @@ export default function LeadAuthModal({
         phone: phone.trim(),
         program_interest: programInterest || "B.Tech CSE",
         source: "chat_inquiry",
+        metadata: { consent_given: true, request_type: "details_shared" },
       });
 
       onSuccess({ name: cleanName, phone: phone.trim() });
@@ -91,8 +92,8 @@ export default function LeadAuthModal({
             <ShieldCheckIcon size={22} />
           </div>
           <div>
-            <h3 className="lead-title">Student Verification</h3>
-            <p className="lead-subtitle">SR University Admissions & Guidance Authentication</p>
+            <h3 className="lead-title">Get personal help (optional)</h3>
+            <p className="lead-subtitle">SR University Admissions 2027-28</p>
           </div>
           <button className="lead-close-btn" onClick={onClose} aria-label="Close" type="button">
             <CloseIcon size={18} />
@@ -100,12 +101,12 @@ export default function LeadAuthModal({
         </div>
 
         <div className="lead-prompt-banner">
-          <span>{reasonText || "To unlock official fee structures, scholarships, and priority admission counselling, please verify your student contact details."}</span>
+          <span>{reasonText || "Share your name and mobile number if you would like the admissions team to be able to help you personally. This is optional."}</span>
         </div>
 
         <form onSubmit={handleSubmit} className="lead-form">
           <div className="lead-field">
-            <label htmlFor="lead-name-input">Student Full Name *</label>
+            <label htmlFor="lead-name-input">Student's full name</label>
             <input
               id="lead-name-input"
               type="text"
@@ -117,17 +118,19 @@ export default function LeadAuthModal({
                 if (error) setError(null);
               }}
               required
-              autoFocus
+              autoFocus={window.innerWidth > 768}
             />
           </div>
 
           <div className="lead-field">
-            <label htmlFor="lead-phone-input">10-Digit Mobile Number *</label>
+            <label htmlFor="lead-phone-input">Mobile number (10 digits)</label>
             <input
               id="lead-phone-input"
               type="tel"
               className="lead-input"
               placeholder="e.g. 9876543210"
+              inputMode="numeric"
+              autoComplete="tel"
               value={phone}
               onChange={(e) => {
                 setPhone(e.target.value);
@@ -146,16 +149,19 @@ export default function LeadAuthModal({
               className="lead-submit-btn"
               disabled={isSubmitting}
             >
-              <BoltIcon size={16} />
-              <span>{isSubmitting ? "Verifying..." : "Verify & Continue"}</span>
+              <span>{isSubmitting ? "Saving..." : "Save and continue"}</span>
             </button>
             <button
               type="button"
               className="lead-skip-btn"
               onClick={onClose}
             >
-              Continue without verification
+              Skip and see the answer
             </button>
+            <p className="lead-optional-note">
+              By saving, you agree that the SR University admissions team may call or message you about admissions.
+              You can change or remove your details any time under My details.
+            </p>
           </div>
         </form>
       </div>

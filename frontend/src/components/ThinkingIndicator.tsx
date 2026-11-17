@@ -1,82 +1,50 @@
 import { useState, useEffect } from "react";
-import { renderUniIcon } from "./Icons";
 import "./ThinkingIndicator.css";
 
-export const THINKING_STEPS = [
-  { icon: "🔍", label: "Reviewing your enquiry..." },
-  { icon: "📘", label: "Assessing university regulations..." },
-  { icon: "⚖️", label: "Evaluating academic criteria..." },
-  { icon: "📋", label: "Verifying applicable policies..." },
-  { icon: "✨", label: "Preparing your response..." },
-];
-
 interface Props {
+  /** What the agent is really doing right now (from the server), e.g. "Calculating your fee". */
   activeToolLabel?: string | null;
 }
 
+/**
+ * Shown while SRU Buddy prepares an answer. It only ever says what is really happening:
+ * the agent's current action when the server reports one, otherwise "Thinking". After a
+ * few seconds it explains a slow first reply (the free server sleeps when idle and needs
+ * up to a minute to wake up), so a student does not think the site is broken.
+ */
 export default function ThinkingIndicator({ activeToolLabel }: Props) {
-  const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [elapsedSecs, setElapsedSecs] = useState(0);
 
   useEffect(() => {
-    // Progress through thinking steps every 1.5 seconds
-    const stepTimer = setInterval(() => {
-      setCurrentStepIdx((prev) => (prev < THINKING_STEPS.length - 1 ? prev + 1 : prev));
-    }, 1500);
-
-    // Track total seconds elapsed
-    const elapsedTimer = setInterval(() => {
-      setElapsedSecs((s) => s + 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(stepTimer);
-      clearInterval(elapsedTimer);
-    };
+    const timer = setInterval(() => setElapsedSecs((s) => s + 1), 1000);
+    return () => clearInterval(timer);
   }, []);
 
-  const activeStep = THINKING_STEPS[currentStepIdx];
-  const displayLabel = activeToolLabel
-    ? (activeToolLabel.endsWith("…") || activeToolLabel.endsWith("...") ? activeToolLabel : `${activeToolLabel}…`)
-    : activeStep.label;
-  const displayIcon = activeToolLabel ? "⚡" : activeStep.icon;
+  const label = activeToolLabel
+    ? activeToolLabel.replace(/[.…]+$/, "")
+    : elapsedSecs >= 10
+    ? "Waking up the server"
+    : "Thinking";
 
   return (
-    <div className="thinking-indicator-wrapper">
-      <div className="thinking-top-row">
-        <div className="thinking-badge-group">
-          <span className="thinking-badge-step">
-            {activeToolLabel ? "AI Agent Action" : `Step ${currentStepIdx + 1} of ${THINKING_STEPS.length}`}
-          </span>
-          <span className="thinking-badge-timer">{elapsedSecs}s</span>
-        </div>
+    <div className="thinking-indicator-wrapper" role="status" aria-live="polite">
+      <div className="thinking-active-step-row">
+        <span className="step-title-animated">{label}…</span>
         <div className="typing-dots-animated" aria-hidden="true">
           <span></span>
           <span></span>
           <span></span>
         </div>
+        {elapsedSecs >= 3 && <span className="thinking-badge-timer">{elapsedSecs}s</span>}
       </div>
-
-      <div className="thinking-active-step-row">
-        <span className="step-icon-bubble">
-          {renderUniIcon(displayIcon, 20, "step-sru-icon-svg") || displayIcon}
-        </span>
-        <span className="step-title-animated">{displayLabel}</span>
-      </div>
-
-      <div className="thinking-progress-track">
-        {THINKING_STEPS.map((_, idx) => (
-          <div
-            key={idx}
-            className={`thinking-step-segment ${
-              idx === currentStepIdx
-                ? "active"
-                : idx < currentStepIdx
-                ? "completed"
-                : ""
-            }`}
-          />
-        ))}
+      {elapsedSecs >= 10 && !activeToolLabel && (
+        <p className="thinking-slow-note">
+          The first reply after a quiet period can take up to a minute while the server starts. Please keep this
+          page open.
+        </p>
+      )}
+      <div className="thinking-progress-track indeterminate" aria-hidden="true">
+        <div className="thinking-indeterminate-bar" />
       </div>
     </div>
   );

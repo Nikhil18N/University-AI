@@ -6,7 +6,17 @@ import ThinkingIndicator from "../components/ThinkingIndicator";
 import ShareModal from "../components/ShareModal";
 import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
 import LeadAuthModal from "../components/LeadAuthModal";
-import { CalculatorIcon } from "../components/Icons";
+import {
+  CalculatorIcon,
+  DownloadIcon,
+  MoonIcon,
+  SettingsIcon,
+  ShareIcon,
+  SoundOffIcon,
+  SoundOnIcon,
+  SunIcon,
+  UserIcon,
+} from "../components/Icons";
 import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
 import { getSessionId } from "../hooks/useSession";
 import SettingsModal from "../components/SettingsModal";
@@ -42,7 +52,7 @@ const MINIMAL_STARTERS = [
   },
   {
     title: "Is the Degree Valid?",
-    desc: "UGC recognition, Telangana State Act 2018 & NBA/NAAC accreditation",
+    desc: "UGC recognition, NBA Tier-I accreditation & NIRF 91st in Engineering",
     prompt: "Is SR University degree valid for government jobs, higher education in India and abroad?",
   },
   {
@@ -392,10 +402,17 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     }
 
     // Middleware: Authenticate prospective student before answering high-intent fee & admission queries
-    if (isHighIntentLeadQuery(trimmed) && !isStudentLeadVerified()) {
+    // Ask once per visit. A student who chose "Skip" is not asked again in this tab.
+    let skipped = false;
+    try {
+      skipped = sessionStorage.getItem("sru_lead_skipped") === "1";
+    } catch {
+      /* private mode */
+    }
+    if (isHighIntentLeadQuery(trimmed) && !isStudentLeadVerified() && !skipped) {
       setPendingAuthMessage(trimmed);
       setAuthReason(
-        "To view complete SR University fee structures, scholarship calculations, and priority admission guidance, please authenticate with your student name and mobile number."
+        "Share your name and mobile number if you would like the admissions team to be able to help you personally. This is optional: you will see the answer either way."
       );
       setShowLeadAuthModal(true);
       return;
@@ -608,8 +625,17 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               <div
                 className="chatgpt-center-pill"
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setShowMobileMenu(!showMobileMenu);
+                  }
+                }}
                 role="button"
                 tabIndex={0}
+                aria-haspopup="menu"
+                aria-expanded={showMobileMenu}
+                aria-label="SRU Buddy menu"
               >
                 <span className="pill-brand-name">SRU Buddy</span>
                 <span className="brand-version-pill" title={`SRU Buddy v${APP_VERSION} (beta)`}>BETA</span>
@@ -618,7 +644,17 @@ export default function ChatPage({ onOpenAdmin }: Props) {
 
               {/* Dropdown Options for Center Pill */}
               {showMobileMenu && (
-                <div className="mobile-options-popover">
+                <div className="mobile-options-popover" role="menu">
+                  <button
+                    className="mobile-popover-item"
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      setIsCalculatorOpen(true);
+                    }}
+                  >
+                    <span className="popover-icon"><CalculatorIcon size={16} /></span>
+                    <span>Fee & Scholarship Calculator</span>
+                  </button>
                   {messages.length > 0 && (
                     <button
                       className="mobile-popover-item"
@@ -627,8 +663,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                         setShowShareModal(true);
                       }}
                     >
-                      <span className="popover-icon">🔗</span>
-                      <span>Share Chat Link</span>
+                      <span className="popover-icon"><ShareIcon size={16} /></span>
+                      <span>Share chat link</span>
                     </button>
                   )}
                   {messages.length > 0 && (
@@ -640,8 +676,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                           handleExportPDF();
                         }}
                       >
-                        <span className="popover-icon">📄</span>
-                        <span>Export as PDF / Print</span>
+                        <span className="popover-icon"><DownloadIcon size={16} /></span>
+                        <span>Save as PDF / Print</span>
                       </button>
                       <button
                         className="mobile-popover-item"
@@ -650,8 +686,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                           handleExportMD();
                         }}
                       >
-                        <span className="popover-icon">📝</span>
-                        <span>Export as Markdown</span>
+                        <span className="popover-icon"><DownloadIcon size={16} /></span>
+                        <span>Save as Markdown</span>
                       </button>
                     </>
                   )}
@@ -662,8 +698,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                       toggleTheme();
                     }}
                   >
-                    <span className="popover-icon">{theme === "light" ? "🌙" : "☀️"}</span>
-                    <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+                    <span className="popover-icon">{theme === "light" ? <MoonIcon size={16} /> : <SunIcon size={16} />}</span>
+                    <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
                   </button>
                   <button
                     className="mobile-popover-item"
@@ -672,8 +708,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                       toggleSound();
                     }}
                   >
-                    <span className="popover-icon">{soundEnabled ? "🔊" : "🔇"}</span>
-                    <span>{soundEnabled ? "Sound: On" : "Sound: Muted"}</span>
+                    <span className="popover-icon">{soundEnabled ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}</span>
+                    <span>{soundEnabled ? "Reply sound: on" : "Reply sound: off"}</span>
                   </button>
                   <button
                     className="mobile-popover-item"
@@ -682,7 +718,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                       setShowSettings(true);
                     }}
                   >
-                    <span className="popover-icon">👤</span>
+                    <span className="popover-icon"><UserIcon size={16} /></span>
                     <span>My details</span>
                   </button>
                   {onOpenAdmin && (
@@ -693,8 +729,8 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                         onOpenAdmin();
                       }}
                     >
-                      <span className="popover-icon">⚙️</span>
-                      <span>Admin Console</span>
+                      <span className="popover-icon"><SettingsIcon size={16} /></span>
+                      <span>Admin console (staff)</span>
                     </button>
                   )}
                   <div className="popover-version-footer">
@@ -708,62 +744,53 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             <div className="header-right">
               {/* Desktop Header Actions */}
               <div className="header-actions desktop-only">
-                {/* Share Chat (ChatGPT style) */}
-                {messages.length > 0 && (
-                  <button
-                    className="header-action-pill-btn share-btn"
-                    onClick={() => setShowShareModal(true)}
-                    title="Share chat link"
-                    aria-label="Share chat"
-                  >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="18" cy="5" r="3" />
-                      <circle cx="6" cy="12" r="3" />
-                      <circle cx="18" cy="19" r="3" />
-                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                    </svg>
-                    <span className="btn-label">Share</span>
-                  </button>
-                )}
-
                 {/* Export Chat Dropdown */}
                 {messages.length > 0 && (
                   <div className="export-menu-container" ref={exportMenuRef}>
                     <button
                       className="header-action-pill-btn export-btn"
                       onClick={() => setShowExportMenu(!showExportMenu)}
-                      title="Export chat"
-                      aria-label="Export chat"
+                      title="Share or save this chat"
+                      aria-label="Share or save this chat"
+                      aria-haspopup="menu"
                       aria-expanded={showExportMenu}
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                      </svg>
-                      <span className="btn-label">Export</span>
+                      <ShareIcon size={15} />
+                      <span className="btn-label">Share</span>
                     </button>
 
                     {showExportMenu && (
                       <div className="export-dropdown-card">
-                        <div className="export-dropdown-header">Export Options</div>
+                        <div className="export-dropdown-header">Share or save</div>
+                        <button
+                          className="export-option-item"
+                          onClick={() => {
+                            setShowExportMenu(false);
+                            setShowShareModal(true);
+                          }}
+                        >
+                          <span className="export-opt-icon"><ShareIcon size={16} /></span>
+                          <div className="export-opt-text">
+                            <span className="export-opt-title">Share link</span>
+                            <span className="export-opt-desc">Send this chat to a parent or friend</span>
+                          </div>
+                        </button>
                         <button className="export-option-item" onClick={handleExportPDF}>
-                          <span className="export-opt-icon">📄</span>
+                          <span className="export-opt-icon"><DownloadIcon size={16} /></span>
                           <div className="export-opt-text">
                             <span className="export-opt-title">PDF / Print</span>
-                            <span className="export-opt-desc">Official university transcript layout</span>
+                            <span className="export-opt-desc">Save or print this conversation</span>
                           </div>
                         </button>
                         <button className="export-option-item" onClick={handleExportMD}>
-                          <span className="export-opt-icon">📝</span>
+                          <span className="export-opt-icon"><DownloadIcon size={16} /></span>
                           <div className="export-opt-text">
                             <span className="export-opt-title">Markdown (.md)</span>
-                            <span className="export-opt-desc">Formatted for Notion, Obsidian & notes</span>
+                            <span className="export-opt-desc">For notes apps</span>
                           </div>
                         </button>
                         <button className="export-option-item" onClick={handleExportTXT}>
-                          <span className="export-opt-icon">📋</span>
+                          <span className="export-opt-icon"><DownloadIcon size={16} /></span>
                           <div className="export-opt-text">
                             <span className="export-opt-title">Plain Text (.txt)</span>
                             <span className="export-opt-desc">Clean unformatted text transcript</span>
@@ -790,19 +817,20 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   className="header-icon-btn"
                   onClick={toggleTheme}
                   title={theme === "light" ? "Switch to Dark mode" : "Switch to Light mode"}
-                  aria-label="Toggle theme"
+                  aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
                 >
-                  {theme === "light" ? "🌙" : "☀️"}
+                  {theme === "light" ? <MoonIcon size={17} /> : <SunIcon size={17} />}
                 </button>
 
                 {/* Sound Toggle */}
                 <button
                   className="header-icon-btn sound-toggle-btn"
                   onClick={toggleSound}
-                  title={soundEnabled ? "Mute chimes" : "Enable chimes"}
-                  aria-label="Toggle audio"
+                  title={soundEnabled ? "Mute reply sound" : "Turn on reply sound"}
+                  aria-label={soundEnabled ? "Mute reply sound" : "Turn on reply sound"}
+                  aria-pressed={soundEnabled}
                 >
-                  {soundEnabled ? "🔊" : "🔇"}
+                  {soundEnabled ? <SoundOnIcon size={17} /> : <SoundOffIcon size={17} />}
                 </button>
 
                 {/* My details (settings) */}
@@ -812,7 +840,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   title="My details"
                   aria-label="My details"
                 >
-                  👤
+                  <UserIcon size={17} />
                 </button>
 
                 {/* Admin console */}
@@ -820,10 +848,10 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                   <button
                     className="header-icon-btn"
                     onClick={onOpenAdmin}
-                    title="Admin console"
+                    title="Admin console (staff)"
                     aria-label="Admin console"
                   >
-                    ⚙️
+                    <SettingsIcon size={17} />
                   </button>
                 )}
               </div>
@@ -889,7 +917,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                     <h1 className="welcome-hero-title">SRU Buddy</h1>
                     <span className="hero-beta-pill">Beta</span>
                   </div>
-                  <p className="welcome-hero-tagline">Your AI agent</p>
+                  <p className="welcome-hero-tagline">SR University admissions assistant · 2027-28</p>
                 </div>
 
                 {/* Clean starter cards */}
@@ -953,25 +981,25 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               const getErrorDetails = (err: string) => {
                 if (err.includes("Failed to fetch") || err.includes("NetworkError")) {
                   return {
-                    title: "Server is connecting",
-                    desc: "Backend service is spinning up. Please tap retry in a few seconds.",
+                    title: "Can't reach SRU Buddy right now",
+                    desc: "The server may be starting up or your connection dropped. Please wait a few seconds and tap Retry. For urgent help call 0870-2818333.",
                   };
                 }
                 if (err.includes("401") || err.includes("Unauthorized") || err.includes("Forbidden") || err.includes("generativelanguage")) {
                   return {
-                    title: "AI service temporarily busy",
-                    desc: "Unable to reach the AI service. Please tap retry to switch to an active key.",
+                    title: "SRU Buddy is busy",
+                    desc: "Please wait a moment and tap Retry. For urgent help call 0870-2818333.",
                   };
                 }
                 if (err.includes("429") || err.includes("quota") || err.includes("rate limit")) {
                   return {
-                    title: "High traffic",
-                    desc: "The AI agent is receiving many requests. Please wait a moment and tap retry.",
+                    title: "Many students are asking right now",
+                    desc: "Please wait a minute and tap Retry. For urgent help call 0870-2818333.",
                   };
                 }
                 return {
-                  title: "Connection issue",
-                  desc: "Something went wrong processing your request. Please tap retry.",
+                  title: "Something went wrong",
+                  desc: "Please tap Retry. If it keeps happening, call the Admissions Office at 0870-2818333.",
                 };
               };
               const { title, desc } = getErrorDetails(error);
@@ -990,12 +1018,14 @@ export default function ChatPage({ onOpenAdmin }: Props) {
                       const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
                       if (lastUserMsg) {
                         setError(null);
+                        // drop the failed attempt so the question is not shown twice
+                        setMessages((prev) => prev.filter((m) => m.id !== lastUserMsg.id));
                         handleSendMessage(lastUserMsg.content);
                       }
                     }}
                     type="button"
                   >
-                    Retry ↻
+                    Retry
                   </button>
                 </div>
               );
@@ -1023,6 +1053,7 @@ export default function ChatPage({ onOpenAdmin }: Props) {
             isLoading={isLoading}
             onStop={handleStopStreaming}
             disabled={isLoading}
+            onOpenCalculator={() => setIsCalculatorOpen(true)}
           />
         </main>
       </div>
@@ -1056,8 +1087,18 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       <LeadAuthModal
         isOpen={showLeadAuthModal}
         onClose={() => {
+          // "Skip" or close: never lose the student's question; answer it and don't ask again this visit.
           setShowLeadAuthModal(false);
-          setPendingAuthMessage(null);
+          try {
+            sessionStorage.setItem("sru_lead_skipped", "1");
+          } catch {
+            /* private mode */
+          }
+          if (pendingAuthMessage) {
+            const nextMsg = pendingAuthMessage;
+            setPendingAuthMessage(null);
+            executeSendMessage(nextMsg);
+          }
         }}
         onSuccess={(_lead) => {
           setShowLeadAuthModal(false);

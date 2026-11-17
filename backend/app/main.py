@@ -107,7 +107,7 @@ async def lifespan(fastapi_app: FastAPI):
 app = FastAPI(
     title="University AI Companion",
     description="Conversational AI with RAG and Function-Calling Agent for university knowledge",
-    version="2.8.0",
+    version="2.9.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.APP_DEBUG else None,
     redoc_url="/redoc" if settings.APP_DEBUG else None,
@@ -116,14 +116,37 @@ app = FastAPI(
 
 # CORS
 origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
+# The website sends no cookies (students are identified by a random id in the request), so
+# credentials are not allowed: another site can never make a request "as" a student.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins if "*" not in origins else ["*"],
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://.*\.vercel\.app$",
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origin_regex=settings.CORS_ORIGIN_REGEX or None,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+def _origin_allowed(origin: str) -> bool:
+    import re as _re
+    if not origin:
+        return False
+    if "*" in origins or origin in origins:
+        return True
+    return bool(settings.CORS_ORIGIN_REGEX and _re.fullmatch(settings.CORS_ORIGIN_REGEX, origin))
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    """Basic protection headers on every API response."""
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("X-Frame-Options", "DENY")  # the API is never shown in a frame
+    if not settings.APP_DEBUG:
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
 
 
 # ---- Global exception handler ----
@@ -135,16 +158,14 @@ async def global_exception_handler(request: Request, exc: Exception):
     # Ensure CORS headers are attached to error responses
     origin = request.headers.get("origin")
     response_headers = {}
-    if origin:
+    if _origin_allowed(origin):  # only the sites CORS allows; never echo an arbitrary origin
         response_headers["Access-Control-Allow-Origin"] = origin
-        response_headers["Access-Control-Allow-Credentials"] = "true"
-        response_headers["Access-Control-Allow-Methods"] = "*"
-        response_headers["Access-Control-Allow-Headers"] = "*"
+        response_headers["Vary"] = "Origin"
 
     detail_msg = "An unexpected error occurred. Please try again later."
     exc_str = str(exc)
     if "Connect call failed" in exc_str or "ConnectionRefused" in exc_str or "Could not connect to a Chroma server" in exc_str or "WinError 10061" in exc_str:
-        detail_msg = "Required backend service (PostgreSQL, ChromaDB, or Redis) is not reachable. Please ensure Docker Desktop is open and run 'docker compose up -d'."
+        detail_msg = "A required service is temporarily unavailable. Please try again in a minute."
 
     return JSONResponse(
         status_code=500,
@@ -350,7 +371,10 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
             conv = await conversation_service.get_or_create_conversation(
                 session, session_id, conv_uuid, title=clean_title
             )
-            if conv.title == "New conversation" and clean_title:
+            # Title the chat by its first real question, not by "hi" or "thanks".
+            from app.sru_agent import intents as agent_intents
+            if clean_title and not agent_intents.small_talk(user_text) and (
+                    conv.title in ("New conversation", "Chat", "") or agent_intents.small_talk(conv.title)):
                 conv.title = clean_title
             finished_at = datetime.now(timezone.utc)
             asked_at = started_at or finished_at

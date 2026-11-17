@@ -49,7 +49,7 @@ GENERAL_FEE_SUGGESTIONS = [
 BTECH_FEE_SUGGESTIONS = [
     "🎓 B.Tech CSE Fee Breakdown",
     "💰 CSE Per-Semester Fee",
-    "🎯 Apply with 50% Off",
+    "📝 How to Apply for 2027-28",
     "🧮 Scholarship Calculator",
 ]
 

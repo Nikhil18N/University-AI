@@ -209,9 +209,6 @@ export default function MessageBubble({
               <div />
             )}
 
-            <div className="ai-response-disclaimer">
-              <span>SRU Buddy is AI and can make mistakes. Verify with official sources</span>
-            </div>
           </div>
         )}
       </div>

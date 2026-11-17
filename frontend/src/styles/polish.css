@@ -1,0 +1,273 @@
+/*
+ * v2.9 polish layer. Loaded after every component stylesheet, so these rules win.
+ * One brand colour (SR University blue) for every primary action, readable contrast,
+ * visible keyboard focus, and fixes for faults found on phones and narrow laptops.
+ */
+
+/* ---- Keyboard focus is always visible (and only for keyboard users) ------------------- */
+:where(button, a, [role="button"], input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--primary, #0055a4);
+  outline-offset: 2px;
+}
+
+/* ---- Phone: the closed sidebar left a grey shadow strip down the left edge ------------ */
+@media (max-width: 768px) {
+  .sidebar.closed {
+    box-shadow: none;
+    visibility: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.25s;
+  }
+  .sidebar.open {
+    visibility: visible;
+  }
+}
+
+/* ---- Header: icons in one style; keep the right-hand group clear of the centre pill ---- */
+.header-icon-btn {
+  color: var(--text-secondary, #475569);
+}
+.header-icon-btn svg {
+  display: block;
+}
+.popover-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #475569);
+}
+.export-opt-icon {
+  display: inline-flex;
+  color: var(--primary, #0055a4);
+}
+@media (min-width: 769px) and (max-width: 1240px) {
+  .calc-nav-pill-btn .calc-nav-text,
+  .header-action-pill-btn .btn-label {
+    display: none;
+  }
+}
+@media (min-width: 769px) and (max-width: 980px) {
+  .header-center {
+    position: static;
+    transform: none;
+  }
+}
+
+/* ---- Calculator button: brand blue instead of purple ---------------------------------- */
+.calc-nav-pill-btn,
+[data-theme="light"] .calc-nav-pill-btn {
+  border-color: rgba(0, 85, 164, 0.35);
+  background: rgba(0, 85, 164, 0.08);
+  color: var(--primary, #0055a4);
+}
+.calc-nav-pill-btn:hover,
+[data-theme="light"] .calc-nav-pill-btn:hover {
+  border-color: var(--primary, #0055a4);
+  background: rgba(0, 85, 164, 0.14);
+}
+[data-theme="dark"] .calc-nav-pill-btn {
+  color: #93c5fd;
+  border-color: rgba(147, 197, 253, 0.35);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+/* ---- Pop-ups (verification, My details): brand blue, not purple ----------------------- */
+.lead-icon-badge,
+[data-theme="light"] .lead-icon-badge {
+  background: var(--primary-light, #e8f1fb);
+  color: var(--primary, #0055a4);
+  border-color: rgba(0, 85, 164, 0.2);
+}
+[data-theme="dark"] .lead-icon-badge {
+  background: rgba(59, 130, 246, 0.14);
+  color: #93c5fd;
+}
+.lead-prompt-banner,
+[data-theme="light"] .lead-prompt-banner {
+  background: var(--primary-light, #e8f1fb);
+  border-color: rgba(0, 85, 164, 0.18);
+  color: #0b3d75;
+}
+[data-theme="dark"] .lead-prompt-banner {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(147, 197, 253, 0.25);
+  color: #cfe0ff;
+}
+.lead-submit-btn {
+  background: var(--primary, #0055a4);
+}
+.lead-submit-btn:hover:not(:disabled) {
+  background: var(--primary-hover, #004382);
+}
+.lead-input:focus,
+[data-theme="light"] .lead-input:focus {
+  border-color: var(--primary, #0055a4);
+  box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.16);
+}
+.lead-optional-note {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted, #64748b);
+}
+@media (max-width: 480px) {
+  .lead-modal-card {
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+}
+
+/* ---- Fee card: a tidy 2 x 2 grid on every screen, readable green ---------------------- */
+.agent-fee-stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.agent-fee-stat-val.bold-emerald {
+  color: #047857;
+}
+[data-theme="dark"] .agent-fee-stat-val.bold-emerald {
+  color: #34d399;
+}
+.agent-fee-card .card-badge {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.agent-fee-card .card-header {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+@media (max-width: 480px) {
+  .agent-fee-stat {
+    padding: 10px;
+  }
+  .agent-fee-stat-val {
+    font-size: 1.02rem;
+  }
+  .agent-fee-stat-label {
+    font-size: 0.66rem;
+    letter-spacing: 0.01em;
+  }
+  .agent-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .agent-card-wa-btn {
+    justify-content: center;
+  }
+}
+
+/* ---- Sidebar footer: the SRU logo instead of a purple "SRU" circle -------------------- */
+.sidebar-avatar-circle-btn {
+  background: #ffffff;
+  border: 1px solid var(--border, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.sidebar-avatar-logo {
+  width: 26px;
+  height: auto;
+  display: block;
+}
+
+/* ---- Welcome screen ------------------------------------------------------------------- */
+.welcome-hero-tagline {
+  color: var(--text-secondary, #475569);
+}
+
+/* ---- Respect "reduce motion" ---------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* iOS zooms into inputs smaller than 16px; keep form fields at 16px on phones */
+@media (max-width: 768px) {
+  .lead-input,
+  .calc-main-input,
+  .calc-input,
+  .calc-select-modern {
+    font-size: 16px;
+  }
+}
+
+.calc-result-heading {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+[data-theme="dark"] .calc-result-heading {
+  color: #e2e8f0;
+}
+
+/* ---- Touch targets and minimum text size (v2.9.0) ---- */
+.action-icon-btn {
+  min-width: 32px;
+  min-height: 32px;
+}
+.chat-item-delete-btn {
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (pointer: coarse) {
+  .action-icon-btn,
+  .chat-item-delete-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  /* on touch screens there is no hover, so keep the delete button visible */
+  .chat-item-delete-btn {
+    opacity: 0.75;
+  }
+}
+.brand-version-pill,
+.sidebar-version-badge,
+.yt-count-pill,
+.yt-new-pill,
+.yt-category-tag {
+  font-size: 11px;
+}
+.yt-channel-name {
+  font-size: 11.5px;
+}
+.yt-duration-badge,
+.yt-watch-pill,
+.insta-reel-badge,
+.stat-sub,
+.application-ad-pill,
+.agent-fee-stat-sub,
+.yt-footer-link {
+  font-size: 11px;
+}
+@media (max-width: 480px) {
+  .agent-fee-stat-label {
+    font-size: 11px;
+  }
+}
+/* bigger tap areas for chips and header pills on touch screens */
+@media (pointer: coarse) {
+  .suggestion-chip,
+  .channel-link-btn,
+  .header-action-pill-btn {
+    min-height: 36px;
+  }
+  .yt-footer-link {
+    display: inline-block;
+    padding: 8px 4px;
+  }
+}
+
+.chat-input-disclaimer {
+  font-size: 11px;
+}

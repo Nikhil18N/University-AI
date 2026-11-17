@@ -101,6 +101,13 @@ def classify_agent_intent(message: str, state: dict | None = None) -> AgentInten
         if res.get("date"):
             return "CAMPUS_VISIT_BOOKING_WITH_DATE"
 
+    # 4b. "I want to visit campus on 2026-11-25" / "visit campus tomorrow": a visit with a date
+    #     anywhere in the sentence (the patterns above only catch "visit on ...").
+    if re.search(r"\b(?:visit|come|tour)\b", msg) and not re.search(r"\b(?:timings?|hours?|rules?|allowed|can\s+parents)\b", msg):
+        from .tools import resolve_campus_visit_date
+        if resolve_campus_visit_date(msg).get("date"):
+            return "CAMPUS_VISIT_BOOKING_WITH_DATE"
+
     # 5. Explicit booking request (without a specific date yet)
     if any(phrase in msg for phrase in _EXPLICIT_BOOKING_PHRASES):
         return "CAMPUS_VISIT_BOOKING"

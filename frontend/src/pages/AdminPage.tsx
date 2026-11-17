@@ -29,6 +29,16 @@ interface Props {
   onBackToChat: () => void;
 }
 
+/** Chat previews come as markdown; show them as plain text in the list. */
+function plainPreview(text: string): string {
+  return (text || "")
+    .replace(/\*\*|__|`|#{1,6}\s/g, "")
+    .replace(/^\s*[-*•]\s+/gm, "")
+    .replace(/\|/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export default function AdminPage({ onBackToChat }: Props) {
   const [adminKey, setAdminKey] = useState<string>(
     () => sessionStorage.getItem("university_ai_admin_key") || ""
@@ -621,7 +631,7 @@ export default function AdminPage({ onBackToChat }: Props) {
                               </div>
 
                               {c.last_message_preview && (
-                                <p className="conv-card-preview">{c.last_message_preview}</p>
+                                <p className="conv-card-preview">{plainPreview(c.last_message_preview)}</p>
                               )}
 
                               <div className="conv-card-footer">
@@ -682,7 +692,7 @@ export default function AdminPage({ onBackToChat }: Props) {
                           <option value={25}>25</option>
                           <option value={50}>50</option>
                           <option value={100}>100</option>
-                          <option value={1000}>All (64+)</option>
+                          <option value={1000}>All</option>
                         </select>
                       </div>
                     </div>
@@ -833,7 +843,7 @@ export default function AdminPage({ onBackToChat }: Props) {
                           Click any conversation on the left to review student questions, AI responses, grounded citations, and feedback ratings.
                         </p>
                         <p style={{ marginTop: "12px", fontSize: "0.8rem", color: "var(--text-2)" }}>
-                          💡 <strong>Tip for Model Training:</strong> Click <em>"Export All Chats (.md for AI Training)"</em> in the toolbar to export all 64+ conversations in a single training file.
+                          💡 <strong>Tip for Model Training:</strong> Click <em>"Export All Chats (.md for AI Training)"</em> in the toolbar to export every conversation in a single file.
                         </p>
                       </div>
                     )}

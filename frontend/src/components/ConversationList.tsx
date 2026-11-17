@@ -80,7 +80,7 @@ export default function ConversationList({
       <div className="sidebar-top-bar">
         <div className="sidebar-brand-title-box">
           <span className="sidebar-brand-title">SRU Buddy</span>
-          <span className="brand-version-pill">v{APP_VERSION}</span>
+          <span className="brand-version-pill" title={`Version ${APP_VERSION}`}>BETA</span>
         </div>
 
         <button
@@ -205,7 +205,7 @@ export default function ConversationList({
             <path d="M12 20h9" />
             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
           </svg>
-          <span>Chat</span>
+          <span>New chat</span>
         </button>
 
         <span className="sidebar-version-badge" title={`SR University AI Companion v${APP_VERSION}`}>
@@ -217,9 +217,10 @@ export default function ConversationList({
           target="_blank"
           rel="noopener noreferrer"
           className="sidebar-avatar-circle-btn"
-          title="SR University (sru.edu.in)"
+          title="Open the official SR University website (sru.edu.in)"
+          aria-label="Open the official SR University website"
         >
-          <span className="avatar-initials">SRU</span>
+          <img src="/sru-logo.png" alt="" className="sidebar-avatar-logo" />
         </a>
       </div>
     </div>

@@ -131,3 +131,26 @@ Full details: `docs/25-audit-round-2-nov-2026.md`.
 - **Scholarship by score:** each score's own scholarship is reported (EAPCET rank above 20,000).
 - **Videos:** matched by topic from their own keywords, no AI call.
 - **Cards:** "requested" instead of "confirmed", one set of visit hours, official helpline.
+
+## v2.9.0 (17 Nov 2026): production readiness
+
+Full details: `docs/26-production-readiness-nov-2026.md`. Gemini API unchanged.
+
+- **Staff-only admin console:** button hidden; open with `/#admin`.
+- **No unconfirmed offers:** Early Bird card off by default (`SHOW_EARLY_BIRD_OFFER`); chip now
+  "How to Apply for 2027-28".
+- **Header and phone menu:** one Share menu, SVG icons, no overlap at any width; calculator first
+  in the phone menu.
+- **Input:** new quick actions, voice typing (en-IN) where supported, real send button, one
+  disclaimer with the Admissions Office number.
+- **Thinking indicator:** real tool step, timer, "waking up the server" note after 10 seconds.
+- **Details form optional:** "Skip and see the answer" sends the question and is remembered for the
+  session.
+- **Campus visit:** a date in the sentence goes straight to the booking.
+- **Security:** CORS by list or pattern without credentials, no origin echo on errors, security
+  headers on server and site, sensible caching on Vercel.
+- **Chat titles** skip greetings.
+- **Accessibility:** focus outlines, labels, tap targets ≥ 32 px (40 px on touch), text ≥ 11 px,
+  zoom allowed, reduced motion.
+- **Keep-awake GitHub Action** (needs the `BACKEND_URL` variable).
+- Tests: 470 passed with PostgreSQL; 3,477 fee calculator checks.

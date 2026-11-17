@@ -95,3 +95,23 @@ async def test_chat_order_profile_and_lead_update_in_postgres():
             assert lead.metadata_["request_type"] == "callback"
     finally:
         await engine.dispose()
+
+
+def test_api_security_headers_and_cors_do_not_echo_unknown_origins():
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    client = TestClient(app)
+    res = client.get("/api/v1/agent/fee-config", headers={"Origin": "https://evil.example.com"})
+    assert res.status_code == 200
+    assert res.headers.get("x-content-type-options") == "nosniff"
+    assert res.headers.get("access-control-allow-origin") is None
+    assert res.headers.get("access-control-allow-credentials") is None
+    ok = client.get("/api/v1/agent/fee-config", headers={"Origin": "https://university-ai-companion.vercel.app"})
+    assert ok.headers.get("access-control-allow-origin") == "https://university-ai-companion.vercel.app"
+
+
+def test_small_talk_does_not_become_the_chat_title():
+    from app.sru_agent import intents
+    assert intents.small_talk("hi") and intents.small_talk("hi sru_buddy") and intents.small_talk("thanks")
+    assert not intents.small_talk("what is the cse fee")

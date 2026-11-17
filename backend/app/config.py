@@ -36,12 +36,20 @@ class Settings(BaseSettings):
     RAG_RERANK: bool = False
 
     # ---- Admin ----
+    # The "Early Bird: 50% off the application fee (pay ₹550)" advertisement card. It is NOT on
+    # the official 2027-28 fee card, so it stays hidden until the Admissions Office confirms the
+    # offer. Set SHOW_EARLY_BIRD_OFFER=true in the server environment to show it.
+    SHOW_EARLY_BIRD_OFFER: bool = False
     ADMIN_API_KEY: str = "change-me-in-production"
 
     # ---- App ----
     APP_ENV: str = "development"
     APP_DEBUG: bool = True
     CORS_ORIGINS: str = "http://localhost:5173"
+    # Other sites allowed to call this API (regular expression). The default allows local
+    # development and Vercel deployments. To embed SRU Buddy on sru.edu.in add it, e.g.
+    # CORS_ORIGIN_REGEX=^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://.*\.vercel\.app$|^https://(www\.)?sru\.edu\.in$
+    CORS_ORIGIN_REGEX: str = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://.*\.vercel\.app$"
 
     # ---- Paths ----
     PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent

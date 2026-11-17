@@ -938,7 +938,8 @@ def generate_cards(
 
     # 2b. Sponsored Early Bird Application Ad Card (media_1794676975023.png reference)
     # Attached whenever student is interested in joining SRU, querying application discount, applying online, or early bird offers
-    if (is_join_interest_query or is_ad_query or (is_cse_fee_query and any(k in msg_lower for k in ("join", "admission", "apply", "want", "breakdown")))) and not is_admission_fee_query:
+    from app.config import settings as _settings
+    if _settings.SHOW_EARLY_BIRD_OFFER and (is_join_interest_query or is_ad_query or (is_cse_fee_query and any(k in msg_lower for k in ("join", "admission", "apply", "want", "breakdown")))) and not is_admission_fee_query:
         if APPLICATION_AD_CARD not in cards:
             cards.append(APPLICATION_AD_CARD)
 

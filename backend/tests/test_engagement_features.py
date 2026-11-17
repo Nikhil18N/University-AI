@@ -330,3 +330,21 @@ def test_calculate_fee_conditional_hostel():
 
 
 
+
+
+
+@pytest.fixture(autouse=True)
+def _early_bird_offer_on(monkeypatch, request):
+    """The advertisement tests above check how the card behaves WHEN the offer is switched on.
+    It is off by default (not on the 2027-28 fee card); see test_early_bird_offer_is_off_by_default."""
+    if request.node.name != "test_early_bird_offer_is_off_by_default":
+        from app.config import settings
+        monkeypatch.setattr(settings, "SHOW_EARLY_BIRD_OFFER", True)
+
+
+def test_early_bird_offer_is_off_by_default():
+    from app.config import Settings
+    from app.services.card_service import generate_cards
+    assert Settings().SHOW_EARLY_BIRD_OFFER is False
+    cards = generate_cards(user_message="I want to join SRU, how do I apply?", answer="")
+    assert not any(c.get("type") == "application_ad" for c in cards)

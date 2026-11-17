@@ -1,0 +1,24 @@
+# Keeps the SRU Buddy backend on Render awake during the day, so the first student of the
+# morning does not wait up to a minute for the server to start.
+#
+# To switch it on: GitHub repository > Settings > Secrets and variables > Actions >
+# Variables > New repository variable:  BACKEND_URL = https://university-ai-luwe.onrender.com
+# (no secret needed; the /health endpoint is public). Without the variable it does nothing.
+#
+# Free GitHub Actions minutes are more than enough (one 5-second run every 10 minutes).
+name: Keep backend awake
+
+on:
+  schedule:
+    # every 10 minutes from about 06:30 to 23:30 India time (01:00-17:59 UTC)
+    - cron: "*/10 1-17 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    if: ${{ vars.BACKEND_URL != '' }}
+    steps:
+      - name: Ping /health
+        run: |
+          curl --silent --show-error --max-time 90 --retry 2 --retry-delay 5 "${{ vars.BACKEND_URL }}/health" -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n"

@@ -504,23 +504,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           <div className="calc-results-container">
             <div className="calc-results-header">
               <div className="calc-status-badge-wrap">
-                {pct > 0 ? (
-                  <div className="calc-status-badge scholarship-awarded">
-                    <AwardIcon size={16} />
-                    <span>
-                      <strong>{pct}% Merit Scholarship</strong>
-                      {" • "}{parsed.display}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="calc-status-badge standard-tuition">
-                    <InfoIcon size={16} />
-                    <span>
-                      <strong>Standard Tuition</strong>
-                      {" • "}{parsed.display}
-                    </span>
-                  </div>
-                )}
+                <span className="calc-result-heading">Your estimate for {shortProgramName}</span>
               </div>
               <button
                 type="button"

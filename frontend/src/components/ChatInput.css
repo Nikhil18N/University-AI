@@ -258,3 +258,41 @@
     max-width: 300px;
   }
 }
+
+/* ---- v2.9 ------------------------------------------------------------------------------- */
+.chat-input-disclaimer {
+  margin: 6px auto 0;
+  max-width: 760px;
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted, #94a3b8);
+  padding: 0 12px;
+}
+.chatgpt-action-circle.send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.input-mic-btn.listening {
+  color: #dc2626;
+  animation: sru-mic-pulse 1.2s ease-in-out infinite;
+}
+@keyframes sru-mic-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.plus-quick-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.input-plus-circle-btn:focus-visible,
+.input-mic-btn:focus-visible,
+.chatgpt-action-circle:focus-visible {
+  outline: 2px solid var(--primary, #0055a4);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .input-mic-btn.listening { animation: none; }
+}

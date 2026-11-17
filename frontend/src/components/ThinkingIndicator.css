@@ -149,3 +149,44 @@
 .thinking-step-segment.completed {
   background: #10b981;
 }
+
+/* ---- v2.9: honest progress (no fake steps) ------------------------------------------ */
+.thinking-indicator-wrapper .thinking-active-step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.thinking-indicator-wrapper .thinking-badge-timer {
+  margin-left: auto;
+}
+.thinking-slow-note {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #64748b);
+}
+.thinking-progress-track.indeterminate {
+  position: relative;
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(0, 85, 164, 0.1);
+  display: block;
+}
+.thinking-indeterminate-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35%;
+  border-radius: 3px;
+  background: var(--primary, #0055a4);
+  animation: sru-indeterminate 1.4s ease-in-out infinite;
+}
+@keyframes sru-indeterminate {
+  0% { left: -35%; }
+  100% { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thinking-indeterminate-bar { animation: none; left: 0; width: 100%; opacity: 0.4; }
+}
