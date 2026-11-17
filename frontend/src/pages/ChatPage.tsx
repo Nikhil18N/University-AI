@@ -1,71 +1,51 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MessageBubble from "../components/MessageBubble";
-import ChatInput from "../components/ChatInput";
-import ConversationList from "../components/ConversationList";
 import ThinkingIndicator from "../components/ThinkingIndicator";
-import ShareModal from "../components/ShareModal";
 import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
 import LeadAuthModal from "../components/LeadAuthModal";
-import {
-  CalculatorIcon,
-  DownloadIcon,
-  MoonIcon,
-  SettingsIcon,
-  ShareIcon,
-  SoundOffIcon,
-  SoundOnIcon,
-  SunIcon,
-  UserIcon,
-} from "../components/Icons";
-import { exportToPDF, exportToMarkdown, exportToText } from "../utils/exportChat";
-import { getSessionId } from "../hooks/useSession";
 import SettingsModal from "../components/SettingsModal";
+import { CalculatorIcon } from "../components/Icons";
+import { getSessionId } from "../hooks/useSession";
 import { applyServerProfile, syncStudentDetails } from "../utils/studentProfile";
 import {
   sendMessageStream,
-  listConversations,
-  getConversation,
-  getSharedConversation,
-  deleteConversation,
-  type ConversationSummary,
   type MessageData,
   type ChatResponse,
 } from "../services/api";
 import { playChime, triggerConfetti } from "../utils/effects";
-import { APP_VERSION } from "../version";
 import "./ChatPage.css";
 
 interface Props {
   onOpenAdmin?: () => void;
 }
 
-const MINIMAL_STARTERS = [
-  {
-    title: "Fees for 2027-28",
-    desc: "Official tuition breakdown, hostel fee tiers & scholarship slabs",
-    prompt: "What is the complete fee structure and hostel fee for B.Tech for 2027-28?",
-  },
-  {
-    title: "Scholarship for My Marks",
-    desc: "Calculate waiver based on 10+2 marks, JEE percentile, or EAPCET rank",
-    prompt: "How much scholarship can I get for B.Tech based on my 10+2 marks or EAPCET rank?",
-  },
-  {
-    title: "Is the Degree Valid?",
-    desc: "UGC recognition, NBA Tier-I accreditation & NIRF 91st in Engineering",
-    prompt: "Is SR University degree valid for government jobs, higher education in India and abroad?",
-  },
-  {
-    title: "Book a Campus Visit",
-    desc: "170-acre green campus tour, SRiX incubation center & labs",
-    prompt: "I want to visit the SR University campus. How can I book a campus tour?",
-  },
+const DEFAULT_WELCOME_MESSAGE: MessageData = {
+  id: "welcome-sru-buddy",
+  role: "assistant",
+  content: "Hello! Welcome to SR University. I am **SRU Buddy**, your virtual AI assistant. How may I assist you with admissions, fee structures, or scholarships today?",
+  created_at: new Date().toISOString(),
+};
+
+const QUICK_STARTER_QUERIES = [
+  { label: "💰 B.Tech CSE Fee Breakdown", prompt: "What is the complete fee structure for B.Tech CSE for 2027-28?" },
+  { label: "🧮 Calculate My Scholarship", prompt: "How much scholarship can I get for B.Tech based on my 10+2 marks?" },
+  { label: "💼 Microsoft 51 LPA Placement", prompt: "Tell me about SR University placements and top packages" },
+  { label: "🏫 Book a Campus Visit", prompt: "I want to schedule a visit to the SR University campus" },
 ];
 
 export default function ChatPage({ onOpenAdmin }: Props) {
   const sessionId = getSessionId();
 
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  // Widget visibility state: default to open to match Image 1, toggleable to closed to match Image 2
+  const [isWidgetOpen, setIsWidgetOpen] = useState(true);
+  const [isMinimized, setIsMinimized] = useState(false);
+
+  // Queries
+  const [dockQuery, setDockQuery] = useState("");
+  const [widgetInput, setWidgetInput] = useState("");
+
+  // Chat message state
+  const [messages, setMessages] = useState<MessageData[]>([DEFAULT_WELCOME_MESSAGE]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const activeConvIdRef = useRef<string | null>(activeConvId);
 
@@ -73,306 +53,80 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     activeConvIdRef.current = activeConvId;
   }, [activeConvId]);
 
-  const [messages, setMessages] = useState<MessageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeToolStatus, setActiveToolStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [streamingMsgId, setStreamingMsgId] = useState<string | null>(null);
 
-  // Responsive sidebar: closed by default on mobile (< 768px), open on desktop
-  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
-
-  // Modals & Popovers
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  // Modals
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
-  const [showLeadAuthModal, setShowLeadAuthModal] = useState<boolean>(false);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showLeadAuthModal, setShowLeadAuthModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [pendingAuthMessage, setPendingAuthMessage] = useState<string | null>(null);
   const [authReason, setAuthReason] = useState<string | undefined>(undefined);
 
-  // Theme & Sound states (default to white / light mode)
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    const saved = localStorage.getItem("sru_theme_v2");
-    if (saved === "light" || saved === "dark") {
-      return saved;
-    }
-    return "light";
-  });
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
-    return localStorage.getItem("sru_sound") !== "false";
-  });
-
-  const [showScrollBottom, setShowScrollBottom] = useState(false);
-  const [streamingMsgId, setStreamingMsgId] = useState<string | null>(null);
-
-  // Shared chat states
-  const [isSharedView, setIsSharedView] = useState(false);
-  const [sharedTitle, setSharedTitle] = useState<string | null>(null);
-  const [isLoadingShared, setIsLoadingShared] = useState(false);
+  // Voice recognition
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const messagesAreaRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelStreamRef = useRef<(() => void) | null>(null);
-  const exportMenuRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const isAtBottomRef = useRef(true);
 
-  // Apply theme to document
+  // Auto-sync profile on mount
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("sru_theme_v2", theme);
-    localStorage.setItem("sru_theme", theme);
-  }, [theme]);
-
-  // Load conversations on mount & check for shared link (?chat=... or #s=...)
-  useEffect(() => {
-    loadConversations();
-    // Make this browser and the server agree on the student's name and mobile number.
     void syncStudentDetails(sessionId);
+  }, [sessionId]);
 
-    async function checkSharedLink() {
-      try {
-        const searchParams = new URLSearchParams(window.location.search);
-        const chatId = searchParams.get("chat") || searchParams.get("share");
-        let hashData = "";
-        if (window.location.hash.startsWith("#s=")) {
-          hashData = window.location.hash.slice(3);
-        }
-
-        // 1. Instant recovery from hash snapshot if available (0ms offline/sleep fallback)
-        if (hashData) {
-          try {
-            const jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(hashData))));
-            const parsed = JSON.parse(jsonStr);
-            if (parsed && Array.isArray(parsed.m) && parsed.m.length > 0) {
-              const restoredMsgs: MessageData[] = parsed.m.map((item: any, i: number) => ({
-                id: `shared-${i}`,
-                role: item.r,
-                content: item.c,
-                created_at: new Date().toISOString(),
-              }));
-              setMessages(restoredMsgs);
-              setIsSharedView(true);
-              setSharedTitle(parsed.t || "Shared Conversation");
-              setTimeout(() => {
-                if (messagesAreaRef.current) {
-                  messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-                }
-              }, 60);
-              return;
-            }
-          } catch (e) {
-            console.warn("Could not decode hash snapshot:", e);
-          }
-        }
-
-        // 2. Fetch from backend public shared endpoint if chatId is present
-        if (chatId && chatId !== "share" && chatId !== "1") {
-          setIsLoadingShared(true);
-          try {
-            const detail = await getSharedConversation(chatId);
-            if (detail && detail.messages && detail.messages.length > 0) {
-              setMessages(detail.messages);
-              setIsSharedView(true);
-              setSharedTitle(detail.title || "Shared Conversation");
-              setTimeout(() => {
-                if (messagesAreaRef.current) {
-                  messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-                }
-              }, 60);
-            }
-          } catch (err) {
-            console.warn("Failed to load shared chat from backend:", err);
-          } finally {
-            setIsLoadingShared(false);
-          }
-        }
-      } catch (err) {
-        console.error("Shared link check error:", err);
-      }
-    }
-
-    checkSharedLink();
-  }, []);
-
-  // Close export & mobile menus when clicking outside
+  // Scroll to bottom of widget when messages update
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        exportMenuRef.current &&
-        !exportMenuRef.current.contains(event.target as Node)
-      ) {
-        setShowExportMenu(false);
-      }
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target as Node)
-      ) {
-        setShowMobileMenu(false);
-      }
-    }
-    if (showExportMenu || showMobileMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showExportMenu, showMobileMenu]);
-
-  // Track user's manual scroll position
-  const handleScroll = () => {
-    if (!messagesAreaRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = messagesAreaRef.current;
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-
-    // If within 80px from bottom, consider user "at bottom"
-    const atBottom = distanceFromBottom <= 80;
-    isAtBottomRef.current = atBottom;
-    setShowScrollBottom(!atBottom);
-  };
-
-  const scrollToBottom = (smooth: boolean = true) => {
-    isAtBottomRef.current = true;
-    setShowScrollBottom(false);
-    if (messagesAreaRef.current) {
-      if (smooth) {
-        messagesAreaRef.current.scrollTo({
-          top: messagesAreaRef.current.scrollHeight,
-          behavior: "smooth",
-        });
-      } else {
-        messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-      }
-    }
-  };
-
-  // Only auto-scroll on new stream tokens if user is already at the bottom
-  // If the user scrolled up to read earlier text, DO NOT hijack their scroll!
-  useEffect(() => {
-    if (!isAtBottomRef.current) return;
-
     if (messagesAreaRef.current) {
       messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
     }
-  }, [messages, streamingMsgId]);
+  }, [messages, streamingMsgId, activeToolStatus]);
 
-  async function loadConversations() {
+  // Voice typing toggle
+  const toggleVoice = () => {
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    const w = window as any;
+    const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice typing is not supported by your browser. Please try Chrome or Edge.");
+      return;
+    }
+
     try {
-      const convs = await listConversations(sessionId);
-      setConversations(convs);
+      const rec = new SpeechRecognition();
+      rec.lang = "en-IN";
+      rec.interimResults = true;
+      rec.continuous = false;
+
+      rec.onresult = (e: any) => {
+        const transcript = Array.from(e.results)
+          .map((r: any) => r[0]?.transcript || "")
+          .join("");
+        setWidgetInput(transcript);
+      };
+
+      rec.onend = () => setListening(false);
+      rec.onerror = () => setListening(false);
+
+      rec.start();
+      recognitionRef.current = rec;
+      setListening(true);
     } catch {
-      // Silently fail on first load
+      setListening(false);
     }
-  }
-
-  async function handleSelectConversation(convId: string) {
-    if (cancelStreamRef.current) {
-      cancelStreamRef.current();
-      cancelStreamRef.current = null;
-    }
-    setStreamingMsgId(null);
-    activeConvIdRef.current = convId;
-    setActiveConvId(convId);
-    setError(null);
-    isAtBottomRef.current = true;
-    setShowScrollBottom(false);
-    try {
-      const detail = await getConversation(convId, sessionId);
-      setMessages(detail.messages);
-      setTimeout(() => {
-        if (messagesAreaRef.current) {
-          messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-        }
-      }, 50);
-    } catch {
-      setError("Failed to load conversation.");
-    }
-  }
-
-  function handleNewChat() {
-    if (cancelStreamRef.current) {
-      cancelStreamRef.current();
-      cancelStreamRef.current = null;
-    }
-    setStreamingMsgId(null);
-    activeConvIdRef.current = null;
-    setActiveConvId(null);
-    setMessages([]);
-    setIsSharedView(false);
-    setSharedTitle(null);
-    setError(null);
-    isAtBottomRef.current = true;
-    setShowScrollBottom(false);
-    if (window.location.search || window.location.hash) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }
-
-  function handleStopStreaming() {
-    if (cancelStreamRef.current) {
-      cancelStreamRef.current();
-      cancelStreamRef.current = null;
-    }
-    setIsLoading(false);
-    setStreamingMsgId(null);
-  }
-
-  async function handleDeleteConversation(convId: string) {
-    try {
-      await deleteConversation(convId, sessionId);
-      setConversations((prev) => prev.filter((c) => c.id !== convId));
-      if (activeConvId === convId) {
-        handleNewChat();
-      }
-    } catch {
-      setError("Failed to delete conversation.");
-    }
-  }
-
-  function toggleTheme() {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }
-
-  function toggleSound() {
-    setSoundEnabled((prev) => {
-      const next = !prev;
-      localStorage.setItem("sru_sound", String(next));
-      return next;
-    });
-  }
-
-  // Active chat title for share & export
-  const activeChatTitle =
-    conversations.find((c) => c.id === activeConvId)?.title ||
-    messages.find((m) => m.role === "user")?.content.slice(0, 40) ||
-    "SRU Buddy Chat";
-
-  const handleExportPDF = () => {
-    setShowExportMenu(false);
-    exportToPDF(activeChatTitle, messages);
-  };
-
-  const handleExportMD = () => {
-    setShowExportMenu(false);
-    exportToMarkdown(activeChatTitle, messages);
-  };
-
-  const handleExportTXT = () => {
-    setShowExportMenu(false);
-    exportToText(activeChatTitle, messages);
   };
 
   function isHighIntentLeadQuery(text: string): boolean {
     const lower = text.toLowerCase();
-    const feeKeywords = [
-      "fee", "fees", "tuition", "scholarship", "cost", "hostel fee", "mess fee", "bus fee", "transport fee"
-    ];
-    const admissionKeywords = [
-      "admission", "admissions", "join", "joining", "apply", "seat", "eligibility",
-      "how to get into", "how to join", "cutoff", "cut off", "rank requirement",
-      "interested in joining", "take admission", "b.tech admission", "how to apply"
-    ];
+    const feeKeywords = ["fee", "fees", "tuition", "scholarship", "cost", "hostel fee", "mess fee", "bus fee"];
+    const admissionKeywords = ["admission", "admissions", "join", "joining", "apply", "eligibility", "take admission"];
     return feeKeywords.some((k) => lower.includes(k)) || admissionKeywords.some((k) => lower.includes(k));
   }
 
@@ -392,28 +146,22 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    const isCalcTrigger =
-      /^\s*(🧮\s*)?(scholarship\s*calculator|calculate\s*(?:my\s*)?scholarship|fee\s*calculator|calculate\s*(?:my\s*)?fee|open\s*(?:scholarship\s*)?calculator|calculator)\s*$/i.test(
-        trimmed
-      );
-    if (isCalcTrigger) {
+    // Check for calculator trigger
+    if (/^\s*(🧮\s*)?(scholarship\s*calculator|calculate\s*(?:my\s*)?scholarship|fee\s*calculator|open\s*calculator|calculator)\s*$/i.test(trimmed)) {
       setIsCalculatorOpen(true);
       return;
     }
 
-    // Middleware: Authenticate prospective student before answering high-intent fee & admission queries
-    // Ask once per visit. A student who chose "Skip" is not asked again in this tab.
     let skipped = false;
     try {
       skipped = sessionStorage.getItem("sru_lead_skipped") === "1";
     } catch {
-      /* private mode */
+      /* ignore */
     }
+
     if (isHighIntentLeadQuery(trimmed) && !isStudentLeadVerified() && !skipped) {
       setPendingAuthMessage(trimmed);
-      setAuthReason(
-        "Share your name and mobile number if you would like the admissions team to be able to help you personally. This is optional: you will see the answer either way."
-      );
+      setAuthReason("Share your name and mobile number if you would like personal assistance from our admissions counselors.");
       setShowLeadAuthModal(true);
       return;
     }
@@ -430,32 +178,10 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setIsLoading(true);
     setError(null);
 
-    // If replying from a shared chat view, seamlessly fork into own conversation
-    if (isSharedView) {
-      setIsSharedView(false);
-      setActiveConvId(null);
-      if (window.location.search || window.location.hash) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-
-    // CRITICAL: When user sends a message, immediately scroll to bottom
-    isAtBottomRef.current = true;
-    setShowScrollBottom(false);
-    if (messagesAreaRef.current) {
-      messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-    }
-    setTimeout(() => {
-      if (messagesAreaRef.current) {
-        messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-      }
-    }, 40);
-
     const userMsgId = crypto.randomUUID();
     const assistantMsgId = crypto.randomUUID();
     setStreamingMsgId(assistantMsgId);
 
-    // 1. Optimistically append user message
     const tempUserMsg: MessageData = {
       id: userMsgId,
       role: "user",
@@ -463,7 +189,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
       created_at: new Date().toISOString(),
     };
 
-    // 2. Add streaming placeholder for assistant
     const placeholderAssistantMsg: MessageData = {
       id: assistantMsgId,
       role: "assistant",
@@ -476,7 +201,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     let accumulatedContent = "";
     const accumulatedCards: any[] = [];
 
-    // 3. Initiate Server-Sent Events stream
     const convIdToSend = activeConvIdRef.current || activeConvId;
     const cancelFn = sendMessageStream(sessionId, text, convIdToSend, {
       onStart: (convId) => {
@@ -519,32 +243,21 @@ export default function ChatPage({ onOpenAdmin }: Props) {
           setActiveConvId(data.conversation_id);
           activeConvIdRef.current = data.conversation_id;
         }
-        // A name or number given in the chat reaches "My details" at once.
         applyServerProfile(data.profile);
-
-        if (soundEnabled) {
-          playChime();
-        }
+        playChime();
 
         const ansLower = (data.answer || "").toLowerCase();
-        if (
-          ansLower.includes("fully eligible") ||
-          ansLower.includes("admission verdict: fully eligible") ||
-          ansLower.includes("you are eligible") ||
-          ansLower.includes("congratulations")
-        ) {
+        if (ansLower.includes("fully eligible") || ansLower.includes("congratulations")) {
           triggerConfetti();
         }
 
-        const finalCards = (data.cards?.length ? data.cards : accumulatedCards);
+        const finalCards = data.cards?.length ? data.cards : accumulatedCards;
 
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsgId
               ? {
                   ...m,
-                  // Agent replies have no message id. Keeping the placeholder id avoids several
-                  // messages sharing the key "undefined", which made React shuffle the chat.
                   id: data.message_id || m.id,
                   content: data.answer || accumulatedContent,
                   sources: data.sources?.length ? data.sources : undefined,
@@ -556,8 +269,6 @@ export default function ChatPage({ onOpenAdmin }: Props) {
               : m
           )
         );
-
-        loadConversations();
       },
       onError: (err) => {
         setIsLoading(false);
@@ -574,503 +285,362 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     cancelStreamRef.current = cancelFn;
   }
 
+  function handleResetChat() {
+    if (cancelStreamRef.current) {
+      cancelStreamRef.current();
+      cancelStreamRef.current = null;
+    }
+    setIsLoading(false);
+    setStreamingMsgId(null);
+    setActiveConvId(null);
+    activeConvIdRef.current = null;
+    setMessages([DEFAULT_WELCOME_MESSAGE]);
+    setError(null);
+  }
+
+  // Handle bottom floating dock input submit
+  const handleDockSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dockQuery.trim()) return;
+    setIsWidgetOpen(true);
+    setIsMinimized(false);
+    handleSendMessage(dockQuery.trim());
+    setDockQuery("");
+  };
+
+  // Handle widget input submit
+  const handleWidgetSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!widgetInput.trim() || isLoading) return;
+    handleSendMessage(widgetInput.trim());
+    setWidgetInput("");
+  };
+
   return (
-    <div className={`chat-page theme-${theme}`}>
-      {/* Mobile Drawer Backdrop */}
-      {sidebarOpen && (
-        <div
-          className="sidebar-backdrop"
-          onClick={() => setSidebarOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Main Layout: Sidebar + Canvas */}
-      <div className="chat-layout-wrapper">
-        {/* Sliding Sidebar */}
-        {/* Sliding Sidebar */}
-        <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-          <ConversationList
-            conversations={conversations}
-            activeId={activeConvId}
-            onSelect={handleSelectConversation}
-            onNew={handleNewChat}
-            onDelete={handleDeleteConversation}
-            onCloseMobile={() => setSidebarOpen(false)}
-            onTriggerPrompt={handleSendMessage}
-          />
-        </aside>
-
-        {/* Main Canvas */}
-        <main className="chat-main">
-          {/* Header (Matching Image 1: Circle Left [=], Center Pill, Circle Right [✎]) */}
-          <header className="chat-header">
-            {/* Left circular toggle button (Image 1) */}
-            <div className="header-left">
-              <button
-                className="chatgpt-circle-icon-btn"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label="Toggle sidebar"
-                title="Toggle sidebar"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-                  <line x1="5" y1="9" x2="19" y2="9" />
-                  <line x1="5" y1="15" x2="19" y2="15" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Center Pill (Matching Image 1 without 'Work') */}
-            <div className="header-center" ref={mobileMenuRef}>
-              <div
-                className="chatgpt-center-pill"
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setShowMobileMenu(!showMobileMenu);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                aria-haspopup="menu"
-                aria-expanded={showMobileMenu}
-                aria-label="SRU Buddy menu"
-              >
-                <span className="pill-brand-name">SRU Buddy</span>
-                <span className="brand-version-pill" title={`SRU Buddy v${APP_VERSION} (beta)`}>BETA</span>
-                <span className="pill-down-arrow">▾</span>
-              </div>
-
-              {/* Dropdown Options for Center Pill */}
-              {showMobileMenu && (
-                <div className="mobile-options-popover" role="menu">
-                  <button
-                    className="mobile-popover-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      setIsCalculatorOpen(true);
-                    }}
-                  >
-                    <span className="popover-icon"><CalculatorIcon size={16} /></span>
-                    <span>Fee & Scholarship Calculator</span>
-                  </button>
-                  {messages.length > 0 && (
-                    <button
-                      className="mobile-popover-item"
-                      onClick={() => {
-                        setShowMobileMenu(false);
-                        setShowShareModal(true);
-                      }}
-                    >
-                      <span className="popover-icon"><ShareIcon size={16} /></span>
-                      <span>Share chat link</span>
-                    </button>
-                  )}
-                  {messages.length > 0 && (
-                    <>
-                      <button
-                        className="mobile-popover-item"
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          handleExportPDF();
-                        }}
-                      >
-                        <span className="popover-icon"><DownloadIcon size={16} /></span>
-                        <span>Save as PDF / Print</span>
-                      </button>
-                      <button
-                        className="mobile-popover-item"
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          handleExportMD();
-                        }}
-                      >
-                        <span className="popover-icon"><DownloadIcon size={16} /></span>
-                        <span>Save as Markdown</span>
-                      </button>
-                    </>
-                  )}
-                  <button
-                    className="mobile-popover-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      toggleTheme();
-                    }}
-                  >
-                    <span className="popover-icon">{theme === "light" ? <MoonIcon size={16} /> : <SunIcon size={16} />}</span>
-                    <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
-                  </button>
-                  <button
-                    className="mobile-popover-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      toggleSound();
-                    }}
-                  >
-                    <span className="popover-icon">{soundEnabled ? <SoundOnIcon size={16} /> : <SoundOffIcon size={16} />}</span>
-                    <span>{soundEnabled ? "Reply sound: on" : "Reply sound: off"}</span>
-                  </button>
-                  <button
-                    className="mobile-popover-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      setShowSettings(true);
-                    }}
-                  >
-                    <span className="popover-icon"><UserIcon size={16} /></span>
-                    <span>My details</span>
-                  </button>
-                  {onOpenAdmin && (
-                    <button
-                      className="mobile-popover-item"
-                      onClick={() => {
-                        setShowMobileMenu(false);
-                        onOpenAdmin();
-                      }}
-                    >
-                      <span className="popover-icon"><SettingsIcon size={16} /></span>
-                      <span>Admin console (staff)</span>
-                    </button>
-                  )}
-                  <div className="popover-version-footer">
-                    <span>SRU Buddy v{APP_VERSION}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Header Right Actions */}
-            <div className="header-right">
-              {/* Desktop Header Actions */}
-              <div className="header-actions desktop-only">
-                {/* Export Chat Dropdown */}
-                {messages.length > 0 && (
-                  <div className="export-menu-container" ref={exportMenuRef}>
-                    <button
-                      className="header-action-pill-btn export-btn"
-                      onClick={() => setShowExportMenu(!showExportMenu)}
-                      title="Share or save this chat"
-                      aria-label="Share or save this chat"
-                      aria-haspopup="menu"
-                      aria-expanded={showExportMenu}
-                    >
-                      <ShareIcon size={15} />
-                      <span className="btn-label">Share</span>
-                    </button>
-
-                    {showExportMenu && (
-                      <div className="export-dropdown-card">
-                        <div className="export-dropdown-header">Share or save</div>
-                        <button
-                          className="export-option-item"
-                          onClick={() => {
-                            setShowExportMenu(false);
-                            setShowShareModal(true);
-                          }}
-                        >
-                          <span className="export-opt-icon"><ShareIcon size={16} /></span>
-                          <div className="export-opt-text">
-                            <span className="export-opt-title">Share link</span>
-                            <span className="export-opt-desc">Send this chat to a parent or friend</span>
-                          </div>
-                        </button>
-                        <button className="export-option-item" onClick={handleExportPDF}>
-                          <span className="export-opt-icon"><DownloadIcon size={16} /></span>
-                          <div className="export-opt-text">
-                            <span className="export-opt-title">PDF / Print</span>
-                            <span className="export-opt-desc">Save or print this conversation</span>
-                          </div>
-                        </button>
-                        <button className="export-option-item" onClick={handleExportMD}>
-                          <span className="export-opt-icon"><DownloadIcon size={16} /></span>
-                          <div className="export-opt-text">
-                            <span className="export-opt-title">Markdown (.md)</span>
-                            <span className="export-opt-desc">For notes apps</span>
-                          </div>
-                        </button>
-                        <button className="export-option-item" onClick={handleExportTXT}>
-                          <span className="export-opt-icon"><DownloadIcon size={16} /></span>
-                          <div className="export-opt-text">
-                            <span className="export-opt-title">Plain Text (.txt)</span>
-                            <span className="export-opt-desc">Clean unformatted text transcript</span>
-                          </div>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Scholarship Calculator */}
-                <button
-                  className="calc-nav-pill-btn"
-                  onClick={() => setIsCalculatorOpen(true)}
-                  title="Fee & Scholarship Calculator"
-                  aria-label="Fee & Scholarship Calculator"
-                >
-                  <span className="calc-nav-icon"><CalculatorIcon size={15} /></span>
-                  <span className="calc-nav-text">Calculator</span>
-                </button>
-
-                {/* Theme Toggle */}
-                <button
-                  className="header-icon-btn"
-                  onClick={toggleTheme}
-                  title={theme === "light" ? "Switch to Dark mode" : "Switch to Light mode"}
-                  aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-                >
-                  {theme === "light" ? <MoonIcon size={17} /> : <SunIcon size={17} />}
-                </button>
-
-                {/* Sound Toggle */}
-                <button
-                  className="header-icon-btn sound-toggle-btn"
-                  onClick={toggleSound}
-                  title={soundEnabled ? "Mute reply sound" : "Turn on reply sound"}
-                  aria-label={soundEnabled ? "Mute reply sound" : "Turn on reply sound"}
-                  aria-pressed={soundEnabled}
-                >
-                  {soundEnabled ? <SoundOnIcon size={17} /> : <SoundOffIcon size={17} />}
-                </button>
-
-                {/* My details (settings) */}
-                <button
-                  className="header-icon-btn"
-                  onClick={() => setShowSettings(true)}
-                  title="My details"
-                  aria-label="My details"
-                >
-                  <UserIcon size={17} />
-                </button>
-
-                {/* Admin console */}
-                {onOpenAdmin && (
-                  <button
-                    className="header-icon-btn"
-                    onClick={onOpenAdmin}
-                    title="Admin console (staff)"
-                    aria-label="Admin console"
-                  >
-                    <SettingsIcon size={17} />
-                  </button>
-                )}
-              </div>
-
-              {/* Circular Right Button (Image 1: Circle with New Chat / Compose Icon) */}
-              <button
-                className="chatgpt-circle-icon-btn"
-                onClick={handleNewChat}
-                title="New chat"
-                aria-label="New chat"
-              >
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </svg>
-              </button>
-            </div>
-          </header>
-
-          {/* Messages Canvas */}
-          <div
-            className="messages-area"
-            ref={messagesAreaRef}
-            onScroll={handleScroll}
+    <div className="sru-portal-root">
+      {/* 1. Top Announcement Ribbon */}
+      <div className="sru-top-ribbon">
+        <div className="sru-ribbon-left">
+          <span className="sru-ribbon-tag">Admissions 2027-28</span>
+          <span className="sru-ribbon-text">
+            Applications Open for Academic Session 2027-28
+          </span>
+          <button
+            className="sru-btn-register"
+            style={{ padding: "2px 8px", fontSize: "0.68rem" }}
+            onClick={() => setShowLeadAuthModal(true)}
           >
-            {/* Shared Chat Snapshot Banner */}
-            {isLoadingShared && (
-              <div className="shared-chat-banner">
-                <div className="shared-chat-info">
-                  <span className="shared-chat-pill">Loading</span>
-                  <span className="shared-chat-hint">Retrieving shared conversation snapshot...</span>
-                </div>
-              </div>
-            )}
+            REGISTER NOW
+          </button>
+        </div>
 
-            {isSharedView && (
-              <div className="shared-chat-banner">
-                <div className="shared-chat-info">
-                  <span className="shared-chat-pill">Shared conversation</span>
-                  <span className="shared-chat-hint">{sharedTitle || "Read-only preview"}</span>
-                </div>
-                <button
-                  className="shared-continue-btn"
-                  onClick={() => setIsSharedView(false)}
-                >
-                  Continue chat →
-                </button>
-              </div>
-            )}
+        <div className="sru-ribbon-right">
+          <a
+            href="https://wa.me/919640606408"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sru-ribbon-link"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg>
+            WhatsApp
+          </a>
 
-            {messages.length === 0 && (
-              <div className="welcome-screen">
-                {/* Minimalist Centered Brand Hero */}
-                <div className="welcome-hero-brand">
-                  <div className="welcome-hero-logo-box">
-                    <img
-                      src="/sru-logo.png"
-                      alt="SR University"
-                      className="welcome-hero-logo"
-                    />
-                  </div>
-                  <div className="welcome-hero-title-row">
-                    <h1 className="welcome-hero-title">SRU Buddy</h1>
-                    <span className="hero-beta-pill">Beta</span>
-                  </div>
-                  <p className="welcome-hero-tagline">SR University admissions assistant · 2027-28</p>
-                </div>
+          <a href="tel:08702818333" className="sru-ribbon-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            Call Us
+          </a>
 
-                {/* Clean starter cards */}
-                <div className="minimal-starters-grid">
-                  {MINIMAL_STARTERS.map((item, idx) => (
-                    <button
-                      key={idx}
-                      className="starter-tile"
-                      onClick={() => handleSendMessage(item.prompt)}
-                      type="button"
-                    >
-                      <span className="starter-tile-title">{item.title}</span>
-                      <span className="starter-tile-desc">{item.desc}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Rendered Messages */}
-            {messages.map((msg) => {
-              const isMsgStreaming = msg.id === streamingMsgId;
-
-              if (isMsgStreaming && msg.content === "") {
-                return (
-                  <div key={msg.id} className="message-bubble-row assistant thinking-row">
-                    <div className="message-avatar-col">
-                      <div className="assistant-avatar-badge" title="SRU Buddy">
-                        <img src="/sru-logo.png" alt="SRU" className="assistant-avatar-img" />
-                      </div>
-                    </div>
-                    <div className="message-content-col">
-                      <div className="message-text-bubble assistant">
-                        <ThinkingIndicator activeToolLabel={activeToolStatus} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <MessageBubble
-                  key={msg.id}
-                  role={msg.role}
-                  content={msg.content}
-                  sources={msg.sources}
-                  suggestions={msg.suggestions}
-                  cards={msg.cards}
-                  flow={msg.flow}
-                  messageId={msg.id}
-                  conversationId={activeConvId}
-                  sessionId={sessionId}
-                  createdAt={msg.created_at}
-                  isStreaming={isMsgStreaming}
-                  onSuggestionClick={handleSendMessage}
-                />
-              );
-            })}
-
-            {error && (() => {
-              const getErrorDetails = (err: string) => {
-                if (err.includes("Failed to fetch") || err.includes("NetworkError")) {
-                  return {
-                    title: "Can't reach SRU Buddy right now",
-                    desc: "The server may be starting up or your connection dropped. Please wait a few seconds and tap Retry. For urgent help call 0870-2818333.",
-                  };
-                }
-                if (err.includes("401") || err.includes("Unauthorized") || err.includes("Forbidden") || err.includes("generativelanguage")) {
-                  return {
-                    title: "SRU Buddy is busy",
-                    desc: "Please wait a moment and tap Retry. For urgent help call 0870-2818333.",
-                  };
-                }
-                if (err.includes("429") || err.includes("quota") || err.includes("rate limit")) {
-                  return {
-                    title: "Many students are asking right now",
-                    desc: "Please wait a minute and tap Retry. For urgent help call 0870-2818333.",
-                  };
-                }
-                return {
-                  title: "Something went wrong",
-                  desc: "Please tap Retry. If it keeps happening, call the Admissions Office at 0870-2818333.",
-                };
-              };
-              const { title, desc } = getErrorDetails(error);
-              return (
-                <div className="error-toast-card">
-                  <div className="error-toast-content">
-                    <span className="error-toast-icon">⚡</span>
-                    <div className="error-toast-text">
-                      <span className="error-toast-title">{title}</span>
-                      <span className="error-toast-desc">{desc}</span>
-                    </div>
-                  </div>
-                  <button
-                    className="error-retry-action-btn"
-                    onClick={() => {
-                      const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
-                      if (lastUserMsg) {
-                        setError(null);
-                        // drop the failed attempt so the question is not shown twice
-                        setMessages((prev) => prev.filter((m) => m.id !== lastUserMsg.id));
-                        handleSendMessage(lastUserMsg.content);
-                      }
-                    }}
-                    type="button"
-                  >
-                    Retry
-                  </button>
-                </div>
-              );
-            })()}
-
-            <div ref={messagesEndRef} />
+          <div className="sru-ribbon-socials">
+            <span className="sru-social-icon" title="Facebook">f</span>
+            <span className="sru-social-icon" title="X / Twitter">𝕏</span>
+            <span className="sru-social-icon" title="LinkedIn">in</span>
+            <span className="sru-social-icon" title="Instagram">ig</span>
+            <span className="sru-social-icon" title="YouTube">yt</span>
           </div>
 
-          {/* Scroll-to-bottom FAB */}
-          {showScrollBottom && (
-            <button
-              className={`scroll-bottom-fab ${streamingMsgId ? "is-streaming" : ""}`}
-              onClick={() => scrollToBottom(true)}
-              title="Scroll to latest message"
-              aria-label="Scroll to bottom"
-            >
-              ↓
-              {streamingMsgId && <span className="fab-unread-dot" />}
+          {onOpenAdmin && (
+            <button className="sru-admin-badge" onClick={onOpenAdmin}>
+              Admin Console
             </button>
           )}
-
-          {/* Bottom Chat Input (ChatGPT/Gemini style with Stop generating & free typing) */}
-          <ChatInput
-            onSend={handleSendMessage}
-            isLoading={isLoading}
-            onStop={handleStopStreaming}
-            disabled={isLoading}
-            onOpenCalculator={() => setIsCalculatorOpen(true)}
-          />
-        </main>
+        </div>
       </div>
 
-      {/* ChatGPT-style Share Modal */}
-      {showShareModal && (
-        <ShareModal
-          conversationId={activeConvId}
-          title={activeChatTitle}
-          messages={messages}
-          onClose={() => setShowShareModal(false)}
-          onExportPDF={handleExportPDF}
-          onExportMD={handleExportMD}
-        />
+      {/* 2. Main University Navigation Bar */}
+      <header className="sru-main-nav">
+        <div className="sru-nav-brand">
+          <img src="/sru-logo.png" alt="SR University Logo" className="sru-brand-logo-img" />
+          <div className="sru-brand-meta">
+            <span className="sru-brand-title">SR UNIVERSITY</span>
+            <span className="sru-brand-sub">WARANGAL, TELANGANA • NAAC 'A' GRADE</span>
+          </div>
+        </div>
+
+        <nav>
+          <ul className="sru-nav-menu">
+            <li className="sru-nav-item"><span className="sru-nav-link">ABOUT US ▾</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link sru-ai-nav-pill">AI FEATURES</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">ACADEMICS ▾</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">PROGRAMS ▾</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">ADMISSIONS ▾</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">CAMPUS LIFE ▾</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">RESEARCH</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">PLACEMENTS</span></li>
+            <li className="sru-nav-item"><span className="sru-nav-link">CONTACT US</span></li>
+          </ul>
+        </nav>
+
+        <div className="sru-nav-cta-group">
+          <button
+            className="sru-btn-calc"
+            onClick={() => setIsCalculatorOpen(true)}
+            title="Open Fee & Scholarship Calculator"
+          >
+            <CalculatorIcon size={16} />
+            <span>Fee Calculator</span>
+          </button>
+          <button
+            className="sru-btn-register"
+            onClick={() => setShowLeadAuthModal(true)}
+          >
+            REGISTER NOW
+          </button>
+        </div>
+      </header>
+
+      {/* 3. Hero Section (Center Stage matching reference image) */}
+      <main className="sru-hero-section">
+        <div className="sru-hero-badge">
+          ✨ Admissions Open • Academic Session 2027-28
+        </div>
+        <h1 className="sru-hero-title">
+          India's First AI-Augmented Multidisciplinary University
+        </h1>
+        <p className="sru-hero-desc">
+          In an era propelled by the advent of artificial intelligence, SR University, Telangana,
+          has embraced customised learning pathways, data-driven insights, virtual reality experiences,
+          and real-world simulations to transform every classroom into a future-ready launchpad,
+          empowering students to learn smarter, think sharper, and graduate career-ready.
+        </p>
+
+        <div className="sru-hero-stats">
+          <div className="sru-stat-card">
+            <span className="sru-stat-value">₹51 LPA</span>
+            <span className="sru-stat-label">Highest Package @ Microsoft</span>
+          </div>
+          <div className="sru-stat-card">
+            <span className="sru-stat-value">91st</span>
+            <span className="sru-stat-label">NIRF Rank in Engineering</span>
+          </div>
+          <div className="sru-stat-card">
+            <span className="sru-stat-value">170 Acres</span>
+            <span className="sru-stat-label">Green Tech Campus & Labs</span>
+          </div>
+          <div className="sru-stat-card">
+            <span className="sru-stat-value">NAAC 'A'</span>
+            <span className="sru-stat-label">Tier-I NBA Accredited</span>
+          </div>
+        </div>
+      </main>
+
+      {/* 4. Floating Bottom Launcher Dock (Matches Reference Image 2) */}
+      {(!isWidgetOpen || isMinimized) && (
+        <div className="sru-floating-dock">
+          <form className="sru-dock-input-pill" onSubmit={handleDockSubmit}>
+            <input
+              type="text"
+              className="sru-dock-field"
+              placeholder="Ask anything about us...."
+              value={dockQuery}
+              onChange={(e) => setDockQuery(e.target.value)}
+            />
+            <button type="submit" className="sru-dock-btn">
+              Just Ask
+            </button>
+          </form>
+
+          <button
+            className="sru-dock-register-btn"
+            onClick={() => setShowLeadAuthModal(true)}
+          >
+            <span>REGISTER</span>
+            <span>NOW</span>
+          </button>
+
+          <button
+            className="sru-launcher-avatar-btn"
+            onClick={() => {
+              setIsWidgetOpen(true);
+              setIsMinimized(false);
+            }}
+            title="Open SRU Buddy AI Assistant"
+            aria-label="Open SRU Buddy AI Assistant"
+          >
+            <div className="sru-launcher-pulse" />
+            <img src="/sru-crest.png" alt="SRU Crest" className="sru-launcher-img" />
+          </button>
+        </div>
       )}
 
-      {/* Scholarship Calculator Modal */}
+      {/* 5. Floating AI Assistant Widget Modal (Matches Reference Image 1) */}
+      {isWidgetOpen && (
+        <div className={`sru-widget-container ${isMinimized ? "sru-widget-minimized" : ""}`}>
+          {/* Header */}
+          <div className="sru-widget-header">
+            <div className="sru-widget-header-left">
+              <div className="sru-widget-avatar-wrap">
+                <img src="/sru-crest.png" alt="SRU" className="sru-widget-avatar-img" />
+              </div>
+              <div className="sru-widget-title-col">
+                <span className="sru-widget-title">SRU Assistant</span>
+                <span className="sru-widget-status">
+                  <span className="sru-widget-status-dot" />
+                  Connected
+                </span>
+              </div>
+            </div>
+
+            <div className="sru-widget-header-actions">
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={() => setIsCalculatorOpen(true)}
+                title="Fee Calculator"
+                aria-label="Fee Calculator"
+              >
+                🧮
+              </button>
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={handleResetChat}
+                title="Reset / New Chat"
+                aria-label="Reset Chat"
+              >
+                ↺
+              </button>
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={() => setIsMinimized((prev) => !prev)}
+                title={isMinimized ? "Expand" : "Minimize"}
+                aria-label="Minimize"
+              >
+                —
+              </button>
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={() => setIsWidgetOpen(false)}
+                title="Close"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          {!isMinimized && (
+            <>
+              <div className="sru-widget-body" ref={messagesAreaRef}>
+                {messages.map((msg, index) => (
+                  <MessageBubble
+                    key={msg.id || index}
+                    role={msg.role}
+                    content={msg.content}
+                    cards={msg.cards}
+                    suggestions={msg.suggestions}
+                    flow={msg.flow}
+                    messageId={msg.id}
+                    conversationId={activeConvId}
+                    sessionId={sessionId}
+                    isStreaming={msg.id === streamingMsgId}
+                    onSuggestionClick={(prompt) => handleSendMessage(prompt)}
+                  />
+                ))}
+
+                {isLoading && (
+                  <ThinkingIndicator activeToolLabel={activeToolStatus} />
+                )}
+
+                {error && (
+                  <div style={{ color: "#f87171", fontSize: "0.82rem", padding: "8px 12px", background: "rgba(220, 38, 38, 0.15)", borderRadius: "8px" }}>
+                    {error}
+                  </div>
+                )}
+
+                {/* Quick starter chips when conversation is just starting */}
+                {messages.length <= 1 && !isLoading && (
+                  <div className="sru-widget-starters">
+                    {QUICK_STARTER_QUERIES.map((q, i) => (
+                      <button
+                        key={i}
+                        className="sru-starter-chip"
+                        onClick={() => handleSendMessage(q.prompt)}
+                      >
+                        <span>{q.label}</span>
+                        <span>→</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer / Input Bar */}
+              <div className="sru-widget-footer">
+                <form className="sru-widget-input-row" onSubmit={handleWidgetSubmit}>
+                  <textarea
+                    className="sru-widget-textarea"
+                    placeholder="Type your message...."
+                    rows={1}
+                    value={widgetInput}
+                    onChange={(e) => setWidgetInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleWidgetSubmit(e);
+                      }
+                    }}
+                  />
+
+                  <button
+                    type="button"
+                    className={`sru-widget-voice-btn ${listening ? "listening" : ""}`}
+                    onClick={toggleVoice}
+                    title="Voice Typing"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                      <line x1="12" y1="19" x2="12" y2="23" />
+                      <line x1="8" y1="23" x2="16" y2="23" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="sru-widget-send-btn"
+                    disabled={!widgetInput.trim() || isLoading}
+                    title="Send Message"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" />
+                    </svg>
+                  </button>
+                </form>
+
+                <div className="sru-widget-watermark">
+                  powered by <strong>SRU Buddy</strong>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Modals */}
       {isCalculatorOpen && (
         <ScholarshipCalculatorModal
           onClose={() => setIsCalculatorOpen(false)}
@@ -1081,18 +651,14 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         />
       )}
 
-      {/* Prospective Student Authentication Modal */}
-      <SettingsModal isOpen={showSettings} sessionId={sessionId} onClose={() => setShowSettings(false)} />
-
       <LeadAuthModal
         isOpen={showLeadAuthModal}
         onClose={() => {
-          // "Skip" or close: never lose the student's question; answer it and don't ask again this visit.
           setShowLeadAuthModal(false);
           try {
             sessionStorage.setItem("sru_lead_skipped", "1");
           } catch {
-            /* private mode */
+            /* ignore */
           }
           if (pendingAuthMessage) {
             const nextMsg = pendingAuthMessage;
@@ -1110,6 +676,14 @@ export default function ChatPage({ onOpenAdmin }: Props) {
         }}
         reasonText={authReason}
       />
+
+      {showSettings && (
+        <SettingsModal
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          sessionId={sessionId}
+        />
+      )}
     </div>
   );
 }
