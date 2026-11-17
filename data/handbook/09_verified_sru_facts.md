@@ -47,7 +47,6 @@
   - **Leadership at SR University**:
     * **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976.
     * **Pro-Chancellor**: **Sri A. Madhukar Reddy** — General Secretary of Sri Rajeshwara Educational Society, championed 170-acre campus and SRiX.
-    * **Vice-Chancellor**: **Prof. Deepak Garg** — AI Professor & pioneer, former Bennett/Thapar Dean, led leadingindia.ai (1M+ students skilled), 160 papers, 1,600+ citations.
     * **Pro Vice-Chancellor**: **Dr. V. Mahesh**
     * **Registrar**: **Dr. P. Venkata Ramana Rao**
     * **Operations & Growth**: **Dr. R. Archana Reddy**

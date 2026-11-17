@@ -14,7 +14,6 @@
 * **Distinguished University Leadership**:
   - **Chancellor**: **Sri A. Varada Reddy** — Educational visionary since 1976 who built the trusted SR brand name across 95 institutions in Telangana and Andhra Pradesh, embedding quality consciousness and ethical standards as SR's DNA.
   - **Pro-Chancellor**: **Sri A. Madhukar Reddy** — General Secretary of Sri Rajeshwara Educational Society; visionary who drove SR's transformation from an engineering college into a world-class university with a 170-acre campus, NIRF top-100 standing, SRiX incubator, merit scholarships, and social impact via SR Foundation.
-  - **Vice-Chancellor**: **Prof. Deepak Garg** — Renowned Professor of Artificial Intelligence with a Ph.D. in Computer Science and 25 years of academic and research leadership (former Professor & Dean at Bennett University and Thapar Institute; expert in Reinforcement Learning and Generative AI with 160 publications, 1,600+ citations, 14 Ph.D. scholars guided; national leader who contributed to AIRAWAT, led leadingindia.ai skilling over 1 million students, and served on NAAC, NBA, UGC, and AICTE committees).
   - **Pro Vice-Chancellor**: **Dr. V. Mahesh**
   - **Registrar**: **Dr. P. Venkata Ramana Rao**
   - **Operations & Growth**: **Dr. R. Archana Reddy**
