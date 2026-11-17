@@ -28,6 +28,12 @@ async def lifespan(fastapi_app: FastAPI):
         gemini_keys = settings.get_gemini_api_keys()
         logger.info("Gemini API Key Pool: %d key(s) active with auto-failover", len(gemini_keys))
     logger.info("Embedding Model: %s", settings.EMBEDDING_MODEL)
+    if settings.admin_key_is_default():
+        logger.error(
+            "ADMIN_API_KEY is still the built-in default. The admin panel (leads, phone numbers, "
+            "documents) is %s. Set ADMIN_API_KEY to a long random value in the server environment.",
+            "open to anyone who reads the source code" if settings.APP_DEBUG else "locked until you do",
+        )
 
     # Ensure upload directory exists
     settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -263,28 +269,14 @@ async def agent_lead_saver(lead_data: dict):
         created = await lead_service.create_lead(session, lead_obj)
         return {"id": str(created.id), "status": created.status}
 
-async def agent_lead_canceller(lead_id: str) -> bool:
-    try:
-        from datetime import datetime, timezone
-        from uuid import UUID
-        from app.db.session import async_session_factory
-        from app.models.lead import ProspectiveLead
-        lead_uuid = UUID(lead_id)
-        async with async_session_factory() as session:
-            lead = await session.get(ProspectiveLead, lead_uuid)
-            if not lead:
-                return False
-            lead.status = "rejected"
-            meta = dict(lead.metadata_ or {})
-            meta["cancelled"] = True
-            meta["do_not_contact"] = True
-            meta["cancelled_at"] = datetime.now(timezone.utc).isoformat()
-            lead.metadata_ = meta
-            await session.commit()
-            return True
-    except Exception as err:
-        logger.warning("agent_lead_canceller error: %s", err)
-        return False
+# "Don't call me": mark the lead do-not-contact so the admissions team does not phone the student
+async def agent_lead_canceller(lead_id: str, reason: str = "") -> bool:
+    import uuid
+    from app.db.session import async_session_factory
+    from app.services import lead_service
+    async with async_session_factory() as session:
+        lead = await lead_service.cancel_lead(session, uuid.UUID(str(lead_id)), reason)
+        return lead is not None
 
 async def agent_conversation_resolver(session_id: str, conversation_id: str | None, message: str) -> str:
     """Resolve or create a persistent conversation before streaming starts."""

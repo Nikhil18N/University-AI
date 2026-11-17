@@ -1,0 +1,5014 @@
+{
+  "status": "ok",
+  "academic_year": "2027-28",
+  "source": "SR University Official Fee Structure & Merit Scholarship Circular 2027-28",
+  "one_time": {
+    "enrollment_fee": 5000,
+    "application_fee": 1100
+  },
+  "yearly_other": {
+    "other_fee": 15000,
+    "exam_fee": 5000
+  },
+  "transport_per_year": 30000,
+  "hostel_per_year": {
+    "non_ac_4": 115000,
+    "non_ac_3": 125000,
+    "ac_4": 125000,
+    "ac_3": 135000
+  },
+  "hostel_labels": {
+    "non_ac_4": "Non-AC, 4-sharing",
+    "non_ac_3": "Non-AC, 3-sharing",
+    "ac_4": "AC, 4-sharing",
+    "ac_3": "AC, 3-sharing"
+  },
+  "hostel_deposits": {
+    "caution_deposit": 5000,
+    "laundry_per_year": 5000,
+    "electricity_deposit_ac": 5000
+  },
+  "special_concessions": [
+    {
+      "key": "sibling",
+      "label": "Real brother or sister on rolls in SRU in 2027-28",
+      "amount": 15000
+    },
+    {
+      "key": "only_girl_child_telangana",
+      "label": "Only girl child from Telangana",
+      "amount": 15000
+    },
+    {
+      "key": "girl_child_outside_telangana",
+      "label": "Girl child from outside Telangana",
+      "amount": 15000
+    },
+    {
+      "key": "single_parent",
+      "label": "Only one parent alive or divorced",
+      "amount": 15000
+    },
+    {
+      "key": "defence",
+      "label": "Defence / CRPF / martyr family",
+      "amount": 15000
+    },
+    {
+      "key": "state_police",
+      "label": "Child of State Police of any state",
+      "amount": 15000
+    },
+    {
+      "key": "sr_junior_college",
+      "label": "SR Junior College student",
+      "amount": 15000
+    },
+    {
+      "key": "alumni",
+      "label": "SRU old student, child of old student, or sibling of old student",
+      "amount": 15000
+    },
+    {
+      "key": "ncc_c",
+      "label": "NCC C certificate holder",
+      "amount": 15000
+    },
+    {
+      "key": "non_local",
+      "label": "Student from outside Telangana and Andhra Pradesh",
+      "amount": 15000
+    },
+    {
+      "key": "sports_national",
+      "label": "Sports: National level representation",
+      "amount": 15000
+    },
+    {
+      "key": "chancellor_recommendation",
+      "label": "Chancellor / Pro Chancellor recommendation",
+      "amount": 10000
+    },
+    {
+      "key": "lateral_entry",
+      "label": "Lateral entry students",
+      "amount": 15000
+    },
+    {
+      "key": "padma_gallantry",
+      "label": "Children of Padma Awards / J&K migrants / Gallantry Awards",
+      "amount": 15000
+    },
+    {
+      "key": "sports_international",
+      "label": "Sports: International level representation",
+      "amount": 50000
+    },
+    {
+      "key": "orphan",
+      "label": "Both parents not alive",
+      "amount": 50000
+    },
+    {
+      "key": "international",
+      "label": "International students",
+      "amount": 15000
+    },
+    {
+      "key": "andhra_pradesh",
+      "label": "Students from Andhra Pradesh",
+      "amount": 15000
+    },
+    {
+      "key": "staff_child",
+      "label": "Children of regular SRU staff",
+      "amount": 50000
+    },
+    {
+      "key": "disability",
+      "label": "More than 50% disability",
+      "amount": 20000
+    }
+  ],
+  "programs": [
+    {
+      "id": "btech_cse",
+      "name": "B.Tech CSE and allied (AI & ML, Data Science, Cyber Security)",
+      "level": "ug",
+      "tuition_per_year": 340000,
+      "tuition_per_semester": 170000,
+      "yearly_increase": 9000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 30000,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 153000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 144500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 136000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 127500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 119000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 102000
+        }
+      ]
+    },
+    {
+      "id": "btech_ai_robotics",
+      "name": "B.Tech Artificial Intelligence & Robotics",
+      "level": "ug",
+      "tuition_per_year": 400000,
+      "tuition_per_semester": 200000,
+      "yearly_increase": 12000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 180000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 170000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 160000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 150000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 140000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 120000
+        }
+      ]
+    },
+    {
+      "id": "btech_ece",
+      "name": "B.Tech ECE (AIML / VLSI / Robotics)",
+      "level": "ug",
+      "tuition_per_year": 270000,
+      "tuition_per_semester": 135000,
+      "yearly_increase": 8000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 121500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 114750
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 108000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 101250
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 94500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 81000
+        }
+      ]
+    },
+    {
+      "id": "btech_eee",
+      "name": "B.Tech EEE (Renewable Energy / EV / Robotics)",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "btech_mech",
+      "name": "B.Tech Mechanical Engineering (Robotics / Smart Manufacturing)",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "btech_civil",
+      "name": "B.Tech Civil Engineering",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "btech_biotech",
+      "name": "B.Tech Biotechnology with AI",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate (confirm required subjects with the Admissions Office)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "btech_food_tech",
+      "name": "B.Tech Food Technology",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate (confirm required subjects with the Admissions Office)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "btech_engg_physics",
+      "name": "B.Tech Engineering Physics / Applied Chemistry",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "btech_iep",
+      "name": "B.Tech IEP (International Engineering Program)",
+      "level": "ug",
+      "tuition_per_year": 340000,
+      "tuition_per_semester": 170000,
+      "yearly_increase": 10000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Maths, Physics, Chemistry (MPC)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 153000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 144500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 136000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 127500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 119000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 102000
+        }
+      ]
+    },
+    {
+      "id": "bsc_agri",
+      "name": "B.Sc. (Hons.) Agriculture (ICAR-Accredited)",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with BiPC / MPC",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "bdes",
+      "name": "B.Des (Design)",
+      "level": "ug",
+      "tuition_per_year": 210000,
+      "tuition_per_semester": 105000,
+      "yearly_increase": 6000,
+      "duration_years": 4,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 94500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 89250
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 84000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 78750
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 73500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 63000
+        }
+      ]
+    },
+    {
+      "id": "bba",
+      "name": "BBA (General Management)",
+      "level": "ug",
+      "tuition_per_year": 150000,
+      "tuition_per_semester": 75000,
+      "yearly_increase": 4000,
+      "duration_years": 3,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 67500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 63750
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 60000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 56250
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 52500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 45000
+        }
+      ]
+    },
+    {
+      "id": "bsc_hospitality",
+      "name": "B.Sc Hospitality and Event Management",
+      "level": "ug",
+      "tuition_per_year": 150000,
+      "tuition_per_semester": 75000,
+      "yearly_increase": 4000,
+      "duration_years": null,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 67500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 63750
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 60000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 56250
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 52500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 45000
+        }
+      ]
+    },
+    {
+      "id": "bba_specialised",
+      "name": "BBA specialised (Finance, Operations, HR, Business Analytics, Marketing)",
+      "level": "ug",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 3,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "bca",
+      "name": "BCA Hons (Bachelor of Computer Applications)",
+      "level": "ug",
+      "tuition_per_year": 150000,
+      "tuition_per_semester": 75000,
+      "yearly_increase": 4000,
+      "duration_years": 3,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Mathematics",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 67500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 63750
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 60000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 56250
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 52500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 45000
+        }
+      ]
+    },
+    {
+      "id": "bsc_cs",
+      "name": "B.Sc Computer Science Hons",
+      "level": "ug",
+      "tuition_per_year": 150000,
+      "tuition_per_semester": 75000,
+      "yearly_increase": 4000,
+      "duration_years": 3,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Mathematics",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 67500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 63750
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 60000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 56250
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 52500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 45000
+        }
+      ]
+    },
+    {
+      "id": "bsc_maths_ai",
+      "name": "B.Sc Hons Mathematics and AI",
+      "level": "ug",
+      "tuition_per_year": 100000,
+      "tuition_per_semester": 50000,
+      "yearly_increase": 3000,
+      "duration_years": null,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate with Mathematics",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 45000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 42500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 40000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 37500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 35000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 30000
+        }
+      ]
+    },
+    {
+      "id": "bcom",
+      "name": "B.Com",
+      "level": "ug",
+      "tuition_per_year": 100000,
+      "tuition_per_semester": 50000,
+      "yearly_increase": 3000,
+      "duration_years": null,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 45000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 42500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 40000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 37500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 35000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 30000
+        }
+      ]
+    },
+    {
+      "id": "bsc_physics",
+      "name": "B.Sc Physics",
+      "level": "ug",
+      "tuition_per_year": 100000,
+      "tuition_per_semester": 50000,
+      "yearly_increase": 3000,
+      "duration_years": null,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 45000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 42500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 40000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 37500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 35000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 30000
+        }
+      ]
+    },
+    {
+      "id": "bsc_chemistry",
+      "name": "B.Sc Chemistry",
+      "level": "ug",
+      "tuition_per_year": 100000,
+      "tuition_per_semester": 50000,
+      "yearly_increase": 3000,
+      "duration_years": null,
+      "minimum_percent": 50,
+      "eligibility": "10+2 / Intermediate, any stream",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "State Board (10+2 / Inter) %"
+        },
+        {
+          "key": "cbse",
+          "label": "CBSE / ICSE %"
+        },
+        {
+          "key": "jee_percentile",
+          "label": "JEE Main percentile"
+        },
+        {
+          "key": "eapcet_rank",
+          "label": "TG/AP EAPCET rank"
+        },
+        {
+          "key": "ib",
+          "label": "IB Diploma score"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%",
+            "cbse": "60 – 64.9%",
+            "jee_percentile": "50 – 59.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ],
+            "cbse": [
+              60,
+              64.99
+            ],
+            "jee_percentile": [
+              50,
+              59.99
+            ]
+          },
+          "payable_per_semester": 45000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%",
+            "cbse": "65 – 69.9%",
+            "jee_percentile": "60 – 69.9 %ile"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ],
+            "cbse": [
+              65,
+              69.99
+            ],
+            "jee_percentile": [
+              60,
+              69.99
+            ]
+          },
+          "payable_per_semester": 42500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%",
+            "cbse": "70 – 79.9%",
+            "jee_percentile": "70 – 79.9 %ile",
+            "ib": "24 – 29"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ],
+            "cbse": [
+              70,
+              79.99
+            ],
+            "jee_percentile": [
+              70,
+              79.99
+            ],
+            "ib": [
+              24,
+              29
+            ]
+          },
+          "payable_per_semester": 40000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%",
+            "cbse": "80 – 89.9%",
+            "jee_percentile": "80 – 89.9 %ile",
+            "eapcet_rank": "8,001 – 20,000",
+            "ib": "30 – 33"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ],
+            "cbse": [
+              80,
+              89.99
+            ],
+            "jee_percentile": [
+              80,
+              89.99
+            ],
+            "eapcet_rank": [
+              8001,
+              20000
+            ],
+            "ib": [
+              30,
+              33
+            ]
+          },
+          "payable_per_semester": 37500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%",
+            "cbse": "90 – 94.9%",
+            "jee_percentile": "90 – 94.9 %ile",
+            "eapcet_rank": "2,001 – 8,000",
+            "ib": "34 – 37"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ],
+            "cbse": [
+              90,
+              94.99
+            ],
+            "jee_percentile": [
+              90,
+              94.99
+            ],
+            "eapcet_rank": [
+              2001,
+              8000
+            ],
+            "ib": [
+              34,
+              37
+            ]
+          },
+          "payable_per_semester": 35000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above",
+            "cbse": "95% and above",
+            "jee_percentile": "95 %ile and above",
+            "eapcet_rank": "1 – 2,000",
+            "ib": "38 and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ],
+            "cbse": [
+              95,
+              100
+            ],
+            "jee_percentile": [
+              95,
+              100
+            ],
+            "eapcet_rank": [
+              1,
+              2000
+            ],
+            "ib": [
+              38,
+              45
+            ]
+          },
+          "payable_per_semester": 30000
+        }
+      ]
+    },
+    {
+      "id": "mba",
+      "name": "MBA (Finance, Operations, HR, Business Analytics, Marketing)",
+      "level": "pg",
+      "tuition_per_year": 300000,
+      "tuition_per_semester": 150000,
+      "yearly_increase": 9000,
+      "duration_years": 2,
+      "minimum_percent": 50,
+      "eligibility": "Any recognized Bachelor's degree (50% aggregate)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "Qualifying degree %"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ]
+          },
+          "payable_per_semester": 135000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ]
+          },
+          "payable_per_semester": 127500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ]
+          },
+          "payable_per_semester": 120000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ]
+          },
+          "payable_per_semester": 112500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ]
+          },
+          "payable_per_semester": 105000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ]
+          },
+          "payable_per_semester": 90000
+        }
+      ]
+    },
+    {
+      "id": "mba_agri",
+      "name": "MBA Agri Business Management",
+      "level": "pg",
+      "tuition_per_year": 200000,
+      "tuition_per_semester": 100000,
+      "yearly_increase": 6000,
+      "duration_years": 2,
+      "minimum_percent": 50,
+      "eligibility": "Any recognized Bachelor's degree (50% aggregate)",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "Qualifying degree %"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ]
+          },
+          "payable_per_semester": 90000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ]
+          },
+          "payable_per_semester": 85000
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ]
+          },
+          "payable_per_semester": 80000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ]
+          },
+          "payable_per_semester": 75000
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ]
+          },
+          "payable_per_semester": 70000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ]
+          },
+          "payable_per_semester": 60000
+        }
+      ]
+    },
+    {
+      "id": "mca",
+      "name": "MCA (Master of Computer Applications)",
+      "level": "pg",
+      "tuition_per_year": 150000,
+      "tuition_per_semester": 75000,
+      "yearly_increase": 4000,
+      "duration_years": 2,
+      "minimum_percent": 50,
+      "eligibility": "BCA / B.Sc / B.Com / B.A with Mathematics at 10+2 or degree level",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "Qualifying degree %"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ]
+          },
+          "payable_per_semester": 67500
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ]
+          },
+          "payable_per_semester": 63750
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ]
+          },
+          "payable_per_semester": 60000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ]
+          },
+          "payable_per_semester": 56250
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ]
+          },
+          "payable_per_semester": 52500
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ]
+          },
+          "payable_per_semester": 45000
+        }
+      ]
+    },
+    {
+      "id": "mtech",
+      "name": "M.Tech (CSE, Data Science, AIML, VLSI, Embedded Systems and others)",
+      "level": "pg",
+      "tuition_per_year": 100000,
+      "tuition_per_semester": 50000,
+      "yearly_increase": 3000,
+      "duration_years": 2,
+      "minimum_percent": 50,
+      "eligibility": "B.Tech / B.E. in a relevant engineering discipline",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "Qualifying degree %"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ]
+          },
+          "payable_per_semester": 45000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ]
+          },
+          "payable_per_semester": 42500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ]
+          },
+          "payable_per_semester": 40000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ]
+          },
+          "payable_per_semester": 37500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ]
+          },
+          "payable_per_semester": 35000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ]
+          },
+          "payable_per_semester": 30000
+        }
+      ]
+    },
+    {
+      "id": "msc",
+      "name": "M.Sc (Computer Science and Agricultural Sciences)",
+      "level": "pg",
+      "tuition_per_year": 100000,
+      "tuition_per_semester": 50000,
+      "yearly_increase": 3000,
+      "duration_years": 2,
+      "minimum_percent": 50,
+      "eligibility": "Bachelor's degree in a relevant discipline",
+      "specialization_fee_per_year_from_year2": 0,
+      "exams": [
+        {
+          "key": "state_board",
+          "label": "Qualifying degree %"
+        }
+      ],
+      "slabs": [
+        {
+          "scholarship_percent": 10,
+          "ranges": {
+            "state_board": "60 – 64.9%"
+          },
+          "bounds": {
+            "state_board": [
+              60,
+              64.99
+            ]
+          },
+          "payable_per_semester": 45000
+        },
+        {
+          "scholarship_percent": 15,
+          "ranges": {
+            "state_board": "65 – 69.9%"
+          },
+          "bounds": {
+            "state_board": [
+              65,
+              69.99
+            ]
+          },
+          "payable_per_semester": 42500
+        },
+        {
+          "scholarship_percent": 20,
+          "ranges": {
+            "state_board": "70 – 79.9%"
+          },
+          "bounds": {
+            "state_board": [
+              70,
+              79.99
+            ]
+          },
+          "payable_per_semester": 40000
+        },
+        {
+          "scholarship_percent": 25,
+          "ranges": {
+            "state_board": "80 – 91.9%"
+          },
+          "bounds": {
+            "state_board": [
+              80,
+              91.99
+            ]
+          },
+          "payable_per_semester": 37500
+        },
+        {
+          "scholarship_percent": 30,
+          "ranges": {
+            "state_board": "92 – 97.9%"
+          },
+          "bounds": {
+            "state_board": [
+              92,
+              97.99
+            ]
+          },
+          "payable_per_semester": 35000
+        },
+        {
+          "scholarship_percent": 40,
+          "ranges": {
+            "state_board": "98% and above"
+          },
+          "bounds": {
+            "state_board": [
+              98,
+              100
+            ]
+          },
+          "payable_per_semester": 30000
+        }
+      ]
+    }
+  ]
+}

@@ -959,6 +959,7 @@ export default function AdminPage({ onBackToChat }: Props) {
                       <option value="applied">Applied</option>
                       <option value="enrolled">Enrolled</option>
                       <option value="lost">Lost</option>
+                                    <option value="do_not_contact">Do not contact</option>
                     </select>
                   </div>
 
@@ -1073,6 +1074,7 @@ export default function AdminPage({ onBackToChat }: Props) {
                                     <option value="applied">Applied</option>
                                     <option value="enrolled">Enrolled</option>
                                     <option value="lost">Lost</option>
+                                    <option value="do_not_contact">Do not contact</option>
                                   </select>
                                 </td>
                                 <td>

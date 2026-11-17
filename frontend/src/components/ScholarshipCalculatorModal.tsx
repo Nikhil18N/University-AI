@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   CalculatorIcon,
   AwardIcon,
@@ -13,442 +13,42 @@ import {
   CheckIcon,
   InfoIcon,
 } from "./Icons";
-import { createLead, calculateAgentFee } from "../services/api";
+import { createLead, calculateAgentFee, fetchFeeConfig } from "../services/api";
+import bundledFeeConfig from "../data/feeConfig.json";
+import {
+  calculateParams,
+  computeEstimate,
+  estimateFromBackend,
+  inr,
+  matchSlab,
+  parseScore,
+  scholarshipStartText,
+} from "../utils/feeCalculator";
+import type { Estimate, FeeConfig } from "../utils/feeCalculator";
 import "./ScholarshipCalculatorModal.css";
+
+/*
+ * Fee & Scholarship Calculator.
+ *
+ * This component holds NO fee amounts. Programs, scholarship slabs, hostel and one-time fees
+ * come from the backend fee table (GET /api/v1/agent/fee-config), which is built from
+ * backend/app/sru_agent/fees_2027_28.json, the file the chat agent also uses. A generated copy
+ * (src/data/feeConfig.json) is bundled so the calculator opens instantly; the live table replaces
+ * it as soon as it arrives, and every result is confirmed by POST /api/v1/agent/calculate.
+ *
+ * To change a fee: edit fees_2027_28.json, run `python scripts/export_fee_config.py` in backend/.
+ */
 
 interface Props {
   onClose: () => void;
   onAskBuddy: (prompt: string) => void;
 }
 
-interface ScholarshipSlab {
-  scholarshipPercent: number;
-  ranges: {
-    stateBoard?: string;
-    cbse?: string;
-    jeeMains?: string;
-    eamcet?: string;
-    sat?: string;
-    ib?: string;
-    degree?: string;
-    icet?: string;
-    catMat?: string;
-    gate?: string;
-    icar?: string;
-  };
-  payableFeeSem: number;
-  cseYearlyPayable?: { yr1: number; yr2: number; yr3: number; yr4: number };
-}
-
-interface ProgramConfig {
-  id: string;
-  name: string;
-  degreeType: "Bachelors" | "Masters";
-  baseTuitionSem: number;
-  annualIncrease?: number;
-  enrollmentFee: number;
-  admissionFee: number;
-  specializationFeeAnnual?: number;
-  specializations?: string[];
-  supportedExams: { key: string; label: string }[];
-  slabs: ScholarshipSlab[];
-}
-
-const PROGRAMS: ProgramConfig[] = [
-  {
-    id: "btech_cse",
-    name: "B.Tech. Computer Science & Engineering (CSE & Allied)",
-    degreeType: "Bachelors",
-    baseTuitionSem: 170000,
-    annualIncrease: 9000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    specializationFeeAnnual: 30000,
-    specializations: ["Artificial Intelligence & Machine Learning", "Cyber Security", "Data Science", "Robotics and Automation", "Quantum AI"],
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE / ICSE %" },
-      { key: "jeeMains", label: "JEE Mains Percentile" },
-      { key: "eamcet", label: "TG/AP EAPCET Rank" },
-      { key: "ib", label: "IB Diploma Score" },
-    ],
-    slabs: [
-      {
-        scholarshipPercent: 10,
-        ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile", eamcet: "40001 – 60000" },
-        payableFeeSem: 153000,
-        cseYearlyPayable: { yr1: 306000, yr2: 315000, yr3: 324000, yr4: 333000 },
-      },
-      {
-        scholarshipPercent: 15,
-        ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile", eamcet: "20001 – 40000" },
-        payableFeeSem: 144500,
-        cseYearlyPayable: { yr1: 289000, yr2: 298000, yr3: 307000, yr4: 316000 },
-      },
-      {
-        scholarshipPercent: 20,
-        ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", ib: "24 – 29", jeeMains: "70 – 79.9 %ile" },
-        payableFeeSem: 136000,
-        cseYearlyPayable: { yr1: 272000, yr2: 281000, yr3: 290000, yr4: 299000 },
-      },
-      {
-        scholarshipPercent: 25,
-        ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", ib: "30 – 33", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" },
-        payableFeeSem: 127500,
-        cseYearlyPayable: { yr1: 255000, yr2: 264000, yr3: 273000, yr4: 282000 },
-      },
-      {
-        scholarshipPercent: 30,
-        ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", ib: "34 – 37", jeeMains: "90 – 94.99 %ile" },
-        payableFeeSem: 119000,
-        cseYearlyPayable: { yr1: 238000, yr2: 247000, yr3: 256000, yr4: 265000 },
-      },
-      {
-        scholarshipPercent: 40,
-        ranges: { stateBoard: "98% and above", cbse: "95% and above", ib: "35/45 and above", jeeMains: "95% and above", eamcet: "1 – 8000" },
-        payableFeeSem: 102000,
-        cseYearlyPayable: { yr1: 204000, yr2: 213000, yr3: 222000, yr4: 231000 },
-      },
-    ],
-  },
-  {
-    id: "btech_ece",
-    name: "B.Tech. Electronics & Communication Engineering (ECE)",
-    degreeType: "Bachelors",
-    baseTuitionSem: 135000,
-    annualIncrease: 8000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    specializations: ["AIML", "VLSI Design", "Robotics and Automation"],
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE / ICSE %" },
-      { key: "jeeMains", label: "JEE Mains Percentile" },
-      { key: "eamcet", label: "TG/AP EAPCET Rank" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile", eamcet: "40001 – 60000" }, payableFeeSem: 121500 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile", eamcet: "20001 – 40000" }, payableFeeSem: 114750 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 108000 },
-      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 101250 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile" }, payableFeeSem: 94500 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 8000" }, payableFeeSem: 81000 },
-    ],
-  },
-  {
-    id: "btech_core",
-    name: "B.Tech. Core (Biotech / Mech / Civil / EEE / Food Tech)",
-    degreeType: "Bachelors",
-    baseTuitionSem: 100000,
-    annualIncrease: 6000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    specializations: ["Biotechnology with AI", "Robotics and Automation", "Smart Manufacturing", "Electric Vehicles", "Renewable Energy"],
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE / ICSE %" },
-      { key: "jeeMains", label: "JEE Mains Percentile" },
-      { key: "eamcet", label: "TG/AP EAPCET Rank" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%", jeeMains: "50 – 59.9 %ile", eamcet: "40001 – 60000" }, payableFeeSem: 90000 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%", jeeMains: "60 – 69.9 %ile", eamcet: "20001 – 40000" }, payableFeeSem: 85000 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%", jeeMains: "70 – 79.9 %ile" }, payableFeeSem: 80000 },
-      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%", jeeMains: "80 – 89.9 %ile", eamcet: "8001 – 20000" }, payableFeeSem: 75000 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%", jeeMains: "90 – 94.99 %ile" }, payableFeeSem: 70000 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above", jeeMains: "95% and above", eamcet: "1 – 8000" }, payableFeeSem: 60000 },
-    ],
-  },
-  {
-    id: "bca",
-    name: "BCA (Bachelor of Computer Applications)",
-    degreeType: "Bachelors",
-    baseTuitionSem: 75000,
-    annualIncrease: 4000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE / ICSE %" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%" }, payableFeeSem: 67500 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%" }, payableFeeSem: 63750 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%" }, payableFeeSem: 60000 },
-      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%" }, payableFeeSem: 56250 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%" }, payableFeeSem: 52500 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above" }, payableFeeSem: 45000 },
-    ],
-  },
-  {
-    id: "bba",
-    name: "BBA (Bachelor of Business Administration)",
-    degreeType: "Bachelors",
-    baseTuitionSem: 75000,
-    annualIncrease: 4000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    supportedExams: [
-      { key: "stateBoard", label: "State Board (10+2 / Inter) %" },
-      { key: "cbse", label: "CBSE / ICSE %" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { stateBoard: "60 – 64.9%", cbse: "60 – 64.9%" }, payableFeeSem: 67500 },
-      { scholarshipPercent: 15, ranges: { stateBoard: "65 – 69.9%", cbse: "65 – 69.9%" }, payableFeeSem: 63750 },
-      { scholarshipPercent: 20, ranges: { stateBoard: "70 – 79.9%", cbse: "70 – 79.9%" }, payableFeeSem: 60000 },
-      { scholarshipPercent: 25, ranges: { stateBoard: "80 – 91.9%", cbse: "80 – 89.9%" }, payableFeeSem: 56250 },
-      { scholarshipPercent: 30, ranges: { stateBoard: "92 – 97.9%", cbse: "90 – 94.9%" }, payableFeeSem: 52500 },
-      { scholarshipPercent: 40, ranges: { stateBoard: "98% and above", cbse: "95% and above" }, payableFeeSem: 45000 },
-    ],
-  },
-  {
-    id: "mba",
-    name: "MBA (Master of Business Administration)",
-    degreeType: "Masters",
-    baseTuitionSem: 150000,
-    annualIncrease: 9000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    supportedExams: [
-      { key: "degree", label: "Qualifying Degree %" },
-      { key: "catMat", label: "MAT / CAT / CMAT %" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { degree: "60 – 64.9%", catMat: "60 – 64.9%" }, payableFeeSem: 135000 },
-      { scholarshipPercent: 15, ranges: { degree: "65 – 69.9%", catMat: "65 – 69.9%" }, payableFeeSem: 127500 },
-      { scholarshipPercent: 20, ranges: { degree: "70 – 79.9%", catMat: "70 – 79.9%" }, payableFeeSem: 120000 },
-      { scholarshipPercent: 25, ranges: { degree: "80 – 91.9%", catMat: "80 – 91.9%" }, payableFeeSem: 112500 },
-      { scholarshipPercent: 30, ranges: { degree: "92 – 97.9%", catMat: "92 – 97.9%" }, payableFeeSem: 105000 },
-      { scholarshipPercent: 40, ranges: { degree: "98% and above", catMat: "98% and above" }, payableFeeSem: 90000 },
-    ],
-  },
-  {
-    id: "mca",
-    name: "MCA (Master of Computer Applications)",
-    degreeType: "Masters",
-    baseTuitionSem: 75000,
-    annualIncrease: 4000,
-    enrollmentFee: 5000,
-    admissionFee: 0,
-    supportedExams: [
-      { key: "degree", label: "Qualifying Degree %" },
-    ],
-    slabs: [
-      { scholarshipPercent: 10, ranges: { degree: "60 – 64.9%" }, payableFeeSem: 67500 },
-      { scholarshipPercent: 15, ranges: { degree: "65 – 69.9%" }, payableFeeSem: 63750 },
-      { scholarshipPercent: 20, ranges: { degree: "70 – 79.9%" }, payableFeeSem: 60000 },
-      { scholarshipPercent: 25, ranges: { degree: "80 – 91.9%" }, payableFeeSem: 56250 },
-      { scholarshipPercent: 30, ranges: { degree: "92 – 97.9%" }, payableFeeSem: 52500 },
-      { scholarshipPercent: 40, ranges: { degree: "98% and above" }, payableFeeSem: 45000 },
-    ],
-  },
-];
-
-
-/**
- * Helper to determine if an exam key is evaluated as a percentage or marks out of 1000.
- */
-function isPercentageBoard(key: string): boolean {
-  return key === "stateBoard" || key === "cbse" || key === "degree" || key === "ib" || key === "jeeMains";
-}
-
-/**
- * Parses user input to auto-detect intended qualifying exam boards and detect ranks.
- */
-function detectBoardFromInput(text: string): {
-  detectedExamKey?: "eamcet" | "jeeMains" | "cbse";
-  cleanedNumberStr: string;
-  isBareNumberGreaterThan1000: boolean;
-  numericVal: number | null;
-} {
-  const trimmed = text.trim();
-  const lower = trimmed.toLowerCase();
-
-  let detectedExamKey: "eamcet" | "jeeMains" | "cbse" | undefined;
-  if (/eapcet|eamcet|rank/i.test(lower)) {
-    detectedExamKey = "eamcet";
-  } else if (/jee|percentile|%ile/i.test(lower)) {
-    detectedExamKey = "jeeMains";
-  } else if (/cbse|icse/i.test(lower)) {
-    detectedExamKey = "cbse";
-  }
-
-  const numMatch = trimmed.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
-  const numericVal = numMatch ? parseFloat(numMatch[1]) : null;
-  const isFraction = trimmed.includes("/");
-  const isBareNumberGreaterThan1000 = !detectedExamKey && !isFraction && numericVal !== null && numericVal > 1000;
-
-  const cleanedNumberStr = numericVal !== null ? String(numericVal) : trimmed;
-
-  return {
-    detectedExamKey,
-    cleanedNumberStr,
-    isBareNumberGreaterThan1000,
-    numericVal,
-  };
-}
-
-/**
- * Intelligent parser & matcher for student scores and ranks.
- */
-function matchSlabFromScore(
-  program: ProgramConfig,
-  examKey: string,
-  rawScoreInput: string
-): {
-  slabIndex: number;
-  percentage?: number;
-  rank?: number;
-  displayText: string;
-  status: "matched" | "below_criteria" | "invalid";
-} {
-  const trimmed = rawScoreInput.trim();
-  if (!trimmed) {
-    return { slabIndex: -1, displayText: "", status: "invalid" };
-  }
-
-  const slabs = program.slabs;
-
-  // 1. Rank-based exams (EAMCET / EAPCET, ICET, etc.)
-  if (examKey === "eamcet" || examKey === "icet" || /rank/i.test(trimmed)) {
-    const cleanNum = trimmed.replace(/[^\d]/g, "");
-    const rank = parseInt(cleanNum, 10);
-    if (isNaN(rank) || rank <= 0) {
-      return { slabIndex: -1, displayText: "Please enter a valid rank number", status: "invalid" };
-    }
-
-    const displayText = `Rank ${rank.toLocaleString("en-IN")}`;
-
-    for (let i = slabs.length - 1; i >= 0; i--) {
-      const slab = slabs[i];
-      const rangeStr = (slab.ranges as any)[examKey] || (slab.ranges as any).eamcet || "";
-      if (!rangeStr) continue;
-
-      const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
-      if (match) {
-        const low = parseInt(match[1], 10);
-        const high = parseInt(match[2], 10);
-        if (rank >= low && rank <= high) {
-          return { slabIndex: i, rank, displayText, status: "matched" };
-        }
-      }
-    }
-
-    return {
-      slabIndex: -1,
-      rank,
-      displayText: `${displayText} (Beyond Top Rank Slabs)`,
-      status: "below_criteria",
-    };
-  }
-
-  // 2. SAT Score
-  if (examKey === "sat" || (/^\d{3,4}$/.test(trimmed) && parseInt(trimmed, 10) > 1000 && parseInt(trimmed, 10) <= 1600 && examKey === "sat")) {
-    const cleanNum = trimmed.replace(/[^\d]/g, "");
-    const satScore = parseInt(cleanNum, 10);
-    if (!isNaN(satScore) && satScore >= 1000 && satScore <= 1600) {
-      const displayText = `SAT Score ${satScore}`;
-      for (let i = slabs.length - 1; i >= 0; i--) {
-        const slab = slabs[i];
-        const rangeStr = slab.ranges.sat || "";
-        const match = rangeStr.match(/(\d+)\s*[–-]\s*(\d+)/);
-        if (match) {
-          const low = parseInt(match[1], 10);
-          const high = parseInt(match[2], 10);
-          if (satScore >= low && satScore <= high) {
-            return { slabIndex: i, displayText, status: "matched" };
-          }
-        }
-      }
-      return { slabIndex: -1, displayText: `${displayText} (Below SAT Cutoff)`, status: "below_criteria" };
-    }
-  }
-
-  // 3. Percentage or Raw Marks
-  const fractionMatch = trimmed.match(/^(\d+(?:\.\d+)?)\s*[/]\s*(\d+(?:\.\d+)?)$/);
-  let obtainedNum = 0;
-  let totalMax = 0;
-
-  if (fractionMatch) {
-    obtainedNum = parseFloat(fractionMatch[1]);
-    totalMax = parseFloat(fractionMatch[2]);
-  } else {
-    const numMatch = trimmed.match(/^(\d+(?:\.\d+)?)/);
-    if (!numMatch) {
-      return { slabIndex: -1, displayText: "Enter valid score/percentage", status: "invalid" };
-    }
-    obtainedNum = parseFloat(numMatch[1]);
-  }
-
-  let percentage: number;
-  let displayText: string;
-
-  if (totalMax > 0) {
-    percentage = Math.round((obtainedNum / totalMax) * 10000) / 100;
-    displayText = `${obtainedNum}/${totalMax} (${percentage}%)`;
-  } else if (obtainedNum > 100) {
-    // Intermediate marks out of 1000! (Telangana / AP state boards: 780 marks -> 78.0%)
-    if (examKey === "cbse" && obtainedNum <= 500) {
-      percentage = Math.round((obtainedNum / 500) * 10000) / 100;
-      displayText = `${obtainedNum}/500 (${percentage}%)`;
-    } else if (obtainedNum <= 1000) {
-      percentage = Math.round((obtainedNum / 10) * 100) / 100;
-      displayText = `${obtainedNum}/1000 (${percentage}%)`;
-    } else {
-      return {
-        slabIndex: -1,
-        displayText: `${obtainedNum} (Invalid mark range)`,
-        status: "invalid",
-      };
-    }
-  } else {
-    percentage = Math.round(obtainedNum * 100) / 100;
-    displayText = `${percentage}%`;
-  }
-
-  // Match normalized percentage against slabs
-  for (let i = slabs.length - 1; i >= 0; i--) {
-    const slab = slabs[i];
-    const rangeStr = (slab.ranges as any)[examKey] || slab.ranges.stateBoard || "";
-
-    if (rangeStr.includes("≥") || rangeStr.includes(">=") || rangeStr.includes(">") || rangeStr.includes("and above")) {
-      const minVal = parseFloat(rangeStr.replace(/[^\d.]/g, ""));
-      if (!isNaN(minVal) && percentage >= minVal) {
-        return { slabIndex: i, percentage, displayText, status: "matched" };
-      }
-    }
-
-    const match = rangeStr.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)/);
-    if (match) {
-      const low = parseFloat(match[1]);
-      const high = parseFloat(match[2]);
-      if (percentage >= low && percentage <= high) {
-        return { slabIndex: i, percentage, displayText, status: "matched" };
-      }
-    }
-  }
-
-  return {
-    slabIndex: -1,
-    percentage,
-    displayText: `${displayText} (Below Cutoff)`,
-    status: "below_criteria",
-  };
-}
-
-interface CalculatedSnapshot {
-  program: ProgramConfig;
-  exam: { key: string; label: string };
-  slab: ScholarshipSlab;
-  rangeText: string;
-  discountAmount: number;
-  enteredScore: string;
-  studentName: string;
-  studentPhone: string;
-}
+const ADMISSIONS_WHATSAPP = "918331003030";
+const HOSTEL_ORDER = ["non_ac_4", "non_ac_3", "ac_4", "ac_3"];
 
 export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Props) {
-  // Pre-load saved lead info if student already verified previously
+  // Details saved earlier by the "verify" step, if any
   const savedLead = useMemo(() => {
     try {
       const raw = localStorage.getItem("sru_student_lead");
@@ -466,467 +66,242 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
   const [isVerified, setIsVerified] = useState<boolean>(Boolean(savedLead?.name && savedLead?.phone));
 
-  // Form state - start without hardcoded marks so user sees real input state
+  // The fee table: bundled copy first, then the live one from the backend
+  const [config, setConfig] = useState<FeeConfig>(bundledFeeConfig as unknown as FeeConfig);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchFeeConfig<FeeConfig>(controller.signal)
+      .then((live) => {
+        if (live?.status === "ok" && Array.isArray(live.programs) && live.programs.length > 0) setConfig(live);
+      })
+      .catch(() => {
+        /* keep the bundled table */
+      });
+    return () => controller.abort();
+  }, []);
+
+  // What the student chose and typed
   const [selectedProgramId, setSelectedProgramId] = useState<string>("btech_cse");
-  const [selectedExamKey, setSelectedExamKey] = useState<string>("stateBoard");
+  const [selectedExamKey, setSelectedExamKey] = useState<string>("state_board");
   const [enteredScore, setEnteredScore] = useState<string>("");
-  const [selectedSlabIndex, setSelectedSlabIndex] = useState<number>(-1);
   const [showSlabsPreview, setShowSlabsPreview] = useState<boolean>(false);
   const [includeHostel, setIncludeHostel] = useState<boolean>(false);
-  const [hostelType, setHostelType] = useState<"non_ac" | "ac">("non_ac");
+  const [hostelKey, setHostelKey] = useState<string>("non_ac_4");
 
-  // Optional admissions callback / lead inputs
+  // Optional callback request
   const [studentName, setStudentName] = useState<string>(savedLead?.name || "");
   const [studentPhone, setStudentPhone] = useState<string>(savedLead?.phone || "");
   const [consentAgreed, setConsentAgreed] = useState<boolean>(true);
   const [leadSuccessMsg, setLeadSuccessMsg] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null); // about the score
+  const [callbackError, setCallbackError] = useState<string | null>(null); // about the callback form
 
-  // Calculated snapshot state
-  const [calculatedSnapshot, setCalculatedSnapshot] = useState<CalculatedSnapshot | null>(null);
-  const [rankSuggestion, setRankSuggestion] = useState<number | null>(null);
-
-  // Active program & exam
-  const currentProgram = useMemo(
-    () => PROGRAMS.find((p) => p.id === selectedProgramId) || PROGRAMS[0],
-    [selectedProgramId]
+  // Everything below is worked out from the inputs on every render, so nothing can go stale.
+  const program = useMemo(
+    () => config.programs.find((p) => p.id === selectedProgramId) || config.programs[0],
+    [config, selectedProgramId]
+  );
+  const parsed = useMemo(
+    () => parseScore(program, selectedExamKey, enteredScore),
+    [program, selectedExamKey, enteredScore]
+  );
+  // The exam actually in use. Typing "EAPCET 9000" switches it even if "State Board" is selected.
+  const examKey = parsed.examKey;
+  const exam = program.exams.find((e) => e.key === examKey) || program.exams[0];
+  const hasScore = parsed.status === "ok" && parsed.value !== undefined;
+  const hostelChoice = includeHostel ? hostelKey : "none";
+  const localPercent = hasScore ? matchSlab(program, examKey, parsed.value as number) : 0;
+  const localEstimate = useMemo(
+    () => computeEstimate(config, program, localPercent, hostelChoice, examKey),
+    [config, program, localPercent, hostelChoice, examKey]
   );
 
-  const activeExams = currentProgram.supportedExams;
-  const currentExam = useMemo(() => {
-    return activeExams.find((e) => e.key === selectedExamKey) || activeExams[0];
-  }, [activeExams, selectedExamKey]);
-
-  // Compute current score match
-  const scoreMatch = useMemo(() => {
-    if (rankSuggestion !== null) {
-      return { slabIndex: -1, displayText: "", status: "invalid" as const };
-    }
-    return matchSlabFromScore(currentProgram, currentExam.key, enteredScore);
-  }, [currentProgram, currentExam.key, enteredScore, rankSuggestion]);
-
-  // Execute calculation snapshot (clears previous snapshot and queries backend for official figures)
-  const computeAndSaveSnapshot = async (
-    prog: ProgramConfig,
-    exam: { key: string; label: string },
-    scoreInput: string,
-    slabIdx: number,
-    nameToUse: string = "",
-    phoneToUse: string = ""
-  ) => {
-    // Clear every previous result snapshot before showing new result
-    setCalculatedSnapshot(null);
-
-    const match = matchSlabFromScore(prog, exam.key, scoreInput);
-    const effectiveSlabIdx = match.slabIndex >= 0 ? match.slabIndex : slabIdx;
-    const isNoScholarship = effectiveSlabIdx === -1;
-    const slab: ScholarshipSlab = isNoScholarship
-      ? {
-          scholarshipPercent: 0,
-          payableFeeSem: prog.baseTuitionSem,
-          ranges: { [exam.key]: scoreInput.trim() ? "Standard Tuition (Below 60% Merit Cutoff)" : "Standard Base Tuition" },
-          cseYearlyPayable:
-            prog.id === "btech_cse"
-              ? { yr1: 340000, yr2: 349000, yr3: 358000, yr4: 367000 }
-              : undefined,
-        }
-      : prog.slabs[effectiveSlabIdx] || prog.slabs[0];
-
-    const rangeText = isNoScholarship
-      ? (scoreInput.trim() ? "Standard Tuition (Below 60% Merit Cutoff)" : "Standard Base Tuition")
-      : (slab.ranges as any)[exam.key] ||
-        slab.ranges.stateBoard ||
-        `Slab ${effectiveSlabIdx + 1}`;
-
-    const discount = isNoScholarship
-      ? 0
-      : Math.round(prog.baseTuitionSem * (slab.scholarshipPercent / 100));
-
-    const finalScoreDisplay = match.displayText || scoreInput.trim() || rangeText;
-
-    // Save lead in localStorage and PostgreSQL backend if valid contact provided
-    if (nameToUse && phoneToUse && phoneToUse.replace(/\D/g, "").length >= 10) {
-      const leadData = {
-        name: nameToUse,
-        phone: phoneToUse,
-        program_interest: prog.name,
-        score: finalScoreDisplay,
-        exam_type: exam.label,
-        source: "scholarship_calculator",
-        metadata: {
-          calculated_discount: discount,
-          scholarship_percent: slab.scholarshipPercent,
-          payable_sem: slab.payableFeeSem,
-          admission_year: "2027-28",
-        },
-      };
-      try {
-        localStorage.setItem("sru_student_lead", JSON.stringify({ name: nameToUse, phone: phoneToUse }));
-        setIsVerified(true);
-        await createLead(leadData);
-      } catch (err) {
-        console.warn("Lead registration note:", err);
-      }
-    }
-
-    // Query backend calculate endpoint to ensure 100% agreement with the AI agent
-    try {
-      const hostelParam = includeHostel ? (hostelType === "ac" ? "ac_4" : "non_ac_4") : "none";
-      const backendCalc = await calculateAgentFee({
-        program: prog.id,
-        percent: match.percentage !== undefined ? match.percentage : undefined,
-        board: exam.key === "cbse" ? "cbse" : "state_board",
-        eapcet_rank: match.rank || (exam.key === "eamcet" && match.percentage ? Math.round(match.percentage) : undefined),
-        jee_percentile: exam.key === "jeeMains" && match.percentage !== undefined ? match.percentage : undefined,
-        hostel: hostelParam,
-      });
-
-      if (backendCalc && backendCalc.status === "ok") {
-        const netSem = parseInt(backendCalc.per_semester_after_scholarship.replace(/[^\d]/g, ""), 10) || slab.payableFeeSem;
-        const discountAmt = Math.round(parseInt(backendCalc.saving_first_year.replace(/[^\d]/g, ""), 10) / 2) || discount;
-        const backendSlab: ScholarshipSlab = {
-          ...slab,
-          scholarshipPercent: backendCalc.scholarship_percent,
-          payableFeeSem: netSem,
-          cseYearlyPayable: backendCalc.year_by_year?.length === 4
-            ? {
-                yr1: parseInt(backendCalc.year_by_year[0].after_scholarship.replace(/[^\d]/g, ""), 10),
-                yr2: parseInt(backendCalc.year_by_year[1].after_scholarship.replace(/[^\d]/g, ""), 10),
-                yr3: parseInt(backendCalc.year_by_year[2].after_scholarship.replace(/[^\d]/g, ""), 10),
-                yr4: parseInt(backendCalc.year_by_year[3].after_scholarship.replace(/[^\d]/g, ""), 10),
-              }
-            : slab.cseYearlyPayable,
-        };
-        setCalculatedSnapshot({
-          program: prog,
-          exam,
-          slab: backendSlab,
-          rangeText: backendCalc.scholarship_basis || rangeText,
-          discountAmount: discountAmt,
-          enteredScore: finalScoreDisplay,
-          studentName: nameToUse,
-          studentPhone: phoneToUse,
+  // Confirm with the backend (the same calculation the chat agent uses). A slow answer for an
+  // older entry is ignored: only the answer for what is on screen now is shown.
+  const inputsKey = `${program.id}|${examKey}|${hasScore ? parsed.value : ""}|${hostelChoice}`;
+  const [confirmed, setConfirmed] = useState<{ key: string; estimate: Estimate } | null>(null);
+  useEffect(() => {
+    if (!hasScore) return;
+    let stale = false;
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      calculateAgentFee(calculateParams(program.id, parsed, hostelChoice), controller.signal)
+        .then((res) => {
+          if (res?.status === "ok" && !stale) {
+            setConfirmed({ key: inputsKey, estimate: estimateFromBackend(res, localEstimate) });
+          }
+        })
+        .catch(() => {
+          /* offline or waking up: the estimate from the fee table stays on screen */
         });
-        return;
-      }
-    } catch {
-      // Graceful fallback to optimistic client-side calculations
+    }, 350);
+    return () => {
+      stale = true;
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputsKey]);
+
+  const isConfirmed = Boolean(confirmed && confirmed.key === inputsKey);
+  const estimate: Estimate = isConfirmed && confirmed ? confirmed.estimate : localEstimate;
+  const pct = estimate.scholarshipPercent;
+  const matchedRange = program.slabs.find((s) => s.scholarship_percent === pct)?.ranges[examKey] || "";
+  const belowMinimum =
+    hasScore && (examKey === "state_board" || examKey === "cbse") && (parsed.value as number) < program.minimum_percent;
+  const year = config.academic_year;
+  const shortProgramName = program.name.split(" (")[0];
+  const hostelLabel = config.hostel_labels[hostelKey] || hostelKey;
+  const otherFeeNote = `Other fee ${inr(config.yearly_other.other_fee || 0)} + exam fee ${inr(config.yearly_other.exam_fee || 0)}`;
+
+  const concessionGroups = useMemo(() => {
+    const groups = new Map<number, string[]>();
+    for (const c of config.special_concessions) {
+      groups.set(c.amount, [...(groups.get(c.amount) || []), c.label]);
     }
+    return [...groups.entries()].sort((a, b) => b[0] - a[0]);
+  }, [config]);
 
-    setCalculatedSnapshot({
-      program: prog,
-      exam,
-      slab,
-      rangeText,
-      discountAmount: discount,
-      enteredScore: finalScoreDisplay,
-      studentName: nameToUse,
-      studentPhone: phoneToUse,
-    });
-  };
-
-  // Reset calculation when clearing score
   const handleResetScore = () => {
     setEnteredScore("");
-    setRankSuggestion(null);
-    setSelectedSlabIndex(-1);
-    setCalculatedSnapshot(null);
     setValidationError(null);
     setIncludeHostel(false);
   };
 
-  // Switch to EAPCET Rank from rank prompt
-  const handleSwitchToRank = (rankNum: number) => {
-    setRankSuggestion(null);
-    setSelectedExamKey("eamcet");
-    const formatted = `Rank ${rankNum.toLocaleString("en-IN")}`;
-    setEnteredScore(formatted);
-    const eamcetExam = activeExams.find((e) => e.key === "eamcet") || { key: "eamcet", label: "TG/AP EAPCET Rank" };
-    const res = matchSlabFromScore(currentProgram, "eamcet", formatted);
-    setSelectedSlabIndex(res.slabIndex);
-    computeAndSaveSnapshot(
-      currentProgram,
-      eamcetExam,
-      formatted,
-      res.slabIndex,
-      savedLead?.name || studentName.trim(),
-      savedLead?.phone || studentPhone.trim()
-    );
-  };
-
-  // Handle score change live - parses typed text, auto-switches board, handles bare numbers > 1000
   const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setEnteredScore(val);
-    setValidationError(null);
-
-    // Clear every previous snapshot immediately before showing new result
-    setCalculatedSnapshot(null);
-
-    if (!val.trim()) {
-      setRankSuggestion(null);
-      setSelectedSlabIndex(-1);
-      return;
-    }
-
-    // 1. Detect keywords to auto-switch board
-    const detection = detectBoardFromInput(val);
-    let activeExamKey = selectedExamKey;
-
-    if (detection.detectedExamKey) {
-      const isSupported = currentProgram.supportedExams.some((x) => x.key === detection.detectedExamKey);
-      if (isSupported && activeExamKey !== detection.detectedExamKey) {
-        activeExamKey = detection.detectedExamKey;
-        setSelectedExamKey(activeExamKey);
-      }
-    }
-
-    // 2. Bare number > 1000 with a percentage board selected cannot be marks.
-    // Prompt to switch to EAPCET Rank and do NOT show standard fee or snapshot.
-    if (isPercentageBoard(activeExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
-      setRankSuggestion(detection.numericVal);
-      setSelectedSlabIndex(-1);
-      return;
-    }
-
-    setRankSuggestion(null);
-
-    const activeExam = currentProgram.supportedExams.find((x) => x.key === activeExamKey) || currentExam;
-    const res = matchSlabFromScore(currentProgram, activeExamKey, val);
-    setSelectedSlabIndex(res.slabIndex);
-
-    // Live update snapshot immediately if format is recognized
-    if (res.status !== "invalid") {
-      computeAndSaveSnapshot(
-        currentProgram,
-        activeExam,
-        val,
-        res.slabIndex,
-        savedLead?.name || studentName.trim(),
-        savedLead?.phone || studentPhone.trim()
-      );
-    }
+    setEnteredScore(e.target.value);
+    if (validationError) setValidationError(null);
   };
 
-  // Program change
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newProgId = e.target.value;
-    setSelectedProgramId(newProgId);
-    setCalculatedSnapshot(null);
-    setRankSuggestion(null);
-    const prog = PROGRAMS.find((p) => p.id === newProgId);
-    let nextExamKey = selectedExamKey;
-    if (prog && !prog.supportedExams.some((x) => x.key === selectedExamKey)) {
-      nextExamKey = prog.supportedExams[0].key;
-      setSelectedExamKey(nextExamKey);
-    }
-    if (prog) {
-      if (enteredScore.trim()) {
-        const detection = detectBoardFromInput(enteredScore);
-        if (isPercentageBoard(nextExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
-          setRankSuggestion(detection.numericVal);
-          setSelectedSlabIndex(-1);
-          return;
-        }
-        const res = matchSlabFromScore(prog, nextExamKey, enteredScore);
-        setSelectedSlabIndex(res.slabIndex);
-        const nextExam = prog.supportedExams.find((x) => x.key === nextExamKey) || currentExam;
-        computeAndSaveSnapshot(
-          prog,
-          nextExam,
-          enteredScore,
-          res.slabIndex,
-          savedLead?.name || studentName.trim(),
-          savedLead?.phone || studentPhone.trim()
-        );
-      } else {
-        setSelectedSlabIndex(-1);
-      }
-    }
+    const next = config.programs.find((p) => p.id === e.target.value);
+    setSelectedProgramId(e.target.value);
+    if (next && !next.exams.some((x) => x.key === selectedExamKey)) setSelectedExamKey(next.exams[0].key);
+    setValidationError(null);
   };
 
-  // Exam change
   const handleExamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newExamKey = e.target.value;
-    setSelectedExamKey(newExamKey);
-    setCalculatedSnapshot(null);
-    setRankSuggestion(null);
-    if (enteredScore.trim()) {
-      const detection = detectBoardFromInput(enteredScore);
-      if (isPercentageBoard(newExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
-        setRankSuggestion(detection.numericVal);
-        setSelectedSlabIndex(-1);
-        return;
-      }
-      const res = matchSlabFromScore(currentProgram, newExamKey, enteredScore);
-      setSelectedSlabIndex(res.slabIndex);
-      const nextExam = activeExams.find((x) => x.key === newExamKey) || currentExam;
-      computeAndSaveSnapshot(
-        currentProgram,
-        nextExam,
-        enteredScore,
-        res.slabIndex,
-        savedLead?.name || studentName.trim(),
-        savedLead?.phone || studentPhone.trim()
-      );
-    } else {
-      setSelectedSlabIndex(-1);
-    }
+    setSelectedExamKey(e.target.value);
+    setValidationError(null);
   };
 
-  // Form submit handler for score calculation
+  // "Calculate" button. The fee already updates while typing; this validates the entry and, for a
+  // student who verified earlier, records the estimate ONCE (never on every keystroke).
   const handleCalculateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationError(null);
-
-    if (!enteredScore.trim()) {
+    if (parsed.status === "empty") {
       setValidationError("Please enter your marks (out of 1000), percentage (%), or EAPCET rank.");
       return;
     }
-
-    const detection = detectBoardFromInput(enteredScore);
-    let activeExamKey = selectedExamKey;
-
-    if (detection.detectedExamKey) {
-      const isSupported = currentProgram.supportedExams.some((x) => x.key === detection.detectedExamKey);
-      if (isSupported && activeExamKey !== detection.detectedExamKey) {
-        activeExamKey = detection.detectedExamKey;
-        setSelectedExamKey(activeExamKey);
-      }
-    }
-
-    if (isPercentageBoard(activeExamKey) && detection.isBareNumberGreaterThan1000 && detection.numericVal) {
-      setRankSuggestion(detection.numericVal);
-      setSelectedSlabIndex(-1);
-      setCalculatedSnapshot(null);
+    if (parsed.status === "invalid") {
+      setValidationError(parsed.message || "Please check the score you entered.");
       return;
     }
-
-    setRankSuggestion(null);
-    setCalculatedSnapshot(null);
-
-    const activeExam = currentProgram.supportedExams.find((x) => x.key === activeExamKey) || currentExam;
-    const res = matchSlabFromScore(currentProgram, activeExamKey, enteredScore);
-    setSelectedSlabIndex(res.slabIndex);
-
-    if (res.status !== "invalid") {
-      await computeAndSaveSnapshot(
-        currentProgram,
-        activeExam,
-        enteredScore,
-        res.slabIndex,
-        savedLead?.name || studentName.trim(),
-        savedLead?.phone || studentPhone.trim()
-      );
+    setValidationError(null);
+    if (!savedLead) return;
+    const onceKey = `sru_calc_lead:${inputsKey}`;
+    try {
+      if (sessionStorage.getItem(onceKey)) return;
+      sessionStorage.setItem(onceKey, "1");
+    } catch {
+      /* private mode: fall through and save once for this click */
+    }
+    try {
+      await createLead({
+        name: savedLead.name,
+        phone: savedLead.phone,
+        program_interest: program.name,
+        score: parsed.display,
+        exam_type: exam.label,
+        source: "scholarship_calculator",
+        metadata: {
+          calculated_discount: Math.round(estimate.savingYear / 2),
+          scholarship_percent: pct,
+          payable_sem: estimate.netSem,
+          admission_year: year,
+        },
+      });
+    } catch (err) {
+      console.warn("Lead registration note:", err);
     }
   };
 
-  // Optional admissions callback / lead request handler with mandatory consent
+  // Optional admissions callback, only with consent and only when the button is pressed
   const handleRequestCallback = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanName = studentName.trim();
-    const cleanPhone = studentPhone.replace(/\D/g, "");
-    if (!cleanName) {
-      setValidationError("Please enter student name.");
+    const cleanPhone = studentPhone.replace(/\D/g, "").replace(/^(?:91|0)(?=[6-9]\d{9}$)/, "");
+    if (cleanName.length < 2) {
+      setCallbackError("Please enter student name.");
       return;
     }
-    if (cleanPhone.length < 10) {
-      setValidationError("Please enter a valid 10-digit mobile number.");
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setCallbackError("Please enter a valid 10-digit mobile number.");
       return;
     }
     if (!consentAgreed) {
-      setValidationError("Please agree that SR University may contact you about admissions.");
+      setCallbackError("Please agree that SR University may contact you about admissions.");
       return;
     }
 
-    setValidationError(null);
-    const leadData = {
-      name: cleanName,
-      phone: cleanPhone,
-      program_interest: currentProgram.name,
-      score: scoreMatch.displayText || enteredScore || "Direct Inquiry",
-      exam_type: currentExam.label,
-      source: "scholarship_calculator_callback",
-      metadata: {
-        consent_given: true,
-        calculated_discount: calculatedSnapshot?.discountAmount || 0,
-        scholarship_percent: calculatedSnapshot?.slab.scholarshipPercent || 0,
-        payable_sem: calculatedSnapshot?.slab.payableFeeSem || currentProgram.baseTuitionSem,
-        admission_year: "2027-28",
-      },
-    };
+    setCallbackError(null);
     try {
       localStorage.setItem("sru_student_lead", JSON.stringify({ name: cleanName, phone: cleanPhone }));
       setIsVerified(true);
-      await createLead(leadData);
-      setLeadSuccessMsg("Admissions callback requested! An admissions counselor will reach out to you shortly.");
+      await createLead({
+        name: cleanName,
+        phone: cleanPhone,
+        program_interest: program.name,
+        score: parsed.display || "Direct Inquiry",
+        exam_type: exam.label,
+        source: "scholarship_calculator_callback",
+        metadata: {
+          consent_given: true,
+          request_type: "callback",
+          calculated_discount: Math.round(estimate.savingYear / 2),
+          scholarship_percent: pct,
+          payable_sem: estimate.netSem,
+          admission_year: year,
+        },
+      });
+      setLeadSuccessMsg("Callback requested. An admissions counsellor will call you on this number.");
     } catch (err) {
       console.warn("Lead registration note:", err);
-      setLeadSuccessMsg("Your inquiry was recorded. Our admissions team will reach out to you shortly.");
+      setLeadSuccessMsg(null);
+      setCallbackError("We could not save your request just now. Please try again, or call 0870-2818333.");
     }
   };
 
-  // WhatsApp Share handler
   const handleWhatsAppShare = () => {
-    if (!calculatedSnapshot) return;
-    const p = calculatedSnapshot.program;
-    const score = calculatedSnapshot.enteredScore || "N/A";
-    const pct = calculatedSnapshot.slab.scholarshipPercent;
-    const semFee = calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN");
-    const annualFee = (calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN");
-    const hostelInfo = includeHostel
-      ? `\n• Hostel (${hostelType === "ac" ? "AC" : "Non-AC"}): +₹${(hostelType === "ac" ? 125000 : 95000).toLocaleString("en-IN")}/year`
-      : "";
-    const total1stYr = ((calculatedSnapshot.slab.payableFeeSem * 2) + p.enrollmentFee + (includeHostel ? (hostelType === "ac" ? 125000 : 95000) : 0)).toLocaleString("en-IN");
-    const text = `Hello SR University Admissions! I calculated my fee estimate for ${p.name} (Admissions 2027-28).\n• Score/Rank: ${score}\n• Scholarship: ${pct}%\n• Net Tuition: ₹${semFee}/sem (₹${annualFee}/year)${hostelInfo}\n• Total 1st Year: ₹${total1stYr}\nPlease share further admission and counseling guidance.`;
-    window.open(`https://wa.me/918331003030?text=${encodeURIComponent(text)}`, "_blank");
+    if (!hasScore) return;
+    const lines = [
+      `Hello SR University Admissions! I calculated my fee estimate for ${program.name} (Admissions ${year}).`,
+      `• Score/Rank: ${parsed.display}`,
+      `• Merit scholarship: ${pct}%`,
+      `• Net tuition: ${inr(estimate.netSem)}/sem (${inr(estimate.netYear)}/year)`,
+    ];
+    if (includeHostel) lines.push(`• Hostel (${hostelLabel}): ${inr(estimate.hostelYear)}/year`);
+    lines.push(
+      `• Total 1st year: ${inr(estimate.firstYearTotal)}`,
+      "Please share further admission and counselling guidance."
+    );
+    window.open(`https://wa.me/${ADMISSIONS_WHATSAPP}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank");
   };
 
-  // Print PDF handler
   const handlePrint = () => {
     window.print();
   };
 
-  // Matched slab info for badge
-  const matchedSlab =
-    selectedSlabIndex >= 0 ? currentProgram.slabs[selectedSlabIndex] : null;
-  const matchedRangeStr = matchedSlab
-    ? (matchedSlab.ranges as any)[currentExam.key] ||
-      matchedSlab.ranges.stateBoard ||
-      "Standard Slab"
-    : "Standard Fee (Below Cutoff)";
-
-  // Next-tier upgrade calculation
-  const nextTierInfo = useMemo(() => {
-    if (selectedSlabIndex === -1) {
-      return {
-        nextSlab: currentProgram.slabs[0],
-        message: enteredScore.trim()
-          ? "Score 60%+ in State Board / CBSE or under 20,000 rank in TG/AP EAPCET to qualify for a 10% to 25% scholarship waiver!"
-          : "Score 60%+ in State Board / CBSE or under 20,000 rank in TG/AP EAPCET to unlock 10% to 40% guaranteed merit scholarship waivers for all 4 years!",
-      };
-    }
-    if (selectedSlabIndex < currentProgram.slabs.length - 1) {
-      const current = currentProgram.slabs[selectedSlabIndex];
-      const next = currentProgram.slabs[selectedSlabIndex + 1];
-      const extraPerSem = current.payableFeeSem - next.payableFeeSem;
-      const extraTotal = extraPerSem * 8;
-      const nextRange = (next.ranges as any)[currentExam.key] || next.ranges.stateBoard;
-      return {
-        nextSlab: next,
-        message: `Score ${nextRange} to unlock the ${next.scholarshipPercent}% Scholarship tier, saving you an extra ₹${extraPerSem.toLocaleString("en-IN")}/sem (₹${extraTotal.toLocaleString("en-IN")} across 4 years)!`,
-      };
-    }
-    return {
-      nextSlab: null,
-      message: "🏆 Maximum Merit Tier: You have qualified for the highest official merit scholarship waiver (40% tuition discount)!",
-    };
-  }, [selectedSlabIndex, currentProgram, currentExam, enteredScore]);
+  const upgradeMessage = estimate.nextSlab
+    ? `${estimate.nextSlab.requires} unlocks the ${estimate.nextSlab.percent}% scholarship, saving a further ` +
+      `${inr(estimate.nextSlab.extraSavingYear)} in the first year.`
+    : "";
+  const scoreSummary = parsed.display;
 
   return (
     <div className="scholarship-modal-backdrop" onClick={onClose}>
       <div className="scholarship-modal-card" onClick={(e) => e.stopPropagation()}>
-        {/* Executive Minimalist Header */}
+        {/* Header */}
         <div className="calc-header">
           <div className="calc-title-group">
             <div className="calc-icon-badge" aria-hidden="true">
@@ -934,7 +309,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
             </div>
             <div>
               <h3 className="calc-title">Fee & Scholarship Calculator</h3>
-              <p className="calc-subtitle">SR University Official Merit Scholarship & Payable Fee Portal</p>
+              <p className="calc-subtitle">SR University fees and merit scholarships, admissions {year}</p>
             </div>
           </div>
           <button className="calc-close-btn" onClick={onClose} aria-label="Close calculator" type="button">
@@ -942,7 +317,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           </button>
         </div>
 
-        {/* 1. Verified Student Profile Bar (If verified: shows clean badge, NO name/phone inputs asked!) */}
+        {/* 1. Verified student strip */}
         {isVerified && savedLead && (
           <div className="calc-verified-strip">
             <div className="calc-verified-info">
@@ -955,26 +330,26 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           </div>
         )}
 
-        {/* 2. Modern Inline Program & Qualifying Exam Selectors */}
+        {/* 2. Program and exam */}
         <div className="calc-selectors-grid">
           <div className="calc-select-group">
             <label htmlFor="calc-prog-select">Degree Program</label>
             <div className="calc-select-wrap">
               <select
                 id="calc-prog-select"
-                value={selectedProgramId}
+                value={program.id}
                 onChange={handleProgramChange}
                 className="calc-select-modern"
               >
                 <optgroup label="Bachelors Degrees">
-                  {PROGRAMS.filter((p) => p.degreeType === "Bachelors").map((p) => (
+                  {config.programs.filter((p) => p.level !== "pg").map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
                   ))}
                 </optgroup>
                 <optgroup label="Masters Degrees">
-                  {PROGRAMS.filter((p) => p.degreeType === "Masters").map((p) => (
+                  {config.programs.filter((p) => p.level === "pg").map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
@@ -989,11 +364,11 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
             <div className="calc-select-wrap">
               <select
                 id="calc-exam-select"
-                value={currentExam.key}
+                value={exam.key}
                 onChange={handleExamChange}
                 className="calc-select-modern"
               >
-                {activeExams.map((ex) => (
+                {program.exams.map((ex) => (
                   <option key={ex.key} value={ex.key}>
                     {ex.label}
                   </option>
@@ -1003,7 +378,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           </div>
         </div>
 
-        {/* 3. Hero Marks Input & Presets */}
+        {/* 3. Score input */}
         <form onSubmit={handleCalculateSubmit} className="calc-input-section">
           <div className="calc-input-box">
             <label htmlFor="calc-marks-input" className="calc-input-label">
@@ -1041,40 +416,38 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </button>
             </div>
 
-            {/* Inline prompt for bare number > 1000 on percentage board */}
-            {rankSuggestion !== null && (
-              <div className="calc-rank-prompt-banner">
-                <span>This looks like a rank. Switch to EAPCET Rank?</span>
-                <button
-                  type="button"
-                  className="calc-switch-rank-btn"
-                  onClick={() => handleSwitchToRank(rankSuggestion)}
-                >
-                  Switch to EAPCET Rank
-                </button>
-              </div>
-            )}
-
-            {rankSuggestion === null && scoreMatch.status === "matched" && matchedSlab && (
+            {hasScore && pct > 0 && (
               <div className="calc-matched-badge">
                 <AwardIcon size={14} />
                 <span>
-                  <strong>{matchedSlab.scholarshipPercent}% Scholarship Matched</strong>
-                  {" • "}{matchedRangeStr}
-                  {scoreMatch.displayText && !matchedRangeStr.includes(scoreMatch.displayText)
-                    ? ` (${scoreMatch.displayText})`
-                    : ""}
+                  <strong>{pct}% Scholarship Matched</strong>
+                  {" • "}{exam.label}: {matchedRange}
+                  {` (${scoreSummary})`}
                 </span>
               </div>
             )}
-            {rankSuggestion === null && scoreMatch.status === "below_criteria" && enteredScore.trim() && (
+            {hasScore && pct === 0 && (
               <div className="calc-matched-badge below-cutoff">
                 <InfoIcon size={14} />
                 <span>
-                  <strong>Standard Tuition (Eligible for Admission)</strong>
-                  {" • "}{scoreMatch.displayText}
-                  {" • Merit scholarship starts at 60%"}
+                  <strong>Standard Tuition</strong>
+                  {" • "}{scoreSummary}
+                  {" • "}{scholarshipStartText(program, examKey)}
                 </span>
+              </div>
+            )}
+            {belowMinimum && (
+              <div className="calc-matched-badge below-cutoff">
+                <InfoIcon size={14} />
+                <span>
+                  This course normally needs at least {program.minimum_percent}%. Please confirm your eligibility with
+                  the Admissions Office (0870-2818333) before applying.
+                </span>
+              </div>
+            )}
+            {parsed.status === "invalid" && !validationError && (
+              <div className="calc-error-banner" style={{ marginTop: "4px" }}>
+                <span>{parsed.message}</span>
               </div>
             )}
             {validationError && (
@@ -1085,14 +458,16 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
           </div>
         </form>
 
-        {/* 4a. Ultra-Minimal Empty State (Hidden completely until user enters marks) */}
-        {!calculatedSnapshot && (
+        {/* 4a. Before a score is entered */}
+        {!hasScore && (
           <div className="calc-empty-card">
             <div className="calc-empty-icon">🎯</div>
             <div className="calc-empty-info">
               <h4>Enter your marks to see your personalized fee</h4>
               <p>
-                SR University provides guaranteed 10% to 40% merit scholarships for 60%+ marks or EAPCET rank under 20,000.
+                {shortProgramName}: tuition {inr(program.tuition_per_year)} per year. Merit scholarships of{" "}
+                {program.slabs[0]?.scholarship_percent}% to {program.slabs[program.slabs.length - 1]?.scholarship_percent}%
+                {" "}are available, subject to marksheet verification.
               </p>
             </div>
             <button
@@ -1107,44 +482,40 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               <div className="calc-slabs-preview-table">
                 <div className="slabs-table-header">
                   <span>Merit Waiver</span>
-                  <span>{currentExam.label}</span>
+                  <span>{exam.label}</span>
                   <span>Payable Tuition</span>
                 </div>
-                {currentProgram.slabs.map((slab, idx) => {
-                  const rangeText = (slab.ranges as any)[currentExam.key] || slab.ranges.stateBoard || `Slab ${idx + 1}`;
-                  return (
-                    <div key={idx} className="slabs-table-row">
-                      <span className="slab-badge-min">{slab.scholarshipPercent}% Waiver</span>
-                      <span className="slab-criteria-min">{rangeText}</span>
-                      <span className="slab-payable-min">₹{slab.payableFeeSem.toLocaleString("en-IN")}/sem</span>
-                    </div>
-                  );
-                })}
+                {program.slabs.map((slab) => (
+                  <div key={slab.scholarship_percent} className="slabs-table-row">
+                    <span className="slab-badge-min">{slab.scholarship_percent}% Waiver</span>
+                    <span className="slab-criteria-min">{slab.ranges[exam.key] || "Not applicable"}</span>
+                    <span className="slab-payable-min">{inr(slab.payable_per_semester)}/sem</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         )}
 
-        {/* 4b. Personalized Breakdown (Only shown when marks are entered/calculated) */}
-        {calculatedSnapshot && (
+        {/* 4b. The estimate */}
+        {hasScore && (
           <div className="calc-results-container">
-            {/* Results Header / Status Bar */}
             <div className="calc-results-header">
               <div className="calc-status-badge-wrap">
-                {calculatedSnapshot.discountAmount > 0 ? (
+                {pct > 0 ? (
                   <div className="calc-status-badge scholarship-awarded">
                     <AwardIcon size={16} />
                     <span>
-                      <strong>{calculatedSnapshot.slab.scholarshipPercent}% Merit Scholarship Unlocked</strong>
-                      {" • "}{calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText}
+                      <strong>{pct}% Merit Scholarship</strong>
+                      {" • "}{parsed.display}
                     </span>
                   </div>
                 ) : (
                   <div className="calc-status-badge standard-tuition">
                     <InfoIcon size={16} />
                     <span>
-                      <strong>Standard Tuition (Eligible for Admission)</strong>
-                      {" • "}{calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText}
+                      <strong>Standard Tuition</strong>
+                      {" • "}{parsed.display}
                     </span>
                   </div>
                 )}
@@ -1159,58 +530,58 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               </button>
             </div>
 
-            {/* High-Impact 2-Card Metric Display */}
             <div className="calc-metrics-grid">
               <div className="calc-metric-card primary-card">
                 <span className="metric-tag">Net Payable Tuition</span>
                 <div className="metric-primary-val">
-                  ₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}
+                  {inr(estimate.netSem)}
                   <span className="metric-unit"> / semester</span>
                 </div>
-                <div className="metric-sub-val">
-                  ₹{(calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN")} / year (Annual Installment)
-                </div>
+                <div className="metric-sub-val">{inr(estimate.netYear)} / year</div>
               </div>
 
-              <div className={`calc-metric-card ${calculatedSnapshot.discountAmount > 0 ? "savings-card" : "neutral-card"}`}>
-                <span className="metric-tag">
-                  {calculatedSnapshot.discountAmount > 0 ? "Merit Scholarship Savings" : "Scholarship Status"}
-                </span>
+              <div className={`calc-metric-card ${pct > 0 ? "savings-card" : "neutral-card"}`}>
+                <span className="metric-tag">{pct > 0 ? "Merit Scholarship Savings" : "Scholarship Status"}</span>
                 <div className="metric-primary-val green">
-                  {calculatedSnapshot.discountAmount > 0
-                    ? `Save ₹${(calculatedSnapshot.discountAmount * 2).toLocaleString("en-IN")}/yr`
-                    : "Standard Fee"}
+                  {pct > 0 ? `Save ${inr(estimate.savingYear)}/yr` : "Standard Fee"}
                 </div>
                 <div className="metric-sub-val">
-                  {calculatedSnapshot.discountAmount > 0
-                    ? `${calculatedSnapshot.slab.scholarshipPercent}% tuition discount (₹${calculatedSnapshot.discountAmount.toLocaleString("en-IN")}/sem)`
-                    : "Scores below 60% pay standard tuition"}
+                  {pct > 0
+                    ? `${pct}% off first-year tuition of ${inr(estimate.tuitionYear)}`
+                    : scholarshipStartText(program, examKey)}
                 </div>
               </div>
             </div>
 
-            {/* First-Year Joining Breakdown with Optional Hostel Toggle */}
+            {/* First-year breakdown with optional hostel */}
             <div className="calc-breakdown-card">
               <div className="breakdown-card-header">
-                <strong>First Year Total Payable Breakdown (2027-28)</strong>
-                <span className="breakdown-badge">{calculatedSnapshot.program.name.split(" (")[0]}</span>
+                <strong>First Year Total Payable Breakdown ({year})</strong>
+                <span className="breakdown-badge">{shortProgramName}</span>
               </div>
 
               <div className="breakdown-lines">
                 <div className="breakdown-line">
                   <span className="line-label">Net 1st Year Tuition Fee:</span>
-                  <span className="line-val">₹{(calculatedSnapshot.slab.payableFeeSem * 2).toLocaleString("en-IN")}</span>
+                  <span className="line-val">{inr(estimate.netYear)}</span>
                 </div>
                 <div className="breakdown-line sub">
                   <span className="line-label">↳ Semester-wise Installment:</span>
-                  <span className="line-val">₹{calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")} / semester</span>
+                  <span className="line-val">{inr(estimate.netSem)} / semester</span>
                 </div>
                 <div className="breakdown-line">
                   <span className="line-label">One-Time Enrollment Fee:</span>
-                  <span className="line-val">₹{calculatedSnapshot.program.enrollmentFee.toLocaleString("en-IN")}</span>
+                  <span className="line-val">{inr(estimate.enrollment)}</span>
+                </div>
+                <div className="breakdown-line">
+                  <span className="line-label">Other & Exam Fees (every year):</span>
+                  <span className="line-val">{inr(estimate.otherYearly)}</span>
+                </div>
+                <div className="breakdown-line sub">
+                  <span className="line-label">↳ {otherFeeNote}</span>
+                  <span className="line-val"></span>
                 </div>
 
-                {/* Optional Hostel Accommodation Toggle */}
                 <div className="calc-hostel-option-box">
                   <label className="hostel-toggle-label">
                     <input
@@ -1226,120 +597,130 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
 
                   {includeHostel && (
                     <div className="hostel-sub-picker">
-                      <label className={`hostel-type-pill ${hostelType === "non_ac" ? "selected" : ""}`}>
-                        <input
-                          type="radio"
-                          name="hostelType"
-                          value="non_ac"
-                          checked={hostelType === "non_ac"}
-                          onChange={() => setHostelType("non_ac")}
-                        />
-                        <span>Non-AC (3/4-Sharing): +₹95,000 / year</span>
-                      </label>
-                      <label className={`hostel-type-pill ${hostelType === "ac" ? "selected" : ""}`}>
-                        <input
-                          type="radio"
-                          name="hostelType"
-                          value="ac"
-                          checked={hostelType === "ac"}
-                          onChange={() => setHostelType("ac")}
-                        />
-                        <span>AC (3/4-Sharing): +₹1,25,000 / year</span>
-                      </label>
+                      {HOSTEL_ORDER.filter((k) => config.hostel_per_year[k] !== undefined).map((k) => (
+                        <label key={k} className={`hostel-type-pill ${hostelKey === k ? "selected" : ""}`}>
+                          <input
+                            type="radio"
+                            name="hostelType"
+                            value={k}
+                            checked={hostelKey === k}
+                            onChange={() => setHostelKey(k)}
+                          />
+                          <span>{config.hostel_labels[k] || k}: +{inr(config.hostel_per_year[k])} / year</span>
+                        </label>
+                      ))}
                     </div>
                   )}
                 </div>
 
-                {calculatedSnapshot.program.annualIncrease && (
+                {program.yearly_increase > 0 && (
                   <div className="breakdown-line sub">
                     <span className="line-label">Tuition Increase from 2nd Year:</span>
-                    <span className="line-val">+₹{calculatedSnapshot.program.annualIncrease.toLocaleString("en-IN")} / year</span>
+                    <span className="line-val">+{inr(program.yearly_increase)} / year</span>
                   </div>
                 )}
 
-                {/* Total 1st Year Sum */}
                 <div className="breakdown-total-row">
                   <span className="total-label">
-                    {includeHostel ? "Total 1st Year (Tuition + Enrollment + Hostel):" : "Total 1st Year (Tuition + Enrollment):"}
+                    {includeHostel
+                      ? "Total 1st Year (Tuition + Enrollment + Other Fees + Hostel):"
+                      : "Total 1st Year (Tuition + Enrollment + Other Fees):"}
                   </span>
-                  <span className="total-val bold-emerald">
-                    ₹{((calculatedSnapshot.slab.payableFeeSem * 2) + calculatedSnapshot.program.enrollmentFee + (includeHostel ? (hostelType === "ac" ? 125000 : 95000) : 0)).toLocaleString("en-IN")}
+                  <span className="total-val bold-emerald">{inr(estimate.firstYearTotal)}</span>
+                </div>
+                <div className="breakdown-line sub">
+                  <span className="line-label">↳ Payable in Semester 1 / each later semester:</span>
+                  <span className="line-val">
+                    {inr(estimate.sem1Total)} / {inr(estimate.regularSemTotal)}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Next Tier Upgrade Opportunity */}
-            {selectedSlabIndex < currentProgram.slabs.length - 1 && (
+            {estimate.nextSlab && (
               <div className="calc-upgrade-card">
                 <div className="upgrade-card-icon">💡</div>
                 <div className="upgrade-card-text">
-                  <strong>Upgrade Opportunity: </strong>
-                  <span>{nextTierInfo.message}</span>
+                  <strong>Next scholarship level: </strong>
+                  <span>{upgradeMessage}</span>
                 </div>
               </div>
             )}
 
-            {/* 4-Year Progression for B.Tech CSE */}
-            {calculatedSnapshot.slab.cseYearlyPayable && (
+            {estimate.years.length > 1 && (
               <div className="calc-progression-card">
                 <div className="progression-header">
                   <CalendarIcon size={14} />
-                  <span>4-Year Tuition Progression (Annual Base + ₹9,000/yr escalation):</span>
+                  <span>
+                    {estimate.years.length}-Year Tuition (increases by {inr(program.yearly_increase)} each year for
+                    every student):
+                  </span>
                 </div>
                 <div className="progression-pill-grid">
-                  <div className="prog-pill">
-                    <span className="prog-yr">Year 1</span>
-                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr1.toLocaleString("en-IN")}</span>
-                  </div>
-                  <div className="prog-pill">
-                    <span className="prog-yr">Year 2</span>
-                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr2.toLocaleString("en-IN")}</span>
-                  </div>
-                  <div className="prog-pill">
-                    <span className="prog-yr">Year 3</span>
-                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr3.toLocaleString("en-IN")}</span>
-                  </div>
-                  <div className="prog-pill">
-                    <span className="prog-yr">Year 4</span>
-                    <span className="prog-amt">₹{calculatedSnapshot.slab.cseYearlyPayable.yr4.toLocaleString("en-IN")}</span>
-                  </div>
+                  {estimate.years.map((amount, i) => (
+                    <div key={i} className="prog-pill">
+                      <span className="prog-yr">Year {i + 1}</span>
+                      <span className="prog-amt">{inr(amount)}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Institutional Notes Callout */}
             <div className="calc-notes">
               <div className="note-item">
                 <PinIcon size={15} />
                 <div>
-                  <strong>One-Time & Annual Charges:</strong> Enrollment Fee: ₹5,000 (one-time). Annual other fee: ₹15,000/yr | Exam fee: ₹5,000/yr | Tri-cities Bus transport: ₹30,000/yr.
+                  <strong>One-Time & Annual Charges:</strong> Enrollment fee {inr(config.one_time.enrollment_fee)}{" "}
+                  (one-time). {otherFeeNote} per year.
+                  {config.transport_per_year ? ` University bus (optional): ${inr(config.transport_per_year)} per year.` : ""}
                 </div>
               </div>
-              {calculatedSnapshot.program.specializationFeeAnnual && (
+              {program.specialization_fee_per_year_from_year2 > 0 && (
                 <div className="note-item">
                   <FlaskIcon size={15} />
                   <div>
-                    <strong>Specialization Fee:</strong> ₹{calculatedSnapshot.program.specializationFeeAnnual.toLocaleString("en-IN")}/year applicable from 2nd year onwards for advanced tech tracks (AI&ML, Cyber Security, Data Science, Quantum AI, Robotics).
+                    <strong>Specialization Fee:</strong> {inr(program.specialization_fee_per_year_from_year2)} per
+                    year from the 2nd year for specialization tracks (not included above).
                   </div>
                 </div>
               )}
-              <div className="note-item special-scholarship">
-                <HeartHandIcon size={15} />
+              {concessionGroups.length > 0 && (
+                <div className="note-item special-scholarship">
+                  <HeartHandIcon size={15} />
+                  <div>
+                    <details>
+                      <summary>
+                        <strong>{config.special_concessions.length} Special Category Concessions</strong> (per year,
+                        subject to document verification). Tap to view.
+                      </summary>
+                      {concessionGroups.map(([amount, labels]) => (
+                        <p key={amount} style={{ margin: "6px 0 0" }}>
+                          <strong>{inr(amount)} per year:</strong> {labels.join("; ")}.
+                        </p>
+                      ))}
+                    </details>
+                  </div>
+                </div>
+              )}
+              <div className="note-item">
+                <InfoIcon size={15} />
                 <div>
-                  <strong>19 Special Category Concessions:</strong> Flat annual tuition waivers of ₹50,000/yr (orphans, international sports, SRU staff children), ₹20,000/yr (differently abled over 50% disability), and ₹15,000/yr (girl students, single parent, defence/police, NCC C, SR Junior College, AP/out-of-state students, alumni siblings).
+                  {isConfirmed ? "Checked against the official fee table. " : ""}
+                  This is an estimate for {year}. The scholarship is subject to marksheet verification and admission
+                  depends on seat availability.
                 </div>
               </div>
             </div>
 
-            {/* Optional Admissions Counselor Callback Box */}
+            {/* Optional callback request */}
             <div className="calc-auth-box">
               <div className="calc-auth-header">
                 <ShieldCheckIcon size={15} />
-                <span>Request an Admissions Counselor Callback (Optional)</span>
+                <span>Request an Admissions Counsellor Callback (Optional)</span>
               </div>
               <p className="calc-auth-subtext">
-                Lock in this scholarship estimate and receive official counselor guidance for 2027-28 admissions.
+                Share this estimate with the admissions team and get guidance for {year} admissions.
               </p>
               {leadSuccessMsg ? (
                 <div className="calc-lead-success">
@@ -1359,7 +740,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                         value={studentName}
                         onChange={(e) => {
                           setStudentName(e.target.value);
-                          if (validationError) setValidationError(null);
+                          if (callbackError) setCallbackError(null);
                         }}
                       />
                     </div>
@@ -1373,7 +754,7 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                         value={studentPhone}
                         onChange={(e) => {
                           setStudentPhone(e.target.value);
-                          if (validationError) setValidationError(null);
+                          if (callbackError) setCallbackError(null);
                         }}
                         maxLength={15}
                       />
@@ -1387,9 +768,9 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                     />
                     <span>I agree that SR University may contact me about admissions.</span>
                   </label>
-                  {validationError && (
+                  {callbackError && (
                     <div className="calc-error-banner">
-                      <span>{validationError}</span>
+                      <span>{callbackError}</span>
                     </div>
                   )}
                   <button type="button" onClick={handleRequestCallback} className="calc-callback-btn">
@@ -1399,20 +780,11 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
               )}
             </div>
 
-            {/* Footer Action Buttons */}
             <div className="calc-footer-actions">
-              <button
-                type="button"
-                className="btn-whatsapp"
-                onClick={handleWhatsAppShare}
-              >
+              <button type="button" className="btn-whatsapp" onClick={handleWhatsAppShare}>
                 <span>💬 Send Estimate to WhatsApp</span>
               </button>
-              <button
-                type="button"
-                className="btn-print"
-                onClick={handlePrint}
-              >
+              <button type="button" className="btn-print" onClick={handlePrint}>
                 <span>🖨️ Download / Print PDF</span>
               </button>
               <button
@@ -1420,9 +792,11 @@ export default function ScholarshipCalculatorModal({ onClose, onAskBuddy }: Prop
                 className="btn-ask-buddy"
                 onClick={() => {
                   onClose();
-                  const hostelText = includeHostel ? ` (including ${hostelType === "ac" ? "AC" : "Non-AC"} hostel)` : "";
+                  const hostelText = includeHostel ? `, with ${hostelLabel} hostel` : "";
                   onAskBuddy(
-                    `I evaluated the scholarship for ${calculatedSnapshot.program.name} with ${calculatedSnapshot.enteredScore || calculatedSnapshot.rangeText} which qualifies for a ${calculatedSnapshot.slab.scholarshipPercent}% merit waiver (Payable: ₹${calculatedSnapshot.slab.payableFeeSem.toLocaleString("en-IN")}/sem)${hostelText}. Please share details on admission verification and next steps.`
+                    `I used the fee calculator for ${program.name} with ${parsed.display}. It shows a ${pct}% merit ` +
+                      `scholarship and ${inr(estimate.netSem)} tuition per semester${hostelText}. ` +
+                      `Please confirm this and tell me the next steps for admission.`
                   );
                 }}
               >

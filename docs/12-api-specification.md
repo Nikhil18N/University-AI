@@ -168,3 +168,20 @@ GET `/api/v1/admin/feedback` returns feedback items with `question` and `answer`
 - `GET /api/v1/admin/evaluations`: Paginated list of benchmark and response evaluation records with groundedness scores, latencies, and pass/fail indicators.
 
 Use consistent error schemas and HTTP status codes.
+
+## Admissions agent endpoints (v2.7.0)
+
+```http
+POST /api/v1/agent/stream        # SSE: start, tool, token, done, error
+POST /api/v1/agent/calculate     # fee + scholarship for one student (same code the agent uses)
+GET  /api/v1/agent/programs      # programs with tuition and minimum marks
+GET  /api/v1/agent/fee-config    # everything the Fee & Scholarship Calculator draws from
+```
+
+`POST /api/v1/agent/calculate` body: `program` (required), `percent`, `board`
+(`state_board` | `cbse`), `eapcet_rank`, `jee_percentile`, `ib_score`, `hostel`
+(`none` | `non_ac_4` | `non_ac_3` | `ac_4` | `ac_3`), `specialization`, `transport`.
+
+`POST /api/v1/leads` is limited to 30 requests per minute per address (HTTP 429 above that).
+Admin routes return HTTP 503 while `ADMIN_API_KEY` is the placeholder and `APP_DEBUG=false`.
+See `docs/24-agent-audit-nov-2026.md`.

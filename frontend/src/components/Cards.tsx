@@ -658,12 +658,13 @@ export function ProgramsOfferedCard({ card }: CardProps) {
 export function AgentFeeCard({ card }: CardProps) {
   const d = card.data || {};
   const progName = d.program_name || d.program || "Academic Program";
-  const semTuition = d.net_tuition_per_sem ?? d.base_tuition_per_sem ?? (d.per_semester_after_scholarship || "₹1,70,000");
+  const semTuition = d.net_tuition_per_sem ?? d.base_tuition_per_sem ?? (d.per_semester_after_scholarship || "—");
   const waiver = d.scholarship_percent || 0;
   const hasHostel = Boolean(d.has_hostel || (d.hostel && d.hostel.per_year));
   const hostelPerSem = d.hostel?.per_semester || (d.hostel?.per_year ? `₹${Math.round(parseInt(String(d.hostel.per_year).replace(/[^\d]/g, ""), 10) / 2).toLocaleString("en-IN")}` : null);
-  const totalPerSem = d.total_per_semester || (hasHostel ? "₹2,42,500" : "₹1,80,000");
-  const sem1Total = d.sem1_total_payable || (hasHostel ? "₹2,47,500" : "₹1,85,000");
+  // No built-in amounts: if the backend did not send a figure, show a dash, never a guess.
+  const totalPerSem = d.total_per_semester || "—";
+  const sem1Total = d.sem1_total_payable || "—";
 
   const handleWhatsApp = () => {
     const text = `Hello SR University Admissions! I received this fee calculation for ${progName} (${d.admission_year || "2027-28"}). Net Tuition: ${semTuition}/sem, Scholarship: ${waiver}%, Total/sem: ${totalPerSem} ${hasHostel ? "(including hostel)" : "(without hostel)"}. Please assist me with admissions.`;

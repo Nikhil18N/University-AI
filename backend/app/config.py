@@ -58,6 +58,10 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
+    def admin_key_is_default(self) -> bool:
+        """True while ADMIN_API_KEY is missing or still the placeholder shipped in the source code."""
+        return (self.ADMIN_API_KEY or "").strip() in ("", "change-me-in-production")
+
     def get_gemini_api_keys(self) -> list[str]:
         """Return a deduplicated list of Gemini API keys configured from GEMINI_API_KEYS, GEMINI_API_KEY, or GOOGLE_API_KEY.
         Handles comma-separated strings in any key variable so users can paste lists into GEMINI_API_KEY or GEMINI_API_KEYS.

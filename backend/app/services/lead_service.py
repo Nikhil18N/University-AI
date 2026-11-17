@@ -114,6 +114,27 @@ async def get_lead_stats(db: AsyncSession) -> dict:
     }
 
 
+DO_NOT_CONTACT = "do_not_contact"
+
+
+async def cancel_lead(db: AsyncSession, lead_id: UUID, reason: str = "") -> ProspectiveLead | None:
+    """The student withdrew a callback / visit request: mark the lead so nobody phones them.
+
+    The lead is kept (not deleted) so the admissions team can see that the request was withdrawn.
+    """
+    lead = await db.get(ProspectiveLead, lead_id)
+    if not lead:
+        return None
+    lead.status = DO_NOT_CONTACT
+    lead.metadata_ = {**(lead.metadata_ or {}), "consent": False,
+                      "cancelled_at": datetime.now(timezone.utc).isoformat(),
+                      "cancel_reason": (reason or "Student asked not to be contacted")[:200]}
+    await db.commit()
+    await db.refresh(lead)
+    logger.info("Lead %s marked do-not-contact at the student's request", lead_id)
+    return lead
+
+
 async def update_lead_status(
     db: AsyncSession,
     lead_id: UUID,

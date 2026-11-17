@@ -34,7 +34,7 @@ COMPARISON_CSE_AIML = {
 
 BTECH_ACADEMIC_FEE_CARD = {
     "type": "fee_breakdown",
-    "title": "Fees before scholarship — B.Tech Programs (2027-28)",
+    "title": "SR University B.Tech Tuition Fee Breakdown (Official 2027-28)",
     "currency": "INR",
     "items": [
         {
@@ -189,7 +189,7 @@ APPLICATION_AD_CARD = {
 
 MERIT_SCHOLARSHIP_CARD = {
     "type": "fee_breakdown",
-    "title": "SR University B.Tech Merit Scholarship Slabs (2026-27)",
+    "title": "SR University B.Tech Merit Scholarship Slabs (2027-28)",
     "currency": "INR",
     "items": [
         {
@@ -233,60 +233,95 @@ MERIT_SCHOLARSHIP_CARD = {
 }
 
 
-TRANSPORT_FEE_CARD = {
-    "type": "fee_breakdown",
-    "title": "SR University Transport & Bus Fee (2026-27 / 2027-28)",
-    "currency": "INR",
-    "items": [
-        {
-            "category": "Tri-Cities Bus Routes (Warangal, Hanamkonda, Kazipet)",
-            "amount": "₹22,000 – ₹30,000",
-            "frequency": "Per Year",
-            "note": "GPS-tracked fleet with 30+ designated pickup stops across the tri-cities",
-        },
-        {
-            "category": "Extended Outstation Routes (Huzurabad, Jammikunta, Karimnagar)",
-            "amount": "As per distance slab",
-            "frequency": "Per Year",
-            "note": "Direct campus transit operated by SR University transport department",
-        },
-    ],
-    "scholarship_note": "Transport in-charge: Mr. A. Keerthi Reddy (9640606408, transport@sru.edu.in).",
-}
+# ---- Cards whose numbers come from the official fee file -------------------------------------
+# These three used to carry their own hand-typed amounts, which had drifted away from the
+# official circular (hostel ₹85,000-95,000, bus ₹22,000, an "admission fee" of ₹25,000 that the
+# circular does not contain). They are now built from app/sru_agent/fees_2027_28.json, the same
+# file the agent and the calculator read, so a card can never disagree with the chat answer.
+def _fee_data() -> dict:
+    from app.sru_agent import fees
+    return fees.load_data()
 
-HOSTEL_FEE_CARD = {
-    "type": "fee_breakdown",
-    "title": "SR University Residential Hostel & Dining Fees (Annual)",
-    "subtitle": "As the academic day comes to an end, the living and learning experience continues.",
-    "currency": "INR",
-    "items": [
-        {
-            "category": "Girls Hostel (AC 4-Sharing)",
-            "amount": "₹1,25,000",
-            "frequency": "Per Year",
-            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, laundry & 24/7 biometric security",
-        },
-        {
-            "category": "Girls Hostel (AC 3-Sharing)",
-            "amount": "₹1,35,000",
-            "frequency": "Per Year",
-            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, laundry & 24/7 biometric security",
-        },
-        {
-            "category": "Boys Hostel (Non-AC 4/3-Sharing)",
-            "amount": "₹85,000 – ₹95,000",
-            "frequency": "Per Year",
-            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, study lounges & laundry",
-        },
-        {
-            "category": "Boys Hostel (AC 4/3-Sharing)",
-            "amount": "₹1,20,000 – ₹1,35,000",
-            "frequency": "Per Year",
-            "note": "4,000-seat mega dining hall (4 meals daily), Wi-Fi, gym & laundry",
-        },
-    ],
-    "scholarship_note": "Hostels for Boys & Girls offer 4,000-seat mega dining hall, 24/7 surveillance, high-speed Wi-Fi, dedicated study areas, and on-campus medical care.",
-}
+
+def _inr(amount) -> str:
+    from app.sru_agent import fees
+    return fees.inr(amount)
+
+
+def _build_transport_fee_card() -> dict:
+    data = _fee_data()
+    return {
+        "type": "fee_breakdown",
+        "title": f"SR University Transport & Bus Fee ({data['academic_year']})",
+        "currency": "INR",
+        "items": [
+            {
+                "category": "University Bus: Tri-Cities (Warangal, Hanamkonda, Kazipet) and outstation routes",
+                "amount": _inr(data["transport_per_year"]),
+                "frequency": "Per Year",
+                "note": "Optional. GPS-tracked fleet with designated pickup stops across the tri-cities",
+            },
+        ],
+        "scholarship_note": "Transport in-charge: Mr. A. Keerthi Reddy (9640606408, transport@sru.edu.in).",
+    }
+
+
+def _build_hostel_fee_card() -> dict:
+    data = _fee_data()
+    hostel, deposits = data["hostel_per_year"], data.get("hostel_deposits", {})
+    amenities = "4 meals daily in the 4,000-seat mega dining hall, 24/7 Wi-Fi, study areas & power backup"
+    rooms = (("non_ac_4", "Non-AC 4-Sharing"), ("non_ac_3", "Non-AC 3-Sharing"),
+             ("ac_4", "AC 4-Sharing"), ("ac_3", "AC 3-Sharing"))
+    return {
+        "type": "fee_breakdown",
+        "title": f"SR University Residential Hostel & Dining Fees (Annual, {data['academic_year']})",
+        "subtitle": "As the academic day comes to an end, the living and learning experience continues.",
+        "currency": "INR",
+        "items": [
+            {
+                "category": f"Boys Hostel / Girls Hostel ({label})",
+                "amount": _inr(hostel[key]),
+                "frequency": "Per Year",
+                "note": amenities,
+            }
+            for key, label in rooms
+        ],
+        "scholarship_note": (
+            f"Room and mess are included. Extra: caution deposit {_inr(deposits.get('caution_deposit', 0))} and "
+            f"laundry {_inr(deposits.get('laundry_per_year', 0))} per year; AC rooms also pay an electricity "
+            f"deposit. Hostel is optional. {data['academic_year']} fees, as per the Admissions Office."
+        ),
+    }
+
+
+def _build_admission_fee_card() -> dict:
+    data = _fee_data()
+    one_time = data["one_time"]
+    return {
+        "type": "fee_breakdown",
+        "title": "SR University One-Time Admission & Enrollment Fees",
+        "currency": "INR",
+        "items": [
+            {
+                "category": "Enrollment Fee (One-time)",
+                "amount": _inr(one_time["enrollment_fee"]),
+                "frequency": "One-time (Year 1)",
+                "note": "Paid once at the time of admission",
+            },
+            {
+                "category": "Admission Application Form Fee",
+                "amount": _inr(one_time["application_fee"]),
+                "frequency": "One-time (when applying)",
+                "note": "Paid with the online application at apply.sru.edu.in",
+            },
+        ],
+        "scholarship_note": f"{data['academic_year']} fees, as per the Admissions Office. Tuition and other yearly fees are separate.",
+    }
+
+
+TRANSPORT_FEE_CARD = _build_transport_fee_card()
+
+HOSTEL_FEE_CARD = _build_hostel_fee_card()
 
 EXAM_FEE_CARD = {
     "type": "fee_breakdown",
@@ -302,25 +337,7 @@ EXAM_FEE_CARD = {
     ],
 }
 
-ADMISSION_FEE_CARD = {
-    "type": "fee_breakdown",
-    "title": "SR University One-Time Admission & Enrollment Fees",
-    "currency": "INR",
-    "items": [
-        {
-            "category": "Enrollment Fee (One-time)",
-            "amount": "₹5,000",
-            "frequency": "One-time (Year 1)",
-            "note": "Mandatory one-time registration and enrollment fee",
-        },
-        {
-            "category": "Admission Fee (One-time)",
-            "amount": "₹25,000",
-            "frequency": "One-time (Year 1)",
-            "note": "Institutional admission and processing fee",
-        },
-    ],
-}
+ADMISSION_FEE_CARD = _build_admission_fee_card()
 
 
 CURRICULUM_CARD = {

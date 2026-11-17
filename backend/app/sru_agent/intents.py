@@ -110,3 +110,163 @@ def classify_agent_intent(message: str, state: dict | None = None) -> AgentInten
         return "CAMPUS_VISIT_INFO"
 
     return "GENERAL"
+
+
+# ----------------------------------------------------------------------------
+# Contact requests: "ask someone to call me", "don't call me", and the name a
+# student gives along with a phone number. Used by the agent to run the callback /
+# cancel tools itself, so a request is never "noted" without being saved.
+# ----------------------------------------------------------------------------
+_CONTACT_VERB = r"(?:call|contact|phone|ring|disturb|message|whatsapp|text)(?:ing)?"
+_NOT_NOW = r"(?!\s+(?:me\s+|us\s+)?(?:before|until|till|at|on|in\s+the|during|now|today|tomorrow|after|between)\b)"
+
+_CANCEL_CONTACT_PATTERN = re.compile(
+    rf"\b(?:do\s*n[o']?t|dont|never|stop|no\s+need\s+to|need\s+not|not\s+to|please\s+don'?t)\s+{_CONTACT_VERB}\b{_NOT_NOW}"
+    r"|\bcancel\b.{0,30}\b(?:call\s*-?\s*back|callback|call|request|visit|booking|appointment|tour)\b"
+    r"|\b(?:call\s*-?\s*back|callback|visit|booking|appointment)\b.{0,20}\bcancel\b"
+    r"|\b(?:remove|delete)\s+my\s+(?:number|details|phone|contact|request|data)\b"
+    r"|\b(?:i\s+)?(?:do\s*n[o']?t|dont)\s+want\s+(?:a\s+|any\s+|the\s+)?(?:call|callback|call\s*back|calls)\b"
+    r"|\bcall\s+(?:cheyakandi|cheyyakandi|cheyoddu|cheyyoddu|cheyakudadhu|vaddu|oddu|mat\s+kar\w*|nahi\s+kar\w*|na\s+kar\w*)\b",
+    re.IGNORECASE,
+)
+_CANCEL_IT_PATTERN = re.compile(r"^\s*(?:please\s+|pls\s+)?cancel(?:\s+(?:it|that|this|please|pls))?[.!\s]*$",
+                                re.IGNORECASE)
+
+_CALLBACK_REQUEST_PATTERN = re.compile(
+    r"\bcall\s*-?\s*back\b"
+    r"|\b(?:call|ring|phone|contact)\s+(?:me|us|him|her|my\s+(?:son|daughter|father|mother|dad|mom|"
+    r"parents?|husband|wife|brother|sister|ward))\b"
+    r"|\b(?:someone|somebody|anyone|counsell?or|admissions?\s+(?:team|office|officer|people)|team)\b"
+    r".{0,25}\b(?:call|contact|phone|ring)\b(?!\s+(?:number|no\b|details|cent(?:re|er)|letter|it\b))"
+    r"|\b(?:talk|speak)\s+(?:to|with)\s+(?:a\s+|an\s+|the\s+|your\s+|some\s+)?(?:counsell?or|admissions?|"
+    r"someone|somebody|human|person|representative|agent|staff)\b"
+    r"|\b(?:call|phone)\s+(?:cheyandi|cheyyandi|cheyamani|cheyinchandi|cheyagalara|cheyyagalara|"
+    r"karo|kijiye|karna|kardo|kar\s+do|kar\s+dijiye)\b",
+    re.IGNORECASE,
+)
+# "Will someone call me after I apply?" is a question about the process, not a request.
+_PROCESS_QUESTION = re.compile(r"^\s*(?:will|would|does|do|did|is|are|when|why|how\s+(?:long|soon|many))\b",
+                               re.IGNORECASE)
+
+_VISIT_REQUEST_PATTERN = re.compile(
+    r"\b(?:book|schedule|arrange|plan|register|reserve|fix)\b.{0,30}\b(?:visit|tour|slot)\b"
+    r"|\b(?:want|wish|like|planning|plan|coming|come)\b.{0,25}\b(?:visit|see\s+the\s+campus|campus\s+tour)\b"
+    r"|\bvisit\b.{0,20}\b(?:book|schedule|arrange)\b",
+    re.IGNORECASE,
+)
+
+
+def is_cancel_contact(message: str, has_open_request: bool = False) -> bool:
+    """True for 'don't call me', 'cancel the callback', 'cancel my visit' (and bare 'cancel' when a
+    request is open or being arranged)."""
+    msg = message or ""
+    if _CANCEL_CONTACT_PATTERN.search(msg):
+        return True
+    return bool(has_open_request and _CANCEL_IT_PATTERN.match(msg))
+
+
+def is_callback_request(message: str) -> bool:
+    """True when the student asks to be phoned by the admissions team."""
+    msg = message or ""
+    if _CANCEL_CONTACT_PATTERN.search(msg) or not _CALLBACK_REQUEST_PATTERN.search(msg):
+        return False
+    has_digits = bool(re.search(r"\d{5,}", msg))
+    return has_digits or not _PROCESS_QUESTION.match(msg)
+
+
+def is_visit_request(message: str) -> bool:
+    """True when the student asks to book / plan a campus visit (not just asks about visiting)."""
+    return bool(_VISIT_REQUEST_PATTERN.search(message or ""))
+
+
+_NOT_A_NAME = frozenset("""
+a an the i im am is are was me my mine we us you your u he she they this that it its here there
+yes yeah yep ok okay no not sure please pls plz thanks thank hi hello hey sir madam mam
+name names number numbers phone mobile contact call calls callback back whatsapp no num ph
+and or but so for of on in at to from with by as if then also too very just now still about
+interested looking planning studying student parent father mother son daughter brother sister
+going coming visiting calling asking thinking confused worried eligible ready waiting getting
+done fine good happy want wants need needs like would will can could should may have has had
+visit campus tour book booking schedule date today tomorrow morning afternoon evening night
+monday tuesday wednesday thursday friday saturday sunday
+january february march april june july august september october november december
+cse ece eee mech civil btech mtech mba bba bca mca bsc msc engineering course fee fees hostel
+scholarship admission admissions counsellor counselor team sru university inter intermediate
+rank marks percent percentage eapcet eamcet jee cbse people persons members friends
+""".split())
+_NAME_INTRO = re.compile(
+    r"(?:\bmy\s+name\s+is|\bname\s*(?:is|:|-)|\bname\s+(?=[A-Za-z])|\bmyself\b|\bnaa\s+peru\b|"
+    r"\bmera\s+naam\b)\s*([A-Za-z][A-Za-z .']{0,45})", re.IGNORECASE)
+# "I am ..." is usually not a name ("I am interested", "I am a parent"), so it needs more proof.
+_WEAK_NAME_INTRO = re.compile(r"(?:\bi\s+am\b|\bi'm\b|\bim\b|\bthis\s+is\b)\s+([A-Za-z][A-Za-z .']{0,45})",
+                              re.IGNORECASE)
+_NAME_WORD = re.compile(r"[A-Za-z][A-Za-z.']*")
+
+
+def _clean_name(fragment: str):
+    """Leading words of `fragment` that can be a person's name (1-4 words), else None."""
+    words = []
+    for raw in (fragment or "").replace(",", " , ").split():
+        word = raw.strip(".'")
+        if not _NAME_WORD.fullmatch(raw) or word.lower() in _NOT_A_NAME or len(words) == 4:
+            break
+        words.append(word)
+    while words and len(words[-1]) == 1 and len(words) > 3:
+        words.pop()
+    name = " ".join(words).strip()
+    if len(name.replace(" ", "")) < 3:
+        return None
+    return " ".join(w if w.isupper() and len(w) <= 3 else w.capitalize() for w in name.split())
+
+
+def extract_name(message: str, bare_ok: bool = False):
+    """The student's name if the message states one.
+
+    Understands 'my name is Ravi Kumar', 'I am Ravi, 98...', 'Ravi Kumar 9876543210',
+    '9876543210 Ravi Kumar'. With bare_ok=True (the agent has just asked for the name) a message
+    that is only a name ('Ravi Kumar') also counts.
+    """
+    msg = (message or "").strip()
+    for m in _NAME_INTRO.finditer(msg):
+        name = _clean_name(m.group(1))
+        if name:
+            return name
+    phone = re.search(r"(?:\+?91[\s-]?|0)?[6-9]\d{4}[\s-]?\d{5}(?!\d)", msg)
+    for m in _WEAK_NAME_INTRO.finditer(msg):
+        name = _clean_name(m.group(1))
+        if name:
+            typed = m.group(1).split()[:len(name.split())]
+            if phone or bare_ok or all(w[:1].isupper() for w in typed):
+                return name
+    if phone:
+        before = re.sub(r"[\s,\-(:]+$", "", msg[:phone.start()])
+        before = re.split(r"[.;:!?\n,]", before)[-1].strip()
+        if before and all(_NAME_WORD.fullmatch(w) for w in before.split()) and len(before.split()) <= 4:
+            name = _clean_name(before)
+            if name and len(name.split()) == len(before.split()):
+                return name
+        after = re.sub(r"^[\s,\-).]+", "", msg[phone.end():])
+        after = re.split(r"[.;:!?\n,]", after)[0].strip()
+        if after and all(_NAME_WORD.fullmatch(w) for w in after.split()) and len(after.split()) <= 4:
+            name = _clean_name(after)
+            if name and len(name.split()) == len(after.split()):
+                return name
+    if bare_ok and 1 <= len(msg.split()) <= 4 and all(_NAME_WORD.fullmatch(w) for w in msg.split()):
+        name = _clean_name(msg)
+        if name and len(name.split()) == len(msg.split()):
+            return name
+    return None
+
+
+def extract_preferred_time(message: str):
+    """'tomorrow evening', 'after 5 pm' ... as typed, or None."""
+    m = re.search(r"\b((?:today|tomorrow|tonight)\s+)?(morning|afternoon|evening|night)\b"
+                  r"|\b(?:after|before|at|around|by)\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)\b"
+                  r"|\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b|\b(?:today|tomorrow)\b", message or "", re.IGNORECASE)
+    return m.group(0).strip().lower() if m else None
+
+
+def extract_visitors(message: str):
+    m = re.search(r"\b(\d{1,2})\s*(?:people|persons?|members?|of\s+us|visitors?|guests?)\b", message or "",
+                  re.IGNORECASE)
+    return int(m.group(1)) if m else None
