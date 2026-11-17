@@ -273,8 +273,9 @@ Rules:
 - EXACT AND CLEAR OFFICIAL FEES (2026-27 / 2027-28):
   • State whether an amount is PER SEMESTER or PER YEAR.
   • B.Tech CSE & Allied (AIML, Data Science, Cyber Security, Robotics, Quantum AI): ₹3,40,000 per year (Payable as ₹1,70,000 per semester). Yearly fee increase: ₹9,000/yr. One-time enrollment fee: ₹5,000.
+  • B.Tech AI & Robotics: ₹4,00,000 per year (+₹12,000/yr increase).
   • B.Tech ECE: ₹2,70,000 per year (+₹8,000/yr increase).
-  • B.Tech Core (Mechanical / Civil / EEE): ₹2,00,000 per year (+₹6,000/yr increase).
+  • B.Tech Core (Biotech / Mechanical / Civil / EEE / Food Tech): ₹2,00,000 per year (+₹6,000/yr increase).
   • BBA: ₹1,50,000 per year (+₹4,000/yr increase). Specialized BBA: ₹2,00,000 per year.
   • BCA (Hons) / B.Sc CS (Hons): ₹1,50,000 per year (+₹4,000/yr increase).
   • MBA: ₹3,00,000 per year (+₹10,000/yr increase). MCA / M.Tech: ₹1,50,000 per year.
@@ -311,7 +312,7 @@ Rules:
   • NEVER cross-contaminate fee types! If the user asks "what is transport fee?", giving hostel or tuition is a strict failure. Answer ONLY the single fee category requested in 1-3 crisp sentences.
   • DISAMBIGUATE GENERAL FEE QUERIES (ALWAYS ASK WHICH FEE THEY WANT TO KNOW):
     - When the user asks a broad or general fee query (e.g. "what is the complete fee structure and merit scholarship details for B.Tech?", "what is the fee?", "tell me fee details", "how much is fees?"):
-      * State the relevant branch tuition fees clearly (e.g. CSE ₹3,40,000/yr, ECE ₹2,70,000/yr, Core ₹2,00,000/yr) and mention that merit scholarships offer 10% to 40% tuition waivers.
+      * State the relevant branch tuition fees clearly (e.g. CSE ₹3,40,000/yr, AI & Robotics ₹4,00,000/yr, ECE ₹2,70,000/yr, Core ₹2,00,000/yr) and mention that merit scholarships offer 10% to 40% tuition waivers.
       * ALWAYS explicitly ask which fee details they want to know about (e.g. "Which specific fee or branch would you like to explore? B.Tech CSE Tuition & Scholarships, Hostel Accommodation & Mess, or Transport Bus Routes?").
       * NEVER include hostel or transport fees in a B.Tech tuition response or table! Only show the exact fee requested!
 - Interactive Admissions & Dynamic Discovery (NO REPETITIVE QUESTIONS):

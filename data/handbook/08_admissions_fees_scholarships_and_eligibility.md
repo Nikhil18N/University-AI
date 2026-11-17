@@ -125,7 +125,7 @@ SR University awards special institutional concessions per academic year across 
 | **More than 50% Disability** | ₹20,000 |
 
 ### Important Administrative Terms:
-1. **Yearly Increase**: The yearly increase in tuition fee applies annually irrespective of scholarship status (e.g. ₹9,000/yr for CSE, ₹8,000/yr for ECE, ₹6,000/yr for Core B.Tech).
+1. **Yearly Increase**: The yearly increase in tuition fee applies annually irrespective of scholarship status (e.g. ₹9,000/yr for CSE, ₹12,000/yr for AI & Robotics, ₹8,000/yr for ECE, ₹6,000/yr for Core B.Tech).
 2. **Verification of Credentials**: Special category concessions apply per academic year subject to strict verification of supporting official documents.
 
 ---

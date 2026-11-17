@@ -47,15 +47,6 @@ async def _default_lead_saver(lead: dict) -> dict:
         return resp.json()
 
 
-async def _default_lead_canceller(lead_id: str) -> bool:
-    async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.patch(
-            f"{config.LEADS_API_URL}/{lead_id}/status",
-            json={"status": "rejected", "metadata": {"do_not_contact": True}},
-        )
-        return resp.status_code in (200, 204)
-
-
 # -------------------------------------------------------------- helpers ----
 def clean_phone(phone: str):
     """Return a 10-digit Indian mobile number, or None if it is not valid."""
@@ -649,10 +640,6 @@ TOOLS = {
                        "placements, labs, sports, student clubs, and infrastructure. Call whenever the student "
                        "asks to see, watch, or get videos/tours of SR University.",
         "parameters_json_schema": _obj({"topic": {"type": "string", "description": "e.g. 'campus', 'hostel life', 'placements', 'infrastructure'"}})}),
-    "cancel_contact_request": (tool_cancel_contact_request, "Cancelling contact request", {
-        "description": "Cancels a previously requested counsellor callback or campus visit. Call when the "
-                       "student asks to cancel their callback/visit or says 'don't contact me'.",
-        "parameters_json_schema": _obj({"reason": {"type": "string", "description": "Optional reason for cancellation"}})}),
 }
 
 # Tools that change something outside the chat (shown as 'actions' in the UI and logs).
