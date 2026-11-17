@@ -39,7 +39,7 @@
     return v === null || v === undefined ? fallback : v;
   };
   var side = opt("position", "right") === "left" ? "left" : "right";
-  var color = opt("color", "#1d4ed8");
+  var color = opt("color", "#dc2626");
   var label = opt("label", "Ask SRU Buddy");
   var greeting = opt("greeting", "Hi! Questions about admissions 2027-28? Ask me.");
   var startOpen = opt("open", "false") === "true";
@@ -55,10 +55,12 @@
     "*{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}" +
     ".launcher{position:fixed;bottom:20px;" + side + ":20px;display:flex;align-items:center;gap:10px;" +
     "flex-direction:" + (side === "left" ? "row" : "row-reverse") + ";border:0;background:none;padding:0;cursor:pointer}" +
-    ".launcher .dot{width:60px;height:60px;border-radius:50%;background:" + color + ";display:flex;align-items:center;" +
-    "justify-content:center;box-shadow:0 8px 24px rgba(15,23,42,.28);transition:transform .15s ease}" +
+    ".launcher .dot{width:62px;height:62px;border-radius:50%;background:" + color + ";display:flex;align-items:center;" +
+    "justify-content:center;box-shadow:0 8px 24px rgba(220,38,38,.4);transition:transform .15s ease;" +
+    "animation:sruPulse 2.5s infinite}" +
+    "@keyframes sruPulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.7),0 8px 24px rgba(0,0,0,.3)}70%{box-shadow:0 0 0 16px rgba(220,38,38,0),0 8px 24px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0),0 8px 24px rgba(0,0,0,.3)}}" +
     ".launcher:hover .dot{transform:scale(1.06)}" +
-    ".launcher .dot img{width:38px;height:38px;border-radius:50%;background:#fff;object-fit:contain;padding:3px}" +
+    ".launcher .dot img{width:40px;height:40px;border-radius:50%;background:#fff;object-fit:contain;padding:2px}" +
     ".launcher .tag{background:#fff;color:#0f172a;font-size:14px;font-weight:600;padding:9px 14px;border-radius:999px;" +
     "box-shadow:0 4px 16px rgba(15,23,42,.16);white-space:nowrap}" +
     ".launcher:focus-visible{outline:none}.launcher:focus-visible .dot{outline:3px solid #f59e0b;outline-offset:3px}" +
@@ -87,7 +89,7 @@
   launcher.setAttribute("aria-expanded", "false");
   launcher.setAttribute("aria-controls", "sru-buddy-panel");
   launcher.innerHTML =
-    '<span class="dot"><img alt="" src="' + base + '/sru-logo.png"></span>' +
+    '<span class="dot"><img alt="" src="' + base + '/sru-crest.png"></span>' +
     (label ? '<span class="tag"></span>' : "");
   if (label) launcher.querySelector(".tag").textContent = label;
   wrap.appendChild(launcher);

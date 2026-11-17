@@ -47,8 +47,8 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   const isWidget = variant === "widget";
   const sessionId = getSessionId();
 
-  // Widget visibility state: default to open to match Image 1, toggleable to closed to match Image 2
-  const [isWidgetOpen, setIsWidgetOpen] = useState(true);
+  // Widget visibility state: closed by default so floating bubble is visible, clicks open it
+  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Queries
@@ -548,6 +548,18 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         </div>
 
         <div className="sru-ribbon-right">
+          <button
+            className="sru-btn-embed"
+            onClick={() => {
+              const code = `<script src="https://university-ai-companion.vercel.app/widget.js" defer></script>`;
+              navigator.clipboard?.writeText(code);
+              alert("Copied embed script to clipboard!\n\nAdd this tag before </body> on your university website to add this chat bubble:\n\n" + code);
+            }}
+            title="Copy script tag to add this chat bubble to your official university website"
+          >
+            📋 Add Bubble to Website
+          </button>
+
           <a
             href="https://wa.me/919640606408"
             target="_blank"
@@ -608,6 +620,17 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         </nav>
 
         <div className="sru-nav-cta-group">
+          <button
+            className="sru-btn-embed"
+            onClick={() => {
+              const code = `<script src="https://university-ai-companion.vercel.app/widget.js" defer></script>`;
+              navigator.clipboard?.writeText(code);
+              alert("Copied embed script to clipboard!\n\nAdd this tag before </body> on your university website to add this chat bubble:\n\n" + code);
+            }}
+            title="Copy script tag to add this chat bubble to your official university website"
+          >
+            📋 Add Bubble to Website
+          </button>
           <button
             className="sru-btn-calc"
             onClick={() => setIsCalculatorOpen(true)}
