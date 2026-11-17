@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { createLead } from "../services/api";
-import { getSessionId } from "../hooks/useSession";
-import { saveStudentDetails } from "../utils/studentProfile";
 import {
   ScaleIcon,
   TargetIcon,
@@ -797,11 +794,10 @@ export function AgentCampusVisitCard({ card }: CardProps) {
         <div className="agent-action-meta">
           {d.name && <div><strong>Visitor:</strong> {d.name}</div>}
           <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
-          <div><strong>Visiting Hours:</strong> 9:30 AM – 4:30 PM (Monday – Saturday)</div>
           {d.reference && <div><strong>Reference ID:</strong> #{d.reference}</div>}
         </div>
         <div className="agent-card-footer">
-          <span className="agent-card-source-tag">The admissions team will confirm arrival logistics via phone.</span>
+          <span className="agent-card-source-tag">Visits are arranged and confirmed by the admissions team by phone.</span>
           <div className="visit-action-btns">
             <a
               href="https://maps.google.com/?q=SR+University+Warangal"
@@ -824,281 +820,194 @@ export function AgentCampusVisitCard({ card }: CardProps) {
   );
 }
 
-export function CampusVisitBookingCard({ card }: CardProps) {
-  const d = card?.data || card || {};
-
-  // Auto-fill student details from localStorage if previously entered
-  const [name, setName] = useState(() => {
-    try {
-      const saved = localStorage.getItem("sru_student_lead");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed?.name) return parsed.name;
-      }
-    } catch {}
-    return "";
-  });
-
-  const [phone, setPhone] = useState(() => {
-    try {
-      const saved = localStorage.getItem("sru_student_lead");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed?.phone) return parsed.phone;
-      }
-    } catch {}
-    return "";
-  });
-
-  // Calculate real date limits
-  const today = new Date();
-  const formatYMD = (dt: Date) => {
-    const y = dt.getFullYear();
-    const m = String(dt.getMonth() + 1).padStart(2, "0");
-    const day = String(dt.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
-
-  const minDateStr = formatYMD(today);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const defaultDateStr = formatYMD(tomorrow);
-
-  const maxDate = new Date(today);
-  maxDate.setDate(maxDate.getDate() + 90);
-  const maxDateStr = formatYMD(maxDate);
-
-  const [visitDate, setVisitDate] = useState(() => d.suggested_date || d.visit_date || defaultDateStr);
-  const [visitors, setVisitors] = useState<number>(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [confirmedData, setConfirmedData] = useState<{
-    reference: string;
-    visitDate: string;
-    visitors: number;
-    name: string;
-    phone: string;
-  } | null>(null);
-
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErrorMsg(null);
-
-    const cleanName = name.trim();
-    const cleanPhone = phone.replace(/\D/g, "");
-
-    if (cleanName.length < 2) {
-      setErrorMsg("Please enter your name.");
-      return;
-    }
-    if (cleanPhone.length < 10) {
-      setErrorMsg("Please enter a valid 10-digit mobile number.");
-      return;
-    }
-    if (!visitDate) {
-      setErrorMsg("Please select your preferred visit date.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const lead = await createLead({
-        name: cleanName,
-        phone: cleanPhone,
-        program_interest: "Campus Visit & Guided Tour",
-        source: "campus_visit_box",
-        metadata: {
-          request_type: "campus_visit",
-          visit_date: visitDate,
-          visitors,
-          consent: true,
-        },
-      });
-
-      // Save for future turns so student doesn't have to type again
-      void saveStudentDetails(getSessionId(), { name: cleanName, phone: cleanPhone });
-
-      const refId = lead?.id ? String(lead.id).slice(0, 8) : Math.random().toString(36).substring(2, 10).toUpperCase();
-
-      setConfirmedData({
-        reference: refId,
-        visitDate,
-        visitors,
-        name: cleanName,
-        phone: cleanPhone,
-      });
-    } catch (err: any) {
-      setErrorMsg(err.message || "Failed to submit booking. Please call the admissions office.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // If confirmed, show confirmed view
-  if (confirmedData) {
-    let friendlyDate = confirmedData.visitDate;
-    try {
-      const [yr, mo, day] = confirmedData.visitDate.split("-").map((v: string) => parseInt(v, 10));
-      const dt = new Date(yr, mo - 1, day);
-      friendlyDate = dt.toLocaleDateString("en-IN", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {}
-
-    return (
-      <div className="rich-card agent-action-card visit-card visit-confirmed-box">
-        <div className="card-header">
-          <span className="card-badge badge-success">
-            ✓ Visit Request Sent
-          </span>
-          <h4 className="card-title">Campus Visit Requested</h4>
-        </div>
-        <div className="agent-action-body">
-          <p className="agent-action-msg">
-            Visit requested for <strong>{friendlyDate}</strong> for{" "}
-            <strong>{confirmedData.visitors} visitor{confirmedData.visitors > 1 ? "s" : ""}</strong>.
-          </p>
-          <div className="agent-action-meta">
-            <div><strong>Visitor Name:</strong> {confirmedData.name}</div>
-            <div><strong>Location:</strong> 170-Acre Lush Campus, Ananthasagar, Hasanparthy, Warangal, Telangana</div>
-            <div><strong>Visiting Hours:</strong> 9:30 AM – 4:30 PM (Monday – Saturday)</div>
-            <div><strong>Reference ID:</strong> #{confirmedData.reference}</div>
-          </div>
-          <div className="agent-card-footer">
-            <span className="agent-card-source-tag">
-              The admissions team will confirm arrival logistics via phone ({confirmedData.phone}).
-            </span>
-            <div className="visit-action-btns">
-              <a
-                href="https://maps.google.com/?q=SR+University+Warangal"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="agent-card-map-btn"
-              >
-                📍 Open in Google Maps
-              </a>
-              <a
-                href="tel:08702818333"
-                className="agent-card-call-btn"
-              >
-                📞 Call Admissions (0870-2818333)
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+/** Campus visits are arranged by the admissions team; SRU Buddy never books or confirms one.
+ * Shown for "campus_visit_contact", for the contacts tool, and in place of the old booking form
+ * ("campus_visit_form") when an older chat is reopened. */
+export function VisitContactCard({ card }: CardProps) {
+  const d = card?.data?.campus_visit || card?.data || card || {};
+  const phone = (d.phone || "0870-2818333 / 0870-2818311") as string;
+  const firstPhone = phone.split("/")[0].replace(/[^\d+]/g, "");
+  const mobile = (d.mobile || "+91 70750 10336") as string;
+  const whatsapp =
+    d.whatsapp ||
+    "https://wa.me/917075010336?text=Hi%2C%20I%20would%20like%20to%20visit%20the%20SR%20University%20campus.";
   return (
-    <div className="rich-card campus-visit-box">
-      <div className="visit-box-header">
-        <div className="visit-box-badge">
-          🏛️ Campus Visit Booking
-        </div>
-        <h4 className="visit-box-title">{d.title || "Schedule Your SR University Campus Visit"}</h4>
-        <p className="visit-box-subtitle">
-          {d.subtitle || "Experience our 170-acre lush campus, state-of-the-art AI labs, hostels & sports complex in person."}
+    <div className="rich-card agent-action-card visit-contact-card">
+      <div className="card-header">
+        <span className="card-badge">Campus visit</span>
+        <h4 className="card-title">{d.title || "Plan your visit with the admissions team"}</h4>
+      </div>
+      <div className="agent-action-body">
+        <p className="agent-action-msg">
+          {d.subtitle ||
+            "Visits are arranged and confirmed by the SR University admissions team. Please contact them before you travel."}
         </p>
-      </div>
-
-      <div className="visit-info-chips">
-        <div className="visit-info-chip">
-          <span className="chip-ico">📍</span>
-          <span>Warangal, Telangana</span>
+        <div className="agent-contacts-row">
+          <a href={`tel:${firstPhone}`} className="agent-contact-pill">
+            Call {phone}
+          </a>
+          <a href={`tel:${mobile.replace(/[^\d+]/g, "")}`} className="agent-contact-pill">
+            Call {mobile}
+          </a>
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="agent-contact-pill wa">
+            WhatsApp {mobile}
+          </a>
+          <a href={`mailto:${d.email || "info@sru.edu.in"}`} className="agent-contact-pill">
+            Email {d.email || "info@sru.edu.in"}
+          </a>
         </div>
-        <div className="visit-info-chip">
-          <span className="chip-ico">🕒</span>
-          <span>10:00 AM – 4:00 PM (Mon–Sat)</span>
-        </div>
-        <div className="visit-info-chip">
-          <span className="chip-ico">🎓</span>
-          <span>Guided Faculty & Lab Tour</span>
-        </div>
-      </div>
-
-      <form className="visit-box-form" onSubmit={handleSubmit}>
-        <div className="visit-fields-grid">
-          <div className="visit-form-group">
-            <label className="visit-form-label">Full Name</label>
-            <input
-              type="text"
-              className="visit-form-input"
-              placeholder="e.g. Chitikeshi Mahesh"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="visit-form-group">
-            <label className="visit-form-label">Mobile Number</label>
-            <input
-              type="tel"
-              className="visit-form-input"
-              placeholder="10-digit mobile number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              maxLength={10}
-              required
-            />
-          </div>
-
-          <div className="visit-form-group">
-            <label className="visit-form-label">Preferred Date (Next 90 Days)</label>
-            <input
-              type="date"
-              className="visit-form-input date-picker-input"
-              min={minDateStr}
-              max={maxDateStr}
-              value={visitDate}
-              onChange={(e) => setVisitDate(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="visit-form-group">
-            <label className="visit-form-label">Number of Visitors</label>
-            <div className="visitors-pill-row">
-              {[1, 2, 3, 4, 5].map((cnt) => (
-                <button
-                  type="button"
-                  key={cnt}
-                  className={`visitor-pill ${visitors === cnt ? "active" : ""}`}
-                  onClick={() => setVisitors(cnt)}
-                >
-                  {cnt === 5 ? "5+ Visitors" : cnt === 1 ? "1 Visitor" : `${cnt} Visitors`}
-                </button>
-              ))}
-            </div>
+        <div className="agent-action-meta">
+          <div>
+            <strong>Campus:</strong>{" "}
+            {d.address || "SR University, Ananthasagar, Hasanparthy, Warangal Urban 506371, Telangana"}
           </div>
         </div>
-
-        {errorMsg && <div className="visit-error-banner">⚠️ {errorMsg}</div>}
-
-        <div className="visit-box-footer">
-          <button
-            type="submit"
-            className="visit-submit-btn"
-            disabled={isSubmitting}
+        <div className="agent-card-footer">
+          <a
+            href="https://maps.google.com/?q=SR+University+Warangal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="agent-card-map-btn"
           >
-            {isSubmitting ? "🏛️ Scheduling Your Visit..." : "🏛️ Schedule Campus Visit"}
-          </button>
-          <div className="visit-security-note">
-            🔒 By scheduling, you authorize the SRU Admissions Desk to coordinate your campus tour.
+            Open in Google Maps
+          </a>
+          <a
+            href={d.visit_page || "https://sru.edu.in/visit-us"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="agent-card-call-btn"
+          >
+            Visit Us page
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** A student's wish to visit, passed to the admissions team as a callback request (not a booking). */
+export function VisitRequestCard({ card }: CardProps) {
+  const d = card?.data || {};
+  if (d.status !== "saved") return null;
+  return (
+    <div className="rich-card agent-action-card visit-card">
+      <div className="card-header">
+        <span className="card-badge badge-success">Request passed on</span>
+        <h4 className="card-title">Campus visit: the admissions team will call you</h4>
+      </div>
+      <div className="agent-action-body">
+        <p className="agent-action-msg">
+          This is not a booking. The admissions team will call <strong>{d.name || "you"}</strong> on the number
+          ending <strong>{d.phone_last4 || "••••"}</strong> to arrange the visit and confirm the day and time.
+        </p>
+        <div className="agent-action-meta">
+          {d.preferred_date && (
+            <div>
+              <strong>Day you mentioned:</strong> {d.preferred_date} (not confirmed)
+            </div>
+          )}
+          {d.reference && (
+            <div>
+              <strong>Reference:</strong> #{d.reference}
+            </div>
+          )}
+          <div>
+            <strong>Admissions:</strong> 0870-2818333 · +91 70750 10336 (call or WhatsApp)
           </div>
         </div>
-      </form>
+      </div>
+    </div>
+  );
+}
+
+type FacultyPerson = {
+  name: string;
+  position?: string;
+  designation?: string;
+  department?: string;
+  qualification?: string;
+  experience_years?: number;
+  research_areas?: string;
+  profile_url?: string;
+};
+
+function FacultyPersonRow({ p }: { p: FacultyPerson }) {
+  return (
+    <li className="faculty-row">
+      <div className="faculty-row-main">
+        <a href={p.profile_url} target="_blank" rel="noopener noreferrer" className="faculty-row-name">
+          {p.name}
+        </a>
+        <span className="faculty-row-position">{p.position}</span>
+      </div>
+      <div className="faculty-row-meta">
+        {[p.department, p.qualification, p.experience_years ? `${p.experience_years} years' experience` : ""]
+          .filter(Boolean)
+          .join(" · ")}
+      </div>
+      {p.research_areas && <div className="faculty-row-research">Research: {p.research_areas}</div>}
+    </li>
+  );
+}
+
+/** Official faculty profiles (sru.edu.in/faculty) found by the find_faculty tool. */
+export function FacultyCard({ card }: CardProps) {
+  const d = card?.data || {};
+  if (d.status !== "ok") return null;
+  const people: FacultyPerson[] = (d.faculty || [...(d.leaders || []), ...(d.some_senior_faculty || [])] || d.deans || []).slice(0, 5);
+  const listed = d.faculty_listed as number | undefined;
+  const title =
+    d.kind === "department"
+      ? `Faculty: ${d.department}`
+      : d.kind === "overview"
+        ? "SR University faculty"
+        : d.kind === "leaders"
+          ? "Deans and heads"
+          : "Faculty profiles";
+  return (
+    <div className="rich-card faculty-card-agent">
+      <div className="card-header">
+        <span className="card-badge">Official faculty profiles</span>
+        <h4 className="card-title">{title}</h4>
+      </div>
+      {listed !== undefined && (
+        <p className="faculty-summary">
+          {listed} faculty listed
+          {d.with_phd_listed !== undefined ? ` · ${d.with_phd_listed} with a Ph.D.` : ""}
+          {d.professors !== undefined
+            ? ` · ${d.professors} Professors, ${d.associate_professors} Associate, ${d.assistant_professors} Assistant`
+            : ""}
+        </p>
+      )}
+      {d.kind === "overview" && d.by_school && (
+        <ul className="faculty-school-list">
+          {Object.entries(d.by_school as Record<string, number>).map(([school, n]) => (
+            <li key={school}>
+              {school}: <strong>{n}</strong>
+            </li>
+          ))}
+        </ul>
+      )}
+      <ul className="faculty-list">
+        {(people.length ? people : (d.deans as FacultyPerson[]) || []).slice(0, 5).map((p) => (
+          <FacultyPersonRow key={p.profile_url || p.name} p={p} />
+        ))}
+      </ul>
+      <div className="agent-card-footer">
+        <span className="agent-card-source-tag">
+          Source: sru.edu.in/faculty{d.as_of ? ` (as of ${d.as_of})` : ""}
+        </span>
+        <a href={d.source || "https://sru.edu.in/faculty/"} target="_blank" rel="noopener noreferrer" className="agent-card-call-btn">
+          Full directory
+        </a>
+      </div>
     </div>
   );
 }
 
 export function AgentContactLinksCard({ card }: CardProps) {
   const d = card.data || {};
+  if (d.campus_visit) return <VisitContactCard card={card} />;
   return (
     <div className="rich-card agent-action-card contact-card">
       <div className="card-header">
@@ -1210,10 +1119,15 @@ export function RenderCard({ card }: { card: any }) {
       return <AgentFeeCard card={card} />;
     case "request_counsellor_callback":
       return <AgentCallbackCard card={card} />;
-    case "book_campus_visit":
+    case "book_campus_visit": // older chats only
       return <AgentCampusVisitCard card={card} />;
-    case "campus_visit_form":
-      return <CampusVisitBookingCard card={card} />;
+    case "request_campus_visit_callback":
+      return <VisitRequestCard card={card} />;
+    case "campus_visit_form": // older chats: the booking form is gone (visits are never booked here)
+    case "campus_visit_contact":
+      return <VisitContactCard card={card} />;
+    case "find_faculty":
+      return <FacultyCard card={card} />;
     case "get_contact_and_apply_links":
       return <AgentContactLinksCard card={card} />;
     case "get_university_videos":

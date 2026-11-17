@@ -54,7 +54,7 @@ async def test_scenario_1_fee_calculation():
         _text("With 85% in Intermediate, you qualify for a 25% merit scholarship for 2027-28. First year tuition is ₹2,55,000.")
     ])
     session = "scenario-1-fee"
-    events = await _run(client, "i got 85% in inter, cse fee?", session)
+    events = await _run(client, "i got 85% in inter (state board, no entrance exam), cse fee?", session)
 
     tools_used = [t["name"] for t in events[-1]["tools_used"]]
     assert tools_used == ["remember_student_details", "calculate_fee"]

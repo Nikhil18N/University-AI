@@ -271,3 +271,156 @@
 .chat-input-disclaimer {
   font-size: 11px;
 }
+
+/* ---- v3.0.0: faculty profiles and campus visit contacts ---- */
+.faculty-card-agent .faculty-summary {
+  margin: 4px 0 8px;
+  font-size: 0.82rem;
+  color: var(--text-2, #475569);
+}
+.faculty-school-list {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  color: var(--text-1, #0f172a);
+}
+.faculty-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.faculty-row {
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  background: var(--surface-2, #f8fafc);
+}
+.faculty-row-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+.faculty-row-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+.faculty-row-name:hover {
+  text-decoration: underline;
+}
+.faculty-row-position {
+  font-size: 0.8rem;
+  color: var(--text-2, #475569);
+}
+.faculty-row-meta,
+.faculty-row-research {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  color: var(--text-2, #475569);
+  line-height: 1.4;
+}
+.visit-contact-card .agent-contacts-row {
+  margin: 8px 0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.visit-contact-card .agent-card-footer,
+.faculty-card-agent .agent-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+[data-theme="dark"] .faculty-row-name {
+  color: #93c5fd;
+}
+
+/* ---- v3.0.0: the embeddable widget (public/widget.js opens /?mode=widget) ---- */
+.chat-page--widget {
+  height: 100dvh;
+  width: 100%;
+}
+.chat-page--widget .chat-main {
+  width: 100%;
+}
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #1d4ed8;
+  color: #fff;
+  flex-shrink: 0;
+}
+.widget-header-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: contain;
+  padding: 2px;
+}
+.widget-header-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.widget-header-title {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.widget-header-sub {
+  font-size: 12px;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.widget-header-actions {
+  display: flex;
+  gap: 2px;
+}
+.widget-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.widget-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.widget-icon-btn:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 1px;
+}
+.chat-page--widget .welcome-screen {
+  padding-top: 16px;
+}
+.chat-page--widget .welcome-hero-logo-box {
+  display: none;
+}
+.chat-page--widget .welcome-hero-title {
+  font-size: 1.4rem;
+}
+.chat-page--widget .minimal-starters-grid {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.chat-page--widget .chat-input-disclaimer {
+  font-size: 11px;
+}

@@ -17,6 +17,16 @@ import "./ChatPage.css";
 
 interface Props {
   onOpenAdmin?: () => void;
+  variant?: "full" | "widget";
+}
+
+/** Tell the page that embeds the widget to close it (public/widget.js listens for this). */
+function closeWidget() {
+  try {
+    window.parent?.postMessage({ type: "sru-buddy:close" }, "*");
+  } catch {
+    /* not embedded */
+  }
 }
 
 const DEFAULT_WELCOME_MESSAGE: MessageData = {
@@ -27,13 +37,14 @@ const DEFAULT_WELCOME_MESSAGE: MessageData = {
 };
 
 const QUICK_STARTER_QUERIES = [
-  { label: "💰 B.Tech CSE Fee Breakdown", prompt: "What is the complete fee structure for B.Tech CSE for 2027-28?" },
-  { label: "🧮 Calculate My Scholarship", prompt: "How much scholarship can I get for B.Tech based on my 10+2 marks?" },
-  { label: "💼 Microsoft 51 LPA Placement", prompt: "Tell me about SR University placements and top packages" },
-  { label: "🏫 Book a Campus Visit", prompt: "I want to schedule a visit to the SR University campus" },
+  { label: "💰 B.Tech Fees (2027-28)", prompt: "What is the complete fee structure and hostel fee for B.Tech for 2027-28?" },
+  { label: "🧮 Calculate My Scholarship", prompt: "How much scholarship can I get for B.Tech based on my 10+2 marks or EAPCET rank?" },
+  { label: "📜 Degree Validity & Accreditation", prompt: "Is SR University degree valid for government jobs, higher education in India and abroad?" },
+  { label: "🏫 Plan a Campus Visit", prompt: "I would like to visit the SR University campus. Whom should I contact?" },
 ];
 
-export default function ChatPage({ onOpenAdmin }: Props) {
+export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
+  const isWidget = variant === "widget";
   const sessionId = getSessionId();
 
   // Widget visibility state: default to open to match Image 1, toggleable to closed to match Image 2
@@ -316,6 +327,208 @@ export default function ChatPage({ onOpenAdmin }: Props) {
     setWidgetInput("");
   };
 
+  // Render Widget View directly if variant === "widget" (used inside public/widget.js iframe)
+  if (isWidget) {
+    return (
+      <div className="sru-portal-root sru-portal--widget" style={{ minHeight: "100vh", height: "100vh", background: "var(--bg-main, #0f172a)" }}>
+        <div className="sru-widget-container" style={{ position: "fixed", inset: 0, width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", borderRadius: 0, border: "none" }}>
+          {/* Header */}
+          <div className="sru-widget-header">
+            <div className="sru-widget-header-left">
+              <div className="sru-widget-avatar-wrap">
+                <img src="/sru-crest.png" alt="SRU" className="sru-widget-avatar-img" />
+              </div>
+              <div className="sru-widget-title-col">
+                <span className="sru-widget-title">SRU Assistant</span>
+                <span className="sru-widget-status">
+                  <span className="sru-widget-status-dot" />
+                  Connected
+                </span>
+              </div>
+            </div>
+
+            <div className="sru-widget-header-actions">
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={() => setIsCalculatorOpen(true)}
+                title="Fee Calculator"
+                aria-label="Fee Calculator"
+              >
+                🧮
+              </button>
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={handleResetChat}
+                title="Reset / New Chat"
+                aria-label="Reset Chat"
+              >
+                ↺
+              </button>
+              <a
+                className="sru-widget-hdr-btn"
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open full screen"
+                aria-label="Open full screen"
+                style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: "white" }}
+              >
+                ↗
+              </a>
+              <button
+                className="sru-widget-hdr-btn"
+                onClick={closeWidget}
+                title="Close"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="sru-widget-body" ref={messagesAreaRef}>
+            {messages.map((msg, index) => (
+              <MessageBubble
+                key={msg.id || index}
+                role={msg.role}
+                content={msg.content}
+                cards={msg.cards}
+                suggestions={msg.suggestions}
+                flow={msg.flow}
+                messageId={msg.id}
+                conversationId={activeConvId}
+                sessionId={sessionId}
+                isStreaming={msg.id === streamingMsgId}
+                onSuggestionClick={(prompt) => handleSendMessage(prompt)}
+              />
+            ))}
+
+            {isLoading && (
+              <ThinkingIndicator activeToolLabel={activeToolStatus} />
+            )}
+
+            {error && (
+              <div style={{ color: "#f87171", fontSize: "0.82rem", padding: "8px 12px", background: "rgba(220, 38, 38, 0.15)", borderRadius: "8px" }}>
+                {error}
+              </div>
+            )}
+
+            {messages.length <= 1 && !isLoading && (
+              <div className="sru-widget-starters">
+                {QUICK_STARTER_QUERIES.map((q, i) => (
+                  <button
+                    key={i}
+                    className="sru-starter-chip"
+                    onClick={() => handleSendMessage(q.prompt)}
+                  >
+                    <span>{q.label}</span>
+                    <span>→</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer / Input Bar */}
+          <div className="sru-widget-footer">
+            <form className="sru-widget-input-row" onSubmit={handleWidgetSubmit}>
+              <textarea
+                className="sru-widget-textarea"
+                placeholder="Type your message...."
+                rows={1}
+                value={widgetInput}
+                onChange={(e) => setWidgetInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleWidgetSubmit(e);
+                  }
+                }}
+              />
+
+              <button
+                type="button"
+                className={`sru-widget-voice-btn ${listening ? "listening" : ""}`}
+                onClick={toggleVoice}
+                title="Voice Typing"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+              </button>
+
+              <button
+                type="submit"
+                className="sru-widget-send-btn"
+                disabled={!widgetInput.trim() || isLoading}
+                title="Send Message"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" />
+                </svg>
+              </button>
+            </form>
+
+            <div className="sru-widget-watermark">
+              powered by <strong>SRU Buddy</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Modals */}
+        {isCalculatorOpen && (
+          <ScholarshipCalculatorModal
+            onClose={() => setIsCalculatorOpen(false)}
+            onAskBuddy={(prompt) => {
+              setIsCalculatorOpen(false);
+              handleSendMessage(prompt);
+            }}
+          />
+        )}
+
+        <LeadAuthModal
+          isOpen={showLeadAuthModal}
+          onClose={() => {
+            setShowLeadAuthModal(false);
+            try {
+              sessionStorage.setItem("sru_lead_skipped", "1");
+            } catch {
+              /* ignore */
+            }
+            if (pendingAuthMessage) {
+              const nextMsg = pendingAuthMessage;
+              setPendingAuthMessage(null);
+              executeSendMessage(nextMsg);
+            }
+          }}
+          onSuccess={(_lead) => {
+            setShowLeadAuthModal(false);
+            if (pendingAuthMessage) {
+              const nextMsg = pendingAuthMessage;
+              setPendingAuthMessage(null);
+              executeSendMessage(nextMsg);
+            }
+          }}
+          reasonText={authReason}
+        />
+
+        {showSettings && (
+          <SettingsModal
+            isOpen={showSettings}
+            onClose={() => setShowSettings(false)}
+            sessionId={sessionId}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Full Portal Landing Page + Floating Minimal Assistant Widget
   return (
     <div className="sru-portal-root">
       {/* 1. Top Announcement Ribbon */}

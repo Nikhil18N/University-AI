@@ -28,14 +28,42 @@ def set_turn_logger(fn):
     _on_turn_complete = fn
 
 
-async def _log_turn(session_id, conv_id, message, event, started_at):
+async def _log_turn(session_id, conv_id, message, event, started_at, channel=None):
     """Call the turn logger with the cards and suggestions too; older 5-argument loggers still work."""
     try:
+        extra = {"channel": channel} if channel else {}
         await _on_turn_complete(session_id, conv_id, message, event["answer"], event["tools_used"],
                                 cards=event.get("cards") or [], suggestions=event.get("suggestions") or [],
-                                started_at=started_at)
+                                started_at=started_at, **extra)
     except TypeError:
         await _on_turn_complete(session_id, conv_id, message, event["answer"], event["tools_used"])
+
+
+_turn_queues: dict = {}  # conversation -> turns still to be saved, in order
+
+
+def _save_turn_later(session_id, conv_id, message, event, started_at, channel=None):
+    key = conv_id or session_id
+    queue = _turn_queues.setdefault(key, [])
+    queue.append((session_id, conv_id, message, dict(event), started_at, channel))
+    if len(queue) > 1:
+        return  # the task already saving this conversation will take this turn too
+
+    async def _drain():
+        try:
+            while queue:
+                args = queue[0]
+                try:
+                    await _log_turn(*args)
+                except Exception:
+                    log.exception("could not save the chat turn")  # logging must never break the chat
+                queue.pop(0)
+        finally:
+            if not queue:
+                _turn_queues.pop(key, None)
+
+    if memory.in_background(_drain(), "chat save") is None:
+        _turn_queues.pop(key, None)
 
 
 def set_conversation_resolver(fn):
@@ -49,6 +77,8 @@ class AgentRequest(BaseModel):
     session_id: str = Field(min_length=1, max_length=64)
     message: str = Field(min_length=1, max_length=config.AGENT_MAX_MESSAGE_CHARS)
     conversation_id: Optional[str] = None
+    # "web" (the website) or "widget" (the embeddable chat bubble); stored with the chat for staff.
+    channel: Optional[str] = Field(default=None, max_length=12, pattern=r"^[a-z]+$")
 
 
 class FeeRequest(BaseModel):
@@ -92,10 +122,10 @@ async def agent_stream(req: AgentRequest):
                 except Exception:
                     event["profile"] = {}
             if event["type"] == "done" and _on_turn_complete:
-                try:
-                    await _log_turn(req.session_id, conv_id, req.message, event, started_at)
-                except Exception:
-                    log.exception("could not save the chat turn")  # logging must never break the chat
+                # Saved after the student has the answer (it used to hold the cards back by about
+                # 1.5 seconds). In order per conversation, and a reopened chat still shows it.
+                _save_turn_later(req.session_id, conv_id, req.message, event, started_at,
+                                 req.channel if req.channel in ("web", "widget") else None)
             yield _sse(event)
 
     return StreamingResponse(events(), media_type="text/event-stream",

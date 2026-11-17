@@ -151,7 +151,7 @@ async def test_greetings_and_thanks_use_no_model_call():
 @pytest.mark.asyncio
 async def test_plain_fee_question_takes_one_model_call():
     client = Recorder([_text("With 85% you get a 25% scholarship: tuition is ₹2,55,000 for 2027-28.")])
-    done = await _run("cse fee with 85% in inter", "r2-onecall", client)
+    done = await _run("cse fee with 85% in inter, state board, no entrance exam", "r2-onecall", client)
     assert len(client.requests) == 1                               # was 2 or 3
     assert "FEE CALCULATION ALREADY DONE" in client.prompts[0] and "₹2,55,000" in client.prompts[0]
     assert done["tools_used"] == [{"name": "calculate_fee", "status": "ok", "is_action": False}]
@@ -312,6 +312,7 @@ async def test_profile_and_history_come_back_from_lasting_storage():
     try:
         assert (await memory.get_profile("lasting-1"))["name"] == "Asha"       # not in the cache: read back
         await memory.update_profile("lasting-1", city="Warangal")
+        await memory.flush()  # the database copy is written in the background
         assert db["saved"][-1][1]["city"] == "Warangal"
         client = Recorder([_text("Yes, hostel is extra.")])
         await _run("and with hostel?", "lasting-1", client, conversation_id="conv-lasting")
