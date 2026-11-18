@@ -32,8 +32,7 @@ function closeWidget() {
 const DEFAULT_WELCOME_MESSAGE: MessageData = {
   id: "welcome-sru-buddy",
   role: "assistant",
-  content:
-    "Welcome to **SR University!** 👋\n\nI'm **SRU Buddy – Your AI Companion**, ready to help you explore everything happening at SRU.\n\nFrom academics and campus life to student activities, events, and opportunities, ask me anything about SR University.\n\n**What's on your mind today?**",
+  content: "Welcome to SR University! I'm **SRU Buddy**.\n\nWho do I have the pleasure of speaking with today? Feel free to share your name or choose a topic below.",
   created_at: new Date().toISOString(),
 };
 
@@ -124,10 +123,10 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   const currentStatus = isLoading
     ? { text: activeToolStatus || "Thinking...", type: "thinking" }
     : connStatus === "setting_up"
-    ? { text: "Setting up...", type: "setting_up" }
-    : error
-    ? { text: "Setting up...", type: "setting_up" }
-    : { text: "Connected", type: "connected" };
+      ? { text: "Setting up...", type: "setting_up" }
+      : error
+        ? { text: "Setting up...", type: "setting_up" }
+        : { text: "Connected", type: "connected" };
 
   // Scroll to bottom of widget when messages update
   useEffect(() => {
@@ -315,15 +314,15 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
             prev.map((m) =>
               m.id === assistantMsgId
                 ? {
-                    ...m,
-                    id: data.message_id || m.id,
-                    content: data.answer || accumulatedContent,
-                    sources: data.sources?.length ? data.sources : undefined,
-                    suggestions: data.suggestions?.length ? data.suggestions : undefined,
-                    cards: finalCards.length ? finalCards : undefined,
-                    flow: data.flow,
-                    model: data.model,
-                  }
+                  ...m,
+                  id: data.message_id || m.id,
+                  content: data.answer || accumulatedContent,
+                  sources: data.sources?.length ? data.sources : undefined,
+                  suggestions: data.suggestions?.length ? data.suggestions : undefined,
+                  cards: finalCards.length ? finalCards : undefined,
+                  flow: data.flow,
+                  model: data.model,
+                }
                 : m
             )
           );
