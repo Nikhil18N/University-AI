@@ -14,6 +14,7 @@ from . import fees
 _TOPICS = [
     ("visit", r"\b(?:visit|visiting|campus\s+tour|come\s+to\s+(?:the\s+)?campus)\b"),
     ("faculty", r"\b(?:faculty|faculties|professors?|lecturers?|teachers?|hod|dean|deans|head\s+of)\b"),
+    ("next_gen", r"\b(?:next[\s-]?gen|ai\s+(?:&|and)\s+robotics|quantum\s+ai|precision\s+agric\w*|robotics\s+(?:&|and)\s+automation)\b"),
     ("concessions", r"\b(?:concessions?|sibling|defen[cs]e|single\s+parent|orphan|sports\s+quota|girl\s+child|"
                     r"special\s+category)\b"),
     ("transport", r"\b(?:bus|buses|transport|transportation|commute|route|routes)\b"),
@@ -67,6 +68,7 @@ def _chips(topic: str, program: str | None, department: str | None) -> list[str]
                         "Do I keep my scholarship every year?", f"{p} fee after scholarship"],
         "concessions": ["Calculate my fee with scholarship", "Documents for a concession", "How do I apply for 2027-28?",
                         "Talk to a counsellor"],
+        "next_gen": ["Fee for AI & Robotics", "B.Tech CSE fee structure", "Calculate my scholarship", "How do I apply for 2027-28?"],
         "eligibility": [f"{p} fee with my marks", "How do I apply for 2027-28?", "Documents needed for admission",
                         f"Placements for {p}"],
         "programs": [f"{p} fee and scholarship", f"Eligibility for {p}", "Who are the faculty?", f"Placements for {p}"],

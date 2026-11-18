@@ -655,6 +655,350 @@ def _is_first_interaction_name_query(message: str) -> bool:
 
 _SMALL_TALK_CHIPS = ["B.Tech CSE fees", "Scholarship for my marks", "Placements at SRU", "Plan a campus visit"]
 
+_SPECIAL_CONCESSIONS_TEXT = """### 🎖️ Special Category Fee Concessions (2027–28)
+
+At SR University, special category tuition fee concessions are offered annually to eligible students across 19 categories. These concessions are applied directly to your annual tuition fee upon verification of valid certificates by the Admissions Office:
+
+| Category / Eligibility | Annual Concession |
+| :--- | :--- |
+| **Students who have lost both parents (Orphans)** | **₹50,000 / year** |
+| **International-level sports achievers** | **₹50,000 / year** |
+| **Children of regular SR University employees** | **₹50,000 / year** |
+| **Students with 50% or above disability (Differently Abled)** | **₹20,000 / year** |
+| **Children of Defence personnel, CRPF personnel & Martyrs** | **₹15,000 / year** |
+| **Children of State Police personnel** | **₹15,000 / year** |
+| **Only Girl Child from Telangana** | **₹15,000 / year** |
+| **Girl students from states other than Telangana** | **₹15,000 / year** |
+| **Students with a single living parent / Divorced parents** | **₹15,000 / year** |
+| **Sibling enrolled at SR University (concurrent 2027–28)** | **₹15,000 / year** |
+| **SRU Alumni, their children and siblings** | **₹15,000 / year** |
+| **Students of SR Junior College** | **₹15,000 / year** |
+| **NCC 'C' Certificate holders** | **₹15,000 / year** |
+| **National-level sports achievers** | **₹15,000 / year** |
+| **Children of Padma / Gallantry awardees & J&K migrant families** | **₹15,000 / year** |
+| **Non-Local students (outside Telangana & Andhra Pradesh)** | **₹15,000 / year** |
+| **Students from Andhra Pradesh** | **₹15,000 / year** |
+| **Lateral Entry students** | **₹15,000 / year** |
+| **International students** | **₹15,000 / year** |
+
+> [!NOTE]
+> - Concessions are applicable per academic year on tuition fees.
+> - Required certificates and documentation must be submitted directly to the Admissions Office (0870-2818333 / info@sru.edu.in) during admission counselling."""
+
+_NEXT_GEN_TECH_TEXT = """### 🚀 Next-Gen Technology Programs at SR University
+
+SR University has pioneered futuristic, multidisciplinary undergraduate engineering programs designed to prepare students for the next industrial revolution:
+
+---
+
+#### 1. 🤖 B.Tech in Artificial Intelligence & Robotics
+- **Focus**: Autonomous mobile robotics, ROS (Robot Operating System), computer vision, sensor fusion, cyber-physical systems, and robotic manipulation.
+- **Key Labs**: Advanced Robotics Arena, Makerspace, and Embedded Systems Lab.
+- **Tuition**: ₹4,00,000 / year (₹2,00,000 / semester) | Merit scholarships up to 40% available.
+
+---
+
+#### 2. 🌾 B.Tech CSE — AI & Precision Agriculture
+- **Focus**: Integrating machine learning, computer vision, IoT sensing, and drone analytics with modern agricultural science to create high-yield, climate-smart farming solutions.
+- **Unique Advantage**: Jointly offered with SRU’s **ICAR-accredited School of Agriculture** with hands-on learning on experiential research farms.
+- **Tuition**: ₹3,40,000 / year (₹1,70,000 / semester) | Merit scholarships up to 40% available.
+
+---
+
+#### 3. 🦾 B.Tech CSE — Robotics & Automation
+- **Focus**: Industrial automation, PLC/SCADA programming, kinematics, machine kinematics, robotic arm control, and smart Industry 4.0 manufacturing.
+- **Career Pathways**: Automation engineer, robotics software engineer, mechatronics specialist in automotive, aerospace, and defense sectors.
+- **Tuition**: ₹3,40,000 / year (₹1,70,000 / semester) | Merit scholarships up to 40% available.
+
+---
+
+#### 4. ⚛️ B.Tech CSE — Quantum AI
+- **Focus**: Quantum computing algorithms, Qiskit framework, quantum neural networks, quantum annealing, and post-quantum cryptography.
+- **Cutting Edge**: Equips students for future high-performance computing, drug discovery simulations, and next-generation cybersecurity.
+- **Tuition**: ₹3,40,000 / year (₹1,70,000 / semester) | Merit scholarships up to 40% available.
+
+---
+
+> [!TIP]
+> All programs feature practical prototyping at **SRiX (DST-supported Technology Business Incubator)** with ₹76+ Cr in funding and 171+ startups.
+
+*Would you like to see the fee breakdown, eligibility cutoffs, or calculate your scholarship for any of these programs?*"""
+
+_FEE_TREE_TEXT = """### 💰 SR University Fee Structure (2027–28)
+
+Here is the **Program Category Directory**. Select or tap a program category to explore its branch fees and scholarship slabs:
+
+```
+SR University (2027-28)
+├── 📘 B.Tech Engineering
+│   ├── CSE & Allied (AIML, Data Science, Cyber Security, Quantum AI)
+│   ├── AI & Robotics
+│   ├── ECE (VLSI & Embedded Systems)
+│   └── Core Engineering (Biotech, Civil, EEE, Mech, Food Tech)
+├── 🏢 Management & Commerce
+│   ├── BBA (General & Analytics)
+│   └── MBA (Finance, Marketing, HR, Analytics, Agri-Business)
+├── 🌾 Agriculture (ICAR-Accredited)
+│   └── B.Sc. (Hons) Agriculture
+├── 💻 Computer Applications & IT
+│   ├── BCA (Hons) / B.Sc Computer Science
+│   └── MCA
+├── 🎨 Design
+│   └── B.Des (Interior & Fashion Design)
+└── 🔬 Postgraduate & Sciences
+    ├── M.Tech (All Engineering Specializations)
+    └── M.Sc (Computer Science / Agriculture)
+```
+
+👉 **Which program category would you like to see the fee structure for?** Tap an option below or type your branch:"""
+
+_BTECH_TREE_TEXT = """### 📘 B.Tech Fee Structure (2027–28)
+
+For **B.Tech (Bachelor of Technology)**, SR University offers several engineering streams. Which branch would you like to view the detailed fee structure for?
+
+```
+B.Tech Engineering Streams
+├── 1. B.Tech CSE & Allied (AIML, Data Science, Cyber, Quantum AI)
+│   └── ₹3,40,000 / yr  (₹1,70,000 / sem)
+├── 2. B.Tech AI & Robotics
+│   └── ₹4,00,000 / yr  (₹2,00,000 / sem)
+├── 3. B.Tech ECE (VLSI & Embedded)
+│   └── ₹2,70,000 / yr  (₹1,35,000 / sem)
+└── 4. B.Tech Core (Biotech, Civil, EEE, Mech, Food Tech)
+    └── ₹2,00,000 / yr  (₹1,00,000 / sem)
+```
+
+*All B.Tech programs offer **10% to 40% Merit Scholarships** based on your 10+2 marks or EAPCET rank.*
+
+👉 **Select a branch below to see the complete semester breakdown:**"""
+
+_BTECH_CSE_FEE_TEXT = """### 💻 B.Tech CSE & Allied Streams — Fee Structure (2027–28)
+
+Official fee schedule for **B.Tech Computer Science & Engineering** and its specialized streams (AIML, Data Science, Cyber Security, Quantum AI, Precision Agriculture):
+
+| Component | Semester Fee | Annual Total | Notes |
+| :--- | :--- | :--- | :--- |
+| **Base Tuition Fee** | **₹1,70,000** | **₹3,40,000** | Payable per semester |
+| **One-Time Enrollment Fee** | **₹5,000** | — | Semester 1 only |
+| **Examination & Other Fees** | **₹10,000** | **₹20,000** | ₹15,000 other + ₹5,000 exam |
+| **Semester 1 Total (Day-Scholar)** | **₹1,85,000** | — | Includes enrollment + exam/other |
+| **Regular Semester Total** | **₹1,80,000** | **₹3,60,000** | Semesters 2 through 8 |
+
+#### 🎓 Merit Scholarships (Tuition Waiver):
+- **40% Waiver**: Inter ≥ 98% / CBSE ≥ 95% / EAPCET 1–2000 → **₹2,04,000 / yr** (Save ₹1,36,000)
+- **30% Waiver**: Inter 92–97.9% / CBSE 90–94.9% / EAPCET 2001–8000 → **₹2,38,000 / yr** (Save ₹1,02,000)
+- **25% Waiver**: Inter 80–91.9% / CBSE 80–89.9% / EAPCET 8001–20000 → **₹2,55,000 / yr** (Save ₹85,000)
+- **20% Waiver**: Inter 70–79.9% → **₹2,72,000 / yr** (Save ₹68,000)
+- **10%–15% Waiver**: Inter 60–69.9% → **₹2,89,000 – ₹3,06,000 / yr**
+
+> [!NOTE]
+> - Annual tuition escalation: ₹9,000/year for subsequent academic years.
+> - Hostel is optional: ₹1,15,000 to ₹1,35,000/year (includes 4 meals daily, AC/Non-AC options, Wi-Fi & laundry)."""
+
+_BTECH_AI_ROBOTICS_FEE_TEXT = """### 🤖 B.Tech in Artificial Intelligence & Robotics — Fee Structure (2027–28)
+
+Official fee schedule for the specialized **B.Tech in Artificial Intelligence & Robotics**:
+
+| Component | Semester Fee | Annual Total | Notes |
+| :--- | :--- | :--- | :--- |
+| **Base Tuition Fee** | **₹2,00,000** | **₹4,00,000** | Payable per semester |
+| **One-Time Enrollment Fee** | **₹5,000** | — | Semester 1 only |
+| **Examination & Other Fees** | **₹10,000** | **₹20,000** | Per semester breakdown |
+| **Semester 1 Total (Day-Scholar)** | **₹2,15,000** | — | With enrollment fee |
+| **Regular Semester Total** | **₹2,10,000** | **₹4,20,000** | Semesters 2 through 8 |
+
+#### 🎓 Merit Scholarships (Tuition Waiver):
+- **40% Waiver**: Net Tuition **₹2,40,000 / yr** (Save ₹1,60,000/yr)
+- **30% Waiver**: Net Tuition **₹2,80,000 / yr** (Save ₹1,20,000/yr)
+- **25% Waiver**: Net Tuition **₹3,00,000 / yr** (Save ₹1,00,000/yr)
+- **20% Waiver**: Net Tuition **₹3,20,000 / yr** (Save ₹80,000/yr)
+
+> [!NOTE]
+> - Annual tuition escalation: ₹12,000/year for subsequent academic years.
+> - Hostel is optional: ₹1,15,000 to ₹1,35,000/year."""
+
+_BTECH_ECE_FEE_TEXT = """### ⚡ B.Tech Electronics & Communication (ECE) — Fee Structure (2027–28)
+
+Official fee schedule for **B.Tech ECE** (Specializations in VLSI, Embedded Systems, and Robotics):
+
+| Component | Semester Fee | Annual Total | Notes |
+| :--- | :--- | :--- | :--- |
+| **Base Tuition Fee** | **₹1,35,000** | **₹2,70,000** | Payable per semester |
+| **One-Time Enrollment Fee** | **₹5,000** | — | Semester 1 only |
+| **Examination & Other Fees** | **₹10,000** | **₹20,000** | Per semester breakdown |
+| **Semester 1 Total (Day-Scholar)** | **₹1,50,000** | — | With enrollment fee |
+| **Regular Semester Total** | **₹1,45,000** | **₹2,90,000** | Semesters 2 through 8 |
+
+#### 🎓 Merit Scholarships (Tuition Waiver):
+- **40% Waiver**: Net Tuition **₹1,62,000 / yr** (Save ₹1,08,000/yr)
+- **30% Waiver**: Net Tuition **₹1,89,000 / yr** (Save ₹81,000/yr)
+- **25% Waiver**: Net Tuition **₹2,02,500 / yr** (Save ₹67,500/yr)
+- **20% Waiver**: Net Tuition **₹2,16,000 / yr** (Save ₹54,000/yr)
+
+> [!NOTE]
+> - Annual tuition escalation: ₹8,000/year for subsequent academic years.
+> - Hostel is optional: ₹1,15,000 to ₹1,35,000/year."""
+
+_BTECH_CORE_FEE_TEXT = """### ⚙️ B.Tech Core Engineering — Fee Structure (2027–28)
+
+Official fee schedule for **B.Tech Core Programs** (Mechanical, Civil, Electrical & Electronics, Biotechnology, Food Technology):
+
+| Component | Semester Fee | Annual Total | Notes |
+| :--- | :--- | :--- | :--- |
+| **Base Tuition Fee** | **₹1,00,000** | **₹2,00,000** | Payable per semester |
+| **One-Time Enrollment Fee** | **₹5,000** | — | Semester 1 only |
+| **Examination & Other Fees** | **₹10,000** | **₹20,000** | Per semester breakdown |
+| **Semester 1 Total (Day-Scholar)** | **₹1,15,000** | — | With enrollment fee |
+| **Regular Semester Total** | **₹1,10,000** | **₹2,20,000** | Semesters 2 through 8 |
+
+#### 🎓 Merit Scholarships (Tuition Waiver):
+- **40% Waiver**: Net Tuition **₹1,20,000 / yr** (Save ₹80,000/yr)
+- **30% Waiver**: Net Tuition **₹1,40,000 / yr** (Save ₹60,000/yr)
+- **25% Waiver**: Net Tuition **₹1,50,000 / yr** (Save ₹50,000/yr)
+- **20% Waiver**: Net Tuition **₹1,60,000 / yr** (Save ₹40,000/yr)
+
+> [!NOTE]
+> - Annual tuition escalation: ₹6,000/year for subsequent academic years.
+> - Hostel is optional: ₹1,15,000 to ₹1,35,000/year."""
+
+_MANAGEMENT_FEE_TEXT = """### 🏢 Astra School of Business — Fee Structure (2027–28)
+
+Official fee schedule for Management & Commerce programs:
+
+| Program | Annual Tuition | Semester Fee | Annual Escalation |
+| :--- | :--- | :--- | :--- |
+| **BBA (General)** | **₹1,50,000** | ₹75,000 | +₹4,000 / yr |
+| **BBA (Business Analytics / Specialized)** | **₹2,00,000** | ₹1,00,000 | +₹6,000 / yr |
+| **B.Com** | **₹1,00,000** | ₹50,000 | +₹3,000 / yr |
+| **MBA (Finance, Marketing, HR, Analytics)** | **₹3,00,000** | ₹1,50,000 | +₹9,000 / yr |
+| **MBA in Agri-Business Management** | **₹2,00,000** | ₹1,00,000 | +₹6,000 / yr |
+
+- **One-time enrollment**: ₹5,000 (Sem 1 only). Exam & other fees: ₹20,000/yr.
+- **Scholarships**: 10% to 40% merit waivers based on qualifying exam scores; eligible PG students receive an additional 10% scholarship."""
+
+_AGRICULTURE_FEE_TEXT = """### 🌾 School of Agriculture — Fee Structure (2027–28)
+
+Official fee schedule for the **ICAR-Accredited** Agricultural programs:
+
+| Program | Annual Tuition | Semester Fee | Annual Escalation |
+| :--- | :--- | :--- | :--- |
+| **B.Sc. (Hons) Agriculture** | **₹2,00,000** | ₹1,00,000 | +₹6,000 / yr |
+| **B.Tech Food Technology** | **₹2,00,000** | ₹1,00,000 | +₹6,000 / yr |
+| **M.Sc Agriculture (All Disciplines)** | **₹1,00,000** | ₹50,000 | +₹3,000 / yr |
+
+- **Accreditation**: First private university in the Telugu States with ICAR accreditation.
+- **One-time enrollment**: ₹5,000 (Sem 1 only). Exam & other fees: ₹20,000/yr.
+- **Scholarships**: 10% to 40% merit waivers based on 10+2 BiPC marks or EAPCET rank."""
+
+_COMP_APP_FEE_TEXT = """### 💻 Computer Applications & IT — Fee Structure (2027–28)
+
+Official fee schedule for Computer Applications:
+
+| Program | Annual Tuition | Semester Fee | Annual Escalation |
+| :--- | :--- | :--- | :--- |
+| **BCA (Hons)** | **₹1,50,000** | ₹75,000 | +₹4,000 / yr |
+| **B.Sc Computer Science (Hons)** | **₹1,50,000** | ₹75,000 | +₹4,000 / yr |
+| **MCA** | **₹1,50,000** | ₹75,000 | +₹4,000 / yr |
+| **M.Sc Computer Science** | **₹1,00,000** | ₹50,000 | +₹3,000 / yr |
+
+- **One-time enrollment**: ₹5,000 (Sem 1 only). Exam & other fees: ₹20,000/yr.
+- **Scholarships**: 10% to 40% merit waivers."""
+
+_DESIGN_FEE_TEXT = """### 🎨 School of Design — Fee Structure (2027–28)
+
+Official fee schedule for Design programs:
+
+| Program | Annual Tuition | Semester Fee | Annual Escalation |
+| :--- | :--- | :--- | :--- |
+| **B.Des Interior Design** | **₹2,10,000** | ₹1,05,000 | +₹6,000 / yr |
+| **B.Des Fashion Design** | **₹2,10,000** | ₹1,05,000 | +₹6,000 / yr |
+
+- **One-time enrollment**: ₹5,000 (Sem 1 only). Exam & other fees: ₹20,000/yr.
+- **Scholarships**: 10% to 40% merit waivers."""
+
+_ALL_PROGRAMS_TEXT = """### 🎓 Programs Offered at SR University (2027–28)
+
+SR University offers comprehensive multidisciplinary undergraduate, postgraduate, and doctoral degrees across **6 specialized schools**:
+
+---
+
+#### 1. 💻 School of Computer Science & Artificial Intelligence (CS & AI)
+* **Undergraduate (UG)**:
+  - **B.Tech Computer Science & Engineering (Core)**
+  - **B.Tech CSE — Artificial Intelligence & Machine Learning (AIML)**
+  - **B.Tech CSE — Data Science**
+  - **B.Tech CSE — Cyber Security**
+  - **B.Tech CSE — Gaming, AR & VR**
+  - **B.Tech CSE — Robotics & Automation**
+  - **B.Tech CSE — Quantum AI**
+  - **B.Tech CSE — AI & Precision Agriculture**
+  - **B.Tech in Artificial Intelligence & Robotics**
+  - **BCA (Bachelor of Computer Applications)**
+  - **B.Sc Computer Science | B.Sc Mathematics | B.Sc (Hons) Mathematics & AI**
+* **Postgraduate (PG)**:
+  - **M.Tech CSE** (AIML, Data Science, Cyber Security)
+  - **MCA (Master of Computer Applications)**
+  - **M.Sc Computer Science | M.Sc Statistics**
+
+---
+
+#### 2. ⚡ School of Engineering
+* **Undergraduate (UG)**:
+  - **B.Tech Electronics & Communication Engineering (ECE)** *(AIML / VLSI / Robotics)*
+  - **B.Tech Electrical & Electronics Engineering (EEE)** *(Renewable Energy / EV / Robotics)*
+  - **B.Tech Mechanical Engineering** *(Robotics & Automation / Smart Manufacturing)*
+  - **B.Tech Civil Engineering**
+  - **B.Tech International Engineering Program (IEP - 2+2 Study Abroad)**
+* **Postgraduate (PG)**:
+  - **M.Tech Embedded Systems | M.Tech VLSI System Design | M.Tech Electronic Design Technology**
+  - **M.Tech Power Electronics | M.Tech Advanced Manufacturing Systems | M.Tech Construction Technology (CTM)**
+
+---
+
+#### 3. 🏢 Astra School of Business
+* **Undergraduate (UG)**:
+  - **BBA (General Management)**
+  - **BBA Specializations** *(Business Analytics, Finance, Marketing, HR, Operations, Event Management)*
+  - **B.Com (Bachelor of Commerce)**
+* **Postgraduate (PG)**:
+  - **MBA (Master of Business Administration)** *(Finance, Marketing, HR, Business Analytics)*
+  - **MBA in Agri-Business Management**
+
+---
+
+#### 4. 🌾 School of Agriculture (ICAR-Accredited)
+* **Undergraduate (UG)**:
+  - **B.Sc. (Hons) Agriculture** *(1st private university in Telugu States with ICAR accreditation)*
+  - **B.Tech Food Technology**
+* **Postgraduate (PG)**:
+  - **M.Sc. Agriculture** *(Agronomy, Genetics & Plant Breeding, Soil Science, Horticulture, Plant Pathology, Agricultural Economics)*
+
+---
+
+#### 5. 🎨 School of Design
+* **Undergraduate (UG)**:
+  - **B.Des Interior Design**
+  - **B.Des Fashion Design**
+
+---
+
+#### 6. 🔬 School of Sciences & Humanities
+* **Undergraduate (UG)**:
+  - **B.Tech Biotechnology with AI**
+  - **B.Tech Engineering Physics** *(AI / Space Sciences)*
+  - **B.Sc (Physics, Chemistry, Maths)**
+* **Postgraduate (PG)**:
+  - **M.Sc Physics | M.Sc Chemistry | M.Sc Biotechnology & AI | M.A. English**
+
+---
+
+#### 7. 🏛️ Doctoral Studies & Research (Ph.D.)
+* **Full-Time & Part-Time Ph.D.** across all Engineering, Computer Science, Agriculture, Business, and Science disciplines.
+
+---
+
+👉 **Which program would you like to know more about (fee structure, eligibility, or syllabus)?**"""
+
 
 def _cache_key(message: str) -> str:
     import hashlib
@@ -765,6 +1109,142 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
             text = f"Hello{name_bit}! What would you like to explore about SR University today?"
 
         async for ev in _say(text, message, session_id, conversation_id, suggestions=_SMALL_TALK_CHIPS):
+            yield ev
+        return
+
+    # ---- 1b. Deterministic quick responses (special concessions, next-gen tech, fee tree, all programs) ----
+    if intent == "SPECIAL_CONCESSIONS_QUERY":
+        async for ev in _say(_SPECIAL_CONCESSIONS_TEXT, message, session_id, conversation_id,
+                             used=[{"name": "get_special_concessions", "status": "ok", "is_action": False}],
+                             cards=[{"type": "get_special_concessions", "data": fees.special_concessions()}],
+                             suggestions=["Calculate my fee with scholarship", "Documents for concession",
+                                          "Fee Structure 2027-28", "Talk to a counsellor"]):
+            yield ev
+        return
+
+    if intent == "NEXT_GEN_TECH_QUERY":
+        async for ev in _say(_NEXT_GEN_TECH_TEXT, message, session_id, conversation_id,
+                             suggestions=["Fee for AI & Robotics", "B.Tech CSE fee structure",
+                                          "Calculate my scholarship", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "ALL_PROGRAMS_QUERY":
+        async for ev in _say(_ALL_PROGRAMS_TEXT, message, session_id, conversation_id,
+                             suggestions=["Fee Structure 2027-28", "Next-Gen Tech Programs",
+                                          "Special Concessions", "Calculate my scholarship"]):
+            yield ev
+        return
+
+    if intent == "FEE_TREE_QUERY":
+        await set_state(fee_tree_step="category")
+        async for ev in _say(_FEE_TREE_TEXT, message, session_id, conversation_id,
+                             suggestions=["B.Tech Engineering", "Management (BBA / MBA)",
+                                          "B.Sc (Hons) Agriculture", "Computer Applications (BCA / MCA)"]):
+            yield ev
+        return
+
+    if intent == "BTECH_TREE_QUERY":
+        await set_state(fee_tree_step="btech_branch")
+        async for ev in _say(_BTECH_TREE_TEXT, message, session_id, conversation_id,
+                             suggestions=["B.Tech CSE & Allied", "B.Tech AI & Robotics",
+                                          "B.Tech ECE", "B.Tech Core Engineering"]):
+            yield ev
+        return
+
+    if intent == "BTECH_CSE_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        cse_fee = fees.calculate_fee(program="btech_cse")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": cse_fee}] if cse_fee.get("status") == "ok" else []
+        async for ev in _say(_BTECH_CSE_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "BTECH_AI_ROBOTICS_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        airo_fee = fees.calculate_fee(program="btech_ai_robotics")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": airo_fee}] if airo_fee.get("status") == "ok" else []
+        async for ev in _say(_BTECH_AI_ROBOTICS_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "BTECH_ECE_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        ece_fee = fees.calculate_fee(program="btech_ece")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": ece_fee}] if ece_fee.get("status") == "ok" else []
+        async for ev in _say(_BTECH_ECE_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "BTECH_CORE_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        core_fee = fees.calculate_fee(program="btech_mech")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": core_fee}] if core_fee.get("status") == "ok" else []
+        async for ev in _say(_BTECH_CORE_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "MANAGEMENT_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        bba_fee = fees.calculate_fee(program="bba")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": bba_fee}] if bba_fee.get("status") == "ok" else []
+        async for ev in _say(_MANAGEMENT_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my fee with scholarship", "MBA specializations",
+                                          "Hostel fees", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "AGRICULTURE_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        ag_fee = fees.calculate_fee(program="bsc_agriculture")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": ag_fee}] if ag_fee.get("status") == "ok" else []
+        async for ev in _say(_AGRICULTURE_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "COMP_APP_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        bca_fee = fees.calculate_fee(program="bca")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": bca_fee}] if bca_fee.get("status") == "ok" else []
+        async for ev in _say(_COMP_APP_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
+            yield ev
+        return
+
+    if intent == "DESIGN_FEE_QUERY":
+        await set_state(fee_tree_step=None)
+        bdes_fee = fees.calculate_fee(program="bdes")
+        used = [{"name": "calculate_fee", "status": "ok", "is_action": False}]
+        cards = [{"type": "calculate_fee", "data": bdes_fee}] if bdes_fee.get("status") == "ok" else []
+        async for ev in _say(_DESIGN_FEE_TEXT, message, session_id, conversation_id,
+                             used=used, cards=cards,
+                             suggestions=["Calculate my scholarship", "Hostel fee details",
+                                          "Special category concessions", "How do I apply?"]):
             yield ev
         return
 

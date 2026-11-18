@@ -38,10 +38,30 @@ const DEFAULT_WELCOME_MESSAGE: MessageData = {
 };
 
 const QUICK_STARTER_QUERIES = [
-  { icon: "💰", title: "B.Tech Fees 2027-28", desc: "Tuition, hostel & fee breakdown", prompt: "What is the complete fee structure and hostel fee for B.Tech for 2027-28?" },
-  { icon: "🧮", title: "Calculate Scholarship", desc: "Based on 10+2 marks or EAPCET rank", prompt: "How much scholarship can I get for B.Tech based on my 10+2 marks or EAPCET rank?" },
-  { icon: "📜", title: "Degree Validity & NBA", desc: "Government jobs & global validity", prompt: "Is SR University degree valid for government jobs, higher education in India and abroad?" },
-  { icon: "🏫", title: "Campus & Lab Tour", desc: "Plan an in-person campus visit", prompt: "I would like to visit the SR University campus. Whom should I contact?" },
+  {
+    icon: "💰",
+    title: "Fee Structure 2027-28",
+    desc: "Interactive program & branch fee tree",
+    prompt: "What is the fee structure for 2027-28 across different programs?",
+  },
+  {
+    icon: "🎁",
+    title: "Special Concessions",
+    desc: "19 category fee waivers up to ₹50,000/yr",
+    prompt: "What are the special category fee concessions available at SR University?",
+  },
+  {
+    icon: "🤖",
+    title: "Next-Gen Tech Programs",
+    desc: "AI & Robotics, Quantum AI & Precision Ag",
+    prompt: "Tell me about the Next-Gen Technology programs at SR University like AI & Robotics, Quantum AI, and Precision Agriculture.",
+  },
+  {
+    icon: "🎓",
+    title: "Programs Available at SRU",
+    desc: "Explore all 6 schools & degree offerings",
+    prompt: "What are all the programs and courses available at SR University?",
+  },
 ];
 
 export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
