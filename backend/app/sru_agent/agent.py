@@ -511,7 +511,8 @@ def _fee_args_from_message(message: str, profile: dict):
             kind = "ac"
         else:
             return None  # which hostel? let the model ask or explain the options
-        args["hostel"] = f"{kind}_{'3' if re.search(r'(?<!\d)3[\s-]?(?:shar|bed|person|member)', low) else '4'}"
+        sharing = "3" if re.search(r"(?<!\d)3[\s-]?(?:shar|bed|person|member)", low) else "4"
+        args["hostel"] = f"{kind}_{sharing}"
     return args
 
 
