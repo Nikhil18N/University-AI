@@ -550,20 +550,109 @@ _LIMIT_REPLY = (f"Many students are using SRU Buddy right now and the free AI li
                 f"scholarship (for example \"CSE fee with 85%\"), arrange a counsellor callback (\"call me\"), "
                 f"find a faculty member, or share the campus visit contacts. You can also call the Admissions Office at {config.ADMISSIONS_PHONE}.")
 
-_SMALL_TALK = {
-    "greeting": ("Hello{name}! 👋 I'm SRU Buddy, the admissions assistant of SR University. Ask me about courses, "
-                 "fees, scholarships, hostels or placements.",
-                 "Hello again{name}! 👋 What would you like to know about SR University today?"),
-    "how_are_you": ("I'm doing well, thank you{name}! Ready to help with anything about SR University admissions. "
-                    "What would you like to know?",) * 2,
-    "thanks": ("You're welcome{name}! If you have more questions about SR University, just ask.",) * 2,
-    "bye": (f"Goodbye{{name}}! All the best. You can come back any time, and the Admissions Office is on "
-            f"{config.ADMISSIONS_PHONE}.",) * 2,
-    "who_are_you": (f"I'm SRU Buddy, the AI admissions assistant of SR University, Warangal. I can work out your fee "
-                    f"and scholarship, check eligibility, compare courses, tell you about our faculty, help you "
-                    f"plan a campus visit and arrange a counsellor callback. I'm an AI, so the Admissions Office ({config.ADMISSIONS_PHONE}) gives "
-                    f"the final confirmation.",) * 2,
-}
+_GREETING_ASK_NAME = [
+    "Hello! Welcome to SR University. 😊 Before we get started, may I know your name?",
+    "Hello and welcome to SR University! Who do I have the pleasure of speaking with today?",
+    "Hello there! Great to connect with you. Before we dive into SR University, may I know your name?",
+    "Hello! Welcome to SR University! 😊 May I know your name so I know who I'm chatting with?",
+    "Hello! Glad you reached out to SR University. What's your name before we get started?",
+    "Hello! Welcome to SR University. What should I call you?",
+]
+
+_GREETING_WITH_NAME = [
+    "Hello {name}! What would you like to explore about SR University today?",
+    "Hey {name}! Great to see you. How can I help you with SR University today?",
+    "Welcome back, {name}! What can I look up for you regarding SRU today?",
+    "Hi {name}! What questions can I answer for you about SR University?",
+    "Hey {name}! Glad to connect again. What's on your mind today regarding SRU?",
+]
+
+_NAME_GIVEN_REPLIES = [
+    "Hi {name}! Great to connect with you. What would you like to explore about SR University?",
+    "Nice to meet you, {name}! How can I assist you with SR University today?",
+    "Welcome, {name}! Glad to have you here. What would you like to know about our programs or campus?",
+    "Pleasure meeting you, {name}! What's on your mind regarding SR University?",
+]
+
+_QUESTION_ACK_FEE = [
+    "Absolutely! I can help you with the B.Tech fee details. First, may I know your name?",
+    "I'd be glad to walk you through the fee structure and scholarship slabs! Before we start, may I know your name?",
+    "Happy to calculate your fee and scholarship details! First, what should I call you?",
+]
+
+_QUESTION_ACK_CAMPUS = [
+    "I'd love to share all about the campus and facilities! Before we get into it, may I have your name?",
+    "Happy to help with campus visit and hostel details! First, may I know your name?",
+    "I can certainly tell you about campus life, hostels, and lab facilities. First, may I know your name?",
+]
+
+_QUESTION_ACK_SRU = [
+    "I'd love to tell you all about SR University! Before we get started, may I know your name?",
+    "Great to connect! I can share everything about SR University with you. First, who do I have the pleasure of speaking with?",
+    "Happy to guide you through everything SR University has to offer! Before we begin, may I know your name?",
+]
+
+_QUESTION_ACK_GENERAL = [
+    "I'd be happy to help you with that! Before we dive in, may I know your name?",
+    "I can certainly guide you through that. First, may I know your name?",
+    "Great question! I'd love to answer that for you. Before we get started, may I know your name?",
+]
+
+_SMALL_TALK_THANKS = [
+    "You're welcome{name}! If you have more questions about SR University, just ask.",
+    "Happy to help and you're always welcome{name}! Let me know if you'd like to explore anything else about courses, campus, or admissions.",
+    "You're welcome{name}! I'm right here if you want to know more about SR University.",
+    "You're welcome{name}! Glad I could help! Feel free to ask if there's anything else you're curious about.",
+]
+
+_SMALL_TALK_HOW_ARE_YOU = [
+    "I'm doing well, thank you{name}! Ready to help you explore everything about SR University admissions. What would you like to know?",
+    "I'm doing well and feeling great, thanks for asking{name}! Excited to assist you with SR University admissions and programs. What would you like to know?",
+    "I'm doing well, thank you{name}! All good here and ready to answer any questions about SRU courses, fees, scholarships, or campus life. How can I help?",
+]
+
+_SMALL_TALK_BYE = [
+    f"Goodbye{{name}}! Wishing you the very best in your academic journey. You can reach out here anytime or contact the Admissions Office on {config.ADMISSIONS_PHONE}.",
+    "Take care{name}! Feel free to come back whenever you have questions. All the best for your future!",
+    "Bye{name}! Have a wonderful day ahead. Don't hesitate to return if you need more info on SR University!",
+]
+
+_SMALL_TALK_WHO_ARE_YOU = [
+    f"I'm SRU Buddy, the AI admissions assistant of SR University, Warangal. I can help you calculate fees and scholarships, check course eligibility, learn about faculty and campus life, and connect with our admissions counsellors. What would you like to know?",
+    f"I'm SRU Buddy, the AI admissions assistant for SR University! Whether you need fee breakdowns, scholarship calculations, placement stats, or campus tour guidance, I'm here to help. What shall we explore?",
+]
+
+
+def _select_variation(options: list[str], seed_str: str) -> str:
+    import hashlib
+    h = int(hashlib.md5(seed_str.encode()).hexdigest(), 16)
+    return options[h % len(options)]
+
+
+def _ack_question_for_name(question: str, seed: str) -> str:
+    q = question.lower()
+    if any(k in q for k in ("fee", "fees", "scholarship", "cost", "tuition", "waiver")):
+        return _select_variation(_QUESTION_ACK_FEE, seed)
+    if any(k in q for k in ("visit", "campus", "hostel", "room", "mess", "food", "tour")):
+        return _select_variation(_QUESTION_ACK_CAMPUS, seed)
+    if any(k in q for k in ("about sru", "about sr university", "tell me about sru", "tell me about sr university", "rank", "ranking", "placement", "nirf")):
+        return _select_variation(_QUESTION_ACK_SRU, seed)
+    return _select_variation(_QUESTION_ACK_GENERAL, seed)
+
+
+def _is_first_interaction_name_query(message: str) -> bool:
+    msg = (message or "").strip().lower()
+    if any(k in msg for k in ("fee", "fees", "scholarship", "tuition", "cost", "waiver")):
+        return True
+    if any(k in msg for k in ("about sru", "about sr university", "tell me about sru", "tell me about sr university",
+                              "what is sru", "what is sr university", "know about sru", "know about sr university")):
+        return True
+    if any(k in msg for k in ("how to apply", "how to join sru", "join sr university",
+                              "courses in sru", "programs in sru", "b.tech in sru", "btech in sru")):
+        return True
+    return False
+
+
 _SMALL_TALK_CHIPS = ["B.Tech CSE fees", "Scholarship for my marks", "Placements at SRU", "Plan a campus visit"]
 
 
@@ -597,6 +686,47 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     async def clear_pending():
         await set_state(pending_action=None, pending_phone=None, pending_name=None, pending_turns=0)
 
+    # Detect user persona and style
+    persona = intents.detect_user_persona(message, history, profile)
+    if persona == "parent" and not profile.get("is_parent"):
+        profile["is_parent"] = True
+        await memory.update_profile(session_id, is_parent=True)
+
+    # Extract name if user provided one
+    awaiting_name = bool(conv_state.get("awaiting_name"))
+    extracted_name = intents.extract_name(message, bare_ok=awaiting_name)
+    if extracted_name and not profile.get("name"):
+        profile["name"] = extracted_name
+        await memory.update_profile(session_id, name=extracted_name)
+        await set_state(name_asked=True, awaiting_name=False)
+
+    # ---- Handle Turn 2 after name was requested ----
+    if awaiting_name:
+        if extracted_name:
+            await set_state(awaiting_name=False)
+            pending_q = conv_state.get("pending_user_question")
+            if pending_q:
+                # Answer the question asked in Turn 1 immediately
+                await set_state(pending_user_question=None)
+                message = pending_q
+                intent = intents.classify_agent_intent(message, conv_state)
+            else:
+                # User had only sent a greeting in Turn 1
+                reply = _select_variation(_NAME_GIVEN_REPLIES, session_id).format(name=_first_name(extracted_name))
+                async for ev in _say(reply, message, session_id, conversation_id, suggestions=_SMALL_TALK_CHIPS):
+                    yield ev
+                return
+        else:
+            # User declined, skipped, or asked another question
+            await set_state(awaiting_name=False)
+            pending_q = conv_state.get("pending_user_question")
+            if pending_q and intents.is_refusal_or_skip(message):
+                await set_state(pending_user_question=None)
+                message = pending_q
+                intent = intents.classify_agent_intent(message, conv_state)
+            elif pending_q:
+                await set_state(pending_user_question=None)
+
     # ---- 1. Things the code can answer by itself ------------------------------------------
     if intent == "DATE_QUERY":
         async for ev in _say(f"Today is {date.today():%B %d, %Y}.", message, session_id, conversation_id,
@@ -613,15 +743,42 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
             yield ev
         return
 
-    # Greetings and thanks need no model call.
+    # Greetings and small talk
     chat = intents.small_talk(message) if intent not in ("DATE_CONFIRMATION_YES", "DATE_CONFIRMATION_NO") else None
     if chat:
-        seen_before = any(h.get("role") in ("model", "assistant") for h in history)
         name_bit = f", {_first_name(profile['name'])}" if profile.get("name") else ""
-        text = _SMALL_TALK[chat][1 if seen_before else 0].format(name=name_bit)
+        if chat == "greeting":
+            if profile.get("name"):
+                text = _select_variation(_GREETING_WITH_NAME, session_id + str(len(history))).format(name=_first_name(profile["name"]))
+            else:
+                await set_state(awaiting_name=True, name_asked=True)
+                text = _select_variation(_GREETING_ASK_NAME, session_id + str(len(history)))
+        elif chat == "how_are_you":
+            text = _select_variation(_SMALL_TALK_HOW_ARE_YOU, session_id + str(len(history))).format(name=name_bit)
+        elif chat == "thanks":
+            text = _select_variation(_SMALL_TALK_THANKS, session_id + str(len(history))).format(name=name_bit)
+        elif chat == "bye":
+            text = _select_variation(_SMALL_TALK_BYE, session_id + str(len(history))).format(name=name_bit)
+        elif chat == "who_are_you":
+            text = _select_variation(_SMALL_TALK_WHO_ARE_YOU, session_id + str(len(history)))
+        else:
+            text = f"Hello{name_bit}! What would you like to explore about SR University today?"
+
         async for ev in _say(text, message, session_id, conversation_id, suggestions=_SMALL_TALK_CHIPS):
             yield ev
         return
+
+    # First interaction direct question name collection:
+    has_replied = any(h.get("role") in ("model", "assistant") for h in history)
+    if not has_replied and client is None and not profile.get("name") and not conv_state.get("name_asked"):
+        if extracted_name:
+            await set_state(name_asked=True, awaiting_name=False)
+        elif _is_first_interaction_name_query(message) and not intents.is_cancel_contact(message) and not intents.is_number_update(message) and not intents.is_visit_request(message) and intent != "CAMPUS_VISIT_INFO":
+            await set_state(pending_user_question=message, awaiting_name=True, name_asked=True)
+            ack_text = _ack_question_for_name(message, session_id)
+            async for ev in _say(ack_text, message, session_id, conversation_id, suggestions=_SMALL_TALK_CHIPS):
+                yield ev
+            return
 
     # ---- 2. "Don't call me" / "cancel my visit": run the cancel tool, report what really happened
     pending = conv_state.get("pending_action")
@@ -904,7 +1061,8 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
                 system_instruction=build_system_prompt(
                     ctx["profile"], variant_id=variant_id, used_openings=assistant_openings,
                     about_sru_angle=about_sru_angle, pending_action=pending, action_note=action_note,
-                    handbook_passages=passages, fee_result=fee_note, faculty_result=faculty_note),
+                    handbook_passages=passages, fee_result=fee_note, faculty_result=faculty_note,
+                    persona=persona),
                 tools=[tool_decl],
                 temperature=0.2,
                 max_output_tokens=900,

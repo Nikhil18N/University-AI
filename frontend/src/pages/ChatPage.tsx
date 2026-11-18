@@ -74,7 +74,6 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   const [showLeadAuthModal, setShowLeadAuthModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pendingAuthMessage, setPendingAuthMessage] = useState<string | null>(null);
-  const [authReason, setAuthReason] = useState<string | undefined>(undefined);
 
   // Voice recognition
   const [listening, setListening] = useState(false);
@@ -155,25 +154,6 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     }
   };
 
-  function isHighIntentLeadQuery(text: string): boolean {
-    const lower = text.toLowerCase();
-    const feeKeywords = ["fee", "fees", "tuition", "scholarship", "cost", "hostel fee", "mess fee", "bus fee"];
-    const admissionKeywords = ["admission", "admissions", "join", "joining", "apply", "eligibility", "take admission"];
-    return feeKeywords.some((k) => lower.includes(k)) || admissionKeywords.some((k) => lower.includes(k));
-  }
-
-  function isStudentLeadVerified(): boolean {
-    try {
-      const lead = localStorage.getItem("sru_student_lead");
-      if (!lead) return false;
-      const parsed = JSON.parse(lead);
-      const digits = (parsed?.phone || "").replace(/\D/g, "");
-      return digits.length >= 10 && Boolean(parsed?.name);
-    } catch {
-      return false;
-    }
-  }
-
   async function handleSendMessage(text: string) {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -181,20 +161,6 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     // Check for calculator trigger
     if (/^\s*(🧮\s*)?(scholarship\s*calculator|calculate\s*(?:my\s*)?scholarship|fee\s*calculator|open\s*calculator|calculator)\s*$/i.test(trimmed)) {
       setIsCalculatorOpen(true);
-      return;
-    }
-
-    let skipped = false;
-    try {
-      skipped = sessionStorage.getItem("sru_lead_skipped") === "1";
-    } catch {
-      /* ignore */
-    }
-
-    if (isHighIntentLeadQuery(trimmed) && !isStudentLeadVerified() && !skipped) {
-      setPendingAuthMessage(trimmed);
-      setAuthReason("Share your name and mobile number if you would like personal assistance from our admissions counselors.");
-      setShowLeadAuthModal(true);
       return;
     }
 
@@ -623,7 +589,6 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
               executeSendMessage(nextMsg);
             }
           }}
-          reasonText={authReason}
         />
 
         {showSettings && (
@@ -1060,7 +1025,6 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
             executeSendMessage(nextMsg);
           }
         }}
-        reasonText={authReason}
       />
 
       {showSettings && (

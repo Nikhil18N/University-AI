@@ -10,7 +10,7 @@ from . import config
 
 # Change this whenever the wording below changes, so a chat log can be matched to the prompt
 # that produced it (AGENTS.md rule 13: prompts are versioned).
-PROMPT_VERSION = "2026-11-17.3"
+PROMPT_VERSION = "2026-11-18.1"
 
 _HIDDEN_PROFILE_KEYS = ("phone_saved", "last_lead_id", "last_lead_key", "last_lead_type", "last_fee")
 
@@ -21,6 +21,34 @@ _STYLES = """  * 1 = DIRECT: straight to the point.
   * 4 = EXAMPLE-LED: explain through the student's own numbers or situation.
   * 5 = Q&A: lead with what most students ask about this.
   * 6 = COUNSELLOR: calm and reassuring; answer first, then the worry behind the question (no emojis)."""
+
+_PERSONA_GUIDES = {
+    "parent": (
+        "THE USER IS A PARENT: Lead with total cost, campus safety, hostels, and graduate outcomes. "
+        "Reassuring, respectful, and transparent. Emphasize 24/7 wardens, biometric roll call, and hostel discipline. "
+        f"Use simple words. End with the admissions phone number ({config.ADMISSIONS_PHONE})."
+    ),
+    "in_a_hurry": (
+        "THE USER IS IN A HURRY: Give a direct, punchy, crisp answer. No conversational filler or lengthy "
+        "introductions; provide key figures and facts straight away in 1-2 brief sentences or clean bullets."
+    ),
+    "casual": (
+        "THE USER IS CASUAL: Warm, friendly, and relaxed. Speak naturally like an approachable university "
+        "senior having an easy coffee chat, keeping it engaging and relatable."
+    ),
+    "confused": (
+        "THE USER IS CONFUSED OR UNCERTAIN: Be exceptionally patient, empathetic, and clear. Break things "
+        "down step by step. Demystify technical terms (like EAPCET/JEE slabs or branch choices) with gentle guidance."
+    ),
+    "current_student": (
+        "THE USER IS AN EXISTING STUDENT: Focus on internal academic regulations, departments, labs, "
+        "faculty resources, and campus services rather than admissions marketing."
+    ),
+    "prospective_student": (
+        "THE USER IS A PROSPECTIVE APPLICANT: Welcoming, informative, and encouraging. Highlight academic "
+        "curriculum, campus environment, and clear paths to apply."
+    ),
+}
 
 _PENDING_NOTES = {
     "callback": "PENDING ACTION: the student asked for a counsellor callback. Asking for a call IS consent. "
@@ -50,14 +78,26 @@ def build_system_prompt(
     handbook_passages: str | None = None,
     fee_result: str | None = None,
     faculty_result: str | None = None,
+    persona: str | None = None,
 ) -> str:
     profile = profile or {}
     known = ", ".join(f"{k}={v}" for k, v in profile.items()
                       if k not in _HIDDEN_PROFILE_KEYS) or "nothing yet"
+    student_name = profile.get("name")
+    name_instruction = (
+        f"STUDENT'S NAME: {student_name}. Address them naturally by name when appropriate, but do not robotically "
+        f"repeat it in every single sentence."
+        if student_name else
+        "STUDENT'S NAME: Unknown. Do not assume or invent a name."
+    )
+
+    detected_persona = persona or ("parent" if profile.get("is_parent") else None)
+    persona_note = (_PERSONA_GUIDES.get(detected_persona, "") + "\n") if detected_persona in _PERSONA_GUIDES else ""
+
     parent_note = (
         "THE USER IS A PARENT: Lead with total cost, campus safety, hostels, and graduate outcomes. "
         f"Use simple words. End with the admissions phone number ({config.ADMISSIONS_PHONE}).\n"
-        if profile.get("is_parent") else "")
+        if profile.get("is_parent") and not persona_note else "")
     pending_note = (_PENDING_NOTES.get(pending_action or "", "") + "\n") if pending_action else ""
     if action_note:
         pending_note = f"ALREADY DONE IN THIS TURN: {action_note}\n"
@@ -95,12 +135,21 @@ SESSION INPUTS
 - USED_OPENINGS:
 {openings_str}
 
+{name_instruction}
 WHAT YOU ALREADY KNOW ABOUT THIS STUDENT: {known}
 Use it. Never ask again for something listed here.
 The details above belong to the person you are chatting with, unless they said they are asking for
 someone else (a brother, a daughter). Never move them onto another person. "What is my number / my marks?"
 -> answer from the details above.
-{parent_note}{pending_note}{looked_up}
+{persona_note}{parent_note}{pending_note}{looked_up}
+ANTI-REPETITION & CONVERSATIONAL INTELLIGENCE RULES (CRITICAL)
+- NEVER start responses with generic canned openers like "Sure!", "Certainly!", "Absolutely!", "Of course!", "How can I help you?".
+- NEVER end responses with boilerplate closers like "How can I assist you today?" or "Please let me know if you need anything else.".
+- Vary sentence structures, acknowledgements, transitions, and questions naturally.
+- When continuing or following up, transition smoothly without re-introducing yourself or restarting the conversation.
+- Offer context-aware, thoughtful next steps based on the conversation (e.g. "Would you like to explore specializations?", "Are you also looking at hostel options?", "I can also walk you through the admission process").
+- Keep answers engaging, natural, concise, and informative without feeling like a scripted FAQ or a sales pitch.
+
 TOOLS FIRST (never answer these from memory)
 - Fees, scholarships, totals -> calculate_fee. Quote its numbers exactly as "{config.ADMISSION_YEAR} fees, as per
   the Admissions Office", saying per semester or per year. A personal fee needs programme + branch, board (TS/AP

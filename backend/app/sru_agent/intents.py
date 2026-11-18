@@ -226,13 +226,15 @@ bus buses route routes transport placement placements library timings timing fac
 hod dean details detail information info location address directions food mess sports ragging refund
 documents document apply application loan lab labs wifi college ranking rankings nirf reach how what where
 when why which who fee structure syllabus curriculum seats seat cutoff exam exams result results
+tell know give check calculate find share help speak chat medium telugu hindi english hyderabad
 """.split())
 _NAME_INTRO = re.compile(
     r"(?:\bmy\s+name\s+is|\bname\s*(?:is|:|-)|\bname\s+(?=[A-Za-z])|\bmyself\b|\bnaa\s+peru\b|"
-    r"\bmera\s+naam\b)\s*([A-Za-z][A-Za-z .']{0,45})", re.IGNORECASE)
-# "I am ..." is usually not a name ("I am interested", "I am a parent"), so it needs more proof.
+    r"\bmera\s+naam\b|\bcall\s+me\s+(?!on\b)|\b(?:it's|its)\b)\s*([A-Za-z][A-Za-z .']{0,45})", re.IGNORECASE)
+# "I am ..." or "This is ..."
 _WEAK_NAME_INTRO = re.compile(r"(?:\bi\s+am\b|\bi'm\b|\bim\b|\bthis\s+is\b)\s+([A-Za-z][A-Za-z .']{0,45})",
                               re.IGNORECASE)
+_HERE_NAME_INTRO = re.compile(r"^([A-Za-z][A-Za-z .']{1,45})\s+here\b", re.IGNORECASE)
 _NAME_WORD = re.compile(r"[A-Za-z][A-Za-z.']*")
 
 
@@ -247,7 +249,7 @@ def _clean_name(fragment: str):
     while words and len(words[-1]) == 1 and len(words) > 3:
         words.pop()
     name = " ".join(words).strip()
-    if len(name.replace(" ", "")) < 3:
+    if len(name.replace(" ", "")) < 2:
         return None
     return " ".join(w if w.isupper() and len(w) <= 3 else w.capitalize() for w in name.split())
 
@@ -255,22 +257,39 @@ def _clean_name(fragment: str):
 def extract_name(message: str, bare_ok: bool = False):
     """The student's name if the message states one.
 
-    Understands 'my name is Ravi Kumar', 'I am Ravi, 98...', 'Ravi Kumar 9876543210',
-    '9876543210 Ravi Kumar'. With bare_ok=True (the agent has just asked for the name) a message
-    that is only a name ('Ravi Kumar') also counts.
+    Understands 'my name is Mahesh', 'I am Mahesh, 98...', 'Mahesh Reddy',
+    'Hello, I'm Mahesh', 'call me Mahesh', 'its Mahesh', 'Mahesh here'.
+    With bare_ok=True (the agent has just asked for the name) a message
+    that is only a name ('Mahesh', 'Mahesh Reddy') also counts.
     """
     msg = (message or "").strip()
+    if not msg:
+        return None
+
+    # 1. Explicit name introduction ("my name is ...", "call me ...", "its ...", "myself ...")
     for m in _NAME_INTRO.finditer(msg):
         name = _clean_name(m.group(1))
         if name:
             return name
+
+    # 2. "[Name] here"
+    m_here = _HERE_NAME_INTRO.match(msg)
+    if m_here:
+        name = _clean_name(m_here.group(1))
+        if name:
+            return name
+
     phone = re.search(r"(?:\+?91[\s-]?|0)?[6-9]\d{4}[\s-]?\d{5}(?!\d)", msg)
+
+    # 3. Weak introductions ("I am Mahesh", "I'm Mahesh", "this is Mahesh")
     for m in _WEAK_NAME_INTRO.finditer(msg):
         name = _clean_name(m.group(1))
         if name:
             typed = m.group(1).split()[:len(name.split())]
             if phone or bare_ok or all(w[:1].isupper() for w in typed):
                 return name
+
+    # 4. Phone adjacent names
     if phone:
         before = re.sub(r"[\s,\-(:]+$", "", msg[:phone.start()])
         before = re.split(r"[.;:!?\n,]", before)[-1].strip()
@@ -284,11 +303,63 @@ def extract_name(message: str, bare_ok: bool = False):
             name = _clean_name(after)
             if name and len(name.split()) == len(after.split()):
                 return name
-    if bare_ok and 1 <= len(msg.split()) <= 4 and all(_NAME_WORD.fullmatch(w) for w in msg.split()):
-        name = _clean_name(msg)
-        if name and len(name.split()) == len(msg.split()):
-            return name
+
+    # 5. Bare name (when awaiting name from previous turn)
+    if bare_ok:
+        # Check if user said "I am / I'm / it's [Name]"
+        cleaned_msg = re.sub(r"^(?:hello|hi|hey|i\s+am|i'm|im|this\s+is|it's|its)\s+", "", msg, flags=re.IGNORECASE).strip()
+        if 1 <= len(cleaned_msg.split()) <= 4 and all(_NAME_WORD.fullmatch(w) for w in cleaned_msg.split()):
+            name = _clean_name(cleaned_msg)
+            if name and len(name.split()) == len(cleaned_msg.split()):
+                return name
+
     return None
+
+
+_REFUSAL_PATTERN = re.compile(
+    r"^\s*(?:no|nope|nah|skip|pass|not\s+now|dont\s+want\s+to\s+say|don'?t\s+want\s+to\s+say|"
+    r"prefer\s+not\s+to\s+say|why\s+do\s+you\s+need|why\s+name|just\s+tell\s+me|"
+    r"leave\s+it|just\s+answer|answer\s+my\s+question)[!.,?\s]*$",
+    re.IGNORECASE,
+)
+
+
+def is_refusal_or_skip(message: str) -> bool:
+    """True if user refuses or skips providing their name."""
+    msg = (message or "").strip()
+    return bool(_REFUSAL_PATTERN.search(msg))
+
+
+def detect_user_persona(message: str, history: list | None = None, profile: dict | None = None) -> str:
+    """Classify user persona and communication style from message and history."""
+    msg = (message or "").lower()
+    profile = profile or {}
+
+    # 1. Parent or guardian
+    if profile.get("is_parent") or re.search(r"\b(?:my\s+(?:son|daughter|child|ward|kid)|as\s+a\s+parent|we\s+are\s+parents)\b", msg):
+        return "parent"
+
+    # 2. In a hurry / direct
+    if re.search(r"\b(?:quick|urgently?|fast|in\s+short|briefly?|summarize|summary|just\s+tell\s+me)\b", msg) or (len(msg.split()) <= 3 and re.search(r"\b(?:fee|fees|cost|cutoff|package)\b", msg)):
+        return "in_a_hurry"
+
+    # 3. Confused
+    if re.search(r"\b(?:confused|not\s+sure|dont\s+know|don't\s+know|help\s+me\s+choose|which\s+is\s+better|explain\s+simply|dont\s+understand|don't\s+understand)\b", msg):
+        return "confused"
+
+    # 4. Current student
+    if re.search(r"\b(?:my\s+roll\s+no|hall\s+ticket|my\s+attendance|semester\s+exam|re-?evaluation|faculty\s+cabin|id\s+card|current\s+student|second\s+year|third\s+year)\b", msg):
+        return "current_student"
+
+    # 5. Casual user
+    if re.search(r"\b(?:bro|buddy|dude|wassup|sup|cool|chill|hey\s+man)\b", msg) or any(c in msg for c in ("😎", "🔥", "🙌", "😂")):
+        return "casual"
+
+    # 6. Interested prospective student
+    if re.search(r"\b(?:intermediate|inter\s+marks|12th|eapcet|eamcet|jee|join\s+sru|apply|admission|scholarship|eligibility)\b", msg):
+        return "prospective_student"
+
+    return "information_seeking"
 
 
 def extract_preferred_time(message: str):
