@@ -178,11 +178,11 @@ function MessageBubble({
           </div>
         )}
 
-        {/* Rich Interactive Cards (e.g. branch comparison, fee breakdown) */}
+        {/* Rich Interactive Cards (e.g. branch comparison, fee breakdown, academic flow) */}
         {!isStreaming && role === "assistant" && cards && cards.length > 0 && (
           <div className="message-cards-container">
             {cards.map((card, idx) => (
-              <RenderCard key={idx} card={card} />
+              <RenderCard key={idx} card={card} onSelect={onSuggestionClick} />
             ))}
           </div>
         )}

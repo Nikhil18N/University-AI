@@ -1108,10 +1108,251 @@ export function ApplicationAdCard({ card }: CardProps) {
   );
 }
 
-export function RenderCard({ card }: { card: any }) {
+export function SchoolSelectionCard({ card, onSelect }: { card: any; onSelect?: (text: string) => void }) {
+  const schools = card.schools || [];
+  return (
+    <div className="rich-card school-selection-card">
+      <div className="card-header">
+        <span className="card-badge">
+          <BookOpenIcon size={14} /> Academic Areas
+        </span>
+        <h4 className="card-title">{card.title || "Select Academic School"}</h4>
+        {card.subtitle && <p className="card-subtitle">{card.subtitle}</p>}
+      </div>
+
+      <div className="school-selection-grid">
+        {schools.map((s: any, idx: number) => (
+          <button
+            key={idx}
+            type="button"
+            className="school-card-choice-btn"
+            onClick={() => onSelect?.(s.name)}
+          >
+            <div className="school-card-choice-icon">{s.icon}</div>
+            <div className="school-card-choice-content">
+              <div className="school-card-choice-title">{s.name}</div>
+              {s.highlight && <div className="school-card-choice-desc">{s.highlight}</div>}
+            </div>
+            <div className="school-card-choice-arrow">→</div>
+          </button>
+        ))}
+      </div>
+
+      <div className="school-card-manual-hint">
+        <span>Can't find your programme?</span>
+        <button
+          type="button"
+          className="school-manual-btn"
+          onClick={() => onSelect?.("Type manual course")}
+        >
+          Type your course manually
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function CourseSelectionCard({ card, onSelect }: { card: any; onSelect?: (text: string) => void }) {
+  const ugProgs = card.programs_ug || [];
+  const pgProgs = card.programs_pg || [];
+
+  return (
+    <div className="rich-card course-selection-card">
+      <div className="card-header">
+        <span className="card-badge">
+          <span>{card.icon || "🎓"}</span> {card.school_name || "Academic School"}
+        </span>
+        <h4 className="card-title">{card.title || "Offered Programmes"}</h4>
+        {card.subtitle && <p className="card-subtitle">{card.subtitle}</p>}
+      </div>
+
+      {ugProgs.length > 0 && (
+        <div className="course-group-section">
+          <div className="course-group-label">Undergraduate Degrees (UG)</div>
+          <div className="course-pills-grid">
+            {ugProgs.map((prog: any, idx: number) => (
+              <button
+                key={idx}
+                type="button"
+                className="course-choice-pill"
+                onClick={() => onSelect?.(prog.name)}
+              >
+                <span className="course-choice-name">{prog.name}</span>
+                <span className="course-choice-arrow">→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pgProgs.length > 0 && (
+        <div className="course-group-section">
+          <div className="course-group-label">Postgraduate Degrees (PG)</div>
+          <div className="course-pills-grid">
+            {pgProgs.map((prog: any, idx: number) => (
+              <button
+                key={idx}
+                type="button"
+                className="course-choice-pill"
+                onClick={() => onSelect?.(prog.name)}
+              >
+                <span className="course-choice-name">{prog.name}</span>
+                <span className="course-choice-arrow">→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="course-card-actions">
+        <button
+          type="button"
+          className="course-back-btn"
+          onClick={() => onSelect?.("Change school")}
+        >
+          ← Change School
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function DetailedFeeStructureCard({ card, onSelect }: { card: any; onSelect?: (text: string) => void }) {
+  const [activeTab, setActiveTab] = useState<"tuition" | "hostel" | "other">("tuition");
+
+  return (
+    <div className="rich-card detailed-fee-card">
+      <div className="card-header">
+        <div className="fee-card-badge-row">
+          <span className="card-badge">
+            <RupeeIcon size={14} /> Verified Fee Breakdown
+          </span>
+          <span className="academic-year-badge">{card.academic_year || "2027-28"}</span>
+        </div>
+        <h4 className="card-title">{card.title || card.program_name}</h4>
+        <p className="card-subtitle">{card.school_name}</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="fee-card-tabs" role="tablist">
+        <button
+          type="button"
+          className={`fee-card-tab-btn ${activeTab === "tuition" ? "active" : ""}`}
+          onClick={() => setActiveTab("tuition")}
+        >
+          Tuition & Academic
+        </button>
+        <button
+          type="button"
+          className={`fee-card-tab-btn ${activeTab === "hostel" ? "active" : ""}`}
+          onClick={() => setActiveTab("hostel")}
+        >
+          Hostel & Living
+        </button>
+        <button
+          type="button"
+          className={`fee-card-tab-btn ${activeTab === "other" ? "active" : ""}`}
+          onClick={() => setActiveTab("other")}
+        >
+          Transport & Deposits
+        </button>
+      </div>
+
+      {activeTab === "tuition" && (
+        <div className="fee-tab-pane">
+          <div className="fee-breakdown-row highlight">
+            <span className="fee-row-label">Annual Tuition Fee</span>
+            <span className="fee-row-value">{card.tuition?.formatted_annual}</span>
+          </div>
+          <div className="fee-breakdown-row sub">
+            <span className="fee-row-label">Per Semester Tuition</span>
+            <span className="fee-row-value">{card.tuition?.formatted_semester}</span>
+          </div>
+
+          <div className="fee-section-divider">One-Time & Academic Charges</div>
+          {(card.one_time_charges || []).map((c: any, i: number) => (
+            <div key={i} className="fee-breakdown-row">
+              <span className="fee-row-label">{c.label}</span>
+              <span className="fee-row-value">{c.formatted}</span>
+            </div>
+          ))}
+          {(card.annual_academic_charges || []).map((c: any, i: number) => (
+            <div key={i} className="fee-breakdown-row">
+              <span className="fee-row-label">{c.label}</span>
+              <span className="fee-row-value">{c.formatted}</span>
+            </div>
+          ))}
+
+          <div className="fee-total-box">
+            <div className="fee-total-label">Total First Year Academic:</div>
+            <div className="fee-total-amount">{card.formatted_first_year_academic}</div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "hostel" && (
+        <div className="fee-tab-pane">
+          <div className="hostel-options-grid">
+            {(card.hostel_options || []).map((h: any, i: number) => (
+              <div key={i} className="hostel-option-card">
+                <div className="hostel-option-title">{h.type}</div>
+                <div className="hostel-option-price">{h.formatted} <span className="per-yr">/yr</span></div>
+              </div>
+            ))}
+          </div>
+          <div className="dining-highlight-box">
+            <SparklesIcon size={14} />
+            <span>{card.dining_info || "Central multi-cuisine mess included in residential fee with 4,000-seat central dining facility."}</span>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "other" && (
+        <div className="fee-tab-pane">
+          <div className="fee-breakdown-row">
+            <span className="fee-row-label">Tri-Cities Bus Transport (Annual)</span>
+            <span className="fee-row-value">{card.formatted_transport || "₹30,000"}</span>
+          </div>
+          {(card.hostel_deposits || []).map((d: any, i: number) => (
+            <div key={i} className="fee-breakdown-row">
+              <span className="fee-row-label">{d.label}</span>
+              <span className="fee-row-value">{d.formatted}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Card Action CTAs */}
+      <div className="fee-card-actions-row">
+        <button
+          type="button"
+          className="fee-action-primary-btn"
+          onClick={() => onSelect?.("Calculate scholarship for my marks")}
+        >
+          <AwardIcon size={14} /> Calculate Scholarship
+        </button>
+        <button
+          type="button"
+          className="fee-action-secondary-btn"
+          onClick={() => onSelect?.("Change school / programme")}
+        >
+          Change Course
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function RenderCard({ card, onSelect }: { card: any; onSelect?: (text: string) => void }) {
   if (!card || !card.type) return null;
 
   switch (card.type) {
+    case "school_selection":
+      return <SchoolSelectionCard card={card} onSelect={onSelect} />;
+    case "course_selection":
+      return <CourseSelectionCard card={card} onSelect={onSelect} />;
+    case "fee_structure_detailed":
+      return <DetailedFeeStructureCard card={card} onSelect={onSelect} />;
     case "comparison":
       return <ComparisonCard card={card} />;
     case "fee_breakdown":

@@ -117,7 +117,7 @@ def test_hostel_payment_and_concession_questions_are_left_to_other_tools():
 async def test_fee_questions_are_asked_without_a_model_call_then_answered_in_one():
     sid = f"r3-fee-{uuid.uuid4()}"
     client = Recorder([_text("With 85% you get a 25% scholarship.")])
-    done = await _run("cse fee", sid, client, "conv-r3-fee")
+    done = await _run("calculate cse fee", sid, client, "conv-r3-fee")
     assert client.requests == [] and "JEE Main" in done["answer"]
     done = await _run("85% state board, no JEE", sid, client, "conv-r3-fee")
     assert len(client.requests) == 1

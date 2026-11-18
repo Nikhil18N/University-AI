@@ -26,7 +26,7 @@ from datetime import date, datetime
 from google import genai
 from google.genai import types
 
-from . import config, faculty, fee_intake, fees, intents, knowledge, memory, tools
+from . import config, faculty, fee_flow, fee_intake, fees, intents, knowledge, memory, tools
 from .prompt import build_system_prompt
 
 log = logging.getLogger("sru_agent")
@@ -1443,11 +1443,20 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     if intent in ("DATE_CONFIRMATION_YES", "DATE_CONFIRMATION_NO"):
         intent = "GENERAL"  # an old chat that was waiting for a visit date: answer normally
 
-    # ---- 4b. Fee enquiries: collect the details a correct fee needs, then calculate ----------------
+    # ---- 4b. Course Selection & Fee Enquiry Flow ----------------
     intake_decision = None
     if not action_note and not action and conv_state.get("pending_action") not in ("callback", "campus_visit") \
             and intent not in ("CAMPUS_VISIT_BOOKING", "CAMPUS_VISIT_BOOKING_WITH_DATE", "DATE_CONFIRMATION_YES",
                                "DATE_CONFIRMATION_NO"):
+        flow_result = fee_flow.process_fee_flow(message, session_id, profile, conv_state)
+        if flow_result is not None:
+            await set_state(**flow_result["new_state"])
+            async for ev in _say(flow_result["text"], message, session_id, conversation_id,
+                                 cards=flow_result.get("cards", []),
+                                 suggestions=flow_result.get("suggestions", [])):
+                yield ev
+            return
+
         intake_decision = fee_intake.decide(message, profile, conv_state.get("fee_intake"))
         if intake_decision and intake_decision["action"] == "ask":
             await set_state(fee_intake=intake_decision["state"])

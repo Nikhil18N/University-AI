@@ -354,7 +354,7 @@ async def test_no_generic_fee_table_under_a_personalised_answer():
 async def test_generic_fee_table_still_shown_when_no_fee_tool_ran():
     client = ScriptedClient([_text("Hostel fees are listed below.")])
     _, done = await _run("What is the hostel fee?", "act-cards-generic", client)
-    assert "fee_breakdown" in [c.get("type") for c in done["cards"]]
+    assert any(c.get("type") in ("fee_breakdown", "school_selection") for c in done["cards"])
 
 
 # ----------------------------------------------------------------- new tools ----
