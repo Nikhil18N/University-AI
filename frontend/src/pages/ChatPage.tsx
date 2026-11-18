@@ -32,7 +32,8 @@ function closeWidget() {
 const DEFAULT_WELCOME_MESSAGE: MessageData = {
   id: "welcome-sru-buddy",
   role: "assistant",
-  content: "Welcome to SR University! I'm **SRU Buddy**.\n\nWho do I have the pleasure of speaking with today? Feel free to share your name or choose a topic below.",
+  content:
+    "Welcome to **SR University!** 👋\n\nI'm **SRU Buddy – Your AI Companion**, ready to help you explore everything happening at SRU.\n\nFrom academics and campus life to student activities, events, and opportunities, ask me anything about SR University.\n\n**What's on your mind today?**",
   created_at: new Date().toISOString(),
 };
 
