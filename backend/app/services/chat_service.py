@@ -46,6 +46,7 @@ from app.services.rag_service import (
     is_about_sru_query,
 )
 from app.services.reformulation_service import canonicalize_query, needs_reformulation, reformulate_query
+from app.services.cache_service import get_cached_answer, set_cached_answer
 from app.services.suggestion_service import generate_suggestions
 from app.services.video_service import (
     DEFAULT_MAX_SEMANTIC_DISTANCE,
@@ -410,7 +411,8 @@ async def handle_chat(
 
         elif intent == "UNIVERSITY" and rag_service:
             search_query = canonicalize_query(request.message)
-            if needs_reformulation(request.message, conversation_context):
+            requires_reformulation = needs_reformulation(request.message, conversation_context)
+            if requires_reformulation:
                 search_query = await reformulate_query(
                     request.message,
                     conversation_context=conversation_context,
@@ -439,14 +441,28 @@ async def handle_chat(
                 else None
             )
 
-            answer, sources = await rag_service.query(
-                question=request.message,
-                search_query=search_query,
-                conversation_context=rag_context,
-                variant_id=calculated_variant,
-                used_openings=assistant_openings,
-                about_sru_angle=about_sru_angle,
+            cacheable = (
+                redis_client is not None
+                and not requires_reformulation
+                and not conversation_context.strip()
+                and not profile
+                and pending_task is None
             )
+            cached = await get_cached_answer(redis_client, search_query) if cacheable else None
+            if cached:
+                answer, sources = cached
+                logger.info("Handled via cached RAG answer (search query: '%s')", search_query[:50])
+            else:
+                answer, sources = await rag_service.query(
+                    question=request.message,
+                    search_query=search_query,
+                    conversation_context=rag_context,
+                    variant_id=calculated_variant,
+                    used_openings=assistant_openings,
+                    about_sru_angle=about_sru_angle,
+                )
+                if cacheable:
+                    await set_cached_answer(redis_client, search_query, answer, sources)
             logger.info(
                 "Handled via RAG pipeline (search query: '%s', variant: %d, about_sru_angle: %s)",
                 search_query[:50],

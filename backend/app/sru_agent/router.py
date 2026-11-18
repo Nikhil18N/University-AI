@@ -5,6 +5,7 @@
 """
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -114,8 +115,20 @@ async def agent_stream(req: AgentRequest):
                 pass  # Fall back to req.conversation_id
 
         started_at = datetime.now(timezone.utc)
+        started_perf = time.perf_counter()
+        first_token_perf = None
         async for event in run_agent(req.message, req.session_id, conv_id):
+            if event["type"] == "token" and first_token_perf is None:
+                first_token_perf = time.perf_counter()
             if event["type"] == "done":
+                event["timings"] = {
+                    "first_token_ms": (
+                        round((first_token_perf - started_perf) * 1000, 1)
+                        if first_token_perf is not None
+                        else None
+                    ),
+                    "total_ms": round((time.perf_counter() - started_perf) * 1000, 1),
+                }
                 # What the chat now knows about the student, so Settings > My details stays in step.
                 try:
                     event["profile"] = memory.public_profile(await memory.get_profile(req.session_id))

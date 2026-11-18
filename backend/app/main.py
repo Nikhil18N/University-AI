@@ -2,6 +2,7 @@
 # Reload configuration trigger for apodex model
 
 import logging
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -38,25 +39,29 @@ async def lifespan(fastapi_app: FastAPI):
     # Ensure upload directory exists
     settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Auto-initialize database tables if using fresh database (e.g. Supabase)
-    try:
-        from app.db.session import engine
-        from app.db.base import Base
-        import app.models.conversation
-        import app.models.message
-        import app.models.feedback
-        import app.models.document
-        import app.models.lead
-        import app.models.memory
-        import app.models.agent
-        import app.models.calculation
-        import app.models.agent_task
+    if settings.AUTO_CREATE_SCHEMA:
+        # Development-only fallback for a fresh local database. Production schemas
+        # must be applied with `alembic upgrade head` before starting the API.
+        try:
+            from app.db.session import engine
+            from app.db.base import Base
+            import app.models.conversation
+            import app.models.message
+            import app.models.feedback
+            import app.models.document
+            import app.models.lead
+            import app.models.memory
+            import app.models.agent
+            import app.models.calculation
+            import app.models.agent_task
 
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("Database schema verified/created in PostgreSQL.")
-    except Exception as e:
-        logger.warning("Database schema check skipped or deferred: %s", e)
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("Development database schema created or verified.")
+        except Exception as e:
+            logger.warning("Development schema initialization skipped or deferred: %s", e)
+    else:
+        logger.info("Database schema creation disabled; apply Alembic migrations before startup.")
 
     # Verify or auto-seed ChromaDB documents in background
     import asyncio
@@ -83,6 +88,8 @@ async def lifespan(fastapi_app: FastAPI):
             logger.info("Redis response cache enabled (%s)", settings.REDIS_URL[:30])
         except Exception as e:
             logger.warning("Redis response cache disabled: %s", e)
+    from app.sru_agent import memory as agent_memory
+    agent_memory.set_redis_client(fastapi_app.state.redis)
 
     yield
 
@@ -99,6 +106,7 @@ async def lifespan(fastapi_app: FastAPI):
             await fastapi_app.state.redis.aclose()
         except Exception:
             pass
+    agent_memory.set_redis_client(None)
 
     from app.api.v1.deps import _llm_provider, _embedding_provider
 
@@ -147,7 +155,10 @@ def _origin_allowed(origin: str) -> bool:
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
     """Basic protection headers on every API response."""
+    started = time.perf_counter()
     response = await call_next(request)
+    elapsed_ms = (time.perf_counter() - started) * 1000
+    response.headers.setdefault("Server-Timing", f"app;dur={elapsed_ms:.1f}")
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "DENY")  # the API is never shown in a frame
@@ -194,13 +205,21 @@ async def root():
         "service": "University AI Companion API",
         "docs": "/docs",
         "health": "/health",
+        "live": "/live",
+        "ready": "/ready",
         "api_v1": "/api/v1",
     }
 
 
+@app.get("/live", tags=["system"])
+async def liveness_check():
+    """Fast process-only probe for load balancers and restart controllers."""
+    return {"status": "alive"}
+
+
 # ---- Health check ----
 @app.get("/health", response_model=HealthResponse, tags=["system"])
-async def health_check() -> HealthResponse:
+async def health_check(request: Request) -> HealthResponse:
     """Health check endpoint."""
     services = {}
 
@@ -219,9 +238,12 @@ async def health_check() -> HealthResponse:
     try:
         import redis.asyncio as aioredis
 
-        r = aioredis.from_url(settings.REDIS_URL)
+        r = getattr(request.app.state, "redis", None)
+        owns_client = r is None
+        r = r or aioredis.from_url(settings.REDIS_URL)
         await r.ping()
-        await r.aclose()
+        if owns_client:
+            await r.aclose()
         services["redis"] = "healthy"
     except Exception:
         services["redis"] = "unhealthy"
@@ -232,12 +254,12 @@ async def health_check() -> HealthResponse:
         from app.services.rag_service import COLLECTION_NAME
 
         client = get_chroma_client()
-        client.heartbeat()
+        await asyncio.to_thread(client.heartbeat)
         collection = client.get_or_create_collection(
             name=COLLECTION_NAME,
             metadata={"hnsw:space": "cosine"},
         )
-        count = collection.count()
+        count = await asyncio.to_thread(collection.count)
         services["chromadb"] = f"healthy ({count} docs)"
     except Exception as e:
         services["chromadb"] = f"unhealthy ({e})"
@@ -261,6 +283,15 @@ async def health_check() -> HealthResponse:
 
     overall = "healthy" if all(v.startswith("healthy") for v in services.values()) else "degraded"
     return HealthResponse(status=overall, services=services)
+
+
+@app.get("/ready", response_model=HealthResponse, tags=["system"])
+async def readiness_check(request: Request) -> HealthResponse:
+    """Dependency-aware probe; returns 503 while required services are degraded."""
+    result = await health_check(request)
+    if result.status != "healthy":
+        raise HTTPException(status_code=503, detail=result.model_dump())
+    return result
 
 
 # ---- Register routers ----
@@ -300,9 +331,17 @@ async def agent_knowledge_search(query: str):
             from app.api.v1.deps import get_embedding_provider
             emb_prov = get_embedding_provider()
             emb = await emb_prov.embed_single(query)
-            results = collection.query(query_embeddings=[emb], n_results=5)
+            results = await asyncio.to_thread(
+                collection.query,
+                query_embeddings=[emb],
+                n_results=5,
+            )
         except Exception:
-            results = collection.query(query_texts=[query], n_results=5)
+            results = await asyncio.to_thread(
+                collection.query,
+                query_texts=[query],
+                n_results=5,
+            )
 
         docs = results.get("documents", [[]])[0] if results.get("documents") else []
         metas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []

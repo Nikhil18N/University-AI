@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import ChatPage from "./pages/ChatPage";
-import AdminPage from "./pages/AdminPage";
 import { setChannel } from "./services/api";
 import "./index.css";
+
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 /**
  * The admin console is for university staff only. Students never see a link to it.
@@ -63,7 +64,9 @@ function App() {
   }
 
   return view === "admin" ? (
-    <AdminPage onBackToChat={backToChat} />
+    <Suspense fallback={null}>
+      <AdminPage onBackToChat={backToChat} />
+    </Suspense>
   ) : (
     <ChatPage onOpenAdmin={isStaff ? () => setView("admin") : undefined} />
   );

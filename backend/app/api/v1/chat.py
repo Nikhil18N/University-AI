@@ -47,6 +47,12 @@ async def send_message(
     - Pass an existing `conversation_id` to continue.
     - `session_id` is a browser-generated UUID for tracking conversations.
     """
+    # Keep the non-streaming compatibility route within the same per-student
+    # quota as the streaming routes; it also consumes model capacity.
+    from app.sru_agent import memory as agent_memory
+    if not await agent_memory.allow_request(f"chat:{request.session_id}"):
+        raise HTTPException(status_code=429, detail="Too many messages. Please wait a minute and try again.")
+
     try:
         return await chat_service.handle_chat(db, request, llm, rag, redis_client=redis)
     except Exception as e:

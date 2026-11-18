@@ -19,6 +19,7 @@ file if the model cannot be reached at all.
 import asyncio
 import logging
 import re
+import time
 import weakref
 from datetime import date, datetime
 
@@ -153,6 +154,16 @@ class ModelUnavailable(Exception):
     """Every key has used up its quota: answer without the model instead of making students wait."""
 
 
+def _remaining_budget(link: dict) -> float:
+    deadline = link.get("deadline")
+    if deadline is None:
+        return config.AGENT_CALL_TIMEOUT
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise ModelUnavailable("agent request time budget exhausted")
+    return min(config.AGENT_CALL_TIMEOUT, remaining)
+
+
 def _is_daily_limit(exc: Exception) -> bool:
     text = str(exc).lower().replace(" ", "").replace("_", "")
     return "perday" in text or "daily" in text or "requestsperday" in text
@@ -221,11 +232,12 @@ async def _generate(contents, cfg, link: dict):
         client = link["fixed"] or _ring.client(link["key"])
         model = link["models"][link["model_idx"]]
         try:
+            timeout = _remaining_budget(link)
             async with _gate():
                 resp = await asyncio.wait_for(
                     client.aio.models.generate_content(model=model, contents=contents,
                                                        config=_with_thinking(cfg, link, model)),
-                    timeout=config.AGENT_CALL_TIMEOUT)
+                    timeout=timeout)
             if not link["fixed"]:
                 _ring.worked(link["key"])
             return resp
@@ -234,6 +246,8 @@ async def _generate(contents, cfg, link: dict):
             if wait is None:
                 continue
             attempt += 1
+            if link.get("deadline") is not None and time.monotonic() + wait >= link["deadline"]:
+                raise ModelUnavailable("agent request time budget exhausted") from exc
             await asyncio.sleep(wait)
 
 
@@ -260,16 +274,17 @@ async def _generate_stream(contents, cfg, link: dict):
         model = link["models"][link["model_idx"]]
         started = False
         try:
+            timeout = _remaining_budget(link)
             async with _gate():
                 stream = await asyncio.wait_for(
                     client.aio.models.generate_content_stream(model=model, contents=contents,
                                                               config=_with_thinking(cfg, link, model)),
-                    timeout=config.AGENT_CALL_TIMEOUT)
+                    timeout=timeout)
                 parts, last = [], None
                 iterator = stream.__aiter__()
                 while True:
                     try:
-                        chunk = await asyncio.wait_for(iterator.__anext__(), timeout=config.AGENT_CALL_TIMEOUT)
+                        chunk = await asyncio.wait_for(iterator.__anext__(), timeout=_remaining_budget(link))
                     except StopAsyncIteration:
                         break
                     last = chunk
@@ -294,6 +309,8 @@ async def _generate_stream(contents, cfg, link: dict):
             if wait is None:
                 continue
             attempt += 1
+            if link.get("deadline") is not None and time.monotonic() + wait >= link["deadline"]:
+                raise ModelUnavailable("agent request time budget exhausted") from exc
             await asyncio.sleep(wait)
 
 
@@ -1527,7 +1544,7 @@ async def run_agent(message: str, session_id: str, conversation_id=None, client=
     tool_decl = _tool_declarations()
     final = ""
     link = {"fixed": client, "key": None, "models": models, "model_idx": 0, "error_kind": None,
-            "thinking": True}
+            "thinking": True, "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT)}
     # Words are shown while Gemini writes them, except when the reply is about a callback / visit
     # request or a cancellation: those are checked for honesty first and only then shown.
     live_ok = not (pending or action_note or _CANCEL_ASK.search(message) or intents.is_callback_request(message))

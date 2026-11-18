@@ -4,7 +4,7 @@ import logging
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select, func
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -28,28 +28,38 @@ async def list_conversations(
 ) -> list[ConversationSummary]:
     """List all non-empty conversations for a session, newest first.
     Backfills titles for conversations whose title is stuck as 'New conversation'."""
+    first_user_message = (
+        select(Message.content)
+        .where(
+            Message.conversation_id == Conversation.id,
+            Message.role == "user",
+            Message.content.is_not(None),
+        )
+        .order_by(Message.created_at.asc(), Message.role.desc())
+        .limit(1)
+        .scalar_subquery()
+    )
     stmt = (
-        select(Conversation)
-        .options(selectinload(Conversation.messages))
-        .where(Conversation.session_id == session_id)
+        select(Conversation, first_user_message.label("first_user_message"))
+        .where(
+            Conversation.session_id == session_id,
+            exists(
+                select(1).where(Message.conversation_id == Conversation.id)
+            ),
+        )
         .order_by(Conversation.updated_at.desc())
     )
     result = await db.execute(stmt)
-    conversations = result.scalars().all()
+    conversations = result.all()
 
     summaries: list[ConversationSummary] = []
     titles_updated = False
 
-    for c in conversations:
-        # Ignore empty conversations with 0 messages
-        if not c.messages:
-            continue
-
+    for c, first_user_content in conversations:
         # Backfill title if stuck on "New conversation"
         if c.title == "New conversation" or not c.title:
-            first_user_msg = next((m.content for m in c.messages if m.role == "user" and m.content), None)
-            if first_user_msg:
-                clean_title = first_user_msg.strip()
+            if first_user_content:
+                clean_title = first_user_content.strip()
                 if len(clean_title) > 50:
                     clean_title = clean_title[:47].rstrip() + "..."
                 if clean_title:

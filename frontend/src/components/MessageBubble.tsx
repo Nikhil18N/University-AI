@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { submitFeedback } from "../services/api";
 import { RenderCard } from "./Cards";
 import MarkdownContent from "./MarkdownContent";
@@ -36,7 +36,7 @@ interface Props {
   onSuggestionClick?: (text: string) => void;
 }
 
-export default function MessageBubble({
+function MessageBubble({
   role,
   content,
   suggestions,
@@ -212,3 +212,17 @@ export default function MessageBubble({
     </div>
   );
 }
+
+const areMessagePropsEqual = (previous: Props, next: Props): boolean =>
+  previous.role === next.role &&
+  previous.content === next.content &&
+  previous.sources === next.sources &&
+  previous.suggestions === next.suggestions &&
+  previous.cards === next.cards &&
+  previous.flow === next.flow &&
+  previous.messageId === next.messageId &&
+  previous.conversationId === next.conversationId &&
+  previous.sessionId === next.sessionId &&
+  previous.isStreaming === next.isStreaming;
+
+export default memo(MessageBubble, areMessagePropsEqual);

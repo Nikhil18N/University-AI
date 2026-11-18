@@ -1,8 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { lazy, Suspense, useState, useEffect, useRef } from "react";
 import MessageBubble from "../components/MessageBubble";
-import ScholarshipCalculatorModal from "../components/ScholarshipCalculatorModal";
-import LeadAuthModal from "../components/LeadAuthModal";
-import SettingsModal from "../components/SettingsModal";
 import { CalculatorIcon } from "../components/Icons";
 import { getSessionId } from "../hooks/useSession";
 import { applyServerProfile, syncStudentDetails } from "../utils/studentProfile";
@@ -14,6 +11,10 @@ import {
 import { playChime, triggerConfetti } from "../utils/effects";
 import { APP_VERSION } from "../version";
 import "./ChatPage.css";
+
+const ScholarshipCalculatorModal = lazy(() => import("../components/ScholarshipCalculatorModal"));
+const LeadAuthModal = lazy(() => import("../components/LeadAuthModal"));
+const SettingsModal = lazy(() => import("../components/SettingsModal"));
 
 interface Props {
   onOpenAdmin?: () => void;
@@ -62,6 +63,7 @@ const QUICK_STARTER_QUERIES = [
     prompt: "What are all the programs and courses available at SR University?",
   },
 ];
+const MESSAGE_RENDER_WINDOW = 60;
 
 export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   const isWidget = variant === "widget";
@@ -77,6 +79,7 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
 
   // Chat message state
   const [messages, setMessages] = useState<MessageData[]>([DEFAULT_WELCOME_MESSAGE]);
+  const [visibleMessageCount, setVisibleMessageCount] = useState(MESSAGE_RENDER_WINDOW);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const activeConvIdRef = useRef<string | null>(activeConvId);
 
@@ -127,6 +130,9 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
       : error
         ? { text: "Setting up...", type: "setting_up" }
         : { text: "Connected", type: "connected" };
+  const visibleMessages = messages.length > visibleMessageCount
+    ? messages.slice(-visibleMessageCount)
+    : messages;
 
   // Scroll to bottom of widget when messages update
   useEffect(() => {
@@ -212,6 +218,49 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     let assistantAppended = false;
     let accumulatedContent = "";
     const accumulatedCards: any[] = [];
+    let renderFrame: number | null = null;
+
+    const cancelScheduledRender = () => {
+      if (renderFrame !== null) {
+        window.cancelAnimationFrame(renderFrame);
+        renderFrame = null;
+      }
+    };
+
+    const flushAssistantRender = () => {
+      renderFrame = null;
+      if (!assistantAppended) {
+        assistantAppended = true;
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: assistantMsgId,
+            role: "assistant",
+            content: accumulatedContent,
+            cards: accumulatedCards.length ? [...accumulatedCards] : undefined,
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      } else {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId
+              ? {
+                ...m,
+                content: accumulatedContent,
+                cards: accumulatedCards.length ? [...accumulatedCards] : undefined,
+              }
+              : m
+          )
+        );
+      }
+    };
+
+    const scheduleAssistantRender = () => {
+      if (renderFrame === null) {
+        renderFrame = window.requestAnimationFrame(flushAssistantRender);
+      }
+    };
 
     const convIdToSend = activeConvIdRef.current || activeConvId;
     const cancelFn = sendMessageStream(sessionId, text, convIdToSend, {
@@ -230,50 +279,15 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
       },
       onCard: (card) => {
         accumulatedCards.push(card);
-        if (!assistantAppended) {
-          assistantAppended = true;
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: assistantMsgId,
-              role: "assistant",
-              content: accumulatedContent,
-              cards: [...accumulatedCards],
-              created_at: new Date().toISOString(),
-            },
-          ]);
-        } else {
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMsgId ? { ...m, cards: [...accumulatedCards] } : m
-            )
-          );
-        }
+        scheduleAssistantRender();
       },
       onToken: (delta) => {
         setActiveToolStatus(null);
         accumulatedContent += delta;
-        if (!assistantAppended) {
-          assistantAppended = true;
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: assistantMsgId,
-              role: "assistant",
-              content: accumulatedContent,
-              cards: accumulatedCards.length ? [...accumulatedCards] : undefined,
-              created_at: new Date().toISOString(),
-            },
-          ]);
-        } else {
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMsgId ? { ...m, content: accumulatedContent } : m
-            )
-          );
-        }
+        scheduleAssistantRender();
       },
       onDone: (data: ChatResponse) => {
+        cancelScheduledRender();
         setIsLoading(false);
         setActiveToolStatus(null);
         setStreamingMsgId(null);
@@ -329,6 +343,7 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         }
       },
       onError: (err) => {
+        cancelScheduledRender();
         setIsLoading(false);
         setActiveToolStatus(null);
         setStreamingMsgId(null);
@@ -353,6 +368,7 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     setActiveConvId(null);
     activeConvIdRef.current = null;
     setMessages([DEFAULT_WELCOME_MESSAGE]);
+    setVisibleMessageCount(MESSAGE_RENDER_WINDOW);
     setError(null);
   }
 
@@ -455,7 +471,16 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
 
           {/* Body */}
           <div className="sru-widget-body" ref={messagesAreaRef}>
-            {messages.map((msg, index) => (
+            {messages.length > visibleMessages.length && (
+              <button
+                type="button"
+                onClick={() => setVisibleMessageCount((count) => Math.min(messages.length, count + MESSAGE_RENDER_WINDOW))}
+                style={{ alignSelf: "center", margin: "8px auto", color: "#bfdbfe", background: "transparent", border: "1px solid rgba(147, 197, 253, 0.35)", borderRadius: "999px", padding: "5px 12px", cursor: "pointer", fontSize: "0.75rem" }}
+              >
+                Load older messages
+              </button>
+            )}
+            {visibleMessages.map((msg, index) => (
               <MessageBubble
                 key={msg.id || index}
                 role={msg.role}
@@ -575,49 +600,52 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
           </div>
         </div>
 
-        {/* Modals */}
-        {isCalculatorOpen && (
-          <ScholarshipCalculatorModal
-            onClose={() => setIsCalculatorOpen(false)}
-            onAskBuddy={(prompt) => {
-              setIsCalculatorOpen(false);
-              handleSendMessage(prompt);
-            }}
-          />
-        )}
+        <Suspense fallback={null}>
+          {isCalculatorOpen && (
+            <ScholarshipCalculatorModal
+              onClose={() => setIsCalculatorOpen(false)}
+              onAskBuddy={(prompt) => {
+                setIsCalculatorOpen(false);
+                handleSendMessage(prompt);
+              }}
+            />
+          )}
 
-        <LeadAuthModal
-          isOpen={showLeadAuthModal}
-          onClose={() => {
-            setShowLeadAuthModal(false);
-            try {
-              sessionStorage.setItem("sru_lead_skipped", "1");
-            } catch {
-              /* ignore */
-            }
-            if (pendingAuthMessage) {
-              const nextMsg = pendingAuthMessage;
-              setPendingAuthMessage(null);
-              executeSendMessage(nextMsg);
-            }
-          }}
-          onSuccess={(_lead) => {
-            setShowLeadAuthModal(false);
-            if (pendingAuthMessage) {
-              const nextMsg = pendingAuthMessage;
-              setPendingAuthMessage(null);
-              executeSendMessage(nextMsg);
-            }
-          }}
-        />
+          {showLeadAuthModal && (
+            <LeadAuthModal
+              isOpen
+              onClose={() => {
+                setShowLeadAuthModal(false);
+                try {
+                  sessionStorage.setItem("sru_lead_skipped", "1");
+                } catch {
+                  /* ignore */
+                }
+                if (pendingAuthMessage) {
+                  const nextMsg = pendingAuthMessage;
+                  setPendingAuthMessage(null);
+                  executeSendMessage(nextMsg);
+                }
+              }}
+              onSuccess={(_lead) => {
+                setShowLeadAuthModal(false);
+                if (pendingAuthMessage) {
+                  const nextMsg = pendingAuthMessage;
+                  setPendingAuthMessage(null);
+                  executeSendMessage(nextMsg);
+                }
+              }}
+            />
+          )}
 
-        {showSettings && (
-          <SettingsModal
-            isOpen={showSettings}
-            onClose={() => setShowSettings(false)}
-            sessionId={sessionId}
-          />
-        )}
+          {showSettings && (
+            <SettingsModal
+              isOpen
+              onClose={() => setShowSettings(false)}
+              sessionId={sessionId}
+            />
+          )}
+        </Suspense>
       </div>
     );
   }
@@ -887,7 +915,16 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
           {!isMinimized && (
             <>
               <div className="sru-widget-body" ref={messagesAreaRef}>
-                {messages.map((msg, index) => (
+                {messages.length > visibleMessages.length && (
+                  <button
+                    type="button"
+                    onClick={() => setVisibleMessageCount((count) => Math.min(messages.length, count + MESSAGE_RENDER_WINDOW))}
+                    style={{ alignSelf: "center", margin: "8px auto", color: "#bfdbfe", background: "transparent", border: "1px solid rgba(147, 197, 253, 0.35)", borderRadius: "999px", padding: "5px 12px", cursor: "pointer", fontSize: "0.75rem" }}
+                  >
+                    Load older messages
+                  </button>
+                )}
+                {visibleMessages.map((msg, index) => (
                   <MessageBubble
                     key={msg.id || index}
                     role={msg.role}
@@ -1011,49 +1048,52 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         </div>
       )}
 
-      {/* Modals */}
-      {isCalculatorOpen && (
-        <ScholarshipCalculatorModal
-          onClose={() => setIsCalculatorOpen(false)}
-          onAskBuddy={(prompt) => {
-            setIsCalculatorOpen(false);
-            handleSendMessage(prompt);
-          }}
-        />
-      )}
+      <Suspense fallback={null}>
+        {isCalculatorOpen && (
+          <ScholarshipCalculatorModal
+            onClose={() => setIsCalculatorOpen(false)}
+            onAskBuddy={(prompt) => {
+              setIsCalculatorOpen(false);
+              handleSendMessage(prompt);
+            }}
+          />
+        )}
 
-      <LeadAuthModal
-        isOpen={showLeadAuthModal}
-        onClose={() => {
-          setShowLeadAuthModal(false);
-          try {
-            sessionStorage.setItem("sru_lead_skipped", "1");
-          } catch {
-            /* ignore */
-          }
-          if (pendingAuthMessage) {
-            const nextMsg = pendingAuthMessage;
-            setPendingAuthMessage(null);
-            executeSendMessage(nextMsg);
-          }
-        }}
-        onSuccess={(_lead) => {
-          setShowLeadAuthModal(false);
-          if (pendingAuthMessage) {
-            const nextMsg = pendingAuthMessage;
-            setPendingAuthMessage(null);
-            executeSendMessage(nextMsg);
-          }
-        }}
-      />
+        {showLeadAuthModal && (
+          <LeadAuthModal
+            isOpen
+            onClose={() => {
+              setShowLeadAuthModal(false);
+              try {
+                sessionStorage.setItem("sru_lead_skipped", "1");
+              } catch {
+                /* ignore */
+              }
+              if (pendingAuthMessage) {
+                const nextMsg = pendingAuthMessage;
+                setPendingAuthMessage(null);
+                executeSendMessage(nextMsg);
+              }
+            }}
+            onSuccess={(_lead) => {
+              setShowLeadAuthModal(false);
+              if (pendingAuthMessage) {
+                const nextMsg = pendingAuthMessage;
+                setPendingAuthMessage(null);
+                executeSendMessage(nextMsg);
+              }
+            }}
+          />
+        )}
 
-      {showSettings && (
-        <SettingsModal
-          isOpen={showSettings}
-          onClose={() => setShowSettings(false)}
-          sessionId={sessionId}
-        />
-      )}
+        {showSettings && (
+          <SettingsModal
+            isOpen
+            onClose={() => setShowSettings(false)}
+            sessionId={sessionId}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

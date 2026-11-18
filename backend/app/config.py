@@ -23,9 +23,11 @@ class Settings(BaseSettings):
 
     # ---- Database ----
     DATABASE_URL: str = "postgresql+asyncpg://university_ai:university_ai_dev@localhost:5433/university_ai"
+    AUTO_CREATE_SCHEMA: bool = False
 
     # ---- Redis ----
     REDIS_URL: str = "redis://localhost:6379/0"
+    RAG_CACHE_VERSION: str = "1"
 
     # ---- ChromaDB ----
     CHROMA_HOST: str = "localhost"

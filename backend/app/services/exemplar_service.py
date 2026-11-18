@@ -1,5 +1,6 @@
 """Exemplar service — manages verified Q&A pairs for dynamic few-shot learning and self-improvement."""
 
+import asyncio
 import logging
 from uuid import UUID
 import chromadb
@@ -126,7 +127,8 @@ class ExemplarService:
                 query_embedding = precomputed_embedding
             else:
                 query_embedding = await self.embeddings.embed_single(query)
-            results = collection.query(
+            results = await asyncio.to_thread(
+                collection.query,
                 query_embeddings=[query_embedding],
                 n_results=1,
                 include=["metadatas", "distances"],

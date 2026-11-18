@@ -180,9 +180,40 @@ export async function calculateAgentFee(params: AgentFeeParams, signal?: AbortSi
  * read live from the official fee file on the backend.
  */
 export async function fetchFeeConfig<T = unknown>(signal?: AbortSignal): Promise<T> {
-  const res = await fetch(`${API_BASE}/api/v1/agent/fee-config`, { signal });
-  return await handleResponse<T>(res, "Failed to load fee table");
+  if (!feeConfigRequest) {
+    feeConfigRequest = fetch(`${API_BASE}/api/v1/agent/fee-config`)
+      .then((res) => handleResponse<T>(res, "Failed to load fee table"))
+      .catch((error) => {
+        feeConfigRequest = null;
+        throw error;
+      });
+  }
+
+  if (!signal) return feeConfigRequest as Promise<T>;
+  if (signal.aborted) {
+    throw new DOMException("The fee table request was aborted.", "AbortError");
+  }
+
+  return await new Promise<T>((resolve, reject) => {
+    const abort = () => {
+      signal.removeEventListener("abort", abort);
+      reject(new DOMException("The fee table request was aborted.", "AbortError"));
+    };
+    signal.addEventListener("abort", abort, { once: true });
+    (feeConfigRequest as Promise<T>).then(
+      (value) => {
+        signal.removeEventListener("abort", abort);
+        resolve(value);
+      },
+      (error) => {
+        signal.removeEventListener("abort", abort);
+        reject(error);
+      },
+    );
+  });
 }
+
+let feeConfigRequest: Promise<unknown> | null = null;
 
 /**
  * Send a chat message with Server-Sent Events (SSE) streaming tokens in real time.

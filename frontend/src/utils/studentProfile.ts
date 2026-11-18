@@ -20,6 +20,7 @@ export interface StudentDetails {
 
 const STORAGE_KEY = "sru_student_lead";
 export const PROFILE_EVENT = "sru-profile-changed";
+const profileSyncs = new Map<string, Promise<void>>();
 
 export function cleanPhone(raw: string): string | null {
   const digits = (raw || "").replace(/\D/g, "").replace(/^(?:91|0)(?=[6-9]\d{9}$)/, "");
@@ -84,8 +85,10 @@ export async function fetchServerProfile(sessionId: string): Promise<Record<stri
  */
 export async function saveStudentDetails(
   sessionId: string,
-  details: { name?: string; phone?: string; program_interest?: string }
+  details: { name?: string; phone?: string; program_interest?: string },
+  invalidateSync = true,
 ): Promise<StudentDetails> {
+  if (invalidateSync) profileSyncs.delete(sessionId);
   const name = (details.name || "").trim();
   const phone = details.phone ? cleanPhone(details.phone) : null;
   if (details.phone && !phone) throw new Error("Please enter a valid 10-digit mobile number.");
@@ -112,6 +115,7 @@ export async function saveStudentDetails(
 
 /** "Forget my details": remove them from this browser and from the chat agent's memory. */
 export async function forgetStudentDetails(sessionId: string): Promise<void> {
+  profileSyncs.delete(sessionId);
   writeLocal(null);
   try {
     await fetch(`${API_BASE}/api/v1/agent/profile?session_id=${encodeURIComponent(sessionId)}`, { method: "DELETE" });
@@ -126,17 +130,29 @@ export async function forgetStudentDetails(sessionId: string): Promise<void> {
  * so the chat agent knows them too.
  */
 export async function syncStudentDetails(sessionId: string): Promise<void> {
-  try {
-    const server = await fetchServerProfile(sessionId);
-    if (server.name || server.phone) {
-      applyServerProfile(server);
-      return;
+  const existing = profileSyncs.get(sessionId);
+  if (existing) return existing;
+
+  let succeeded = false;
+  const sync = (async () => {
+    try {
+      const server = await fetchServerProfile(sessionId);
+      if (server.name || server.phone) {
+        applyServerProfile(server);
+      } else {
+        const local = readStudentDetails();
+        if (local?.name && cleanPhone(local.phone)) {
+          await saveStudentDetails(sessionId, { name: local.name, phone: local.phone }, false);
+        }
+      }
+      succeeded = true;
+    } catch {
+      /* backend asleep: try again on the next load */
+    } finally {
+      if (!succeeded) profileSyncs.delete(sessionId);
     }
-    const local = readStudentDetails();
-    if (local?.name && cleanPhone(local.phone)) {
-      await saveStudentDetails(sessionId, { name: local.name, phone: local.phone });
-    }
-  } catch {
-    /* backend asleep: try again on the next load */
-  }
+  })();
+
+  profileSyncs.set(sessionId, sync);
+  return sync;
 }

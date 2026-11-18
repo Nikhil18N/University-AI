@@ -17,6 +17,39 @@ from app.sru_agent import agent, config, memory
 from app.sru_agent.agent import run_agent
 
 
+def test_agent_memory_reuses_application_redis_client():
+    shared = object()
+    memory.set_redis_client(shared)
+    try:
+        assert memory._client() is shared
+    finally:
+        memory.set_redis_client(None)
+
+
+@pytest.mark.asyncio
+async def test_legacy_chat_route_rejects_rate_limited_session(monkeypatch):
+    from fastapi import HTTPException
+
+    from app.api.v1 import chat as chat_api
+    from app.schemas.chat import ChatRequest
+
+    async def deny_request(*args, **kwargs):
+        return False
+
+    monkeypatch.setattr(memory, "allow_request", deny_request)
+
+    with pytest.raises(HTTPException) as error:
+        await chat_api.send_message(
+            ChatRequest(session_id="rate-limited-session", message="hello"),
+            db=None,
+            llm=None,
+            rag=None,
+            redis=None,
+        )
+
+    assert error.value.status_code == 429
+
+
 def _text_chunk(text):
     return types.GenerateContentResponse(candidates=[types.Candidate(content=types.Content(
         role="model", parts=[types.Part.from_text(text=text)]))])

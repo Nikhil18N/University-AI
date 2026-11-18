@@ -16,11 +16,13 @@ import json
 import logging
 from typing import Any
 
+from app.config import settings
+
 logger = logging.getLogger(__name__)
 
 _CACHE_TTL_SECONDS = 3600  # 1 hour
 _MAX_ANSWER_LEN = 4000     # don't cache abnormally long answers
-_KEY_PREFIX = "sru:rag:v1:"
+_KEY_PREFIX = f"sru:rag:v{settings.RAG_CACHE_VERSION}:"
 
 
 def make_cache_key(canonical_query: str) -> str:

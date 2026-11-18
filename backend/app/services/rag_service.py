@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import re
@@ -225,7 +226,8 @@ class RAGService:
         query_embedding = await self.embeddings.embed_single(query)
         collection = self._get_collection()
 
-        results = collection.query(
+        results = await asyncio.to_thread(
+            collection.query,
             query_embeddings=[query_embedding],
             n_results=top_k,
             include=["documents", "metadatas", "distances"],

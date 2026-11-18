@@ -92,7 +92,10 @@ async def test_list_conversations_filters_empty_and_backfills_titles():
     c3.messages = [m3]  # Already has good title -> kept intact
 
     mock_result = MagicMock()
-    mock_result.scalars.return_value.all.return_value = [c1, c2, c3]
+    mock_result.all.return_value = [
+        (c2, m2.content),
+        (c3, m3.content),
+    ]
     mock_db.execute = AsyncMock(return_value=mock_result)
 
     summaries = await conversation_service.list_conversations(mock_db, "sess-1")

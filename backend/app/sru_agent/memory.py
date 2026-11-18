@@ -18,6 +18,7 @@ MAX_HISTORY = 12  # messages kept per student
 _local: dict = {}
 _redis = None
 _redis_loop = None
+_shared_redis = None
 
 # ---- Speed: a copy in this server's own memory -------------------------------------------
 # Every Redis or database trip from Render to a hosted Redis / PostgreSQL costs 50-150 ms, and a
@@ -34,11 +35,24 @@ _flushing: dict = {}        # key -> the task writing it
 _tasks: set = set()         # background tasks (kept so they are not garbage-collected)
 
 
+def set_redis_client(client):
+    """Use the application-lifecycle Redis client when one is available."""
+    global _shared_redis, _redis, _redis_loop
+    _shared_redis = client
+    if client is not None:
+        _redis = client
+        try:
+            _redis_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            _redis_loop = None
+
+
 def _client():
     global _redis, _redis_loop
+    if _shared_redis is not None:
+        return _shared_redis
     if config.REDIS_URL:
         try:
-            import asyncio
             curr_loop = asyncio.get_running_loop()
         except RuntimeError:
             curr_loop = None
