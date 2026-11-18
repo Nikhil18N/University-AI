@@ -122,48 +122,42 @@ _BTECH_ENGINEERING_PATTERN = re.compile(
 )
 
 _BTECH_CSE_ALLIED_PATTERN = re.compile(
-    r"\b(?:b\.?\s?tech\s+cse\s*(?:&|and)\s*allied|cse\s*(?:&|and)\s*allied|b\.?\s?tech\s+cse\s+fee|"
-    r"cse\s+fee\s+structure|cse\s+tuition\s+fee)\b",
+    r"^\s*(?:b\.?\s?tech\s+cse\s*(?:&|and)\s*allied|cse\s*(?:&|and)\s*allied|b\.?\s?tech\s+cse\s+branch)\s*$",
     re.IGNORECASE,
 )
 
 _BTECH_AI_ROBOTICS_PATTERN = re.compile(
-    r"\b(?:b\.?\s?tech\s+(?:in\s+)?(?:ai|artificial\s+intelligence)\s*(?:&|and)\s*robotics|"
-    r"ai\s*(?:&|and)\s*robotics\s+fee)\b",
+    r"^\s*(?:b\.?\s?tech\s+(?:in\s+)?(?:ai|artificial\s+intelligence)\s*(?:&|and)\s*robotics|ai\s*(?:&|and)\s*robotics\s+branch)\s*$",
     re.IGNORECASE,
 )
 
 _BTECH_ECE_PATTERN = re.compile(
-    r"\b(?:b\.?\s?tech\s+ece|ece\s+fee|ece\s+branch\s+fee|electronics\s*(?:&|and)\s*communication\s+fee)\b",
+    r"^\s*(?:b\.?\s?tech\s+ece|ece\s+branch)\s*$",
     re.IGNORECASE,
 )
 
 _BTECH_CORE_PATTERN = re.compile(
-    r"\b(?:b\.?\s?tech\s+core(?:\s+engineering)?|core\s+engineering\s+fee|"
-    r"mechanical\s+fee|civil\s+fee|eee\s+fee|biotechnology\s+fee|food\s+technology\s+fee)\b",
+    r"^\s*(?:b\.?\s?tech\s+core(?:\s+engineering)?|core\s+engineering\s+branch)\s*$",
     re.IGNORECASE,
 )
 
 _MANAGEMENT_PATTERN = re.compile(
-    r"\b(?:management\s*(?:\(\s*bba\s*/\s*mba\s*\))?|bba\s*(?:&|and)\s*mba(?:\s+management)?|"
-    r"bba\s+fee|mba\s+fee|management\s+fee)\b",
+    r"^\s*(?:management\s*(?:\(\s*bba\s*/\s*mba\s*\))?|bba\s*(?:&|and)\s*mba(?:\s+management)?)\s*$",
     re.IGNORECASE,
 )
 
 _AGRICULTURE_PATTERN = re.compile(
-    r"\b(?:b\.?\s?sc\.?\s*(?:\(hons\)\s*)?agriculture|agriculture\s+fee|"
-    r"school\s+of\s+agriculture\s+fee|agri\s+fee)\b",
+    r"^\s*(?:b\.?\s?sc\.?\s*(?:\(hons\)\s*)?agriculture|agriculture\s+program)\s*$",
     re.IGNORECASE,
 )
 
 _COMP_APP_PATTERN = re.compile(
-    r"\b(?:computer\s+applications\s*(?:\(\s*bca\s*/\s*mca\s*\))?|bca\s*(?:&|and)\s*mca|"
-    r"bca\s+fee|mca\s+fee)\b",
+    r"^\s*(?:computer\s+applications\s*(?:\(\s*bca\s*/\s*mca\s*\))?|bca\s*(?:&|and)\s*mca)\s*$",
     re.IGNORECASE,
 )
 
 _DESIGN_PATTERN = re.compile(
-    r"\b(?:design\s*(?:\(\s*b\.?\s?des\s*\))?|b\.?\s?des\s+fee|design\s+fee)\b",
+    r"^\s*(?:design\s*(?:\(\s*b\.?\s?des\s*\))?|b\.?\s?des)\s*$",
     re.IGNORECASE,
 )
 
@@ -233,24 +227,25 @@ def classify_agent_intent(message: str, state: dict | None = None) -> AgentInten
         if _ALL_PROGRAMS_PATTERN.search(msg):
             return "ALL_PROGRAMS_QUERY"
 
-        # Tree sub-selections
-        if _BTECH_CSE_ALLIED_PATTERN.search(msg):
+        # Tree sub-selections (exact chip clicks or active tree exploration)
+        in_tree = bool(state.get("fee_tree_step"))
+        if _BTECH_CSE_ALLIED_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:cse|computer\s+science)\b", msg)):
             return "BTECH_CSE_FEE_QUERY"
-        if _BTECH_AI_ROBOTICS_PATTERN.search(msg):
+        if _BTECH_AI_ROBOTICS_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:ai\s*&?\s*robotics|artificial\s+intelligence\s*&?\s*robotics)\b", msg)):
             return "BTECH_AI_ROBOTICS_FEE_QUERY"
-        if _BTECH_ECE_PATTERN.search(msg):
+        if _BTECH_ECE_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:ece|electronics)\b", msg)):
             return "BTECH_ECE_FEE_QUERY"
-        if _BTECH_CORE_PATTERN.search(msg):
+        if _BTECH_CORE_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:core|mech|civil|eee|biotech)\b", msg)):
             return "BTECH_CORE_FEE_QUERY"
-        if _BTECH_ENGINEERING_PATTERN.search(msg):
+        if _BTECH_ENGINEERING_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:b\.?\s?tech|engineering)\b", msg)):
             return "BTECH_TREE_QUERY"
-        if _MANAGEMENT_PATTERN.search(msg):
+        if _MANAGEMENT_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:bba|mba|management)\b", msg)):
             return "MANAGEMENT_FEE_QUERY"
-        if _AGRICULTURE_PATTERN.search(msg):
+        if _AGRICULTURE_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:agri|agriculture)\b", msg)):
             return "AGRICULTURE_FEE_QUERY"
-        if _COMP_APP_PATTERN.search(msg):
+        if _COMP_APP_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:bca|mca)\b", msg)):
             return "COMP_APP_FEE_QUERY"
-        if _DESIGN_PATTERN.search(msg):
+        if _DESIGN_PATTERN.match(msg) or (in_tree and re.search(r"\b(?:design|b\.?\s?des)\b", msg)):
             return "DESIGN_FEE_QUERY"
 
     return "GENERAL"
