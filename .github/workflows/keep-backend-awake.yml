@@ -17,8 +17,9 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
-    if: ${{ vars.BACKEND_URL != '' }}
+    env:
+      TARGET_URL: ${{ vars.BACKEND_URL || 'https://university-ai-luwe.onrender.com' }}
     steps:
       - name: Ping /health
         run: |
-          curl --silent --show-error --max-time 90 --retry 2 --retry-delay 5 "${{ vars.BACKEND_URL }}/health" -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n"
+          curl --silent --show-error --max-time 90 --retry 2 --retry-delay 5 "${TARGET_URL}/health" -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n"

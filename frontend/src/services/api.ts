@@ -206,17 +206,35 @@ export function sendMessageStream(
     let tokensStreamed = 0;
 
     const streamFromEndpoint = async (url: string): Promise<boolean> => {
-      let res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          message,
-          conversation_id: conversationId || null,
-          channel: CHANNEL,
-        }),
-        signal: controller.signal,
-      });
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId,
+            message,
+            conversation_id: conversationId || null,
+            channel: CHANNEL,
+          }),
+          signal: controller.signal,
+        });
+      } catch (fetchErr: unknown) {
+        if (controller.signal.aborted) throw fetchErr;
+        // If the server was sleeping on cold start, retry once after a short wait
+        await new Promise((r) => setTimeout(r, 2000));
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId,
+            message,
+            conversation_id: conversationId || null,
+            channel: CHANNEL,
+          }),
+          signal: controller.signal,
+        });
+      }
 
       if (!res.ok || !res.body) {
         return false;
