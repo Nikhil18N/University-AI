@@ -32,7 +32,7 @@ function closeWidget() {
 const DEFAULT_WELCOME_MESSAGE: MessageData = {
   id: "welcome-sru-buddy",
   role: "assistant",
-  content: "Hello! Welcome to SR University. I am **SRU Buddy**, your virtual AI assistant. How may I assist you with admissions, fee structures, or scholarships today?",
+  content: "Welcome to SR University! I'm **SRU Buddy**.\n\nWho do I have the pleasure of speaking with today? Feel free to share your name or choose a topic below.",
   created_at: new Date().toISOString(),
 };
 
