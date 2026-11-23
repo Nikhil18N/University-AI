@@ -14,7 +14,7 @@
     "test": "npm run test:calc && npm run test:effects"
   },
   "dependencies": {
-    "react": "^19.2.8",
+    "react": "^19.3.1",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
