@@ -1,7 +1,7 @@
 # University AI Companion — Backend
 
 fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
+uvicorn[standard]>=0.54.0
 pydantic>=2.0
 pydantic-settings>=2.0
 
