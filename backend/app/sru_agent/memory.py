@@ -451,3 +451,40 @@ async def get_cached_answer(key: str, max_age_seconds: int):
 
 async def set_cached_answer(key: str, value: dict):
     await _set(key, {"at": time.time(), "value": value})
+
+
+# ---- v4.17.1: the state before the latest turn, so the student can edit their latest typed message -------------
+def _snap_key(session_id: str, conversation_id: str | None) -> str:
+    return f"sru:snap:{session_id}:{conversation_id or ''}"
+
+
+async def save_turn_snapshot(session_id: str, conversation_id: str | None, snapshot: dict) -> None:
+    """Kept for the LATEST turn only: the profile, conversation state and history just before it."""
+    await _set(_snap_key(session_id, conversation_id), snapshot)
+
+
+async def get_turn_snapshot(session_id: str, conversation_id: str | None) -> dict | None:
+    return await _get(_snap_key(session_id, conversation_id), None)
+
+
+async def mark_turn_snapshot(session_id: str, conversation_id: str | None, **fields) -> None:
+    snap = await get_turn_snapshot(session_id, conversation_id)
+    if snap:
+        snap.update(fields)
+        await save_turn_snapshot(session_id, conversation_id, snap)
+
+
+async def restore_turn_snapshot(session_id: str, conversation_id: str | None, snapshot: dict) -> None:
+    """Put back the profile, the conversation state (cache and database) and the history from before the turn."""
+    await replace_profile(session_id, dict(snapshot.get("profile") or {}))
+    state = dict(snapshot.get("state") or {})
+    key = _state_key(session_id, conversation_id)
+    await _set(key, state)
+    if _state_saver and conversation_id:
+        encoded = json.dumps(state, sort_keys=True, ensure_ascii=False, default=str)
+        _state_saved[key] = encoded
+        _state_pending[key] = (session_id, str(conversation_id), json.loads(encoded))
+        if key not in _state_writing:
+            _state_writing.add(key)
+            in_background(_flush_state(key), "conversation state")
+    await _set(_history_key(session_id, conversation_id), list(snapshot.get("history") or []))

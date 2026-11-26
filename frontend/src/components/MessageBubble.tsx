@@ -6,7 +6,11 @@ import MarkdownContent from "./MarkdownContent";
 import { copyCleanText } from "../utils/cleanCopy";
 import { renderUniIcon } from "./Icons";
 import { sanitizeHelplineNumbers } from "../utils/sanitizeNumbers";
+import { FEE_CARD_TYPES } from "../utils/messageActions";
+import type { ReplyPreview } from "../utils/messageActions";
 import "./MessageBubble.css";
+
+export { FEE_CARD_TYPES };
 
 function parseSuggestionChip(text: string): { icon: React.ReactNode; label: string } {
   const emojiRegex = /^(\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u;
@@ -23,9 +27,6 @@ function parseSuggestionChip(text: string): { icon: React.ReactNode; label: stri
   return { icon: null, label: text };
 }
 
-/** Cards that show a fee result; only the newest one in the chat is current. */
-export const FEE_CARD_TYPES = new Set(["fee_summary", "calculate_fee", "concession_fee", "fee_plan"]);
-
 interface Props {
   role: "user" | "assistant";
   content: string;
@@ -41,6 +42,17 @@ interface Props {
   /** A later message has a newer fee estimate (details changed): this one's fee cards are marked outdated. */
   feeOutdated?: boolean;
   onSuggestionClick?: (text: string, form?: AcademicFormPayload) => void;
+  /** v4.17.1 Reply: shown on saved answers; the composer then replies to this message. */
+  onReply?: (messageId: string) => void;
+  /** v4.17.1: this (student) message replies to an earlier one: its one-line preview, and a jump to it. */
+  replyQuote?: ReplyPreview | null;
+  onJumpToReply?: () => void;
+  /** v4.17.1 Edit: this is the latest typed message and editing is possible now. */
+  canEdit?: boolean;
+  /** Why it cannot be edited even though it is the latest (e.g. it started an admissions request). */
+  editBlockedReason?: string | null;
+  onEditSubmit?: (messageId: string, text: string) => void;
+  edited?: boolean;
 }
 
 function MessageBubble({
@@ -56,8 +68,36 @@ function MessageBubble({
   isStreaming,
   feeOutdated,
   onSuggestionClick,
+  onReply,
+  replyQuote,
+  onJumpToReply,
+  canEdit,
+  editBlockedReason,
+  onEditSubmit,
+  edited,
 }: Props) {
   const [copied, setCopied] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [editNote, setEditNote] = useState<string | null>(null);
+
+  const startEdit = () => {
+    if (editBlockedReason) {
+      setEditNote(editBlockedReason);
+      return;
+    }
+    setEditNote(null);
+    setDraft(content);
+    setIsEditing(true);
+  };
+  const submitEdit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const text = draft.trim();
+    if (!text || !messageId) return;
+    setIsEditing(false);
+    if (text === content.trim()) return; // nothing changed
+    onEditSubmit?.(messageId, text);
+  };
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -165,11 +205,75 @@ function MessageBubble({
           </div>
         )}
 
-        {/* Message Content Bubble */}
-        {mainText && mainText.trim().length > 0 && (
-          <div className={`message-text-bubble ${role}`}>
-            <MarkdownContent content={mainText} isStreaming={isStreaming} />
+        {/* v4.17.1: the earlier message this one replies to (tap to see it) */}
+        {role === "user" && replyQuote && (
+          <button
+            type="button"
+            className="msg-reply-quote"
+            onClick={onJumpToReply}
+            aria-label={`Reply to ${replyQuote.label}: ${replyQuote.text}. Show that message`}
+          >
+            <span className="msg-reply-quote-label">{replyQuote.label}</span>
+            <span className="msg-reply-quote-text">{replyQuote.text}</span>
+          </button>
+        )}
+
+        {/* Message Content Bubble (or the editor, while the student edits their latest message) */}
+        {role === "user" && isEditing ? (
+          <form className="msg-edit-form" onSubmit={submitEdit}>
+            <label className="msg-edit-label" htmlFor={`msg-edit-${messageId}`}>Edit your message</label>
+            <textarea
+              id={`msg-edit-${messageId}`}
+              className="msg-edit-input"
+              value={draft}
+              rows={Math.min(5, Math.max(2, Math.ceil(draft.length / 38)))}
+              maxLength={2000}
+              autoFocus
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setIsEditing(false);
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) submitEdit(e);
+              }}
+            />
+            <p className="msg-edit-hint">SRU Buddy will answer your corrected message again.</p>
+            <div className="msg-edit-actions">
+              <button type="button" className="msg-edit-btn" onClick={() => setIsEditing(false)}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="msg-edit-btn primary"
+                disabled={!draft.trim() || draft.trim() === content.trim()}
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        ) : (
+          mainText && mainText.trim().length > 0 && (
+            <div className={`message-text-bubble ${role}`}>
+              <MarkdownContent content={mainText} isStreaming={isStreaming} />
+            </div>
+          )
+        )}
+
+        {/* v4.17.1: "Edited" and the Edit action on the student's latest typed message */}
+        {role === "user" && !isEditing && (edited || canEdit) && (
+          <div className="msg-user-meta">
+            {edited && <span className="msg-edited-tag">Edited</span>}
+            {canEdit && onEditSubmit && (
+              <button type="button" className="msg-user-action" onClick={startEdit} aria-label="Edit this message">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+                Edit
+              </button>
+            )}
           </div>
+        )}
+        {role === "user" && editNote && (
+          <div className="msg-edit-note" role="status">{editNote}</div>
         )}
 
         {/* Rich Interactive Cards (placed seamlessly under main response text) */}
@@ -293,6 +397,22 @@ function MessageBubble({
                 )}
               </button>
 
+              {onReply && messageId && (
+                <button
+                  className="action-icon-btn action-reply-btn"
+                  onClick={() => onReply(messageId)}
+                  title="Reply to this message"
+                  aria-label="Reply to this message"
+                  type="button"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <polyline points="9 17 4 12 9 7" />
+                    <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+                  </svg>
+                  <span className="action-btn-text">Reply</span>
+                </button>
+              )}
+
               <button
                 className={`action-icon-btn ${feedback === "up" ? "active" : ""}`}
                 onClick={() => handleRating(1)}
@@ -338,6 +458,13 @@ const areMessagePropsEqual = (previous: Props, next: Props): boolean =>
   previous.sessionId === next.sessionId &&
   previous.isStreaming === next.isStreaming &&
   // v4.17.1: a newer fee estimate marks this card outdated: the bubble must re-render to show it
-  previous.feeOutdated === next.feeOutdated;
+  previous.feeOutdated === next.feeOutdated &&
+  // v4.17.1: Reply / Edit state
+  !!previous.onReply === !!next.onReply &&
+  previous.canEdit === next.canEdit &&
+  previous.editBlockedReason === next.editBlockedReason &&
+  previous.edited === next.edited &&
+  previous.replyQuote?.label === next.replyQuote?.label &&
+  previous.replyQuote?.text === next.replyQuote?.text;
 
 export default memo(MessageBubble, areMessagePropsEqual);

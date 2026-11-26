@@ -58,6 +58,12 @@ class MessageResponse(BaseModel):
     cards: list[dict] = Field(default_factory=list)
     flow: dict | None = None
     agent: dict | None = None
+    # v4.17.1: the student edited this message / replied to an earlier message (its id)
+    edited: bool = False
+    reply_to: str | None = None
+    # how the student sent it ("typed" / "button") and whether it started an admissions request (not editable)
+    source: str | None = None
+    action_done: bool = False
     model: str | None = None
     created_at: datetime
 

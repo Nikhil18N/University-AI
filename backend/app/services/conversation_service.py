@@ -114,10 +114,14 @@ async def get_conversation(
                 cards=(m.metadata_ or {}).get("cards", []),
                 flow=(m.metadata_ or {}).get("flow"),
                 agent=(m.metadata_ or {}).get("agent"),
+                edited=bool((m.metadata_ or {}).get("edited")),
+                reply_to=(m.metadata_ or {}).get("reply_to"),
+                source=(m.metadata_ or {}).get("source"),
+                action_done=bool((m.metadata_ or {}).get("action_done")),
                 model=m.model,
                 created_at=m.created_at,
             )
-            for m in conv.messages
+            for m in conv.messages if not (m.metadata_ or {}).get("superseded")
         ],
         created_at=conv.created_at,
     )
@@ -157,10 +161,14 @@ async def get_shared_conversation(
                 cards=(m.metadata_ or {}).get("cards", []),
                 flow=(m.metadata_ or {}).get("flow"),
                 agent=(m.metadata_ or {}).get("agent"),
+                edited=bool((m.metadata_ or {}).get("edited")),
+                reply_to=(m.metadata_ or {}).get("reply_to"),
+                source=(m.metadata_ or {}).get("source"),
+                action_done=bool((m.metadata_ or {}).get("action_done")),
                 model=m.model,
                 created_at=m.created_at,
             )
-            for m in conv.messages
+            for m in conv.messages if not (m.metadata_ or {}).get("superseded")
         ],
         created_at=conv.created_at,
     )
@@ -203,6 +211,7 @@ async def add_message(
     sources: list[dict] | None = None,
     metadata: dict | None = None,
     created_at: datetime | None = None,
+    message_id: uuid.UUID | None = None,
 ) -> Message:
     """Add a message to a conversation.
 
@@ -210,6 +219,7 @@ async def add_message(
     the transaction time, which would give both the same timestamp.
     """
     msg = Message(
+        **({"id": message_id} if message_id else {}),
         conversation_id=conversation_id,
         role=role,
         content=content,
@@ -244,6 +254,7 @@ async def get_recent_messages(
             "metadata": m.metadata_ if isinstance(m.metadata_, dict) else {},
         }
         for m in messages
+        if not (m.metadata_ if isinstance(m.metadata_, dict) else {}).get("superseded")   # replaced by an edit
     ]
 
 

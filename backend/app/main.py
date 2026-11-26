@@ -526,7 +526,9 @@ async def agent_conversation_resolver(session_id: str, conversation_id: str | No
 
 async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str,
                             tools_used: list, cards: list | None = None, suggestions: list | None = None,
-                            started_at=None, channel: str | None = None, sources: list | None = None):
+                            started_at=None, channel: str | None = None, sources: list | None = None,
+                            message_id: str | None = None, user_message_id: str | None = None,
+                            user_metadata: dict | None = None):
     """Save one agent turn so a reopened chat looks exactly as it did live: the question first
     (stamped when it was asked), then the answer with its cards and follow-up suggestions."""
     try:
@@ -558,7 +560,11 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
             asked_at = started_at or finished_at
             if asked_at >= finished_at:
                 asked_at = finished_at - timedelta(milliseconds=1)
-            await conversation_service.add_message(session, conv.id, "user", user_text, created_at=asked_at)
+            # the ids the student's browser already has (Reply / Edit refer to them), the reply / edit markers
+            await conversation_service.add_message(
+                session, conv.id, "user", user_text, created_at=asked_at,
+                metadata={k: v for k, v in (user_metadata or {}).items() if v} or None,
+                message_id=uuid.UUID(user_message_id) if user_message_id else None)
             await conversation_service.add_message(
                 session,
                 conv.id,
@@ -570,6 +576,7 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
                 # the sources that supported the answer, so a reopened chat shows them too (v4.17.1)
                 sources=[s for s in (sources or []) if isinstance(s, dict) and s.get("document_id") and s.get("title")],
                 created_at=finished_at,
+                message_id=uuid.UUID(message_id) if message_id else None,
             )
             await session.commit()
     except Exception as err:
