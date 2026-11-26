@@ -115,6 +115,21 @@ def test_rerank_lets_the_question_words_decide_between_similar_faq_entries():
     assert out[0]["question"].startswith("Who is the Senior Director of Admissions")
 
 
+def test_rerank_brings_the_leadership_answer_up_for_who_leads_admissions():
+    # distances measured on the index for "Who leads admissions at SRU?": general admissions FAQs sit just ahead
+    from app.main import _rerank_by_question_words
+    hits = [{"title": "University FAQ — Admissions", "text": "Section: Admission Q: How can I apply for admission?",
+             "distance": 0.282},
+            {"title": "University FAQ — Admissions", "text": "Section: Admission Q: Is the entrance exam mandatory?",
+             "distance": 0.285},
+            {"title": "University FAQ — Admissions", "text": "Section: Admission Q: What is the application fee?",
+             "distance": 0.287},
+            {"title": "University FAQ — Leadership", "text": "Section: Leadership Q: Who is the Senior Director of "
+             "Admissions and Marketing? A: Admissions and marketing activities are led by Dr. C.", "distance": 0.293}]
+    out = _rerank_by_question_words("Who leads admissions at SRU?", hits)
+    assert out[0]["title"] == "University FAQ — Leadership"
+
+
 # ---------------------------------------------- self-check: people and offices before they are shown ----
 @pytest.mark.parametrize("text, kept", [
     ("Admissions and marketing are led by **Dr. Ram Raghotham Rao Deshmukh**, Senior Director of Admissions and "
@@ -169,3 +184,14 @@ def test_done_event_carries_sources():
     from app.sru_agent.agent import _done
     ev = _done("c-1", "answer", sources=[{"document_id": "d-1", "title": "T"}])
     assert ev["sources"] == [{"document_id": "d-1", "title": "T"}]
+
+
+def test_a_follow_up_keeps_the_previous_answers_read_only_tools():
+    from app.sru_agent import tools
+    plain = tools.select_tools_for_message("Are you sure? Please verify that again.", {}, {})
+    assert "find_faculty" not in plain
+    st = {"last_tools": ["find_faculty", "request_counsellor_callback"]}
+    follow_up = tools.select_tools_for_message("Are you sure? Please verify that again.", st, {})
+    assert "find_faculty" in follow_up                      # the same evidence can be checked again
+    assert "request_counsellor_callback" not in follow_up   # an action is never carried over
+

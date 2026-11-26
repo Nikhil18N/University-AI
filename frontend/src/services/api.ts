@@ -29,8 +29,11 @@ export interface SourceReference {
 
 export interface ChatResponse {
   conversation_id: string;
-  /** Present for the legacy chat pipeline; the agent's replies carry no message id. */
+  /** The saved id of this answer (v4.17.1: also sent by the agent, so Reply / Edit can refer to it). */
   message_id?: string;
+  /** v4.17.1: the saved id of the student's message of this turn, and how it was saved. */
+  user_message_id?: string;
+  user_metadata?: { source?: string; edited?: boolean; reply_to?: string; action_done?: boolean };
   /** What the agent now knows about the student (name, mobile number...), sent with every agent reply. */
   profile?: Record<string, unknown>;
   answer: string;
@@ -51,6 +54,22 @@ export interface MessageData {
   flow?: any;
   model?: string;
   created_at: string;
+  /** v4.17.1: how the student sent it ("typed" / "button"), whether it was edited, which message it replies to,
+   * and whether it started an admissions request (then it cannot be edited). */
+  source?: string | null;
+  edited?: boolean;
+  reply_to?: string | null;
+  action_done?: boolean;
+}
+
+/** An agent error with a reason code (e.g. "message_action": a reply / edit the server refused). */
+export class ChatStreamError extends Error {
+  code?: string;
+  constructor(message: string, code?: string) {
+    super(message);
+    this.name = "ChatStreamError";
+    this.code = code;
+  }
 }
 
 export interface ConversationSummary {
@@ -239,7 +258,9 @@ export function sendMessageStream(
   },
   // "typed": the student typed it (the model understands it); "button": a chip / card option / tile the bot
   // offered (its fixed flow runs on the server).
-  source: "typed" | "button" = "typed"
+  source: "typed" | "button" = "typed",
+  // v4.17.1: the saved message this one replies to, or the latest typed message it replaces (Edit)
+  action: { replyTo?: string; editOf?: string } = {}
 ): () => void {
   const controller = new AbortController();
 
@@ -259,6 +280,8 @@ export function sendMessageStream(
             channel: CHANNEL,
             ...(url.includes("/agent/") ? { source } : {}),
             ...(form && url.includes("/agent/") ? { form } : {}),
+            ...(action.replyTo && url.includes("/agent/") ? { reply_to: action.replyTo } : {}),
+            ...(action.editOf && url.includes("/agent/") ? { edit_of: action.editOf } : {}),
           }),
           signal: controller.signal,
         });
@@ -276,6 +299,8 @@ export function sendMessageStream(
             channel: CHANNEL,
             ...(url.includes("/agent/") ? { source } : {}),
             ...(form && url.includes("/agent/") ? { form } : {}),
+            ...(action.replyTo && url.includes("/agent/") ? { reply_to: action.replyTo } : {}),
+            ...(action.editOf && url.includes("/agent/") ? { edit_of: action.editOf } : {}),
           }),
           signal: controller.signal,
         });
@@ -341,7 +366,7 @@ export function sendMessageStream(
             if (tokensStreamed === 0 && !strict) {
               return false;
             }
-            throw new Error(parsed.detail || "Error streaming response");
+            throw new ChatStreamError(parsed.detail || "Error streaming response", parsed.code);
           }
         }
       }

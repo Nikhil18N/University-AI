@@ -4,6 +4,7 @@
     app.include_router(agent_router)
 """
 import json
+import uuid
 import logging
 import time
 from datetime import datetime, timezone
@@ -36,6 +37,9 @@ async def _log_turn(session_id, conv_id, message, event, started_at, channel=Non
     """Call the turn logger with the cards and suggestions too; older 5-argument loggers still work."""
     try:
         extra = {"channel": channel} if channel else {}
+        for k in ("message_id", "user_message_id", "user_metadata"):
+            if event.get(k):
+                extra[k] = event[k]
         if event.get("telemetry"):
             extra["telemetry"] = event["telemetry"]
         await _on_turn_complete(session_id, conv_id, message, event["answer"], event["tools_used"],
@@ -106,6 +110,10 @@ class AgentRequest(BaseModel):
     # "typed": the student typed the message (the model understands it). "button": the text of a chip, card
     # option or tile the bot offered (its fixed flow runs). Default "typed".
     source: Literal["typed", "button"] = "typed"
+    # v4.17.1: reply to an earlier message of this conversation (its id), or edit the student's latest typed
+    # message (its id; the message text is the corrected text).
+    reply_to: Optional[str] = Field(default=None, pattern=r"^[0-9a-fA-F-]{36}$")
+    edit_of: Optional[str] = Field(default=None, pattern=r"^[0-9a-fA-F-]{36}$")
 
 
 class FeeRequest(BaseModel):
@@ -149,6 +157,28 @@ async def agent_stream(req: AgentRequest, request: Request = None):
             except Exception:
                 pass  # Fall back to req.conversation_id
 
+        # v4.17.1: message ids known before the turn (Reply / Edit refer to them); reply and edit checked here
+        from app.services import message_actions
+        user_message_id, message_id = str(uuid.uuid4()), str(uuid.uuid4())
+        user_metadata: dict = {"source": req.source}
+        reply_ctx = None
+        try:
+            if req.edit_of:
+                if not conv_id:
+                    raise message_actions.MessageActionError("Only your latest message can be edited.")
+                snap = await message_actions.prepare_edit(req.session_id, conv_id, req.edit_of,
+                                                          await memory.get_turn_snapshot(req.session_id, conv_id))
+                await memory.restore_turn_snapshot(req.session_id, conv_id, snap)
+                user_metadata.update(edited=True, edited_from=req.edit_of)
+            if req.reply_to:
+                if not conv_id:
+                    raise message_actions.MessageActionError("That message is not in this conversation.")
+                reply_ctx = await message_actions.reply_context(req.session_id, conv_id, req.reply_to)
+                user_metadata["reply_to"] = req.reply_to
+        except message_actions.MessageActionError as err:
+            yield _sse({"type": "error", "detail": str(err), "code": "message_action"})
+            return
+
         started_at = datetime.now(timezone.utc)
         started_perf = time.perf_counter()
         first_token_perf = None
@@ -159,6 +189,8 @@ async def agent_stream(req: AgentRequest, request: Request = None):
             require_contact_details=True,
             form=req.form.model_dump() if req.form else None,
             source=req.source,
+            reply_context=reply_ctx,
+            turn_id=user_message_id,
         ):
             if event["type"] == "token" and first_token_perf is None:
                 first_token_perf = time.perf_counter()
@@ -187,6 +219,19 @@ async def agent_stream(req: AgentRequest, request: Request = None):
                     event["profile"] = memory.public_profile(await memory.get_profile(req.session_id))
                 except Exception:
                     event["profile"] = {}
+            if event["type"] == "done":
+                event.update(message_id=message_id, user_message_id=user_message_id, user_metadata=user_metadata)
+                # a turn that completed an external action (callback / visit request) cannot be edited later
+                try:
+                    profile_now = await memory.get_profile(req.session_id)
+                    snap = await memory.get_turn_snapshot(req.session_id, conv_id) or {}
+                    acted = any(t.get("is_action") and t.get("status") in ("saved", "ok", "cancelled")
+                                for t in event.get("tools_used") or [])
+                    if acted or (profile_now.get("last_lead_id") or None) != (snap.get("lead_id") or None):
+                        await memory.mark_turn_snapshot(req.session_id, conv_id, action_done=True)
+                        user_metadata["action_done"] = True   # saved with the message: no Edit after a refresh
+                except Exception:
+                    log.exception("turn snapshot not updated")
             if event["type"] == "done" and _on_turn_complete:
                 # Saved after the student has the answer (it used to hold the cards back by about
                 # 1.5 seconds). In order per conversation, and a reopened chat still shows it.

@@ -354,6 +354,25 @@ Callback / visit leads carry `metadata.case`: `program`, `marks`, `scholarship`,
 * Admin conversations list / detail: new optional `student` object (name, phone, program, marks, scholarship_percent,
   request, lead_status, is_parent).
 
+
+### v4.17.1: Reply and Edit (`docs/45-reply-and-edit-nov-2026.md`)
+
+`POST /api/v1/agent/stream` body, new optional fields (each a message UUID):
+
+| Field | Meaning | Refused (SSE `error`, `code: "message_action"`, nothing changed) when |
+|---|---|---|
+| `reply_to` | The student replies to this saved message (a fee card's message included). The model is given that message and, for a fee card, that card's own estimate, and is told when a newer estimate exists. | the message is not in this student's conversation |
+| `edit_of` | This message replaces the student's latest **typed** message. The state from before that message is restored; it and every later message are archived (`metadata.superseded`, never deleted); the new text is answered. | it is not the latest typed message, it was a button choice, the state from before it is no longer kept, or that turn or a later one started an admissions request (callback / visit) |
+
+The `done` event now also carries `message_id` (the saved answer), `user_message_id` (the saved student message)
+and `user_metadata` (`source`, and when set `edited`, `reply_to`, `action_done`). Both messages are saved with
+these ids, so Reply / Edit can refer to them.
+
+`GET /api/v1/conversations/{id}` messages: new fields `edited` (bool), `reply_to` (message id or null), `source`
+(`typed` / `button` / null for older messages) and `action_done` (bool: the message started an admissions request
+and cannot be edited). Messages replaced by an edit are not returned. No database migration: these live in the
+existing `messages.metadata` JSON column.
+
 ## Admin Observability Endpoint
 
 ### `GET /api/v1/admin/telemetry`

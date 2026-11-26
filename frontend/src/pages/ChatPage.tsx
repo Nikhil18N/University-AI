@@ -1,9 +1,17 @@
-import React, { lazy, Suspense, useState, useEffect, useRef } from "react";
+import React, { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { ChatAdStrip } from "../components/CampusCards";
 import MessageBubble, { FEE_CARD_TYPES } from "../components/MessageBubble";
 import ChatLeadForm from "../components/ChatLeadForm";
 import WelcomeBackPanel, { type WelcomeBackStatus } from "../components/WelcomeBackPanel";
 import { describeGap } from "../utils/timeAgo";
+import {
+  choiceStillOffered,
+  editableMessage,
+  isSavedMessage,
+  replyPreviewFor,
+  type LaterChoice,
+  type ReplyPreview,
+} from "../utils/messageActions";
 import { CalculatorIcon } from "../components/Icons";
 import { getSessionId, startFreshSession } from "../hooks/useSession";
 import { applyServerProfile, cleanPhone, forgetStudentDetails, keepContactOnly, readStudentDetails, syncStudentDetails } from "../utils/studentProfile";
@@ -31,6 +39,43 @@ interface Props {
   onOpenAdmin?: () => void;
   variant?: "full" | "widget";
 }
+
+/** v4.17.1: the message the student is replying to, shown above the composer (tap it to see it, X to cancel). */
+function ReplyBar({ preview, onJump, onCancel }: { preview: ReplyPreview; onJump: () => void; onCancel: () => void }) {
+  return (
+    <div className="sru-reply-bar" role="group" aria-label="Replying to a message">
+      <button
+        type="button"
+        className="sru-reply-bar-body"
+        onClick={onJump}
+        aria-label={`Replying to ${preview.label}: ${preview.text}. Show that message`}
+      >
+        <span className="sru-reply-bar-label">Replying to {preview.label}</span>
+        <span className="sru-reply-bar-text">{preview.text}</span>
+      </button>
+      <button type="button" className="sru-reply-bar-close" onClick={onCancel} aria-label="Cancel reply">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+const EDIT_BLOCKED_AFTER_ACTION =
+  "This message sent a request to the admissions team, so it can't be edited. Please send a new message instead.";
+
+type MessageAction = {
+  /** the saved message this one replies to */
+  replyTo?: string;
+  /** the latest typed message this one replaces (Edit) */
+  editOf?: string;
+  /** the user message already on screen for a held question (contact form first) */
+  shownUserMsgId?: string;
+  /** the chat as it was before an edit: put back if the server refuses the edit */
+  restoreOnRefusal?: MessageData[];
+};
 
 /** Tell the page that embeds the widget to close it (public/widget.js listens for this). */
 function closeWidget() {
@@ -228,7 +273,9 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     pendingQuestionRef.current = null;
     setPendingQuestion(null);
     if (q) {
-      executeSendMessage(q, true, undefined, pendingSourceRef.current);
+      const action = pendingActionRef.current;
+      pendingActionRef.current = {};
+      executeSendMessage(q, true, undefined, pendingSourceRef.current, action);
     }
   };
 
@@ -262,6 +309,14 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   // Where a held message came from ("typed" or a "button" tap): kept so that, once the welcome-back choice or the
   // contact details are done, it is sent exactly as the student sent it (v4.17.1).
   const pendingSourceRef = useRef<"typed" | "button">("typed");
+  // v4.17.1: a held question's reply target and the id of its message already on screen (contact form first)
+  const pendingActionRef = useRef<MessageAction>({});
+  const [replyTarget, setReplyTarget] = useState<{ id: string; preview: ReplyPreview } | null>(null);
+  const [highlightMsgId, setHighlightMsgId] = useState<string | null>(null);
+  // v4.17.1: after an edit, the button choices the student made after the edited message, replayed in order while
+  // each new answer still offers them (so a corrected mark recalculates the estimate without asking again)
+  const replayRef = useRef<LaterChoice[]>([]);
+  const [isReplaying, setIsReplaying] = useState(false);
   const resumeAfterMinutesRef = useRef<number>(DEFAULT_RESUME_AFTER_MINUTES);
   const restoringRef = useRef(false);
   // Where a restored conversation continues: a quiet divider after its last saved message.
@@ -270,10 +325,12 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   useEffect(() => { recoveryRef.current = recovery; }, [recovery]);
 
   const isLoadingRef = useRef(isLoading);
+  const isReplayingRef = useRef(false);
   const dockQueryRef = useRef(dockQuery);
   const widgetInputRef = useRef(widgetInput);
 
   useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
+  useEffect(() => { isReplayingRef.current = isReplaying; }, [isReplaying]);
   useEffect(() => { dockQueryRef.current = dockQuery; }, [dockQuery]);
   useEffect(() => { widgetInputRef.current = widgetInput; }, [widgetInput]);
 
@@ -672,12 +729,16 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
   async function handleSendMessage(
     text: string,
     form?: AcademicFormPayload,
-    source: "typed" | "button" = "typed"
+    source: "typed" | "button" = "typed",
+    action: MessageAction = {}
   ) {
     const trimmed = text.trim();
     if (!trimmed) return;
 
     recordUserActivity();
+    // the student acts themselves: no more replay of earlier choices after an edit
+    replayRef.current = [];
+    setIsReplaying(false);
 
     // The first message of a visit, with an earlier conversation on file: ask now, after this message, whether to
     // continue it or start fresh (the message is answered once the student chooses).
@@ -745,23 +806,25 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         created_at: new Date().toISOString(),
       };
       lastSentUserMsgIdRef.current = userMsgId;
-      setMessages((prev) => [...prev, tempUserMsg]);
+      setMessages((prev) => [...prev, { ...tempUserMsg, reply_to: action.replyTo || null }]);
       setPendingQuestion(trimmed);
       pendingQuestionRef.current = trimmed;
       pendingSourceRef.current = source;
+      pendingActionRef.current = { replyTo: action.replyTo, shownUserMsgId: userMsgId };
       setShowInlineLeadForm(true);
       setError(null);
       return;
     }
 
-    await executeSendMessage(trimmed, false, form, source);
+    await executeSendMessage(trimmed, false, form, source, action);
   }
 
   async function executeSendMessage(
     text: string,
     skipAppendUserMsg = false,
     form?: AcademicFormPayload,
-    source: "typed" | "button" = "typed"
+    source: "typed" | "button" = "typed",
+    action: MessageAction = {}
   ) {
     if (isLoading && cancelStreamRef.current) {
       cancelStreamRef.current();
@@ -781,10 +844,14 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         role: "user",
         content: text,
         created_at: new Date().toISOString(),
+        reply_to: action.replyTo || null,
+        edited: Boolean(action.editOf),
       };
       lastSentUserMsgIdRef.current = userMsgId;
       setMessages((prev) => [...prev, tempUserMsg]);
     }
+    // the student's message on screen for this turn: given its saved id when the answer arrives
+    const shownUserMsgId = skipAppendUserMsg ? action.shownUserMsgId : userMsgId;
 
     let assistantAppended = false;
     let accumulatedContent = "";
@@ -897,6 +964,41 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         const rawCards = data.cards?.length ? data.cards : accumulatedCards;
         const finalCards = deduplicateCards(rawCards);
 
+        // v4.17.1 Edit: replay the next earlier button choice if this answer still offers it
+        if (replayRef.current.length) {
+          const next = replayRef.current[0];
+          if (choiceStillOffered(next, data.suggestions, rawCards)) {
+            replayRef.current = replayRef.current.slice(1);
+            window.setTimeout(() => {
+              if (!stale()) void executeSendMessage(next.text, false, undefined, "button");
+            }, 350);
+          } else {
+            replayRef.current = [];
+            setIsReplaying(false);
+          }
+        } else if (isReplayingRef.current) {
+          setIsReplaying(false);
+        }
+
+        // v4.17.1: the student's message now has its saved id (Reply / Edit refer to it) and how it was saved
+        if (shownUserMsgId && data.user_message_id) {
+          const meta = data.user_metadata || {};
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === shownUserMsgId
+                ? {
+                  ...m,
+                  id: data.user_message_id as string,
+                  source: meta.source || source,
+                  edited: Boolean(meta.edited),
+                  reply_to: meta.reply_to || null,
+                  action_done: Boolean(meta.action_done),
+                }
+                : m
+            )
+          );
+        }
+
         if (!assistantAppended) {
           assistantAppended = true;
           setMessages((prev) => [
@@ -940,11 +1042,23 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
         setStreamingMsgId(null);
         cancelStreamRef.current = null;
         setError(err.message || "Failed to get response.");
+        replayRef.current = [];
+        setIsReplaying(false);
+        if ((err as { code?: string }).code === "message_action") {
+          // the server refused the reply / edit and changed nothing: the chat goes back to how it was
+          if (action.restoreOnRefusal) {
+            setMessages(action.restoreOnRefusal);
+          } else {
+            setMessages((prev) => prev.filter((m) => m.id !== shownUserMsgId && m.id !== assistantMsgId));
+            setWidgetInput(text);
+          }
+          return;
+        }
         setMessages((prev) =>
           prev.filter((m) => m.id !== assistantMsgId || accumulatedContent.length > 0)
         );
       },
-    }, source);
+    }, source, { replyTo: action.replyTo, editOf: action.editOf });
 
     if (stale()) {
       cancelFn(); // the chat was replaced before the request even started
@@ -977,6 +1091,10 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     setShowInlineLeadForm(false);
     setPendingQuestion(null);
     setResumeDivider(null);
+    setReplyTarget(null);
+    pendingActionRef.current = {};
+    replayRef.current = [];
+    setIsReplaying(false);
   }
 
   // Handle bottom floating dock input submit
@@ -995,8 +1113,69 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
     e.preventDefault();
     const input = widgetInput.trim();
     if (!input || isLoading || showInlineLeadForm) return;
-    handleSendMessage(input);
+    const replyTo = replyTarget?.id;
+    setReplyTarget(null);
+    handleSendMessage(input, undefined, "typed", replyTo ? { replyTo } : {});
     setWidgetInput("");
+  };
+
+  // ---- v4.17.1 Reply and Edit ----------------------------------------------------------------------------
+  const messagesById = useMemo(() => new Map(messages.map((m) => [m.id, m])), [messages]);
+  const editable = useMemo(() => editableMessage(messages), [messages]);
+  const editableId = editable?.id ?? null;
+
+  /** Scroll to a message (loading older ones if needed) and highlight it briefly. */
+  const jumpToMessage = (id: string) => {
+    const index = messages.findIndex((m) => m.id === id);
+    if (index < 0) return;
+    const needed = messages.length - index;
+    if (needed > visibleMessageCount) setVisibleMessageCount(needed);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById(`sru-msg-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        setHighlightMsgId(id);
+        window.setTimeout(() => setHighlightMsgId((cur) => (cur === id ? null : cur)), 1800);
+      });
+    });
+  };
+
+  const startReply = (id: string) => {
+    const target = messagesById.get(id);
+    if (!target || !isSavedMessage(target, streamingMsgId)) return;
+    setReplyTarget({ id, preview: replyPreviewFor(target) });
+    requestAnimationFrame(() => (widgetTextareaRef.current || portalTextareaRef.current)?.focus());
+  };
+
+  /** Edit the latest typed message: the server puts back the state from before it and answers the new text. */
+  const submitEdit = (id: string, text: string) => {
+    if (isLoadingRef.current || isReplayingRef.current || showInlineLeadForm || recoveryRef.current) return;
+    const index = messages.findIndex((m) => m.id === id);
+    if (index < 0 || !editable || id !== editable.id || editable.blocked) return;
+    const original = messages[index];
+    recordUserActivity();
+    setReplyTarget(null);
+    const before = messages;
+    // the message and everything after it is replaced (archived on the server, never deleted)
+    setMessages(messages.slice(0, index));
+    replayRef.current = [...editable.laterChoices];
+    setIsReplaying(editable.laterChoices.length > 0);
+    void executeSendMessage(text, false, undefined, "typed", {
+      editOf: id,
+      replyTo: original.reply_to || undefined,
+      restoreOnRefusal: before,
+    });
+  };
+
+  // stable callbacks for the memoised bubbles, always calling the latest handlers
+  const actionHandlersRef = useRef({ startReply, submitEdit });
+  actionHandlersRef.current = { startReply, submitEdit };
+  const onReplyStable = useCallback((id: string) => actionHandlersRef.current.startReply(id), []);
+  const onEditStable = useCallback((id: string, text: string) => actionHandlersRef.current.submitEdit(id, text), []);
+
+  const replyQuoteFor = (id?: string | null): ReplyPreview | null => {
+    if (!id) return null;
+    const target = messagesById.get(id);
+    return target ? replyPreviewFor(target) : { label: "Earlier message", text: "That message is no longer shown." };
   };
 
   // Render Widget View directly if variant === "widget" (used inside public/widget.js iframe)
@@ -1100,10 +1279,11 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                 Load older messages
               </button>
             )}
-            {visibleMessages.map((msg, index) => (
+            {visibleMessages.filter((m) => !(m.id === streamingMsgId && !(m.content || "").trim())).map((msg, index) => (
               <div
                 key={msg.id || index}
                 id={msg.id ? `sru-msg-${msg.id}` : undefined}
+                className={highlightMsgId === msg.id ? "msg-jump-highlight" : undefined}
                 style={{ width: "100%" }}
               >
                 <MessageBubble
@@ -1119,6 +1299,13 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                   sessionId={sessionId}
                   isStreaming={msg.id === streamingMsgId}
                   onSuggestionClick={(prompt, form) => handleSendMessage(prompt, form, "button")}
+                  onReply={msg.role === "assistant" && isSavedMessage(msg, streamingMsgId) ? onReplyStable : undefined}
+                  replyQuote={msg.role === "user" ? replyQuoteFor(msg.reply_to) : null}
+                  onJumpToReply={msg.reply_to ? () => jumpToMessage(msg.reply_to as string) : undefined}
+                  canEdit={msg.id === editableId && !isLoading && !isReplaying && !showInlineLeadForm && !recovery}
+                  editBlockedReason={msg.id === editableId && editable?.blocked ? EDIT_BLOCKED_AFTER_ACTION : null}
+                  onEditSubmit={onEditStable}
+                  edited={msg.edited}
                 />
                 {resumeDivider && msg.id === resumeDivider.afterId && (
                   <div className="wb-resume-divider" role="note">{resumeDivider.text}</div>
@@ -1144,7 +1331,7 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
               <ChatLeadForm onComplete={handleLeadFormComplete} pendingQuestion={pendingQuestion} />
             )}
 
-            {isLoading && !messages.some((m) => m.id === streamingMsgId && ((m.content && m.content.trim().length > 0) || (m.cards && m.cards.length > 0))) && (
+            {isLoading && !messages.some((m) => m.id === streamingMsgId && m.content && m.content.trim().length > 0) && (
               <div className="message-bubble-row assistant sru-thinking-bubble-row">
                 <div className="message-avatar-col">
                   <div className="assistant-avatar-badge" title="SRU Buddy">
@@ -1182,6 +1369,13 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
           {/* Footer / Input Bar */}
           <div className="sru-widget-footer">
             {!showInlineLeadForm && <ChatAdStrip />}
+            {replyTarget && !showInlineLeadForm && (
+              <ReplyBar
+                preview={replyTarget.preview}
+                onJump={() => jumpToMessage(replyTarget.id)}
+                onCancel={() => setReplyTarget(null)}
+              />
+            )}
             <form className="sru-widget-input-row" onSubmit={handleWidgetSubmit}>
               <textarea
                 ref={widgetTextareaRef}
@@ -1189,7 +1383,9 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                 placeholder={
                   showInlineLeadForm
                     ? "Please share your name & mobile number above to chat"
-                    : "Ask SRU Buddy..."
+                    : replyTarget
+                      ? "Write your reply..."
+                      : "Ask SRU Buddy..."
                 }
                 rows={1}
                 value={widgetInput}
@@ -1609,10 +1805,11 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                     Load older messages
                   </button>
                 )}
-                {visibleMessages.map((msg, index) => (
+                {visibleMessages.filter((m) => !(m.id === streamingMsgId && !(m.content || "").trim())).map((msg, index) => (
                   <div
                     key={msg.id || index}
                     id={msg.id ? `sru-msg-${msg.id}` : undefined}
+                    className={highlightMsgId === msg.id ? "msg-jump-highlight" : undefined}
                     style={{ width: "100%" }}
                   >
                     <MessageBubble
@@ -1628,6 +1825,13 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                       sessionId={sessionId}
                       isStreaming={msg.id === streamingMsgId}
                       onSuggestionClick={(prompt, form) => handleSendMessage(prompt, form, "button")}
+                      onReply={msg.role === "assistant" && isSavedMessage(msg, streamingMsgId) ? onReplyStable : undefined}
+                      replyQuote={msg.role === "user" ? replyQuoteFor(msg.reply_to) : null}
+                      onJumpToReply={msg.reply_to ? () => jumpToMessage(msg.reply_to as string) : undefined}
+                      canEdit={msg.id === editableId && !isLoading && !isReplaying && !showInlineLeadForm && !recovery}
+                      editBlockedReason={msg.id === editableId && editable?.blocked ? EDIT_BLOCKED_AFTER_ACTION : null}
+                      onEditSubmit={onEditStable}
+                      edited={msg.edited}
                     />
                     {resumeDivider && msg.id === resumeDivider.afterId && (
                       <div className="wb-resume-divider" role="note">{resumeDivider.text}</div>
@@ -1653,7 +1857,7 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                   <ChatLeadForm onComplete={handleLeadFormComplete} pendingQuestion={pendingQuestion} />
                 )}
 
-                {isLoading && !messages.some((m) => m.id === streamingMsgId && ((m.content && m.content.trim().length > 0) || (m.cards && m.cards.length > 0))) && (
+                {isLoading && !messages.some((m) => m.id === streamingMsgId && m.content && m.content.trim().length > 0) && (
                   <div className="message-bubble-row assistant sru-thinking-bubble-row">
                     <div className="message-avatar-col">
                       <div className="assistant-avatar-badge" title="SRU Buddy">
@@ -1691,6 +1895,13 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
               {/* Footer / Input Bar */}
               <div className="sru-widget-footer">
                 {!showInlineLeadForm && <ChatAdStrip />}
+                {replyTarget && !showInlineLeadForm && (
+                  <ReplyBar
+                    preview={replyTarget.preview}
+                    onJump={() => jumpToMessage(replyTarget.id)}
+                    onCancel={() => setReplyTarget(null)}
+                  />
+                )}
                 <form className="sru-widget-input-row" onSubmit={handleWidgetSubmit}>
                   <textarea
                     ref={portalTextareaRef}
@@ -1698,7 +1909,9 @@ export default function ChatPage({ onOpenAdmin, variant = "full" }: Props) {
                     placeholder={
                       showInlineLeadForm
                         ? "Please share your name & mobile number above to chat"
-                        : "Ask SRU Buddy..."
+                        : replyTarget
+                      ? "Write your reply..."
+                      : "Ask SRU Buddy..."
                     }
                     rows={1}
                     value={widgetInput}
