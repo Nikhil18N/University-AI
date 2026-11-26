@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     # ---- Database ----
     DATABASE_URL: str = "postgresql+asyncpg://university_ai:university_ai_dev@localhost:5433/university_ai"
     AUTO_CREATE_SCHEMA: bool = False
+    # Apply the Alembic migrations when the API starts (hosts without a shell, e.g. Render free tier).
+    RUN_MIGRATIONS_ON_START: bool = True
 
     # ---- Redis ----
     REDIS_URL: str = "redis://localhost:6379/0"

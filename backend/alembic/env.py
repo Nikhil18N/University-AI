@@ -18,7 +18,8 @@ from app.models.evaluation import EvaluationRecord  # noqa: F401
 from app.models.feedback import Feedback  # noqa: F401
 
 config = context.config
-if config.config_file_name is not None:
+if config.config_file_name is not None and config.attributes.get("configure_logger", True):
+    # not when the API applies the migrations at startup: its own logging setup stays as it is
     fileConfig(config.config_file_name)
 
 # Override sqlalchemy.url from our settings

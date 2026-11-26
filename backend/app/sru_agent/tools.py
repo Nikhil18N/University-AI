@@ -329,6 +329,13 @@ async def tool_check_eligibility(args, ctx):
                                   stream=p.get("stream"))
 
 
+async def tool_start_guided_check(args, ctx):
+    """Hand-over to the guided board-first steps; the agent shows the first step card (v4.17.1)."""
+    program = fees.find_program(args.get("program") or "") if args.get("program") else None
+    ctx["guided_check"] = {"program": program}
+    return {"status": "started", "note": "The steps are shown to the student now; do not ask anything yourself."}
+
+
 async def tool_get_program_info(args, ctx):
     p = ctx.get("profile") or {}
     return fees.program_info(args.get("program") or p.get("program_interest") or "")
@@ -744,10 +751,17 @@ TOOLS = {
         }, ["program"])}),
 
     "check_eligibility": (tool_check_eligibility, "Checking eligibility", {
-        "description": "The ONLY way to decide admission eligibility. Call whenever the student gives marks "
-                       "for a programme or asks 'can I join / am I eligible'. Never work eligibility out yourself. "
-                       "Without marks it returns need_marks: then ask for them.",
+        "description": "The ONLY way to decide admission eligibility when the student's marks AND board are "
+                       "already known. Never work eligibility out yourself. If the marks or the board are not known "
+                       "yet, call start_guided_check instead (never ask for marks in a message).",
         "parameters_json_schema": _obj({"program": _PROGRAM, "percent": _PERCENT}, ["program"])}),
+    "start_guided_check": (tool_start_guided_check, "Starting your eligibility check", {
+        "description": "Starts the step-by-step eligibility / scholarship / fee check (board first, then stage, "
+                       "then marks out of that board's total). Call when the student wants to join, check "
+                       "eligibility, know their scholarship or their fee, or agrees to such a check, and their marks "
+                       "with board are not known yet. Never ask for marks, total marks or the board yourself.",
+        "parameters_json_schema": _obj({"program": {"type": "string",
+                                                    "description": "programme if the student named one, else empty"}})}),
     "get_program_info": (tool_get_program_info, "Looking up the course", {
         "description": "Eligibility, duration, yearly tuition and scholarship slabs of ONE course when the "
                        "student has NOT given marks, e.g. 'MBA eligibility', 'what is BBA fee', "
@@ -937,6 +951,12 @@ def select_tools_for_message(
     for name in (st.get("last_tools") or [])[:3]:
         if name not in ACTION_TOOLS:
             add(name)
+
+    # v4.17.1: always available, whatever the words: a "Yes" to the bot's own offer must be able to start the guided
+    # check or save the callback it offered (keyword pruning left the model only the search tool then)
+    add("start_guided_check")
+    if not pending:
+        add("request_counsellor_callback")
 
     if not selected:
         add("search_university_info")
