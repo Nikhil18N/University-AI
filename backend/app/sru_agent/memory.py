@@ -5,9 +5,13 @@ Uses Redis when REDIS_URL is set, otherwise the server's own memory
 """
 import asyncio
 import copy
+import hashlib
 import json
 import logging
+import os
+import re
 import time
+from pathlib import Path
 
 from . import config
 
@@ -100,6 +104,22 @@ def in_background(coro, name: str = "write"):
     return task
 
 
+def get_redis():
+    """Return the active async Redis client if configured, else None."""
+    return _client()
+
+
+async def shutdown_flush(timeout: float = 10.0) -> None:
+    """Gracefully drain all pending background writes and conversation state saves on shutdown."""
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(flush(), flush_state_writes(timeout=timeout), return_exceptions=True),
+            timeout=timeout,
+        )
+    except Exception:
+        pass
+
+
 async def flush():
     """Wait for every background write (tests, shutdown, and anything that reads the database
     straight after a write)."""
@@ -119,6 +139,29 @@ async def _flush_key(key):
                 _local[key] = (time.time() + TTL_SECONDS, value)
     finally:
         _flushing.pop(key, None)
+
+
+def _profile_key(session_id: str) -> str:
+    return f"sru:profile:{session_id}"
+
+
+async def warm_turn_keys(session_id: str, conversation_id: str | None = None) -> None:
+    """Batch-fetch profile, history, and conversation state in one Redis MGET round-trip."""
+    r = _client()
+    if r is None or not hasattr(r, "mget"):
+        return
+    keys = [_profile_key(session_id), _history_key(session_id, conversation_id), _state_key(session_id, conversation_id)]
+    if config.AGENT_LOCAL_CACHE and all(_hot_get(k) is not None for k in keys):
+        return
+    try:
+        raw_vals = await r.mget(keys)
+        for k, raw in zip(keys, raw_vals):
+            if raw:
+                val = json.loads(raw)
+                _hot_put(k, val)
+                _local[k] = (time.time() + TTL_SECONDS, val)
+    except Exception:
+        pass
 
 
 async def _get(key, default):
@@ -451,3 +494,88 @@ async def get_cached_answer(key: str, max_age_seconds: int):
 
 async def set_cached_answer(key: str, value: dict):
     await _set(key, {"at": time.time(), "value": value})
+
+
+_RELEVANT_PROFILE_FIELDS = (
+    "program_interest", "board", "percent", "eapcet_rank",
+    "jee_percentile", "ib_score", "stream", "language",
+)
+_PII_OR_PERSONAL_RE = re.compile(
+    r"(?:\b\d{10}\b|@|\bmy\s+name\b|\bcall\s+me\b|\bvisit\b|\bcancel\b|"
+    r"\bmy\s+marks\b|\bi\s+got\b|\bi\s+scored\b|\bmy\s+rank\b|\bmy\s+number\b)",
+    re.I,
+)
+_PRONOUN_FOLLOWUP_RE = re.compile(r"\b(?:it|that|this|they|them|those|these)\b", re.I)
+
+
+def kb_fingerprint() -> str:
+    """Short stable hash of fee policy, prompt version, RAG_CACHE_VERSION, and handbook mtimes."""
+    h = hashlib.sha256()
+    h.update(os.getenv("RAG_CACHE_VERSION", "1").encode())
+    try:
+        from . import prompt
+        h.update(prompt.PROMPT_VERSION.encode())
+    except Exception:
+        pass
+    fee_file = Path(__file__).with_name("fee_policy_2027_28.json")
+    if fee_file.exists():
+        st = fee_file.stat()
+        h.update(f"{st.st_mtime_ns}:{st.st_size}".encode())
+    handbook_dir = Path(__file__).resolve().parent.parent.parent / "data" / "handbook"
+    if handbook_dir.exists():
+        for p in sorted(handbook_dir.glob("*.md")):
+            st = p.stat()
+            h.update(f"{p.name}:{st.st_mtime_ns}".encode())
+    return h.hexdigest()[:12]
+
+
+def relevant_profile_hash(profile: dict | None) -> str:
+    """Hash only non-PII academic/program fields (never name, phone, email, or lead IDs)."""
+    pr = profile or {}
+    subset = {k: pr.get(k) for k in _RELEVANT_PROFILE_FIELDS if pr.get(k) not in (None, "")}
+    raw = json.dumps(subset, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(raw.encode()).hexdigest()[:10]
+
+
+def faq_cache_key(
+    message: str,
+    profile: dict | None = None,
+    conv_state: dict | None = None,
+    *,
+    has_history: bool = False,
+) -> str | None:
+    """Return a policy-safe Redis FAQ cache key, or None if the turn must not be cached."""
+    if config.AGENT_ANSWER_CACHE_SECONDS <= 0:
+        return None
+    st = conv_state or {}
+    if (
+        (st.get("fee_eval") or {}).get("active")
+        or (st.get("fee_intake") or {}).get("waiting_for")
+        or (st.get("dialogue") or {}).get("step")
+        or st.get("pending_action")
+        or st.get("awaiting_name")
+        or st.get("offer")
+    ):
+        return None
+    text = (message or "").strip()
+    if not text or _PII_OR_PERSONAL_RE.search(text):
+        return None
+    norm = re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", text.lower())).strip()
+    if not norm:
+        return None
+    if has_history and (_PRONOUN_FOLLOWUP_RE.search(norm) or len(norm.split()) < 3):
+        return None
+    q_hash = hashlib.sha256(norm.encode()).hexdigest()[:16]
+    return f"sru:faq:{kb_fingerprint()}:{relevant_profile_hash(profile)}:{q_hash}"
+
+
+async def get_faq_cache(key: str | None) -> dict | None:
+    if not key or config.AGENT_ANSWER_CACHE_SECONDS <= 0:
+        return None
+    return await get_cached_answer(key, config.AGENT_ANSWER_CACHE_SECONDS)
+
+
+async def set_faq_cache(key: str | None, value: dict) -> None:
+    if not key or config.AGENT_ANSWER_CACHE_SECONDS <= 0:
+        return
+    await set_cached_answer(key, value)

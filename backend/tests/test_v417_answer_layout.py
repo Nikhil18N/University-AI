@@ -22,7 +22,10 @@ def test_layout_spec_is_one_file_used_by_both_prompts():
     assert layout in build_system_prompt({})                 # the chat agent prompt ends with it
     assert layout in load_prompt("system")                   # system.md includes it ({{ANSWER_LAYOUT}})
     assert "{{ANSWER_LAYOUT}}" not in load_prompt("system")
-    assert build_system_prompt({}).rstrip().endswith(layout.splitlines()[-1].strip())
+    prompt_text = build_system_prompt({})
+    assert layout in prompt_text                             # included in static prefix
+    assert "CURRENT TURN CONTEXT" in prompt_text
+    assert layout in prompt_text.split("CURRENT TURN CONTEXT")[0]
 
 
 def test_layout_rules_cover_every_content_type():

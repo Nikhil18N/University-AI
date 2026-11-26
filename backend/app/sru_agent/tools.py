@@ -853,6 +853,94 @@ TOOLS = {
 ACTION_TOOLS = {"request_counsellor_callback", "request_campus_visit_callback", "cancel_contact_request",
                 "update_contact_details"}
 
+_RE_COMPARE = re.compile(r"\b(?:vs|versus|compare|comparison|cheaper|difference\s+between)\b", re.I)
+_RE_CONCESSION = re.compile(
+    r"\b(?:concession\w*|sibling|girl\s+child|single\s+parent|orphan|defen[cs]e|sports|"
+    r"disab\w*|staff\s+child|alumni|other\s+state|special\s+category)\b", re.I
+)
+_RE_SHARE = re.compile(r"\b(?:share|whatsapp|send\s+(?:this|it)\s+to\s+(?:my\s+)?(?:father|mother|parents?|dad|mom))\b", re.I)
+_RE_FEE = re.compile(
+    r"\b(?:fees?|tuition|scholarship\w*|cost|payable|semester|waiver|afford|hostel\s+fee|"
+    r"bus\s+fee|transport\s+fee|eapcet|eamcet|jee|ib\s+score|marks?|percent\w*|%)\b", re.I
+)
+_RE_ELIG = re.compile(r"\b(?:eligib\w*|qualify|can\s+i\s+join|minimum\s+marks?|cutoff|cut-off|bipc|mpc|mec)\b", re.I)
+_RE_PROGS = re.compile(r"\b(?:programs?|programmes?|courses?|branch(?:es)?|offer(?:ed)?|speciali[sz]ations?)\b", re.I)
+_RE_FACULTY = re.compile(
+    r"\b(?:faculty|professors?|prof\.?|hod|head\s+of|deans?|teachers?|dr\.?\s+[a-z]|who\s+teaches|research\s+area)\b",
+    re.I,
+)
+_RE_CANCEL = re.compile(r"\b(?:cancel|withdraw|don'?t\s+call|stop\s+calling)\b", re.I)
+_RE_UPDATE_CONTACT = re.compile(r"\b(?:update|change\s+my|new\s+(?:number|phone|name)|spelt|spelling)\b", re.I)
+_RE_VISIT = re.compile(r"\b(?:visit|campus\s+tour)\b", re.I)
+_RE_CALLBACK = re.compile(r"\b(?:call\s*back|call\s+me|counsell?or|speak\s+to|talk\s+to|apply|contact\s+number|phone|helpline)\b", re.I)
+_RE_VIDEO = re.compile(r"\b(?:videos?|watch|youtube|virtual\s+tour)\b", re.I)
+_RE_REMEMBER = re.compile(
+    r"\b(?:my\s+name\s+is|i\s+am\b|i'?m\s+(?:from|a\s+parent)|i\s+got|i\s+scored|telugu|hindi|tenglish|hinglish)\b",
+    re.I,
+)
+
+
+def select_tools_for_message(
+    message: str,
+    conv_state: dict | None = None,
+    profile: dict | None = None,
+    *,
+    max_tools: int = 4,
+) -> list[str]:
+    """Return 0-4 relevant tool names for this turn instead of injecting all 16 schemas."""
+    text = message or ""
+    st = conv_state or {}
+    pr = profile or {}
+    selected: list[str] = []
+
+    def add(name: str) -> None:
+        if name in TOOLS and name not in selected:
+            selected.append(name)
+
+    pending = st.get("pending_action")
+    if pending == "callback":
+        add("request_counsellor_callback")
+    elif pending == "campus_visit":
+        add("request_campus_visit_callback")
+
+    if _RE_CANCEL.search(text):
+        add("cancel_contact_request")
+    if _RE_UPDATE_CONTACT.search(text):
+        add("update_contact_details")
+    if _RE_COMPARE.search(text):
+        add("compare_programs")
+    if _RE_CONCESSION.search(text):
+        add("get_special_concessions")
+    if _RE_SHARE.search(text) and pr.get("last_fee"):
+        add("share_fee_estimate")
+    if _RE_FEE.search(text):
+        add("calculate_fee")
+        add("get_program_info")
+    if _RE_ELIG.search(text):
+        add("check_eligibility")
+        add("get_program_info")
+    if _RE_FACULTY.search(text):
+        add("find_faculty")
+    if _RE_VISIT.search(text):
+        add("request_campus_visit_callback")
+    if _RE_CALLBACK.search(text):
+        add("request_counsellor_callback")
+        add("get_contact_and_apply_links")
+    if _RE_VIDEO.search(text):
+        add("get_university_videos")
+    if _RE_PROGS.search(text):
+        add("list_programs")
+        add("get_program_info")
+    if _RE_REMEMBER.search(text):
+        add("remember_student_details")
+
+    if not selected:
+        add("search_university_info")
+    elif "search_university_info" not in selected and len(selected) < max_tools and not _RE_FEE.search(text):
+        add("search_university_info")
+
+    return selected[:max_tools]
+
 
 async def run_tool(name: str, args: dict, ctx: dict) -> dict:
     if name not in TOOLS:

@@ -39,7 +39,7 @@ class UserMemory(Base):
     )
     session_id: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
     memory_key: Mapped[str] = mapped_column(String(64), nullable=False)
-    memory_value: Mapped[str] = mapped_column(String(255), nullable=False)
+    memory_value: Mapped[str] = mapped_column(Text, nullable=False)
     consented: Mapped[bool] = mapped_column(nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

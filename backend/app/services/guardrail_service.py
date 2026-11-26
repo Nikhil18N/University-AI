@@ -20,7 +20,7 @@ STUDENT_SCORE_CLAIM_PATTERN = re.compile(
 # (attendance minimums, scholarship slabs, early-bird waiver, placement assistance).
 # Whitelisting these for general policy statements prevents false-positive guardrail triggers.
 KNOWN_POLICY_PERCENTAGES = {
-    "10%", "20%", "30%", "40%", "50%", "60%", "65%", "75%", "100%",
+    "10%", "15%", "20%", "25%", "30%", "40%", "50%", "55%", "75%", "100%",
 }
 
 
