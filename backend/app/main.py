@@ -23,6 +23,36 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+async def _apply_migrations_on_start() -> None:
+    """`alembic upgrade head` at startup, for hosts without a shell (Render free tier). Never blocks the start: if
+    Alembic cannot run (e.g. a database created without Alembic history), the tables the agent writes to that may be
+    missing (turn telemetry) are created on their own (create-if-missing; nothing existing is altered or dropped)."""
+    import asyncio as _asyncio
+    from pathlib import Path as _Path
+    try:
+        from alembic import command as _alembic_command
+        from alembic.config import Config as _AlembicConfig
+
+        ini = _Path(__file__).resolve().parent.parent / "alembic.ini"
+        cfg = _AlembicConfig(str(ini))
+        cfg.set_main_option("script_location", str(ini.parent / "alembic"))
+        cfg.attributes["configure_logger"] = False   # keep the API's own logging configuration
+        await _asyncio.wait_for(_asyncio.to_thread(_alembic_command.upgrade, cfg, "head"), timeout=90)
+        logger.info("Database migrations applied (alembic upgrade head).")
+        return
+    except Exception as err:
+        logger.warning("alembic upgrade at startup did not run (%s); creating missing agent tables only", err)
+    try:
+        from app.db.session import engine
+        from app.models.telemetry import TurnTelemetry
+
+        async with engine.begin() as conn:
+            await conn.run_sync(lambda c: TurnTelemetry.__table__.create(c, checkfirst=True))
+        logger.info("turn_telemetry table checked / created.")
+    except Exception as err:
+        logger.warning("turn_telemetry table not created: %s", err)
+
+
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI):
     """Startup and shutdown events."""
@@ -65,6 +95,8 @@ async def lifespan(fastapi_app: FastAPI):
             logger.info("Development database schema created or verified.")
         except Exception as e:
             logger.warning("Development schema initialization skipped or deferred: %s", e)
+    elif settings.RUN_MIGRATIONS_ON_START:
+        await _apply_migrations_on_start()
     else:
         logger.info("Database schema creation disabled; apply Alembic migrations before startup.")
 

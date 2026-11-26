@@ -191,3 +191,24 @@ async def test_rate_limit_gives_an_honest_busy_reply_never_a_keyword_answer(mess
     assert "₹" not in done["answer"]
     assert done["suggestions"] == list(agent._BUSY_CHIPS)
     assert not done["cards"]
+
+
+def _call(name, **args):
+    return types.GenerateContentResponse(candidates=[types.Candidate(content=types.Content(
+        role="model", parts=[types.Part.from_function_call(name=name, args=args)]))])
+
+
+@pytest.mark.asyncio
+async def test_the_model_starts_the_guided_board_first_check_instead_of_asking_for_marks():
+    # v4.17.1: "i want to join for b.tech cse" -> the model hands over to the guided steps (board, stage, marks out of
+    # that board's total); it never collects marks in a message
+    sid = _sid()
+    await memory.update_profile(sid, name="Ravi Kumar", phone="9876543210", welcome_actions_shown=True)
+    client = Recorder([_call("start_guided_check", program="B.Tech CSE")])
+    events = await _run("i want to join sru for b.tech cse", sid, client)
+    done = events[-1]
+    assert done["type"] == "done"
+    assert any(c.get("type") == "counsellor_board_selection" for c in done["cards"]), done["cards"]
+    assert "board" in done["answer"].lower()
+    state = await memory.get_conversation_state(sid, done["conversation_id"])
+    assert (state.get("fee_intake") or {}).get("waiting_for") == "board"

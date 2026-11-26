@@ -190,8 +190,18 @@ def test_a_follow_up_keeps_the_previous_answers_read_only_tools():
     from app.sru_agent import tools
     plain = tools.select_tools_for_message("Are you sure? Please verify that again.", {}, {})
     assert "find_faculty" not in plain
-    st = {"last_tools": ["find_faculty", "request_counsellor_callback"]}
+    st = {"last_tools": ["find_faculty", "cancel_contact_request"]}
     follow_up = tools.select_tools_for_message("Are you sure? Please verify that again.", st, {})
     assert "find_faculty" in follow_up                      # the same evidence can be checked again
-    assert "request_counsellor_callback" not in follow_up   # an action is never carried over
+    assert "cancel_contact_request" not in follow_up        # an action is never carried over
+
+
+def test_the_guided_check_and_the_callback_are_offered_whatever_the_words():
+    # a "Yes" to the bot's own offer carries no keywords: it must still be able to start the guided check (board
+    # first) or save the callback it offered
+    from app.sru_agent import tools
+    for msg in ("Yes", "i want to join sru", "ok sure"):
+        picked = tools.select_tools_for_message(msg, {}, {})
+        assert "start_guided_check" in picked and "request_counsellor_callback" in picked, (msg, picked)
+        assert len(picked) <= 4
 

@@ -1768,6 +1768,24 @@ _FEE_STANDARD_ONLY = re.compile(
     re.IGNORECASE)
 _FEE_OTHER_TOPIC = re.compile(r"\b(?:hostel|mess|bus|transport|room|application\s+fee|exam\s+fee|other\s+fees?|"
                               r"4[- ]?years?|four[- ]years?|total\s+course|20\d\d)\b", re.IGNORECASE)
+def _open_guided_check(fee_prog, message: str, profile: dict, first_name: str | None) -> dict | None:
+    """The first step of the guided eligibility / scholarship check (board first, then stage, then marks out of that
+    board's total), exactly as the "Calculate my scholarship" button starts it. None when every detail is known."""
+    start = {"counsellor_mode": True, **({"program": fee_prog} if fee_prog else {})}
+    step = fee_intake.decide("Calculate my scholarship. " + (message or ""), profile, start, first_name=first_name)
+    if not step or step.get("action") != "ask":
+        return None
+    body = _FEE_STEP_OPENER.sub("", step["text"]).strip()
+    if not fee_prog:
+        body = ("Which B.Tech branch are you interested in?" if "branch" in step["text"]
+                else "Which programme are you interested in?")
+    short = fees.short_name(fee_prog) if fee_prog else ""
+    lead = (f"Let's check your eligibility and scholarship for **{short}** step by step."
+            if fee_prog else "Let's check your eligibility and scholarship step by step.")
+    return {"state": step["state"], "text": f"{lead}\n\n{body}", "cards": step.get("cards") or [],
+            "chips": list(step.get("chips") or [])}
+
+
 _FEE_STEP_OPENER = re.compile(r"^(?:Sure|Absolutely|Great)[^!.]*[!.]\s*(?:Let's work out your scholarship for \*\*[^*]+\*\*\.\s*)?",
                               re.IGNORECASE)
 
@@ -4345,6 +4363,25 @@ async def run_agent(
                 turn_evidence.append({"tool": call.name, "result": result})
                 result_parts.append(types.Part(function_response=types.FunctionResponse(
                     name=call.name, response=result, id=getattr(call, "id", None))))
+            if ctx.get("guided_check") is not None:
+                # v4.17.1: the model chose the guided check: show its first step card (board first) instead of
+                # collecting marks in a message
+                guided = ctx.pop("guided_check") or {}
+                g_prof = ctx.get("profile") or profile
+                g_prog = guided.get("program") or conv_state.get("active_program") or g_prof.get("program_interest")
+                if g_prog not in fees.load_data()["programs"]:
+                    g_prog = None
+                opened = _open_guided_check(g_prog, message, g_prof, natural_name)
+                if opened:
+                    conv_state["fee_intake"] = opened["state"]
+                    await memory.update_conversation_state(
+                        session_id, conversation_id, fee_intake=opened["state"],
+                        **({"active_program": g_prog} if g_prog else {}))
+                    async for ev in _say(opened["text"], message, session_id, conversation_id, used,
+                                         cards=opened["cards"], suggestions=opened["chips"], exact_chips=True,
+                                         profile=g_prof):
+                        yield ev
+                    return
             contents.append(types.Content(role="user", parts=result_parts))
     except Exception as exc:
         if link.get("error_kind") in ("rate", "busy"):
@@ -4407,12 +4444,22 @@ async def run_agent(
                 final = _cancel_text({"status": ran["status"], "reference": str(profile.get("last_lead_id", ""))[:8],
                                       "request_type": profile.get("last_lead_type")})
     elif final and _claims_saved(final) and not saved_now and not (ctx.get("profile") or {}).get("last_lead_id"):
-        is_visit = bool(re.search(r"\bvisit\b|\btour\b", final + " " + message, re.IGNORECASE))
+        # what the student asked for or agreed to: their message and the question they answered (not words the
+        # model happened to use in its own reply)
+        offer = next((h.get("text", "") for h in reversed(history or []) if h.get("role") in ("model", "assistant")), "")
+        is_visit = bool(re.search(r"\bvisit\b|\btour\b", message + " " + offer[-300:], re.IGNORECASE))
         await set_state(pending_action="campus_visit" if is_visit else "callback", pending_turns=0)
-        final = ("I have not saved anything yet. To ask the admissions team to call you about a "
-                 + ("campus visit, please send your full name and 10-digit mobile number. I can't book or confirm "
-                    "a visit myself."
-                    if is_visit else "callback, please send your full name and 10-digit mobile number."))
+        prof_now = ctx.get("profile") or profile or {}
+        digits = re.sub(r"\D", "", str(prof_now.get("phone") or ""))
+        if prof_now.get("name") and len(digits) >= 10:
+            final = ("I haven't sent the request yet. Shall I ask the admissions team to call you about "
+                     + ("a campus visit" if is_visit else "your admission")
+                     + f" on your number ending in {digits[-4:]}? Reply yes to confirm.")
+        else:
+            final = ("I have not saved anything yet. To ask the admissions team to call you about a "
+                     + ("campus visit, please send your full name and 10-digit mobile number. I can't book or confirm "
+                        "a visit myself."
+                        if is_visit else "callback, please send your full name and 10-digit mobile number."))
     if saved_now:
         await clear_pending()
 
