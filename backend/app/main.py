@@ -23,6 +23,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _without_urls(text: str) -> str:
+    """Never write a connection string (it holds the database password) to the logs."""
+    import re as _re
+    return _re.sub(r"(?:[A-Za-z_]+=)?[a-z][a-z0-9+.-]*://\S+", "<connection URL hidden>", text or "")[:300]
+
+
 async def _apply_migrations_on_start() -> None:
     """`alembic upgrade head` at startup, for hosts without a shell (Render free tier). Never blocks the start: if
     Alembic cannot run (e.g. a database created without Alembic history), the tables the agent writes to that may be
@@ -41,7 +47,8 @@ async def _apply_migrations_on_start() -> None:
         logger.info("Database migrations applied (alembic upgrade head).")
         return
     except Exception as err:
-        logger.warning("alembic upgrade at startup did not run (%s); creating missing agent tables only", err)
+        logger.warning("alembic upgrade at startup did not run (%s: %s); creating missing agent tables only",
+                       type(err).__name__, _without_urls(str(err)))
     try:
         from app.db.session import engine
         from app.models.telemetry import TurnTelemetry
@@ -50,7 +57,7 @@ async def _apply_migrations_on_start() -> None:
             await conn.run_sync(lambda c: TurnTelemetry.__table__.create(c, checkfirst=True))
         logger.info("turn_telemetry table checked / created.")
     except Exception as err:
-        logger.warning("turn_telemetry table not created: %s", err)
+        logger.warning("turn_telemetry table not created: %s: %s", type(err).__name__, _without_urls(str(err)))
 
 
 @asynccontextmanager
@@ -106,7 +113,7 @@ async def lifespan(fastapi_app: FastAPI):
         try:
             import redis.asyncio as aioredis
             fastapi_app.state.redis = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
-            logger.info("Redis response cache enabled (%s)", settings.REDIS_URL[:30])
+            logger.info("Redis response cache enabled (%s)", _without_urls(settings.REDIS_URL))   # no password
         except Exception as e:
             logger.warning("Redis response cache disabled: %s", e)
     from app.sru_agent import memory as agent_memory

@@ -13,6 +13,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # The API creates this table at startup when Alembic cannot run (v4.18.0): skip it if it is already there.
+    if sa.inspect(op.get_bind()).has_table("turn_telemetry"):
+        return
     op.create_table(
         "turn_telemetry",
         sa.Column("id", sa.UUID(), nullable=False),
