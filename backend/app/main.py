@@ -649,12 +649,21 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
                 created_at=finished_at,
                 message_id=uuid.UUID(message_id) if message_id else None,
             )
-            if telemetry:
-                from app.sru_agent import observability as agent_observability
-                session.add(agent_observability.build_turn_telemetry_row(telemetry))
             await session.commit()
     except Exception as err:
         logger.warning("agent_turn_logger error: %s", err)
+        return
+    if telemetry:
+        # Saved on its own: the chat (and Reply / Edit, which refer to these saved messages) must never be lost
+        # because the telemetry table is missing or a telemetry field is rejected.
+        try:
+            from app.db.session import async_session_factory
+            from app.sru_agent import observability as agent_observability
+            async with async_session_factory() as session:
+                session.add(agent_observability.build_turn_telemetry_row(telemetry))
+                await session.commit()
+        except Exception as err:
+            logger.warning("turn telemetry not saved: %s", err)
 
 from app.sru_agent.router import set_turn_logger, set_conversation_resolver
 set_turn_logger(agent_turn_logger)

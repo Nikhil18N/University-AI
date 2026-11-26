@@ -202,3 +202,19 @@ async def test_the_latest_typed_message_can_be_edited_after_buttons_and_everythi
     # a button turn takes no snapshot: the typed message stays the one that can be edited
     snap = await memory.get_turn_snapshot(sid, conv)
     assert snap["turn_id"] == edited[-1]["user_message_id"]
+
+
+@pytest.mark.asyncio
+async def test_a_telemetry_failure_never_loses_the_turn_so_reply_still_works(model, monkeypatch):
+    # production without the turn_telemetry table: the chat must still be saved, and a reply must find its message
+    from app.sru_agent import observability
+    def broken(_telemetry):
+        raise RuntimeError('relation "turn_telemetry" does not exist')
+    monkeypatch.setattr(observability, "build_turn_telemetry_row", broken)
+    sid = await _student()
+    first = (await _turn(sid, "Just show the B.Tech CSE fee", source="button"))[-1]
+    conv = first["conversation_id"]
+    ids = [str(m.id) for m in (await _saved(sid, conv)).messages]
+    assert first["message_id"] in ids and first["user_message_id"] in ids
+    reply = await _turn(sid, "What does this amount include?", conv, reply_to=first["message_id"])
+    assert reply[-1]["type"] == "done", reply[-1]
