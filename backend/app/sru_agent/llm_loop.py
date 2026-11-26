@@ -169,8 +169,8 @@ async def _handle_call_error(exc, link: dict, attempt: int, model: str, ring=Non
     err_str = str(exc).lower()
     if "name resolution" in err_str or "clientconnectordnserror" in type(exc).__name__.lower():
         raise exc
-    if kind == "model" and link["model_idx"] + 1 < len(link["models"]):
-        log.warning("Agent model %s unavailable (%s), trying the next model", model, exc)
+    if kind in ("model", "busy") and link["model_idx"] + 1 < len(link["models"]):
+        log.warning("Agent model %s %s (%s), trying the next model", model, kind, str(exc)[:120])
         link["model_idx"] += 1
         return None
     if kind == "config" and link.get("thinking"):

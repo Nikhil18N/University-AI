@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, func
+from sqlalchemy import Boolean, DateTime, Float, Integer, JSON, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -36,6 +36,7 @@ class TurnTelemetry(Base):
     first_token_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     fallback_decision: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     fallback_reason: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    response_meta: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

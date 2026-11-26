@@ -20,7 +20,7 @@ _RUPEES = re.compile(r"(?:₹|rs\.?|inr)\s?(\d[\d,]*(?:\.\d+)?)", re.IGNORECASE)
 # Salaries, stipends and funding ("₹44 LPA", "₹1.25L/month", "₹76+ Cr") are not fees: never checked as fee amounts.
 _NOT_A_FEE = re.compile(r"\s*\+?\s*(?:lpa\b|l\b|lakhs?\b|lacs?\b|cr\b|crores?\b|k\b|/\s*(?:month|mo)\b|per\s+month\b)",
                         re.IGNORECASE)
-_PCT_SCHOLARSHIP = re.compile(r"(\d{1,2})\s?%\s*(?:merit\s+)?(?:scholarship|waiver|fee\s+waiver)", re.IGNORECASE)
+_PCT_SCHOLARSHIP = re.compile(r"\b(\d{1,3})\s?%\s*(?:merit\s+)?(?:scholarship|waiver|fee\s+waiver)", re.IGNORECASE)
 NOTE = ("\n\n_I couldn't verify every amount above against the official fee data; please confirm with the "
         "Admissions Office ({phone})._")
 
@@ -93,6 +93,13 @@ def check(text: str, *, fee_result: dict | None = None, sources: list | None = N
 
         def fix(m):
             n = int(m.group(1))
+            ctx_window = out[max(0, m.start() - 35): min(len(out), m.end() + 45)]
+            if _NEGATED.search(ctx_window) or re.search(
+                r"\b(?:not\s+applicable|not\s+offered|not\s+available|maximum|up\s+to|next\s+(?:tier|slab)|above|highest|range)\b",
+                ctx_window,
+                re.I,
+            ):
+                return m.group(0)
             if n != right and right > 0:
                 problems.append(f"scholarship {n}% -> {right}%")
                 return m.group(0).replace(m.group(1), str(right), 1)
@@ -169,16 +176,19 @@ def _known_name(tokens: list[str], corpus: str) -> bool:
     return bool(re.search(pattern, corpus))
 
 
+_ROLE_GENERIC = {"university", "department", "dept", "school", "centre", "center", "engineering", "sciences", "studies"}
+
+
 def _role_paired(tokens: list[str], office: str, corpus: str) -> bool:
-    """Some evidence mentions this person and the office words within a short distance (one entry or row)."""
-    office_words = [w[:5] for w in _norm_text(office).split() if len(w) > 3 and w not in ("university",)]
+    """Some evidence mentions this person and the core role/subject words within a short distance."""
+    office_words = [w[:5] for w in _norm_text(office).split() if len(w) > 3 and w not in _ROLE_GENERIC]
     if not office_words:
         return True
     surname = tokens[-1]
     for m in re.finditer(rf"\b{re.escape(surname)}\b", corpus):
         window = corpus[max(0, m.start() - 260): m.end() + 260]
         found = {w[:5] for w in window.split()}
-        if all(w in found for w in office_words):
+        if office_words[0] in found and (len(office_words) == 1 or any(w in found for w in office_words[1:])):
             return True
     return False
 

@@ -10,7 +10,7 @@ from . import config
 
 # Change this whenever the wording below changes, so a chat log can be matched to the prompt
 # that produced it (AGENTS.md rule 13: prompts are versioned).
-PROMPT_VERSION = "2026-11-26.1"  # .1: people & offices from evidence; re-check when challenged
+PROMPT_VERSION = "2026-11-26.2"  # .2: no trailing yes/no on info replies; clean answer_check percentages & roles
 
 _HIDDEN_PROFILE_KEYS = ("phone_saved", "last_lead_id", "last_lead_key", "last_lead_type", "last_fee",
                        # details from an EARLIER conversation: never used unless the student asks to reuse them
@@ -126,7 +126,7 @@ TOOLS FIRST (never answer these from memory)
 - Faculty, HOD, dean -> find_faculty: name, position, dept, research, link; never from memory.
 - Other SRU facts and offices -> search_university_info; if unconfirmed, give {config.ADMISSIONS_PHONE}.
 - Profile updates -> update_contact_details / remember_student_details in same turn.
-- After fee/eligibility, offer ONE next step: callback, campus visit, apply link, or share_fee_estimate.
+- If you end with a follow-up question, ask ONE specific thing only; never combine two options with "or" / "and" (never "A or B?").
 
 ACTIONS THAT SAVE DATA (request_counsellor_callback, request_campus_visit_callback, cancel_contact_request)
 - Need name + 10-digit mobile. Student asking for call has consented (consent=true); if YOU offered, ask permission first.
