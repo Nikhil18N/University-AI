@@ -614,45 +614,56 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
                 await creating  # the row of a brand-new chat is still being written
             except Exception:
                 pass
-        async with async_session_factory() as session:
-            conv_uuid = uuid.UUID(conversation_id) if conversation_id else None
-            clean_title = (user_text or "").strip()
-            if len(clean_title) > 50:
-                clean_title = clean_title[:47].rstrip() + "..."
-            conv = await conversation_service.get_or_create_conversation(
-                session, session_id, conv_uuid, title=clean_title
-            )
-            # Title the chat by its first real question, not by "hi" or "thanks".
-            from app.sru_agent import intents as agent_intents
-            if clean_title and not agent_intents.small_talk(user_text) and (
-                    conv.title in ("New conversation", "Chat", "") or agent_intents.small_talk(conv.title)):
-                conv.title = clean_title
-            finished_at = datetime.now(timezone.utc)
-            asked_at = started_at or finished_at
-            if asked_at >= finished_at:
-                asked_at = finished_at - timedelta(milliseconds=1)
-            # the ids the student's browser already has (Reply / Edit refer to them), the reply / edit markers
-            await conversation_service.add_message(
-                session, conv.id, "user", user_text, created_at=asked_at,
-                metadata={k: v for k, v in (user_metadata or {}).items() if v} or None,
-                message_id=uuid.UUID(user_message_id) if user_message_id else None)
-            await conversation_service.add_message(
-                session,
-                conv.id,
-                "assistant",
-                answer,
-                model=agent_config.AGENT_MODEL,
-                metadata={"tools_used": tools_used, "cards": cards or [], "suggestions": suggestions or [],
-                          **({"channel": channel} if channel else {})},
-                # the sources that supported the answer, so a reopened chat shows them too (v4.17.1)
-                sources=[s for s in (sources or []) if isinstance(s, dict) and s.get("document_id") and s.get("title")],
-                created_at=finished_at,
-                message_id=uuid.UUID(message_id) if message_id else None,
-            )
-            if telemetry:
-                from app.sru_agent import observability as agent_observability
-                session.add(agent_observability.build_turn_telemetry_row(telemetry))
-            await session.commit()
+        async def _save(with_telemetry: bool) -> None:
+            async with async_session_factory() as session:
+                conv_uuid = uuid.UUID(conversation_id) if conversation_id else None
+                clean_title = (user_text or "").strip()
+                if len(clean_title) > 50:
+                    clean_title = clean_title[:47].rstrip() + "..."
+                conv = await conversation_service.get_or_create_conversation(
+                    session, session_id, conv_uuid, title=clean_title
+                )
+                # Title the chat by its first real question, not by "hi" or "thanks".
+                from app.sru_agent import intents as agent_intents
+                if clean_title and not agent_intents.small_talk(user_text) and (
+                        conv.title in ("New conversation", "Chat", "") or agent_intents.small_talk(conv.title)):
+                    conv.title = clean_title
+                finished_at = datetime.now(timezone.utc)
+                asked_at = started_at or finished_at
+                if asked_at >= finished_at:
+                    asked_at = finished_at - timedelta(milliseconds=1)
+                # the ids the student's browser already has (Reply / Edit refer to them), the reply / edit markers
+                await conversation_service.add_message(
+                    session, conv.id, "user", user_text, created_at=asked_at,
+                    metadata={k: v for k, v in (user_metadata or {}).items() if v} or None,
+                    message_id=uuid.UUID(user_message_id) if user_message_id else None)
+                await conversation_service.add_message(
+                    session,
+                    conv.id,
+                    "assistant",
+                    answer,
+                    model=agent_config.AGENT_MODEL,
+                    metadata={"tools_used": tools_used, "cards": cards or [], "suggestions": suggestions or [],
+                              **({"channel": channel} if channel else {})},
+                    # the sources that supported the answer, so a reopened chat shows them too (v4.17.1)
+                    sources=[s for s in (sources or []) if isinstance(s, dict) and s.get("document_id") and s.get("title")],
+                    created_at=finished_at,
+                    message_id=uuid.UUID(message_id) if message_id else None,
+                )
+                if with_telemetry:
+                    from app.sru_agent import observability as agent_observability
+                    session.add(agent_observability.build_turn_telemetry_row(telemetry))   # same commit (one round trip)
+                await session.commit()
+
+        try:
+            await _save(bool(telemetry))
+        except Exception as err:
+            if not telemetry:
+                raise
+            # The chat must never be lost because of telemetry (table not migrated yet, a rejected field): Reply /
+            # Edit refer to these saved messages. Save the turn again without it.
+            logger.warning("turn telemetry not saved, saving the turn without it: %s", err)
+            await _save(False)
     except Exception as err:
         logger.warning("agent_turn_logger error: %s", err)
 
