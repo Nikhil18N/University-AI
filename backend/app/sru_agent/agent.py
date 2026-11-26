@@ -34,7 +34,7 @@ except ImportError:
 
 from . import affordability, ai_guard, config, dialogue, eligibility, journey, faculty, fee_flow, fee_intake, fees, followups, intents, knowledge, memory, responses, tools
 from app.services import card_service
-from . import campus_life, compound, fact_service, fee_coordinator, fee_journey, fee_plan, llm_loop, observability, policy_engine, policy_models, policy_service, postprocess, semantic_router, tool_runner
+from . import campus_life, compound, fact_service, fee_coordinator, fee_journey, fee_plan, llm_loop, observability, policy_engine, policy_models, policy_service, postprocess, semantic_router, structured_flows, tool_runner
 from .llm_loop import (
     GeminiAgentProvider,
     ModelUnavailable,
@@ -73,6 +73,15 @@ log = logging.getLogger("sru_agent")
 _client = None
 _TURN_STARTED: contextvars.ContextVar[float | None] = contextvars.ContextVar("_TURN_STARTED", default=None)
 _TURN_TELEMETRY_RECORDED: contextvars.ContextVar[bool] = contextvars.ContextVar("_TURN_TELEMETRY_RECORDED", default=False)
+
+
+def _should_persist_telemetry_db() -> bool:
+    """Batch telemetry into agent_turn_logger when router._on_turn_complete is wired; else persist directly."""
+    try:
+        from . import router as agent_router
+        return agent_router._on_turn_complete is None
+    except Exception:
+        return True
 
 
 def _extract_usage_metadata(resp) -> dict[str, int]:
@@ -265,7 +274,7 @@ async def _handle_call_error(exc, link: dict, attempt: int, model: str) -> float
 def _with_thinking(cfg, link: dict, model: str):
     """Ask for the least thinking the model allows (AGENT_THINKING_LEVEL), which is the biggest
     single speed setting on Gemini 3 models. Dropped automatically if a model refuses it."""
-    level = (config.AGENT_THINKING_LEVEL or "").upper()
+    level = (link.get("thinking_level") or config.AGENT_THINKING_LEVEL or "").upper()
     if not link.get("thinking") or not level or level == "DEFAULT":
         return cfg
     if model.startswith("gemini-2"):
@@ -787,7 +796,11 @@ async def _say(text, message, session_id, conversation_id, used=(), cards=(), su
         suggestions, exact_chips = ["Yes, prepare my fee chart", "No, thanks"], True
     for c in cards:
         yield {"type": "card", "card": c}
+    t_started = _TURN_STARTED.get()
+    say_first_token_ms = None
     for piece in _chunks(text):
+        if say_first_token_ms is None and t_started is not None:
+            say_first_token_ms = round((time.perf_counter() - t_started) * 1000, 2)
         yield {"type": "token", "delta": piece}
     await memory.append_history(session_id, message, text, conversation_id)
     if suggestions and exact_chips:
@@ -830,10 +843,11 @@ async def _say(text, message, session_id, conversation_id, used=(), cards=(), su
                 fallback_decision=bool(plain),
                 fallback_reason="model_unavailable" if plain else None,
             )
-        t_started = _TURN_STARTED.get()
+        if say_first_token_ms is not None and t_obj.first_token_ms is None:
+            t_obj.first_token_ms = say_first_token_ms
         if t_started is not None and not t_obj.total_latency_ms:
             t_obj.total_latency_ms = round((time.perf_counter() - t_started) * 1000, 2)
-        observability.record_policy_telemetry(t_obj)
+        observability.record_policy_telemetry(t_obj, persist_db=_should_persist_telemetry_db())
         _TURN_TELEMETRY_RECORDED.set(True)
         telemetry = t_obj.to_dict()
     yield _done(conversation_id, text, used, cards, final_suggestions, telemetry=telemetry, profile=profile, eligible=eligible,
@@ -967,12 +981,14 @@ async def _model_words(brief: str, message: str, session_id: str, *, history=Non
     fail a check: an unverified amount, a leak of instructions, or an empty answer."""
     history = list(history or [])
     try:
-        models = []
-        for m in (config.AGENT_MODEL, *_FALLBACK_MODELS):
-            if m and m not in models:
-                models.append(m)
+        models, tier_thinking, _tier = llm_loop.select_model_tier(
+            message,
+            fallback_models=_FALLBACK_MODELS,
+            has_tools=False,
+        )
         link = {"fixed": client if (client is not None and not _is_mock_or_test_client(client)) else None,
                 "key": None, "models": models, "model_idx": 0, "error_kind": None, "thinking": True,
+                "thinking_level": tier_thinking,
                 "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT)}
         if link["fixed"] is None and get_client is not _DEFAULT_GET_CLIENT:
             link["fixed"] = get_client()
@@ -1430,9 +1446,12 @@ def _handbook_context(query: str) -> str:
         search_queries.extend(sub_questions)
 
     found_by_id = {}
-    for q in search_queries:
+    per_sub_top: list[dict] = []
+    for idx, q in enumerate(search_queries):
         try:
             results = knowledge.search(q, k=4, min_score=1.0)
+            if idx > 0 and results:
+                per_sub_top.extend(results[:2])
             for r in results:
                 doc_key = r.get("title", "") + r.get("text", "")[:60]
                 if doc_key not in found_by_id or r.get("score", 0) > found_by_id[doc_key].get("score", 0):
@@ -1443,14 +1462,24 @@ def _handbook_context(query: str) -> str:
     if not found_by_id:
         return ""
 
-    sorted_found = sorted(found_by_id.values(), key=lambda x: x.get("score", 0), reverse=True)[:4]
+    max_passages = min(8, max(4, 2 * len(sub_questions))) if len(sub_questions) > 1 else 4
+    picked: list[dict] = []
+    seen_keys: set[str] = set()
+    for item in per_sub_top + sorted(found_by_id.values(), key=lambda x: x.get("score", 0), reverse=True):
+        doc_key = item.get("title", "") + item.get("text", "")[:60]
+        if doc_key not in seen_keys:
+            seen_keys.add(doc_key)
+            picked.append(item)
+            if len(picked) >= max_passages:
+                break
+
     # Passages are data: one that carries instructions for the model never reaches the prompt.
-    sorted_found = ai_guard.screen_passages(sorted_found, "handbook")
+    sorted_found = ai_guard.screen_passages(picked, "handbook")
     if not sorted_found:
         return ""
-    top = sorted_found[0]["score"]
+    top = max(f.get("score", 0) for f in sorted_found) or 1.0
     parts = [f"[{f['title'].split(' > ')[-1]} | source: {f.get('source') or 'SR University handbook'}]\n"
-             f"{f['text'][:750]}" for f in sorted_found if f["score"] >= 0.40 * top]
+             f"{f['text'][:750]}" for f in sorted_found if f.get("score", 0) >= 0.40 * top or len(sub_questions) > 1]
     return "\n\n".join(parts)
 
 
@@ -1462,19 +1491,19 @@ async def _hybrid_handbook_context(query: str) -> str:
     sub_questions = semantic_router.decompose_multi_questions(query)
     search_queries = [query] + (sub_questions if len(sub_questions) > 1 else [])
 
-    bm25_hits, sem_hits = [], []
+    bm25_per_q: list[list[dict]] = []
     for q in search_queries:
         try:
-            bm25_hits.extend(knowledge.search(q, k=4, min_score=1.0))
+            bm25_per_q.append(knowledge.search(q, k=4, min_score=1.0))
         except Exception:
-            pass
+            bm25_per_q.append([])
     sem_batches = await asyncio.gather(
         *(tools._knowledge_search(q) for q in search_queries),
         return_exceptions=True,
     )
-    for batch in sem_batches:
-        if isinstance(batch, list):
-            sem_hits.extend(batch)
+
+    bm25_hits = [item for batch in bm25_per_q for item in batch]
+    sem_hits = [item for batch in sem_batches if isinstance(batch, list) for item in batch]
 
     if not sem_hits and not bm25_hits:
         return ""
@@ -1493,7 +1522,29 @@ async def _hybrid_handbook_context(query: str) -> str:
             scores[key] = scores.get(key, 0.0) + 1.0 / (60 + rank)
             fused.setdefault(key, dict(item))
 
-    ranked = [fused[k] for k in sorted(scores.keys(), key=lambda x: scores[x], reverse=True)[:4]]
+    max_passages = min(8, max(4, 2 * len(sub_questions))) if len(sub_questions) > 1 else 4
+    ranked: list[dict] = []
+    seen_keys: set[str] = set()
+
+    # Ensure each sub-question gets at least its top hit before filling remaining slots globally.
+    if len(sub_questions) > 1:
+        for idx in range(1, len(search_queries)):
+            sem_b = sem_batches[idx] if idx < len(sem_batches) and isinstance(sem_batches[idx], list) else []
+            bm_b = bm25_per_q[idx] if idx < len(bm25_per_q) else []
+            for item in (sem_b[:1] + bm_b[:1]):
+                key = re.sub(r"\W+", " ", (item.get("text") or "").lower()).strip()[:160]
+                if key and key not in seen_keys:
+                    seen_keys.add(key)
+                    ranked.append(fused.get(key, dict(item)))
+
+    for k in sorted(scores.keys(), key=lambda x: scores[x], reverse=True):
+        if len(ranked) >= max_passages:
+            break
+        if k not in seen_keys:
+            seen_keys.add(k)
+            ranked.append(fused[k])
+
+    ranked = ranked[:max_passages]
     ranked = ai_guard.screen_passages(ranked, "handbook")
     if not ranked:
         return ""
@@ -1756,16 +1807,7 @@ def _side_question(message: str, conv_state: dict) -> bool:
     return bool(_SIDE_TOPIC.search(text))
 
 
-def _intake_open(conv_state: dict, message: str) -> bool:
-    """Is the fee intake waiting for this message? A finished intake ("done") re-opens only when the message
-    brings new academic details (a marks correction, another board): every other question after the result is
-    answered as itself, never by re-sending the scholarship result and the fee card."""
-    waiting = (conv_state.get("fee_intake") or {}).get("waiting_for")
-    if not waiting:
-        return False
-    if waiting != "done":
-        return True
-    return bool(set(fee_intake.parse_details(message)) & set(fee_intake._ACADEMIC_FIELDS))
+_intake_open = fee_coordinator.intake_open
 
 
 def _starts_fee_evaluation(message: str, conv_state: dict) -> bool:
@@ -2497,11 +2539,24 @@ async def run_agent(
         if stale:
             await set_state(**stale)
         shown_facts = list(conv_state.get("facts_shown") or [])
-        picked = fact_service.retrieve(message, k=6, exclude=shown_facts)
+        sub_qs = semantic_router.decompose_multi_questions(message)
+        if len(sub_qs) > 1:
+            picked = []
+            seen_fact_ids = set()
+            for sq in sub_qs[:4]:
+                for f in fact_service.retrieve(sq, k=3, exclude=shown_facts):
+                    fid = getattr(f, "id", None) or str(f)
+                    if fid not in seen_fact_ids:
+                        seen_fact_ids.add(fid)
+                        picked.append(f)
+            picked = picked[:8]
+        else:
+            picked = fact_service.retrieve(message, k=6, exclude=shown_facts)
         facts_note = fact_service.format_facts_for_prompt(picked) if picked else None
         turn_telemetry = observability.PolicyTurnTelemetry(
             session_id=session_id, conversation_id=conversation_id, message=message,
-            detected_intent="MODEL_FIRST", response_mode="model")
+            detected_intent="MODEL_FIRST", response_mode="model",
+            routing_latency_ms=round((time.perf_counter() - started) * 1000, 2))
         log.info("model-first turn (session %s)", (session_id or "")[:8])
     else:
         log.info("structured turn (%s) session %s", structured, (session_id or "")[:8])
@@ -2865,36 +2920,23 @@ async def run_agent(
             compound_plan = compound.plan(message, profile)
         if compound_plan:
             log.info("Agent compound query: %d parts for '%s'", len(compound_plan), message[:60])
-            resolved_parts, combined_cards, combined_chips, seen_card_types = [], [], [], set()
-            for sq, sq_topic in compound_plan:
-                part_text, part_cards, part_chips = await _resolve_sub_query(sq, sq_topic, session_id)
-                if part_text:
-                    resolved_parts.append(part_text.strip())
-                for c in part_cards:
-                    ctype = c.get("type") if isinstance(c, dict) else str(c)
-                    if ctype not in seen_card_types:
-                        seen_card_types.add(ctype)
-                        combined_cards.append(c)
-                for chip in part_chips:
-                    if chip not in combined_chips:
-                        combined_chips.append(chip)
-            if resolved_parts and compound.from_other_state(message):
-                conc = next((c for c in fees.load_data().get("special_concessions", []) if c["key"] == "non_local"), None)
-                if conc:
-                    resolved_parts.append(
-                        f"Coming from outside Telangana and Andhra Pradesh? The 2027-28 fee circular has a special concession "
-                        f"of **{fees.inr(int(conc['amount']))} a year** for students from outside Telangana and AP, applied after the "
-                        "Admissions Office verifies your proof.")
-            if resolved_parts:
+            resolved = await structured_flows.resolve_compound_plan(
+                compound_plan,
+                message,
+                session_id,
+                conversation_id,
+                resolve_sub_query=_resolve_sub_query,
+                with_resume_chip=_with_resume_chip,
+            )
+            if resolved:
                 # A side question during an unfinished fee evaluation keeps the "continue" button (docs/36 rule 2).
-                chips = await _with_resume_chip(session_id, conversation_id, combined_chips[:4])
                 async for ev in _reply(
-                    "\n\n---\n\n".join(resolved_parts),
+                    resolved["text"],
                     message,
                     session_id,
                     conversation_id,
-                    cards=combined_cards,
-                    suggestions=chips,
+                    cards=resolved["cards"],
+                    suggestions=resolved["suggestions"],
                     exact_chips=True,
                     resume=False,
                     client=client, history=history, profile=profile, conv_state=conv_state,
@@ -3913,29 +3955,6 @@ async def run_agent(
         if not action_note and not action and conv_state.get("pending_action") not in ("callback", "campus_visit") \
                 and intent not in ("CAMPUS_VISIT_BOOKING", "CAMPUS_VISIT_BOOKING_WITH_DATE", "DATE_CONFIRMATION_YES",
                                    "DATE_CONFIRMATION_NO"):
-            intake_state = dict(conv_state.get("fee_intake") or {})
-            if not intake_state.get("program"):
-                candidate_p = conv_state.get("fee_flow_prog") or conv_state.get("active_program") or (profile.get("program_interest") if profile else None)
-                if candidate_p:
-                    intake_state["program"] = candidate_p
-
-            async def _apply_intake_updates(state_dict: dict):
-                await set_state(fee_intake=state_dict)
-                for k in ("program", "board", "board_label", "board_key", "academic_stage", "stage_label",
-                          "raw_marks", "max_marks", "percent", "admission_route", "route_label",
-                          "eapcet_rank", "jee_percentile", "stream"):
-                    val = state_dict.get(k)
-                    if val is not None:
-                        if k == "program":
-                            if profile is not None:
-                                profile["program_interest"] = val
-                            await memory.update_profile(session_id, program_interest=val)
-                            await set_state(active_program=val, fee_flow_prog=val)
-                        else:
-                            if profile is not None:
-                                profile[k] = val
-                            await memory.update_profile(session_id, **{k: val})
-
             # 0. Check affordability and concession multi-step flow
             if conv_state.get("affordability_flow") or affordability.is_affordability_query(message):
                 afford_res = affordability.process_affordability_flow(message, profile, conv_state)
@@ -3947,154 +3966,56 @@ async def run_agent(
                         yield ev
                     return
 
-            # 1. If fee intake is active, or user asks specifically about scholarship/calculation, prioritize fee intake
-            low_msg = (message or "").lower()
-            is_other_fee_inquiry = bool(re.search(
-                r"\b(?:other\s+fees?|other\s+academic(?:\s*/\s*university|\s+university)?\s+charges?|other\s+charges?|annual\s+charges?|"
-                r"university\s+charges?|additional\s+fees?|additional\s+charges?|enrolment\s+fee|enrollment\s+fee|application\s+form\s+fee|"
-                r"specialisation\s+fee|specialization\s+fee|phd\s+fee|"
-                r"fees?\s+(?:other\s+than|apart\s+from|besides|excluding|except)\s+(?:sem(?:ester)?\s+fee|tuition(?:\s+fee)?|course\s+fee)|"
-                r"(?:other\s+than|apart\s+from|besides|excluding|except)\s+(?:sem(?:ester)?\s+fee|tuition(?:\s+fee)?|course\s+fee))\b",
-                low_msg,
-            ))
-
-            is_scholarship_calc_q = not is_other_fee_inquiry and bool(re.search(
-                r"\b(?:(?:schol\w*|s[ck]?h?o[lr]+[ae]?r?s+h?i*p+\w*)|waiver|concession|discount|fee\s+assessment|scholarship\s+assessment|assessment\s+form|"
-                r"calculate\s+(?:[\w\s]+\s+)?(?:fee|tuition|scholarship)|fee\s+calculation|my\s+fee|expected\s+scholarship|"
-                r"scholarship\s+counsell?or|fee\s+counsell?or)\b",
-                low_msg,
-            ))
+            # 1-3. Coordinated fee_intake and exploratory school/course flows
             is_multi_q = len(semantic_router.decompose_multi_questions(message)) > 1
-            is_general_scholarship = bool(re.search(
-                r"\b(?:what\s+(?:are\s+the\s+)?scholarships|which\s+scholarships|scholarships\s+available|"
-                r"are\s+there\s+scholarships|any\s+scholarships|do\s+you\s+(?:have|offer|provide)\s+scholarships|"
-                r"scholarship\s+options|list\s+of\s+scholarships|details\s+about\s+scholarships)\b",
-                low_msg,
-            ))
-            if is_multi_q or is_general_scholarship:
-                is_scholarship_calc_q = False
-
-            if is_other_fee_inquiry and conv_state.get("fee_intake"):
-                await set_state(fee_intake=None)
-                intake_state = {}
-            is_bare_score_msg = bool(re.match(
-                r"^\s*(?:i\s+(?:got|scored|have|secured|obtained)\s+)?\d{2,4}(?:\.\d+)?\s*(?:marks?|%|percent)?\s*$",
-                low_msg,
-            )) or bool(re.fullmatch(r"\s*\d{2,4}(?:\.\d+)?\s*%?\s*", low_msg))
-            is_branch_guidance = (intent == "BRANCH_GUIDANCE_QUERY") or intents.is_branch_guidance_query(message)
-            is_seat_guarantee = (intent == "ADMISSION_GUARANTEE_QUERY") or bool(intents._ADMISSION_GUARANTEE_PATTERN.search(message))
-            is_future_year = (intent == "FUTURE_YEAR_FEE_QUERY") or bool(intents._FUTURE_YEAR_FEE_PATTERN.search(message))
-            if is_seat_guarantee or is_future_year:
-                is_scholarship_calc_q = False
-                if conv_state.get("fee_intake"):
-                    await set_state(fee_intake=None)
-                    intake_state = {}
-
-            intake_in_progress = _intake_open(conv_state, message) and not is_multi_q and not side_q
-            if not is_other_fee_inquiry and not is_branch_guidance and not is_seat_guarantee and not is_future_year and (intake_in_progress or is_scholarship_calc_q or (is_bare_score_msg and client is None)):
-                intake_decision = fee_intake.decide(message, profile, intake_state, first_name=natural_name)
-                if intake_decision and intake_decision["action"] == "ineligible":
-                    await set_state(fee_intake={k: v for k, v in intake_decision["state"].items()
-                                                if k in ("program", "ineligible", "counsellor_mode")})
-                    # v4.15.0: the marks given are still the student's marks (other programmes, a later question)
-                    kept = {k: intake_decision["state"].get(k) for k in ("percent", "raw_marks", "max_marks", "board",
-                                                                         "board_key", "board_label", "academic_stage")
-                            if intake_decision["state"].get(k) not in (None, "")}
-                    if kept.get("percent") is not None:
-                        profile = await memory.update_profile(session_id, **kept)
-                        ctx["profile"] = profile
-                    async for ev in _say(intake_decision["text"], message, session_id, conversation_id,
-                                         cards=[],
-                                         suggestions=intake_decision.get("chips", []),
-                                         eligible=False, exact_chips=True):
-                        yield ev
-                    return
-                elif intake_decision and intake_decision["action"] == "ask":
-                    if intake_decision.get("profile_clear"):
-                        # "Change my details" / an impossible percentage: the old values must not come back
-                        profile = await memory.remove_profile_keys(session_id, *intake_decision["profile_clear"])
-                        ctx["profile"] = profile
-                    await _apply_intake_updates(intake_decision["state"])
-                    async for ev in _say(intake_decision["text"], message, session_id, conversation_id,
-                                         cards=intake_decision.get("cards", []),
-                                         suggestions=intake_decision["chips"], exact_chips=True):
-                        yield ev
-                    return
-                elif intake_decision and intake_decision["action"] == "calculate" and intake_decision.get("counsellor") and not _is_mock_or_test_client(client):
-                    await _apply_intake_updates(intake_decision["state"])
-                    fee_args = dict(intake_decision["args"])
-                    fee_result = await tools.run_tool("calculate_fee", fee_args, ctx)
-                    if fee_result.get("status") == "ok":
-                        c_text = format_counsellor_assessment(fee_result, intake_decision.get("counsellor_details", {}))
-                        c_det = intake_decision.get("counsellor_details", {})
-                        if c_det.get("uses_entrance") and not c_det.get("has_entrance_score"):
-                            chips = ["Add my EAPCET rank", "Add my JEE Main percentile", "Hostel fee details", "How do I apply?"]
-                        else:
-                            chips = ["Hostel fee details", "How do I apply?", "Talk to an admission counsellor", "Campus visit"]
-                        for ev in _tool_events("calculate_fee", fee_result):
-                            yield ev
-                        async for ev in _counsellor_result(fee_result, c_det, c_text, chips, message, session_id,
-                                                           conversation_id, conv_state, ctx, set_state):
-                            yield ev
-                        return
-
-            # 2. Check exploratory school & course browsing flow ONLY when user is actively in selection or asked to explore schools
-            in_selection_flow = conv_state.get("fee_flow_state") in ("awaiting_school_selection", "awaiting_course_selection")
-            wants_course_explore = any(k in low_msg for k in ("explore programs", "explore schools", "browse courses", "browse schools", "change school", "different course", "change programme"))
-            if not is_branch_guidance and (in_selection_flow or wants_course_explore or _is_mock_or_test_client(client)):
-                flow_result = fee_flow.process_fee_flow(message, session_id, profile, conv_state)
-                if flow_result is not None:
-                    await set_state(**flow_result["new_state"])
-                    async for ev in _say(flow_result["text"], message, session_id, conversation_id,
-                                         cards=flow_result.get("cards", []),
-                                         suggestions=flow_result.get("suggestions", [])):
-                        yield ev
-                    return
-
-            # 3. Fallback check for fee intake ONLY if user wants to calculate fee
-            if not is_other_fee_inquiry and not is_branch_guidance and not is_seat_guarantee and not is_future_year and (is_scholarship_calc_q or intake_in_progress):
-                if not intake_decision:
-                    intake_decision = fee_intake.decide(message, profile, intake_state, first_name=natural_name)
-                if intake_decision and intake_decision["action"] == "ineligible":
-                    await set_state(fee_intake={k: v for k, v in intake_decision["state"].items()
-                                                if k in ("program", "ineligible", "counsellor_mode")})
-                    async for ev in _say(intake_decision["text"], message, session_id, conversation_id,
-                                         cards=[],
-                                         suggestions=intake_decision.get("chips", []),
-                                         eligible=False, exact_chips=True):
-                        yield ev
-                    return
-                elif intake_decision and intake_decision["action"] == "ask":
-                    if intake_decision.get("profile_clear"):
-                        # "Change my details" / an impossible percentage: the old values must not come back
-                        profile = await memory.remove_profile_keys(session_id, *intake_decision["profile_clear"])
-                        ctx["profile"] = profile
-                    await _apply_intake_updates(intake_decision["state"])
-                    async for ev in _say(intake_decision["text"], message, session_id, conversation_id,
-                                         cards=intake_decision.get("cards", []),
-                                         suggestions=intake_decision["chips"], exact_chips=True):
-                        yield ev
-                    return
-                elif intake_decision and intake_decision["action"] == "calculate" and intake_decision.get("counsellor") and not _is_mock_or_test_client(client):
-                    await _apply_intake_updates(intake_decision["state"])
-                    fee_args = dict(intake_decision["args"])
-                    fee_result = await tools.run_tool("calculate_fee", fee_args, ctx)
-                    if fee_result.get("status") == "ok":
-                        c_text = format_counsellor_assessment(fee_result, intake_decision.get("counsellor_details", {}))
-                        c_det = intake_decision.get("counsellor_details", {})
-                        if c_det.get("uses_entrance") and not c_det.get("has_entrance_score"):
-                            chips = ["Add my EAPCET rank", "Add my JEE Main percentile", "Hostel fee details", "How do I apply?"]
-                        else:
-                            chips = ["Hostel fee details", "How do I apply?", "Talk to an admission counsellor", "Campus visit"]
-                        for ev in _tool_events("calculate_fee", fee_result):
-                            yield ev
-                        async for ev in _counsellor_result(fee_result, c_det, c_text, chips, message, session_id,
-                                                           conversation_id, conv_state, ctx, set_state):
-                            yield ev
-                        return
-
-            if intake_decision and not intake_decision.get("counsellor"):
-                await set_state(fee_intake=None)
+            flow_res = await structured_flows.run_fee_or_explore_turn(
+                message=message,
+                intent=intent,
+                is_multi_q=is_multi_q,
+                side_q=side_q,
+                natural_name=natural_name,
+                session_id=session_id,
+                conv_state=conv_state,
+                profile=profile,
+                ctx=ctx,
+                client=client,
+                set_state=set_state,
+                is_mock_client=_is_mock_or_test_client,
+                format_counsellor_assessment=format_counsellor_assessment,
+            )
+            profile = flow_res["profile"]
+            intake_decision = flow_res["intake_decision"]
+            is_other_fee_inquiry = flow_res["is_other_fee_inquiry"]
+            if flow_res["outcome"] == "say":
+                async for ev in _say(
+                    flow_res["text"],
+                    message,
+                    session_id,
+                    conversation_id,
+                    cards=flow_res.get("cards", []),
+                    suggestions=flow_res.get("suggestions", []),
+                    eligible=flow_res.get("eligible"),
+                    exact_chips=flow_res.get("exact_chips", False),
+                ):
+                    yield ev
+                return
+            if flow_res["outcome"] == "counsellor":
+                for ev in _tool_events("calculate_fee", flow_res["fee_result"]):
+                    yield ev
+                async for ev in _counsellor_result(
+                    flow_res["fee_result"],
+                    flow_res["c_det"],
+                    flow_res["c_text"],
+                    flow_res["chips"],
+                    message,
+                    session_id,
+                    conversation_id,
+                    conv_state,
+                    ctx,
+                    set_state,
+                ):
+                    yield ev
+                return
 
     # ---- 5. Everything else: the model, with tools --------------------------------------------
     ctx["message"] = message   # the student's own words: a score the model passes must appear in them (tools)
@@ -4241,16 +4162,22 @@ async def run_agent(
                 yield ev
             return
 
-    models = []
-    for m in (config.AGENT_MODEL, *_FALLBACK_MODELS):
-        if m and m not in models:
-            models.append(m)
     selected_tools = tools.select_tools_for_message(message, conv_state, ctx.get("profile"))
     tool_decl = _tool_declarations(selected_tools)
+    models, tier_thinking, model_tier = llm_loop.select_model_tier(
+        message,
+        fallback_models=_FALLBACK_MODELS,
+        has_tools=bool(tool_decl),
+        is_compound=bool(compound.model_note(message)),
+        is_compare=is_compare_q,
+        speculative_single_round=speculative_single_round,
+        has_pending_action=bool(pending or action_note),
+    )
     final = ""
     model_text = None   # the model's own words (the self-check runs only on these)
     link = {"fixed": client, "key": None, "models": models, "model_idx": 0, "error_kind": None,
-            "thinking": True, "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT),
+            "thinking": True, "thinking_level": tier_thinking, "model_tier": model_tier,
+            "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT),
             "static_prefix": build_static_prefix(), "cache_tag": ",".join(selected_tools)}
     # Words are shown while Gemini writes them, except when the reply is about a callback / visit
     # request or a cancellation: those are checked for honesty first and only then shown.
@@ -4329,12 +4256,16 @@ async def run_agent(
                                 if not seg_probs:
                                     _, seg_probs = answer_check.check_people(checked_seg, evidence=ev_sources)
                                 if not seg_probs and checked_seg == seg and not ai_guard.leak_reason(streamed):
+                                    if turn_telemetry.first_token_ms is None:
+                                        turn_telemetry.first_token_ms = round((time.perf_counter() - started) * 1000, 2)
                                     yield {"type": "token", "delta": seg}
                                     shown = candidate_end
                                     next_sens = _SENSITIVE_DETAIL.search(streamed, shown)
                                     hold_from = next_sens.start() if next_sens else None
                         limit = len(streamed) - 12 if hold_from is None else min(hold_from, len(streamed) - 12)
                         if limit > shown and not ai_guard.leak_reason(streamed):
+                            if turn_telemetry.first_token_ms is None:
+                                turn_telemetry.first_token_ms = round((time.perf_counter() - started) * 1000, 2)
                             yield {"type": "token", "delta": streamed[shown:limit]}
                             shown = limit
                     else:
@@ -4526,17 +4457,6 @@ async def run_agent(
         # v4.17.0: the answer already has its own comparison table: the generic comparison card would repeat it
         if _HAS_MD_TABLE.search(final or ""):
             cards[:] = [c for c in cards if not (isinstance(c, dict) and c.get("type") == "comparison")]
-        # v4.15.1: the same topic videos as code-written answers (one topic once per chat), when none came above
-        if not any(isinstance(c, dict) and c.get("type") in _VIDEO_CARDS for c in cards):
-            try:
-                cards[:] = await _with_topic_videos(message, final, list(cards), session_id, conversation_id)
-            except Exception:
-                log.exception("topic videos skipped")
-        delivered = {c.get("type") for c in cards if isinstance(c, dict)}
-        shown_now = get_session_shown_cards(card_scope)
-        for card_type in list(shown_now - shown_before):
-            if card_type not in delivered:
-                shown_now.discard(card_type)
     except Exception as card_err:
         log.warning("Could not generate contextual cards for agent: %s", card_err)
 
@@ -4547,18 +4467,41 @@ async def run_agent(
         if fac:
             department = fac.get("department") or next(
                 (p.get("department") for p in fac.get("faculty") or [] if p.get("department")), None)
-        suggestions = followups.suggest(message, used, ctx.get("profile"), department, history=history, active_topic=active_topic, answer=final)
-        if offered_chart:
-            suggestions = ["Yes, prepare my fee chart", "No, thanks"]
-        else:
-            suggestions = await _with_resume_chip(session_id, conversation_id, suggestions)
+        base_suggestions = followups.suggest(
+            message, used, ctx.get("profile"), department,
+            history=history, active_topic=active_topic, answer=final,
+        )
+
+        async def _cards_coro():
+            if not any(isinstance(c, dict) and c.get("type") in _VIDEO_CARDS for c in cards):
+                return await _with_topic_videos(message, final, list(cards), session_id, conversation_id)
+            return list(cards)
+
+        async def _sugg_coro():
+            if offered_chart:
+                return ["Yes, prepare my fee chart", "No, thanks"]
+            return await _with_resume_chip(session_id, conversation_id, base_suggestions)
+
+        cards[:], suggestions = await postprocess.parallel_cards_and_suggestions(
+            cards_coro=_cards_coro(),
+            suggestions_coro=_sugg_coro(),
+        )
+        from app.services.card_service import get_session_shown_cards
+        card_scope = f"{session_id}:{conversation_id or ''}"
+        delivered = {c.get("type") for c in cards if isinstance(c, dict)}
+        shown_now = get_session_shown_cards(card_scope)
+        for card_type in list(shown_now - shown_before):
+            if card_type not in delivered:
+                shown_now.discard(card_type)
     except Exception as sugg_err:
-        log.warning("Could not generate suggestions for agent: %s", sugg_err)
+        log.warning("Could not run parallel card/suggestion post-processing: %s", sugg_err)
 
     _apply_rounds_telemetry(turn_telemetry, link)
     turn_telemetry.total_latency_ms = round((time.perf_counter() - started) * 1000, 2)
+    if turn_telemetry.first_token_ms is None and (streamed or final):
+        turn_telemetry.first_token_ms = turn_telemetry.total_latency_ms
     if not _TURN_TELEMETRY_RECORDED.get():
-        observability.record_policy_telemetry(turn_telemetry)
+        observability.record_policy_telemetry(turn_telemetry, persist_db=_should_persist_telemetry_db())
         _TURN_TELEMETRY_RECORDED.set(True)
     if (
         faq_key

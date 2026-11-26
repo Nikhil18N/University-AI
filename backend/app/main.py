@@ -595,7 +595,8 @@ async def agent_conversation_resolver(session_id: str, conversation_id: str | No
 
 async def agent_turn_logger(session_id: str, conversation_id: str | None, user_text: str, answer: str,
                             tools_used: list, cards: list | None = None, suggestions: list | None = None,
-                            started_at=None, channel: str | None = None, sources: list | None = None):
+                            started_at=None, channel: str | None = None, sources: list | None = None,
+                            telemetry: dict | None = None):
     """Save one agent turn so a reopened chat looks exactly as it did live: the question first
     (stamped when it was asked), then the answer with its cards and follow-up suggestions."""
     try:
@@ -640,6 +641,9 @@ async def agent_turn_logger(session_id: str, conversation_id: str | None, user_t
                 sources=[s for s in (sources or []) if isinstance(s, dict) and s.get("document_id") and s.get("title")],
                 created_at=finished_at,
             )
+            if telemetry:
+                from app.sru_agent import observability as agent_observability
+                session.add(agent_observability.build_turn_telemetry_row(telemetry))
             await session.commit()
     except Exception as err:
         logger.warning("agent_turn_logger error: %s", err)

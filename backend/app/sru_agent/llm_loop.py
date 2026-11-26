@@ -192,7 +192,7 @@ async def _handle_call_error(exc, link: dict, attempt: int, model: str, ring=Non
 
 
 def _with_thinking(cfg, link: dict, model: str):
-    level = (config.AGENT_THINKING_LEVEL or "").upper()
+    level = (link.get("thinking_level") or config.AGENT_THINKING_LEVEL or "").upper()
     if not link.get("thinking") or not level or level == "DEFAULT":
         return cfg
     if model.startswith("gemini-2"):
@@ -202,6 +202,51 @@ def _with_thinking(cfg, link: dict, model: str):
             level = "LOW"
         thinking = types.ThinkingConfig(thinking_level=level)
     return cfg.model_copy(update={"thinking_config": thinking})
+
+
+def select_model_tier(
+    message: str,
+    *,
+    fallback_models: tuple[str, ...] = (),
+    has_tools: bool = True,
+    is_compound: bool = False,
+    is_compare: bool = False,
+    speculative_single_round: bool = False,
+    has_pending_action: bool = False,
+) -> tuple[list[str], str, str]:
+    """Select (ordered_models, thinking_level, tier_name) based on query complexity.
+
+    Simple synthesis turns (no tools needed, speculative single-round synthesis where
+    tools already ran, or short single-question informational queries without comparisons
+    or compound sub-questions) route to AGENT_LITE_MODEL with MINIMAL thinking.
+    """
+    base_models: list[str] = []
+    for m in (config.AGENT_MODEL, *fallback_models):
+        if m and m not in base_models:
+            base_models.append(m)
+
+    if not config.AGENT_MODEL_TIERING:
+        return base_models, (config.AGENT_THINKING_LEVEL or "MINIMAL"), "standard"
+
+    word_count = len((message or "").split())
+    simple_synthesis = (
+        not is_compound
+        and not is_compare
+        and not has_pending_action
+        and (
+            not has_tools
+            or speculative_single_round
+            or word_count <= 14
+        )
+    )
+    if simple_synthesis and config.AGENT_LITE_MODEL:
+        lite_models: list[str] = []
+        for m in (config.AGENT_LITE_MODEL, *base_models):
+            if m and m not in lite_models:
+                lite_models.append(m)
+        return lite_models, "MINIMAL", "lite"
+
+    return base_models, (config.AGENT_THINKING_LEVEL or "MINIMAL"), "standard"
 
 
 _EXPLICIT_CACHES: dict[tuple[str, str, str], tuple[float, str]] = {}

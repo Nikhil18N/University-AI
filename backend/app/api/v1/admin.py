@@ -712,4 +712,21 @@ async def export_leads(
     )
 
 
+@router.get("/telemetry")
+async def get_telemetry(
+    limit: int = Query(50, ge=1, le=500),
+    _admin: str = Depends(verify_admin_key),
+):
+    """Return aggregated turn latency/token/cache observability metrics and recent turns."""
+    from app.sru_agent import observability
+
+    records = await observability.get_recent_telemetry_async(limit=limit)
+    summary = observability.compute_telemetry_summary(records)
+    return {
+        "summary": summary,
+        "recent": records[-limit:],
+    }
+
+
+
 
