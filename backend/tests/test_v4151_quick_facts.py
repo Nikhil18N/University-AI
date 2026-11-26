@@ -204,6 +204,5 @@ def test_fee_and_other_questions_keep_their_own_flows(question):
 
 def test_prompt_forbids_guessed_facts():
     from app.sru_agent.prompt import build_system_prompt
-    import inspect
-    src = inspect.getsource(build_system_prompt)
+    src = build_system_prompt({})
     assert "NO GUESSED FACTS" in src and "NAAC grade not in sources" in src

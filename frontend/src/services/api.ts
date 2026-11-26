@@ -374,25 +374,10 @@ export function sendMessageStream(
     };
 
     try {
-      const useAgent = import.meta.env.VITE_USE_AGENT !== "false";
-      let success = false;
-
-      if (useAgent) {
-        // v4.17.1: no silent switch to the legacy /chat/stream pipeline when the agent fails: that pipeline has
-        // neither this conversation's state, nor the typed / button source, nor the agent's checks, and the
-        // message would be processed twice. The error is shown with Retry instead.
-        success = await streamFromEndpoint(`${API_BASE}/api/v1/agent/stream`, true);
-        if (!success && !controller.signal.aborted) {
-          throw new Error("SRU Buddy could not answer just now. Please tap Retry.");
-        }
-      }
-
-      // Legacy mode only (VITE_USE_AGENT=false): the chat stream endpoint
-      if (!useAgent && !success && !controller.signal.aborted) {
-        const legacySuccess = await streamFromEndpoint(`${API_BASE}/api/v1/chat/stream`);
-        if (!legacySuccess) {
-          throw new Error("Failed to receive response from university companion.");
-        }
+      // Strict /api/v1/agent/stream path: no silent fallback to legacy /api/v1/chat/stream.
+      const success = await streamFromEndpoint(`${API_BASE}/api/v1/agent/stream`, true);
+      if (!success && !controller.signal.aborted) {
+        throw new Error("SRU Buddy could not answer just now. Please tap Retry.");
       }
     } catch (err: unknown) {
       if ((err as Error)?.name === "AbortError") return;

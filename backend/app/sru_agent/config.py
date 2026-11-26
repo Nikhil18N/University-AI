@@ -65,13 +65,14 @@ AGENT_TOTAL_TIMEOUT = float(os.getenv("AGENT_TOTAL_TIMEOUT", "45"))
 AGENT_THINKING_LEVEL = os.getenv("AGENT_THINKING_LEVEL", "MINIMAL")
 # Send the answer to the browser while Gemini is still writing it (first words ~1-2 s sooner).
 AGENT_STREAM = os.getenv("AGENT_STREAM", "true").strip().lower() in ("1", "true", "yes", "on")
+AGENT_EXPLICIT_CACHE = os.getenv("AGENT_EXPLICIT_CACHE", "true").strip().lower() in ("1", "true", "yes", "on")
 AGENT_KEY_COOLDOWN_SECONDS = float(os.getenv("AGENT_KEY_COOLDOWN_SECONDS", "45"))
 # A key that hit its PER-DAY limit is rested this long before it is tried again:
 AGENT_DAILY_LIMIT_COOLDOWN = float(os.getenv("AGENT_DAILY_LIMIT_COOLDOWN", "3600"))
 # The same first question from different students (for example a suggestion button) is answered
 # from a saved copy for this many seconds instead of calling the model again. 0 switches it off.
 # No longer used: the agent does not cache answers (v4.10.0). Kept so older settings and tests still load.
-AGENT_ANSWER_CACHE_SECONDS = int(os.getenv("AGENT_ANSWER_CACHE_SECONDS", "0"))
+AGENT_ANSWER_CACHE_SECONDS = int(os.getenv("AGENT_ANSWER_CACHE_SECONDS", "3600"))
 
 REDIS_URL = os.getenv("REDIS_URL") or _default_redis
 

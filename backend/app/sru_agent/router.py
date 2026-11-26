@@ -193,14 +193,23 @@ async def agent_stream(req: AgentRequest, request: Request = None):
             if event["type"] == "token" and first_token_perf is None:
                 first_token_perf = time.perf_counter()
             if event["type"] == "done":
+                first_token_ms = (
+                    round((first_token_perf - started_perf) * 1000, 1)
+                    if first_token_perf is not None
+                    else None
+                )
+                total_ms = round((time.perf_counter() - started_perf) * 1000, 1)
                 event["timings"] = {
-                    "first_token_ms": (
-                        round((first_token_perf - started_perf) * 1000, 1)
-                        if first_token_perf is not None
-                        else None
-                    ),
-                    "total_ms": round((time.perf_counter() - started_perf) * 1000, 1),
+                    "first_token_ms": first_token_ms,
+                    "total_ms": total_ms,
                 }
+                log.info(
+                    "AGENT_SSE_TIMING: session=%s conv=%s first_token_ms=%s total_ms=%.1f",
+                    (req.session_id or "")[:8],
+                    str(conv_id or "")[:8],
+                    first_token_ms,
+                    total_ms,
+                )
                 # What the chat now knows about the student, so Settings > My details stays in step.
                 try:
                     event["profile"] = memory.public_profile(await memory.get_profile(req.session_id))

@@ -850,8 +850,22 @@ WELCOME_ACTIONS_CARD = {
 POST_WELCOME_CHIPS = ("B.Tech CSE fees", "Hostel fees & facilities", "Placements at SRU", "Plan a campus visit")
 
 
-# Session memory for shown cards to prevent repeating cards within the same session
+# Session memory for shown cards to prevent repeating cards within the same session.
+# Externalized to Redis (sru:shown_cards:{session_id}, TTL 24h) for multi-worker consistency.
 _SESSION_SHOWN_CARDS: dict[str, set[str]] = {}
+_SHOWN_CARDS_TTL = 86400
+
+
+def _redis_cards_key(session_id: str) -> str:
+    return f"sru:shown_cards:{session_id}"
+
+
+def _get_agent_redis():
+    try:
+        from app.sru_agent import memory
+        return memory.get_redis()
+    except Exception:
+        return None
 
 
 def get_session_shown_cards(session_id: str) -> set[str]:
@@ -861,16 +875,67 @@ def get_session_shown_cards(session_id: str) -> set[str]:
     return _SESSION_SHOWN_CARDS.setdefault(session_id, set())
 
 
+async def get_session_shown_cards_async(session_id: str) -> set[str]:
+    """Retrieve shown card types from Redis (multi-worker safe) with local fallback."""
+    if not session_id:
+        return set()
+    r = _get_agent_redis()
+    if r is not None:
+        try:
+            members = await r.smembers(_redis_cards_key(session_id))
+            if members:
+                local = _SESSION_SHOWN_CARDS.setdefault(session_id, set())
+                local.update(str(m) for m in members)
+                return set(local)
+        except Exception:
+            pass
+    return set(get_session_shown_cards(session_id))
+
+
 def record_session_card(session_id: str, card_type: str) -> None:
-    """Record that a card type has been shown in the session."""
-    if session_id and card_type:
-        _SESSION_SHOWN_CARDS.setdefault(session_id, set()).add(card_type)
+    """Record that a card type has been shown in the session (sync + background Redis)."""
+    if not (session_id and card_type):
+        return
+    _SESSION_SHOWN_CARDS.setdefault(session_id, set()).add(card_type)
+    r = _get_agent_redis()
+    if r is not None:
+        try:
+            from app.sru_agent import memory
+            async def _push():
+                key = _redis_cards_key(session_id)
+                await r.sadd(key, card_type)
+                await r.expire(key, _SHOWN_CARDS_TTL)
+            memory.in_background(_push(), "shown_cards")
+        except Exception:
+            pass
+
+
+async def record_session_card_async(session_id: str, card_type: str) -> None:
+    """Record a shown card directly in Redis and local cache."""
+    if not (session_id and card_type):
+        return
+    _SESSION_SHOWN_CARDS.setdefault(session_id, set()).add(card_type)
+    r = _get_agent_redis()
+    if r is not None:
+        try:
+            key = _redis_cards_key(session_id)
+            await r.sadd(key, card_type)
+            await r.expire(key, _SHOWN_CARDS_TTL)
+        except Exception:
+            pass
 
 
 def clear_session_cards(session_id: str | None = None) -> None:
     """Clear session shown cards (for testing or session reset)."""
     if session_id:
         _SESSION_SHOWN_CARDS.pop(session_id, None)
+        r = _get_agent_redis()
+        if r is not None:
+            try:
+                from app.sru_agent import memory
+                memory.in_background(r.delete(_redis_cards_key(session_id)), "clear_shown_cards")
+            except Exception:
+                pass
     else:
         _SESSION_SHOWN_CARDS.clear()
 

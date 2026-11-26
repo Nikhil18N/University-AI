@@ -107,7 +107,50 @@ HANDBOOK_DOCS = [
         "department": "Admissions & University Administration",
         "effective_date": datetime(2026, 11, 17, tzinfo=timezone.utc),
     },
+    {
+        "file": "13_laboratories_and_research_centers.md",
+        "title": "SRU Student Handbook — Laboratories & Research Centers",
+        "document_type": "handbook",
+        "department": "Research & Development",
+        "effective_date": datetime(2026, 11, 20, tzinfo=timezone.utc),
+    },
+    {
+        "file": "14_university_overview_and_institutional_profile.md",
+        "title": "SRU University Overview & Institutional Profile",
+        "document_type": "registry",
+        "department": "Admissions & University Administration",
+        "effective_date": datetime(2026, 11, 20, tzinfo=timezone.utc),
+    },
+    {
+        "file": "15_events_clubs_and_student_life_nov2026.md",
+        "title": "SRU Events, Clubs & Student Life (Nov 2026)",
+        "document_type": "handbook",
+        "department": "Student Affairs",
+        "effective_date": datetime(2026, 11, 20, tzinfo=timezone.utc),
+    },
 ]
+
+
+def purge_stale_handbook_chunks(collection) -> int:
+    """Remove stale 2025-26, 2026-27, and 150-acre chunks from ChromaDB."""
+    if collection is None:
+        return 0
+    stale_markers = ("2025-26", "2026-27", "150-acre", "150 acre", "150 acres")
+    try:
+        all_rows = collection.get(include=["documents"])
+        ids = all_rows.get("ids") or []
+        docs = all_rows.get("documents") or []
+        stale_ids = [
+            cid for cid, text in zip(ids, docs)
+            if text and any(marker in text.lower() for marker in stale_markers)
+        ]
+        if stale_ids:
+            collection.delete(ids=stale_ids)
+            logger.info("  Purged %d stale chunks (2025-26/2026-27/150-acre) from ChromaDB", len(stale_ids))
+        return len(stale_ids)
+    except Exception as e:
+        logger.warning("  Stale chunk purge error: %s", e)
+        return 0
 
 
 async def clear_existing_handbook_docs(db, collection):
@@ -115,6 +158,7 @@ async def clear_existing_handbook_docs(db, collection):
     handbook_titles = {d["title"] for d in HANDBOOK_DOCS}
 
     if collection is not None:
+        purge_stale_handbook_chunks(collection)
         for t in handbook_titles:
             try:
                 existing = collection.get(where={"title": t})

@@ -68,25 +68,7 @@ async def lifespan(fastapi_app: FastAPI):
     else:
         logger.info("Database schema creation disabled; apply Alembic migrations before startup.")
 
-    # Verify or auto-seed ChromaDB documents in background
-    import asyncio
-    from app.services.auto_seed import (ensure_documents_seeded, refresh_handbook_if_changed,
-                                        retire_obsolete_fee_knowledge)
-
-    async def _prepare_knowledge():
-        # The agent's own handbook search reads the files directly: ready at once, no AI calls.
-        try:
-            from app.sru_agent import knowledge
-            logger.info("Handbook keyword index ready: %d passages.", knowledge.reload())
-        except Exception as err:
-            logger.warning("Handbook keyword index could not be built: %s", err)
-        await ensure_documents_seeded()        # vector index, only when it is empty
-        await retire_obsolete_fee_knowledge()  # never serve a fee from the retired policy
-        await refresh_handbook_if_changed()    # vector index, when handbook files were edited
-
-    asyncio.create_task(_prepare_knowledge())
-
-    # Initialize optional Redis client for response caching
+    # Initialize optional Redis client for response caching & multi-worker locks
     fastapi_app.state.redis = None
     if settings.REDIS_URL:
         try:
@@ -98,12 +80,41 @@ async def lifespan(fastapi_app: FastAPI):
     from app.sru_agent import memory as agent_memory
     agent_memory.set_redis_client(fastapi_app.state.redis)
 
+    # Verify or auto-seed ChromaDB documents in background (guarded by Redis lock for multi-worker safety)
+    import asyncio
+    from app.services.auto_seed import (ensure_documents_seeded, refresh_handbook_if_changed,
+                                        retire_obsolete_fee_knowledge)
+
+    async def _prepare_knowledge():
+        # The agent's own handbook search reads the files directly: ready at once, no AI calls.
+        try:
+            from app.sru_agent import knowledge
+            logger.info("Handbook keyword index ready: %d passages.", knowledge.reload())
+        except Exception as err:
+            logger.warning("Handbook keyword index could not be built: %s", err)
+
+        r = getattr(fastapi_app.state, "redis", None)
+        if r is not None:
+            try:
+                acquired = await r.set("sru:startup_seed_lock", "1", nx=True, ex=300)
+                if not acquired:
+                    logger.info("Another worker holds startup_seed_lock; skipping duplicate vector seeding.")
+                    return
+            except Exception:
+                pass
+
+        await ensure_documents_seeded()        # vector index, only when it is empty
+        await retire_obsolete_fee_knowledge()  # never serve a fee from the retired policy
+        await refresh_handbook_if_changed()    # vector index, when handbook files were edited
+
+    asyncio.create_task(_prepare_knowledge())
+
     yield
 
-    # Finish the chat saves still running in the background (at most 10 seconds).
+    # Finish the chat saves and state writes still running in the background (at most 10 seconds).
     try:
         from app.sru_agent import memory as _agent_memory
-        await asyncio.wait_for(_agent_memory.flush(), timeout=10)
+        await _agent_memory.shutdown_flush(timeout=10.0)
     except Exception:
         pass
 
@@ -177,7 +188,9 @@ async def security_headers(request: Request, call_next):
     started = time.perf_counter()
     response = await call_next(request)
     elapsed_ms = (time.perf_counter() - started) * 1000
-    response.headers.setdefault("Server-Timing", f"app;dur={elapsed_ms:.1f}")
+    content_type = response.headers.get("content-type", "")
+    if not content_type.startswith("text/event-stream"):
+        response.headers.setdefault("Server-Timing", f"app;dur={elapsed_ms:.1f}")
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "DENY")  # the API is never shown in a frame
@@ -330,6 +343,50 @@ from app.api.v1.memory import router as memory_router
 from app.sru_agent.router import router as agent_router
 from app.sru_agent import tools as agent_tools
 
+_EMB_LOCAL_CACHE: dict[str, list[float]] = {}
+_EMB_CACHE_TTL = 86400
+
+
+async def _cached_embed_query(query: str) -> list[float]:
+    """Return query embedding from local/Redis cache when available, else compute and cache."""
+    import hashlib
+    import json as _json
+    import re as _re
+    norm = _re.sub(r"\s+", " ", (query or "").strip().lower())
+    key_hash = hashlib.sha256(norm.encode()).hexdigest()[:16]
+    if norm in _EMB_LOCAL_CACHE:
+        return _EMB_LOCAL_CACHE[norm]
+
+    redis_key = f"sru:emb:{key_hash}"
+    try:
+        from app.sru_agent import memory as _agent_mem
+        r = _agent_mem.get_redis()
+        if r is not None:
+            raw = await r.get(redis_key)
+            if raw:
+                vec = _json.loads(raw)
+                if len(_EMB_LOCAL_CACHE) > 1000:
+                    _EMB_LOCAL_CACHE.clear()
+                _EMB_LOCAL_CACHE[norm] = vec
+                return vec
+    except Exception:
+        pass
+
+    from app.api.v1.deps import get_embedding_provider
+    vec = await get_embedding_provider().embed_single(query)
+    if len(_EMB_LOCAL_CACHE) > 1000:
+        _EMB_LOCAL_CACHE.clear()
+    _EMB_LOCAL_CACHE[norm] = vec
+    try:
+        from app.sru_agent import memory as _agent_mem
+        r = _agent_mem.get_redis()
+        if r is not None:
+            await r.set(redis_key, _json.dumps(vec), ex=_EMB_CACHE_TTL)
+    except Exception:
+        pass
+    return vec
+
+
 # Connect agent knowledge retrieval to ChromaDB
 async def agent_knowledge_search(query: str):
     """Approved-knowledge search for the agent (v4.17.1): the handbook keyword search AND the vector index,
@@ -344,7 +401,7 @@ async def agent_knowledge_search(query: str):
     try:
         from app.sru_agent import knowledge
         lexical = [{"title": f["title"], "text": f["text"][:1800], "source": f["source"], "retrieval": "keyword"}
-                   for f in knowledge.search(query, k=4, min_score=3.0)]
+                   for f in knowledge.search(query, k=6, min_score=1.0)]
     except Exception as err:
         logger.warning("keyword handbook search failed: %s", err)
     try:
@@ -352,9 +409,8 @@ async def agent_knowledge_search(query: str):
         from app.services.rag_service import COLLECTION_NAME
         collection = get_chroma_client().get_or_create_collection(name=COLLECTION_NAME,
                                                                   metadata={"hnsw:space": "cosine"})
-        from app.api.v1.deps import get_embedding_provider
-        emb = await get_embedding_provider().embed_single(query)
-        results = await asyncio.to_thread(collection.query, query_embeddings=[emb], n_results=12)
+        emb = await _cached_embed_query(query)
+        results = await asyncio.to_thread(collection.query, query_embeddings=[emb], n_results=8)
         docs = (results.get("documents") or [[]])[0]
         metas = (results.get("metadatas") or [[]])[0]
         dists = (results.get("distances") or [[]])[0] or [None] * len(docs)
@@ -400,24 +456,37 @@ def _rerank_by_question_words(query: str, hits: list) -> list:
 _SEMANTIC_MAX_DISTANCE = 0.42
 
 
-def _merge_evidence(semantic: list, lexical: list, limit: int = 6) -> list:
-    """Strong semantic matches (distance < 0.33) first, then semantic and keyword results alternate; the same
-    passage found by both is kept once."""
+def _merge_evidence(semantic: list, lexical: list, limit: int = 6, k: int = 60) -> list:
+    """Merge semantic (ChromaDB) and lexical (BM25) results using Reciprocal Rank Fusion (RRF).
+
+    Ensures admin-uploaded PDFs/DOCXs in ChromaDB are never shadowed by BM25 short-circuiting.
+    """
     import re as _re
-    strong = [h for h in semantic if (h.get("rank", h.get("distance")) or 1) < 0.33]
-    rest_sem = [h for h in semantic if h not in strong]
-    ordered = strong[:]
-    for pair in zip_longest_lists(lexical, rest_sem):
-        ordered.extend(pair)
-    seen, out = set(), []
-    for h in ordered:
-        key = _re.sub(r"\W+", " ", (h.get("text") or "").lower())[:160]
-        if key in seen:
+    fused: dict[str, dict] = {}
+    scores: dict[str, float] = {}
+
+    for rank, item in enumerate(semantic, start=1):
+        key = _re.sub(r"\W+", " ", (item.get("text") or "").lower()).strip()[:160]
+        if not key:
             continue
-        seen.add(key)
-        out.append(h)
-        if len(out) >= limit:
-            break
+        scores[key] = scores.get(key, 0.0) + 1.0 / (k + rank)
+        if key not in fused:
+            fused[key] = dict(item)
+
+    for rank, item in enumerate(lexical, start=1):
+        key = _re.sub(r"\W+", " ", (item.get("text") or "").lower()).strip()[:160]
+        if not key:
+            continue
+        scores[key] = scores.get(key, 0.0) + 1.0 / (k + rank)
+        if key not in fused:
+            fused[key] = dict(item)
+
+    ranked_keys = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
+    out = []
+    for key in ranked_keys[:limit]:
+        entry = fused[key]
+        entry["rrf_score"] = round(scores[key], 6)
+        out.append(entry)
     return out
 
 

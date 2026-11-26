@@ -2,6 +2,7 @@
 
 import json
 import logging
+import time
 from collections.abc import AsyncIterator
 
 import httpx
@@ -38,6 +39,8 @@ class GeminiProvider(LLMProvider):
         }
         self.model = legacy_models.get(model, model)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
+        self.last_usage: dict[str, int] | None = None
+        self.last_latency_ms: float | None = None
         self._client = httpx.AsyncClient(
             timeout=httpx.Timeout(15.0, connect=5.0),
             # Keep a small pool of persistent connections so successive Gemini calls
@@ -101,6 +104,18 @@ class GeminiProvider(LLMProvider):
 
         return payload
 
+    @staticmethod
+    def _extract_usage(data: dict) -> dict[str, int] | None:
+        raw = data.get("usageMetadata")
+        if not isinstance(raw, dict):
+            return None
+        return {
+            "prompt_token_count": int(raw.get("promptTokenCount") or 0),
+            "candidates_token_count": int(raw.get("candidatesTokenCount") or 0),
+            "thoughts_token_count": int(raw.get("thoughtsTokenCount") or 0),
+            "cached_content_token_count": int(raw.get("cachedContentTokenCount") or 0),
+        }
+
     async def generate(
         self,
         messages: list[dict[str, str]],
@@ -109,6 +124,9 @@ class GeminiProvider(LLMProvider):
     ) -> str:
         """Send messages to Gemini and return the full response with automatic multi-key and quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
+        self.last_usage = None
+        self.last_latency_ms = None
+        t0 = time.perf_counter()
         # STRICT QUOTA PROTECTION:
         # Only use high-quota Flash-Lite models (15 RPM / 500 RPD).
         # NEVER fall back to 3.6-flash or 3.8-flash (5 RPM / 20 RPD) which burn the daily 20-call cap.
@@ -140,6 +158,8 @@ class GeminiProvider(LLMProvider):
                         self.key_pool.mark_success(active_key)
                         self.model = model_name
                         data = response.json()
+                        self.last_usage = self._extract_usage(data)
+                        self.last_latency_ms = round((time.perf_counter() - t0) * 1000, 2)
                         candidates = data.get("candidates", [])
                         if not candidates:
                             return ""
@@ -186,6 +206,9 @@ class GeminiProvider(LLMProvider):
     ) -> AsyncIterator[str]:
         """Stream tokens from Gemini with automatic multi-key and quota fallback."""
         payload = self._format_payload(messages, temperature, max_tokens)
+        self.last_usage = None
+        self.last_latency_ms = None
+        t0 = time.perf_counter()
         # STRICT QUOTA PROTECTION:
         # Only use high-quota Flash-Lite models (15 RPM / 500 RPD).
         # NEVER fall back to 3.6-flash or 3.8-flash (5 RPM / 20 RPD) which burn the daily 20-call cap.
@@ -240,6 +263,9 @@ class GeminiProvider(LLMProvider):
                             json_str = line[len("data: ") :]
                             try:
                                 data = json.loads(json_str)
+                                usage = self._extract_usage(data)
+                                if usage is not None:
+                                    self.last_usage = usage
                                 candidates = data.get("candidates", [])
                                 if candidates:
                                     parts = candidates[0].get("content", {}).get("parts", [])
@@ -249,6 +275,7 @@ class GeminiProvider(LLMProvider):
                                             yield text
                             except json.JSONDecodeError:
                                 continue
+                        self.last_latency_ms = round((time.perf_counter() - t0) * 1000, 2)
                         return
                 except httpx.TimeoutException:
                     continue
