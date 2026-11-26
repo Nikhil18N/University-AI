@@ -85,3 +85,11 @@ Written in the background, one writer per conversation, the latest state always 
 read on a cache miss (`agent_profile_store.load_conversation_state`). Lead merging: a repeat callback / visit request
 from the same mobile number (status `new`, < 7 days, same `metadata.request_type`) updates that `prospective_leads`
 row and counts `metadata.repeat_requests` instead of inserting a second row.
+
+## Row Level Security (v4.18.0, migration `j0k1l2m3n456`)
+
+Every table in `public` has Row Level Security enabled with no policies, and the Supabase API roles (`anon`,
+`authenticated`) have no privileges on the tables. Supabase's REST API therefore cannot read or change any app data
+with the public anon key. The backend connects to Postgres as the table owner, which RLS does not restrict, so the
+API works as before. A database event trigger enables RLS on tables created later (where the role may create event
+triggers; otherwise a new table's migration must enable it). The migration runs automatically when the API starts.
