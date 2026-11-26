@@ -77,15 +77,28 @@ async def _apply_migrations_on_start() -> None:
         await _lock_public_tables()
         return
     except Exception as err:
-        logger.warning("alembic upgrade at startup did not run (%s: %s); creating missing agent tables only",
-                       type(err).__name__, _without_urls(str(err)))
+        if "already exists" in str(err):
+            # a database created from the models (not through Alembic) has no Alembic history: every migration
+            # would try to create what is already there. The changes the API needs are applied directly below.
+            logger.info("Database has no Alembic history (created from the models); applying the required "
+                        "changes directly.")
+        else:
+            logger.warning("alembic upgrade at startup did not run (%s: %s); creating missing agent tables only",
+                           type(err).__name__, _without_urls(str(err)))
     try:
         from app.db.session import engine
         from app.models.telemetry import TurnTelemetry
 
+        from sqlalchemy import text as _text
         async with engine.begin() as conn:
             await conn.run_sync(lambda c: TurnTelemetry.__table__.create(c, checkfirst=True))
-        logger.info("turn_telemetry table checked / created.")
+            # migration i9j0k1l2m345: user_memories.memory_value varchar(255) -> text (only when still varchar)
+            await conn.execute(_text(
+                "DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' "
+                "AND table_name = 'user_memories' AND column_name = 'memory_value' "
+                "AND data_type = 'character varying') THEN "
+                "ALTER TABLE public.user_memories ALTER COLUMN memory_value TYPE TEXT; END IF; END $$;"))
+        logger.info("turn_telemetry table and user_memories.memory_value checked.")
     except Exception as err:
         logger.warning("turn_telemetry table not created: %s: %s", type(err).__name__, _without_urls(str(err)))
     await _lock_public_tables()
