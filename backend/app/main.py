@@ -29,6 +29,35 @@ def _without_urls(text: str) -> str:
     return _re.sub(r"(?:[A-Za-z_]+=)?[a-z][a-z0-9+.-]*://\S+", "<connection URL hidden>", text or "")[:300]
 
 
+# Row Level Security on every public table that has none yet, and no table access for the Supabase API roles
+# (anon / authenticated): the public anon key must not reach app data through Supabase's REST API. The API itself
+# connects as the table owner, which RLS does not restrict. Tables that already have RLS are left as they are.
+_LOCK_PUBLIC_TABLES_SQL = """DO $$
+DECLARE t record;
+BEGIN
+  FOR t IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND NOT rowsecurity LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t.tablename);
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+      EXECUTE format('REVOKE ALL ON public.%I FROM anon', t.tablename);
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+      EXECUTE format('REVOKE ALL ON public.%I FROM authenticated', t.tablename);
+    END IF;
+  END LOOP;
+END $$;"""
+
+
+async def _lock_public_tables() -> None:
+    try:
+        from sqlalchemy import text as _text
+        from app.db.session import engine
+        async with engine.begin() as conn:
+            await conn.execute(_text(_LOCK_PUBLIC_TABLES_SQL))
+        logger.info("Row Level Security checked on public tables.")
+    except Exception as err:
+        logger.warning("Row Level Security not applied: %s: %s", type(err).__name__, _without_urls(str(err)))
+
+
 async def _apply_migrations_on_start() -> None:
     """`alembic upgrade head` at startup, for hosts without a shell (Render free tier). Never blocks the start: if
     Alembic cannot run (e.g. a database created without Alembic history), the tables the agent writes to that may be
@@ -45,6 +74,7 @@ async def _apply_migrations_on_start() -> None:
         cfg.attributes["configure_logger"] = False   # keep the API's own logging configuration
         await _asyncio.wait_for(_asyncio.to_thread(_alembic_command.upgrade, cfg, "head"), timeout=90)
         logger.info("Database migrations applied (alembic upgrade head).")
+        await _lock_public_tables()
         return
     except Exception as err:
         logger.warning("alembic upgrade at startup did not run (%s: %s); creating missing agent tables only",
@@ -58,6 +88,7 @@ async def _apply_migrations_on_start() -> None:
         logger.info("turn_telemetry table checked / created.")
     except Exception as err:
         logger.warning("turn_telemetry table not created: %s: %s", type(err).__name__, _without_urls(str(err)))
+    await _lock_public_tables()
 
 
 @asynccontextmanager
