@@ -933,6 +933,10 @@ def select_tools_for_message(
         add("get_program_info")
     if _RE_REMEMBER.search(text):
         add("remember_student_details")
+    # v4.17.1: the read-only tools of the previous answer, so a follow-up or a challenge can re-check its evidence
+    for name in (st.get("last_tools") or [])[:3]:
+        if name not in ACTION_TOOLS:
+            add(name)
 
     if not selected:
         add("search_university_info")

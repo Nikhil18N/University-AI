@@ -4554,5 +4554,13 @@ async def run_agent(
     except Exception:
         log.exception("source references skipped")
         sources = []
+    try:
+        # v4.17.1: the read-only tools this answer used stay available for the next turn, so a follow-up ("Are you
+        # sure?", "and his office?") can re-check with the same tool instead of only the general search
+        await memory.update_conversation_state(
+            session_id, conversation_id,
+            last_tools=[t.get("name") for t in used if t.get("name") and not t.get("is_action")][:3])
+    except Exception:
+        log.exception("last tools not saved")
     yield _done(conversation_id, final, used, cards, suggestions, telemetry=turn_telemetry.to_dict(), profile=profile,
                 sources=sources)

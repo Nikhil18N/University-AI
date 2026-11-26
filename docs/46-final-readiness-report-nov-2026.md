@@ -8,9 +8,9 @@ rehearsal of the 20-step demo. This report covers what was done, how it was veri
 | | |
 |---|---|
 | Baseline (main at the start) | `556715c` (v4.17.0) |
-| Main during the mission | `6340341` (PR #36 by Mahesh-ch06: merged commits 1-3 below), then `2137184` (Nikhil Nakka, Phases 1-4, `5009cdf`) |
+| Main during the mission | `6340341` (PR #36 by Mahesh-ch06: merged commits 1-3 below), then `2137184` (Nikhil Nakka, Phases 1-4, `5009cdf`), then `23589a2` (Nikhil Nakka: observability, multi-query, model tiering, structured flows, `4403e96`) |
 | Branch | `claude/great-ptolemy-1x1q7k` |
-| Commits | `2fde644` accuracy · `fb6f8d4` model-first, honest errors, sources, outdated cards · `54c65af` PNG sharing · `5f96de9` Reply / Edit · `2cda021` merge of main + integration fixes · `4ecbbba` knowledge index repair · this report |
+| Commits | `2fde644` accuracy · `fb6f8d4` model-first, honest errors, sources, outdated cards · `54c65af` PNG sharing · `5f96de9` Reply / Edit · `2cda021` merge of main + integration fixes · `4ecbbba` knowledge index repair · `52b9838` this report · `8a66582` merge of the latest main · retrieval follow-up fixes (below) |
 
 ## 2. Root causes found
 
@@ -32,7 +32,11 @@ rehearsal of the 20-step demo. This report covers what was done, how it was veri
    memo comparator, so outdated fee cards were not re-marked.
 8. **Sharing sent text only** (wa.me links; no image).
 9. **No stable message ids or state snapshots**, so Reply / Edit could not be done properly.
-10. **After the merge, memory lost turns.** `memory.warm_turn_keys` (Phases 1-4) overwrote newer in-process values
+10. **"Who leads admissions at SRU?" still missed the answer on the latest main.** The Leadership FAQ is 4th by
+    vector distance (0.293 vs 0.282-0.287 for general admissions FAQs) and the new RRF merge keeps 6 passages, so it
+    was cut. The question-word re-rank used 5-letter stems ("leads" vs "leade(rship)") and could not lift it. Also,
+    a follow-up ("Are you sure?") only had the general search tool, not the tool that produced the answer.
+11. **After the merge, memory lost turns.** `memory.warm_turn_keys` (Phases 1-4) overwrote newer in-process values
     with older Redis copies: history turns and saved details disappeared. Three existing tests failed on main as well.
 
 ## 3. What changed, and why
@@ -46,7 +50,8 @@ rehearsal of the 20-step demo. This report covers what was done, how it was veri
 | Model-first | `sru_agent/agent.py`, `frontend/src/pages/ChatPage.tsx`, `services/api.ts` | A typed message continues a step only if it gives what the step asked for; held messages keep their typed / button source; no silent legacy fallback |
 | Fee cards | `utils/feeCardImage.ts`, `components/FeePlanCards.tsx`, `public/widget.js` | Real PNG (canvas), native file share, Download / Copy caption / Copy image fallbacks, truthful status |
 | Reply / Edit | `services/message_actions.py`, `sru_agent/router.py`, `sru_agent/memory.py`, `schemas/chat.py`, `utils/messageActions.ts`, `MessageBubble.tsx`, `ChatPage.tsx` | Server message ids, ownership checks, typed-turn snapshots, archive (never delete), replay of later choices |
-| Merge integration | `sru_agent/agent.py`, `sru_agent/memory.py` | Reply kept through the new prompt structure; replies never served from the FAQ cache; stale cache overwrite fixed |
+| Merge integration | `sru_agent/agent.py`, `sru_agent/memory.py`, `main.py`, `router.py` | Reply kept through the new prompt structure; replies never served from the FAQ cache; stale cache overwrite fixed; message ids and telemetry both logged |
+| Retrieval follow-up | `app/main.py` (`_rerank_by_question_words`), `sru_agent/tools.py`, `sru_agent/agent.py` | 4-letter stems in the re-rank ("leads" matches "Leadership"); the previous answer's read-only tools stay available on the next turn (actions never carried over) |
 | Knowledge index | `chroma_data/chroma.sqlite3`, `scripts/repair_vector_index.py` | 187 missing vectors restored; whole index re-materialised consistently; reusable check / fix tool |
 | Docs | `docs/12`, `docs/45`, this report | API contract (reply_to, edit_of, ids, message fields), behaviour, report |
 
@@ -99,7 +104,7 @@ Both equal the fee engine (the same calculator the 3,794 frontend checks compare
 
 ## 9. Tests
 
-* Backend: **1,787 passed, 1 skipped**; 1 deselected (`test_feedback_submission`, needs a real Gemini key, failing
+* Backend: **1,796 passed, 1 skipped**; 1 deselected (`test_feedback_submission`, needs a real Gemini key, failing
   before this work).
 * Frontend: TypeScript clean, production build OK, fee calculator 3,794 checks (338 backend answers compared),
   effects 11 checks, oxlint 0 errors (warnings were there before).
@@ -110,7 +115,7 @@ Both equal the fee engine (the same calculator the 3,794 frontend checks compare
 
 | Step | Result |
 |---|---|
-| 1-2 Who leads admissions; source and designation | Dr. Ram Raghotham Rao Deshmukh, Senior Director of Admissions and Marketing; source "University FAQ — Leadership" |
+| 1-2 Who leads admissions; source and designation | Dr. Ram Raghotham Rao Deshmukh, Senior Director of Admissions and Marketing (3 of 3 fresh chats on the final code); source "University FAQ — Leadership" |
 | 3-4 "Rupesh Mitra" challenge; "Are you sure?" | Not agreed; evidence re-checked; supported answer kept |
 | 5 Dr. Rupesh Mishra's role | Associate Professor, Director of Centre for Experiential Learning; Boys Hostel Warden |
 | 6-7 Scholarship flow: programme, board, stage | Board-first flow, step cards |
@@ -146,6 +151,12 @@ Both equal the fee engine (the same calculator the 3,794 frontend checks compare
 | Large-scale simulation in this mission | Not run (not claimed) |
 
 ## 12. Limitations and open points
+
+0. **Known model issue:** after "What role does Dr. Rupesh Mishra hold?" (answered correctly from the faculty
+   directory), the follow-up "Are you sure? Please verify that again." can make the model re-check with the general
+   search only, find his Boys Hostel Warden record, and wrongly withdraw his directory designation (seen in most live
+   runs on the final code; he holds both roles). The scripted demo order (steps 1-5) is not affected. Next step: a
+   check that blocks withdrawing a claim that the previous turn's official records support.
 
 1. Share sheets on real iOS / Android devices are untested.
 2. The "Verified Sources" drawer was removed from the chat bubble on main (`5009cdf`). Sources are still produced,

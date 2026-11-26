@@ -437,14 +437,15 @@ _GENERIC_WORDS = set("what which when where whom whose about does have there the
 def _rerank_by_question_words(query: str, hits: list) -> list:
     """Similar FAQ entries ("Who is the X of SR University?") sit close together in the vector space; the
     distinctive words of the student's own question decide between them. Each distinct question word found in
-    a passage lowers its rank distance a little (stems of 5 letters, so "admission" matches "Admissions")."""
+    a passage lowers its rank distance a little. Stems of 4 letters, so "admission" matches "Admissions" and
+    "leads" matches "Leadership" (5 letters missed that: "leads" / "leade")."""
     import re as _re
-    words = {w[:5] for w in _re.findall(r"[a-z]+", (query or "").lower()) if len(w) > 3 and w not in _GENERIC_WORDS}
+    words = {w[:4] for w in _re.findall(r"[a-z]+", (query or "").lower()) if len(w) > 3 and w not in _GENERIC_WORDS}
     if not words:
         return hits
     def adjusted(h):
         text = f"{h.get('title', '')} {h.get('question', '')} {h.get('text', '')}".lower()
-        found = {t[:5] for t in _re.findall(r"[a-z]+", text) if len(t) > 3}
+        found = {t[:4] for t in _re.findall(r"[a-z]+", text) if len(t) > 3}
         return (h.get("distance") or 0.5) - 0.03 * len(words & found)
     for h in hits:
         h["rank"] = round(adjusted(h), 3)
