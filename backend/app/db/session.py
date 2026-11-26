@@ -19,6 +19,12 @@ def get_database_url() -> str:
     return url
 
 
+def alembic_database_url() -> str:
+    """The same cleaned URL for Alembic. Its config reader treats '%' as interpolation, so a URL-encoded password
+    ('%26' for '&') must be written as '%%26' there."""
+    return get_database_url().replace("%", "%%")
+
+
 _db_url = get_database_url()
 _connect_args = {}
 if ":6543" in _db_url:

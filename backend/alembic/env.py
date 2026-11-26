@@ -23,7 +23,9 @@ if config.config_file_name is not None and config.attributes.get("configure_logg
     fileConfig(config.config_file_name)
 
 # Override sqlalchemy.url from our settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# the same cleaned URL the API uses (a pasted "DATABASE_URL=" prefix, quotes and line breaks removed), with "%" escaped
+from app.db.session import alembic_database_url  # noqa: E402
+config.set_main_option("sqlalchemy.url", alembic_database_url())
 
 target_metadata = Base.metadata
 
