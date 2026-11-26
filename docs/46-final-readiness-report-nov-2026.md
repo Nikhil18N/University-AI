@@ -1,4 +1,16 @@
-# SRU Buddy — Final Production Readiness Report (v4.17.1, 26 Nov 2026)
+# SRU Buddy — Final Production Readiness Report (released as v4.18.0, 26 Nov 2026)
+
+## Release 4.18.0 (PRs #37, #38, #39 and the version bump)
+
+* Reply to any answer or fee card; Edit the latest typed message (recalculates, keeps later choices).
+* Fee cards shared as real PNG images (Download / Copy fallbacks).
+* Guided eligibility / scholarship check from any wording or a "Yes": board first, marks out of that board's total.
+* A "Yes" to the bot's callback offer saves the callback on the number on file.
+* Admissions leadership answered from the official FAQ again (knowledge index repaired; better re-ranking).
+* Every chat turn is saved even if telemetry fails; database migrations are applied when the API starts.
+* Smaller Edit button.
+
+Work in progress during the mission was labelled "v4.17.1" in code comments and in the sections below.
 
 Mission: accuracy, model-first understanding, verified retrieval, fee-card sharing, Reply / Edit, memory, and a full
 rehearsal of the 20-step demo. This report covers what was done, how it was verified, and what is still open.
