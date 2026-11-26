@@ -353,3 +353,12 @@ Callback / visit leads carry `metadata.case`: `program`, `marks`, `scholarship`,
 * `chat_ads[].image_url` and `event_highlights[].image_url` accept `/api/v1/agent/media/<id>` as well as https:// links.
 * Admin conversations list / detail: new optional `student` object (name, phone, program, marks, scholarship_percent,
   request, lead_status, is_parent).
+
+## Admin Observability Endpoint
+
+### `GET /api/v1/admin/telemetry`
+- **Auth**: Requires `X-Admin-Key` (`verify_admin_key`).
+- **Query Params**: `limit` (int, `1..500`, default `50`).
+- **Response**:
+  - `summary`: `{ total_turns, avg_total_latency_ms, p50_total_latency_ms, p95_total_latency_ms, avg_generation_latency_ms, avg_first_token_ms, total_prompt_tokens, total_candidates_tokens, total_thoughts_tokens, total_cached_tokens, cache_hit_rate, fallback_rate, by_intent, by_model, by_mode }`
+  - `recent`: List of recent `PolicyTurnTelemetry` records from Redis (multi-worker safe) or in-process fallback.

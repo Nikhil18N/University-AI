@@ -1,6 +1,7 @@
 """Post-processing constants and helpers for sru_agent responses."""
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import re
 
@@ -72,3 +73,15 @@ async def with_topic_videos(message: str, text: str, cards: list, session_id: st
         videos_shown=(list(shown) + [v["id"] for v in vids])[-30:],
     )
     return cards + [video_service.create_video_card(vids, topic=topic)]
+
+
+async def parallel_cards_and_suggestions(
+    *,
+    cards_coro,
+    suggestions_coro,
+) -> tuple[list, list]:
+    """Run independent post-processing coroutines (topic videos & resume chip) concurrently."""
+    cards_res, sugg_res = await asyncio.gather(cards_coro, suggestions_coro, return_exceptions=True)
+    final_cards = cards_res if isinstance(cards_res, list) else []
+    final_sugg = list(sugg_res) if isinstance(sugg_res, (list, tuple)) else []
+    return final_cards, final_sugg

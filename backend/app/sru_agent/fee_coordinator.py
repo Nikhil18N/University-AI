@@ -3,9 +3,95 @@ from __future__ import annotations
 
 import re
 
-from . import fee_intake, fee_journey, fees
+from . import fee_intake, fee_journey, fees, intents, memory
 
 _FEE_STEP_OPENER = re.compile(r"^(?:Sure!?\s*|Certainly!?\s*)", re.I)
+_OTHER_FEE_RE = re.compile(
+    r"\b(?:other\s+fees?|other\s+academic(?:\s*/\s*university|\s+university)?\s+charges?|other\s+charges?|annual\s+charges?|"
+    r"university\s+charges?|additional\s+fees?|additional\s+charges?|enrolment\s+fee|enrollment\s+fee|application\s+form\s+fee|"
+    r"specialisation\s+fee|specialization\s+fee|phd\s+fee|"
+    r"fees?\s+(?:other\s+than|apart\s+from|besides|excluding|except)\s+(?:sem(?:ester)?\s+fee|tuition(?:\s+fee)?|course\s+fee)|"
+    r"(?:other\s+than|apart\s+from|besides|excluding|except)\s+(?:sem(?:ester)?\s+fee|tuition(?:\s+fee)?|course\s+fee))\b",
+    re.I,
+)
+_SCHOLARSHIP_CALC_RE = re.compile(
+    r"\b(?:(?:schol\w*|s[ck]?h?o[lr]+[ae]?r?s+h?i*p+\w*)|waiver|concession|discount|fee\s+assessment|scholarship\s+assessment|assessment\s+form|"
+    r"calculate\s+(?:[\w\s]+\s+)?(?:fee|tuition|scholarship)|fee\s+calculation|my\s+fee|expected\s+scholarship|"
+    r"scholarship\s+counsell?or|fee\s+counsell?or)\b",
+    re.I,
+)
+_GENERAL_SCHOLARSHIP_RE = re.compile(
+    r"\b(?:what\s+(?:are\s+the\s+)?scholarships|which\s+scholarships|scholarships\s+available|"
+    r"are\s+there\s+scholarships|any\s+scholarships|do\s+you\s+(?:have|offer|provide)\s+scholarships|"
+    r"scholarship\s+options|list\s+of\s+scholarships|details\s+about\s+scholarships)\b",
+    re.I,
+)
+_BARE_SCORE_RE = re.compile(
+    r"^\s*(?:i\s+(?:got|scored|have|secured|obtained)\s+)?\d{2,4}(?:\.\d+)?\s*(?:marks?|%|percent)?\s*$",
+    re.I,
+)
+
+
+def intake_open(conv_state: dict | None, message: str) -> bool:
+    """True when fee_intake is waiting on the student, or re-opens on new academic details."""
+    waiting = ((conv_state or {}).get("fee_intake") or {}).get("waiting_for")
+    if not waiting:
+        return False
+    if waiting != "done":
+        return True
+    return bool(set(fee_intake.parse_details(message)) & set(fee_intake._ACADEMIC_FIELDS))
+
+
+def classify_fee_turn(message: str, intent: str, is_multi_q: bool) -> dict[str, bool]:
+    """Classify fee/scholarship/guard flags once for structured flow coordination."""
+    low_msg = (message or "").lower()
+    is_other_fee = bool(_OTHER_FEE_RE.search(low_msg))
+    is_general_schol = bool(_GENERAL_SCHOLARSHIP_RE.search(low_msg))
+    is_schol_calc = (not is_other_fee) and bool(_SCHOLARSHIP_CALC_RE.search(low_msg))
+    if is_multi_q or is_general_schol:
+        is_schol_calc = False
+    is_bare_score = bool(_BARE_SCORE_RE.match(low_msg)) or bool(re.fullmatch(r"\s*\d{2,4}(?:\.\d+)?\s*%?\s*", low_msg))
+    is_branch_guidance = (intent == "BRANCH_GUIDANCE_QUERY") or intents.is_branch_guidance_query(message)
+    is_seat_guarantee = (intent == "ADMISSION_GUARANTEE_QUERY") or bool(intents._ADMISSION_GUARANTEE_PATTERN.search(message))
+    is_future_year = (intent == "FUTURE_YEAR_FEE_QUERY") or bool(intents._FUTURE_YEAR_FEE_PATTERN.search(message))
+    if is_seat_guarantee or is_future_year:
+        is_schol_calc = False
+    return {
+        "is_other_fee_inquiry": is_other_fee,
+        "is_scholarship_calc_q": is_schol_calc,
+        "is_bare_score_msg": is_bare_score,
+        "is_branch_guidance": is_branch_guidance,
+        "is_seat_guarantee": is_seat_guarantee,
+        "is_future_year": is_future_year,
+    }
+
+
+async def sync_intake_updates(
+    state_dict: dict,
+    session_id: str,
+    profile: dict,
+    ctx: dict,
+    set_state,
+) -> dict:
+    """Persist fee_intake state and sync collected academic/programme fields into student profile."""
+    await set_state(fee_intake=state_dict)
+    prof_updates = {}
+    for k in (
+        "program", "board", "board_label", "board_key", "academic_stage", "stage_label",
+        "raw_marks", "max_marks", "percent", "admission_route", "route_label",
+        "eapcet_rank", "jee_percentile", "stream", "ib_score",
+    ):
+        val = state_dict.get(k)
+        if val is not None:
+            if k == "program":
+                prof_updates["program_interest"] = val
+                await set_state(active_program=val, fee_flow_prog=val)
+            else:
+                prof_updates[k] = val
+    if prof_updates:
+        profile = await memory.update_profile(session_id, **prof_updates)
+        ctx["profile"] = profile
+    return profile
 
 
 def is_active_fee_step(conv_state: dict | None) -> bool:

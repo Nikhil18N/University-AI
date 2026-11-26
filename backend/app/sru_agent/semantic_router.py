@@ -123,6 +123,7 @@ def _is_inquiry(chunk: str) -> bool:
 def decompose_multi_questions(text: str) -> list[str]:
     """Split compound or multi-part student inquiries into individual sub-questions."""
     s = re.sub(r"\?+", " ? <SPLIT> ", text or "")
+    s = re.sub(r"(?<!\d)(?:\b\d{1,2}[.)]\s+)", " <SPLIT> ", s)
     s = re.sub(r"(?i)\s+(?:and(?:\s+also)?|also|as\s+well\s+as|plus)\s+(?=(?:is|are|can|do|does|what|where|how|why|which|who|tell|explain|give)\b)", " <SPLIT> ", s)
     s = re.sub(r"(?i),\s*(?=(?:is|are|can|do|does|what|where|how|why|which|who)\b)", " <SPLIT> ", s)
     s = re.sub(r"[;\n]+", " <SPLIT> ", s)

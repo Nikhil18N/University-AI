@@ -36,6 +36,8 @@ async def _log_turn(session_id, conv_id, message, event, started_at, channel=Non
     """Call the turn logger with the cards and suggestions too; older 5-argument loggers still work."""
     try:
         extra = {"channel": channel} if channel else {}
+        if event.get("telemetry"):
+            extra["telemetry"] = event["telemetry"]
         await _on_turn_complete(session_id, conv_id, message, event["answer"], event["tools_used"],
                                 cards=event.get("cards") or [], suggestions=event.get("suggestions") or [],
                                 started_at=started_at, sources=event.get("sources") or [], **extra)
@@ -171,6 +173,8 @@ async def agent_stream(req: AgentRequest, request: Request = None):
                     "first_token_ms": first_token_ms,
                     "total_ms": total_ms,
                 }
+                if isinstance(event.get("telemetry"), dict) and event["telemetry"].get("first_token_ms") is None and first_token_ms is not None:
+                    event["telemetry"]["first_token_ms"] = first_token_ms
                 log.info(
                     "AGENT_SSE_TIMING: session=%s conv=%s first_token_ms=%s total_ms=%.1f",
                     (req.session_id or "")[:8],
