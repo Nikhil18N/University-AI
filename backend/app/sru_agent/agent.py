@@ -248,8 +248,8 @@ async def _handle_call_error(exc, link: dict, attempt: int, model: str) -> float
     err_str = str(exc).lower()
     if "name resolution" in err_str or "clientconnectordnserror" in type(exc).__name__.lower():
         raise exc
-    if kind == "model" and link["model_idx"] + 1 < len(link["models"]):
-        log.warning("Agent model %s unavailable (%s), trying the next model", model, exc)
+    if kind in ("model", "busy") and link["model_idx"] + 1 < len(link["models"]):
+        log.warning("Agent model %s %s (%s), trying the next model", model, kind, str(exc)[:120])
         link["model_idx"] += 1
         return None
     if kind == "config" and link.get("thinking"):
@@ -864,6 +864,9 @@ async def _say(text, message, session_id, conversation_id, used=(), cards=(), su
             t_obj.first_token_ms = say_first_token_ms
         if t_started is not None and not t_obj.total_latency_ms:
             t_obj.total_latency_ms = round((time.perf_counter() - t_started) * 1000, 2)
+        observability.attach_response_metadata(
+            t_obj, answer=text, cards=cards, suggestions=final_suggestions, sources=(), used=used
+        )
         observability.record_policy_telemetry(t_obj, persist_db=_should_persist_telemetry_db())
         _TURN_TELEMETRY_RECORDED.set(True)
         telemetry = t_obj.to_dict()
@@ -4348,7 +4351,17 @@ async def run_agent(
                 log.info("tool=%s status=%s session=%s", call.name, result.get("status"), (session_id or "")[:8])
                 used.append({"name": call.name, "status": result.get("status"),
                              "is_action": call.name in tools.ACTION_TOOLS})
-                is_card_ready = call.name in CARD_TOOLS and result.get("status") in ("calculated", "saved", "ok")
+                is_bus_only_q = bool(
+                    call.name == "calculate_fee"
+                    and re.search(r"\b(?:bus|transport)\b", message or "", re.I)
+                    and not re.search(
+                        r"\b(?:tuition|b\.?tech|btech|bba|mba|m\.?tech|bca|mca|b\.?sc|program|programme|course\s+fee|semester|total\s+fee|scholarship)\b",
+                        message or "",
+                        re.I,
+                    )
+                )
+                is_card_ready = (call.name in CARD_TOOLS and result.get("status") in ("calculated", "saved", "ok")
+                                 and not is_bus_only_q)
                 if call.name == "calculate_fee":
                     prefetched_fee = None  # the model asked for its own calculation: show that one
                     cards[:] = [c for c in cards if c.get("type") != "calculate_fee"]
@@ -4480,8 +4493,13 @@ async def run_agent(
     # A fee with hostel or transport added: offer the complete fee chart once per conversation.
     offered_chart = await _offer_fee_chart(session_id, conversation_id, cards)
     if offered_chart:
+        if final.rstrip().endswith("?"):
+            # Avoid stacking a second trailing question when the model already asked one.
+            final = re.sub(r"\n+[^\n]*\?\s*$", "", final.rstrip()).rstrip()
         final = final.rstrip() + "\n\n" + _FEE_CHART_OFFER
         conv_state.update(fee_chart_offered=True, offer="fee_chart")
+    elif not pending and not action_note:
+        final = postprocess.strip_trailing_filler_question(final)
     if not streamed:
         for piece in _chunks(final):
             yield {"type": "token", "delta": piece}
@@ -4574,16 +4592,27 @@ async def run_agent(
     except Exception as sugg_err:
         log.warning("Could not run parallel card/suggestion post-processing: %s", sugg_err)
 
+    try:
+        sources = _answer_sources(final, turn_evidence, passages)
+    except Exception:
+        log.exception("source references skipped")
+        sources = []
     _apply_rounds_telemetry(turn_telemetry, link)
     turn_telemetry.total_latency_ms = round((time.perf_counter() - started) * 1000, 2)
     if turn_telemetry.first_token_ms is None and (streamed or final):
         turn_telemetry.first_token_ms = turn_telemetry.total_latency_ms
+    observability.attach_response_metadata(
+        turn_telemetry, answer=final, cards=cards, suggestions=suggestions, sources=sources, used=used
+    )
     if not _TURN_TELEMETRY_RECORDED.get():
         observability.record_policy_telemetry(turn_telemetry, persist_db=_should_persist_telemetry_db())
         _TURN_TELEMETRY_RECORDED.set(True)
+    _stu_first = _first_name((ctx.get("profile") or {}).get("name") or "")
+    _personalized_name = bool(_stu_first and len(_stu_first) >= 2 and re.search(rf"\b{re.escape(_stu_first)}\b", final or "", re.I))
     if (
         faq_key
         and final
+        and not _personalized_name
         and not any(t.get("is_action") for t in used)
         and not any(t.get("name") in ("calculate_fee", "check_eligibility", "remember_student_details", "share_fee_estimate") for t in used)
     ):
@@ -4596,11 +4625,6 @@ async def run_agent(
                 "suggestions": list(suggestions),
             },
         )
-    try:
-        sources = _answer_sources(final, turn_evidence, passages)
-    except Exception:
-        log.exception("source references skipped")
-        sources = []
     try:
         # v4.17.1: the read-only tools this answer used stay available for the next turn, so a follow-up ("Are you
         # sure?", "and his office?") can re-check with the same tool instead of only the general search

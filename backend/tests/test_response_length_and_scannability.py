@@ -20,7 +20,7 @@ from app.sru_agent import agent
 def test_prompt_version_and_length_guidelines():
     """Verify that the system prompt specifies the target response lengths."""
     prompt = build_system_prompt({})
-    assert PROMPT_VERSION in ("2026-11-21.6", "2026-11-21.7", "2026-11-22.1", "2026-11-22.2", "2026-11-23.1", "2026-11-23.2", "2026-11-23.3", "2026-11-24.1", "2026-11-25.1", "2026-11-25.2", "2026-11-26.1")
+    assert PROMPT_VERSION in ("2026-11-21.6", "2026-11-21.7", "2026-11-22.1", "2026-11-22.2", "2026-11-23.1", "2026-11-23.2", "2026-11-23.3", "2026-11-24.1", "2026-11-25.1", "2026-11-25.2", "2026-11-26.1", "2026-11-26.2")
     # v4.17.0: one answer layout (prompts/answer_layout.md) sets the length for every answer
     assert "50–130 words" in prompt and "≤170 with a table or steps" in prompt
 

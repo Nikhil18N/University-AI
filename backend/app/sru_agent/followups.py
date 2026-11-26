@@ -216,19 +216,31 @@ def ensure_fixed_chips(chips: list[str] | None = None, answer: str | None = None
     return result[:MAX_CHIPS]
 
 
+_ACTIONABLE_YES_NO = re.compile(
+    r"\b(?:calculate\s+(?:your|my)\s+(?:fee|scholarship)|check\s+(?:your|my)\s+eligibility|"
+    r"add\s+(?:the\s+)?hostel\s+fee|prepare\s+your\s+complete\s+fee\s+chart|shall\s+i\s+show\s+you)\b",
+    re.I,
+)
+
+
 def suggest(message: str, tools_used: list | None = None, profile: dict | None = None,
             department: str | None = None, limit: int = 4, history: list | None = None,
             active_topic: str | None = None, answer: str | None = None) -> list[str]:
-    if needs_yes_no(answer):
-        return ["Yes", "No"]   # the answer to the question just asked; nothing else to pick from
+    from . import intents
 
     topic = topic_of(message, tools_used, active_topic=active_topic)
-    if topic in ("after_request", "default"):
-        # A request was just completed (callback, visit), or the message has no topic to follow up on.
+    if topic == "after_request":
+        if needs_yes_no(answer) and _ACTIONABLE_YES_NO.search(answer or ""):
+            return ["Yes", "No"]
         return []
+    if topic == "default" and (intents.small_talk(message) or not (message or "").strip()):
+        return []
+    if needs_yes_no(answer) and _ACTIONABLE_YES_NO.search(answer or ""):
+        return ["Yes", "No"]
+
     chips = _chips(topic, _short_program(profile or {}), department, message=message)
     if topic == "career_guidance":
-        return ensure_fixed_chips(chips, answer=answer, message=message)   # the four interest options
+        return ensure_fixed_chips(chips, answer=None, message=message)   # the four interest options
 
     # Collect past questions from history to avoid repeating recent queries
     past_queries = set()
@@ -244,6 +256,10 @@ def suggest(message: str, tools_used: list | None = None, profile: dict | None =
             continue
         picked.append(c)
 
-    return ensure_fixed_chips(picked, answer=answer, message=message)
+    if not picked and not intents.small_talk(message):
+        fallback_pool = _chips("default", _short_program(profile or {}), department, message=message)
+        picked = [c for c in fallback_pool if not _overlaps(c, message or "")] or fallback_pool
+
+    return ensure_fixed_chips(picked, answer=None, message=message)
 
 

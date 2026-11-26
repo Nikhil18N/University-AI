@@ -5,10 +5,13 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import json
 import logging
+import re
 import time
 from typing import Any, Dict, List, Optional
 
 log = logging.getLogger("sru_agent.observability")
+_VIDEO_CARD_TYPES = {"video_recommendations", "get_university_videos", "event_highlights"}
+_HAS_MD_TABLE_RE = re.compile(r"^\s*\|.*\|\s*$", re.MULTILINE)
 
 
 @dataclass
@@ -36,10 +39,50 @@ class PolicyTurnTelemetry:
     cached_tokens: int = 0
     round_latencies_ms: List[float] = field(default_factory=list)
     evaluation_score: float = 1.0
+    answer_chars: int = 0
+    has_table: bool = False
+    card_types: List[str] = field(default_factory=list)
+    video_count: int = 0
+    video_topics: List[str] = field(default_factory=list)
+    suggestions: List[str] = field(default_factory=list)
+    sources_count: int = 0
+    tools_used: List[str] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+def attach_response_metadata(
+    telemetry: PolicyTurnTelemetry,
+    *,
+    answer: str = "",
+    cards: list | None = None,
+    suggestions: list | None = None,
+    sources: list | None = None,
+    used: list | None = None,
+) -> None:
+    """Populate whole-response observability fields (cards, videos, tables, chips, sources, tools)."""
+    telemetry.answer_chars = len(answer or "")
+    telemetry.has_table = bool(_HAS_MD_TABLE_RE.search(answer or ""))
+    card_list = [c for c in (cards or []) if isinstance(c, dict)]
+    telemetry.card_types = [str(c.get("type")) for c in card_list if c.get("type")]
+    v_count = 0
+    v_topics: list[str] = []
+    for c in card_list:
+        if c.get("type") in _VIDEO_CARD_TYPES:
+            vids = ((c.get("data") or c).get("videos") or [])
+            v_count += len(vids) if isinstance(vids, list) else 0
+            title = c.get("title") or (c.get("data") or {}).get("title")
+            if title and str(title) not in v_topics:
+                v_topics.append(str(title))
+    telemetry.video_count = v_count
+    telemetry.video_topics = v_topics
+    telemetry.suggestions = [str(s) for s in (suggestions or [])][:6]
+    telemetry.sources_count = len(sources or [])
+    telemetry.tools_used = [
+        str(t.get("name")) for t in (used or []) if isinstance(t, dict) and t.get("name")
+    ]
 
 
 _recent_telemetry: List[PolicyTurnTelemetry] = []
@@ -73,6 +116,16 @@ def build_turn_telemetry_row(telemetry: PolicyTurnTelemetry | Dict[str, Any]):
         first_token_ms=float(d["first_token_ms"]) if d.get("first_token_ms") is not None else None,
         fallback_decision=bool(d.get("fallback_decision") or False),
         fallback_reason=str(fb_reason)[:128] if fb_reason else None,
+        response_meta={
+            "answer_chars": int(d.get("answer_chars") or 0),
+            "has_table": bool(d.get("has_table") or False),
+            "card_types": list(d.get("card_types") or []),
+            "video_count": int(d.get("video_count") or 0),
+            "video_topics": list(d.get("video_topics") or []),
+            "suggestions": list(d.get("suggestions") or []),
+            "sources_count": int(d.get("sources_count") or 0),
+            "tools_used": list(d.get("tools_used") or []),
+        },
     )
 
 
@@ -183,6 +236,7 @@ async def get_recent_telemetry_async(limit: int = 50) -> List[Dict[str, Any]]:
                         "first_token_ms": row.first_token_ms,
                         "fallback_decision": row.fallback_decision,
                         "fallback_reason": row.fallback_reason,
+                        **(row.response_meta or {}),
                         "timestamp": row.created_at.isoformat() if row.created_at else None,
                     }
                     for row in reversed(rows)
@@ -193,7 +247,7 @@ async def get_recent_telemetry_async(limit: int = 50) -> List[Dict[str, Any]]:
 
 
 def compute_telemetry_summary(records: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Compute latency percentiles, token totals, cache hit rate, and breakdowns."""
+    """Compute latency percentiles, token totals, cache hit rate, and whole-response breakdowns."""
     total = len(records)
     if not total:
         return {
@@ -209,9 +263,13 @@ def compute_telemetry_summary(records: List[Dict[str, Any]]) -> Dict[str, Any]:
             "total_cached_tokens": 0,
             "cache_hit_rate": 0.0,
             "fallback_rate": 0.0,
+            "cards_shown_rate": 0.0,
+            "videos_shown_rate": 0.0,
+            "table_rate": 0.0,
             "by_intent": {},
             "by_model": {},
             "by_mode": {},
+            "by_card_type": {},
         }
 
     latencies = sorted(float(r.get("total_latency_ms") or 0.0) for r in records)
@@ -225,10 +283,14 @@ def compute_telemetry_summary(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     cached_tok = sum(int(r.get("cached_tokens") or 0) for r in records)
     cache_hits = sum(1 for r in records if r.get("response_mode") == "cache" or int(r.get("cached_tokens") or 0) > 0)
     fallbacks = sum(1 for r in records if r.get("fallback_decision"))
+    cards_shown = sum(1 for r in records if r.get("card_types"))
+    videos_shown = sum(1 for r in records if int(r.get("video_count") or 0) > 0)
+    tables_shown = sum(1 for r in records if r.get("has_table"))
 
     by_intent: Dict[str, int] = {}
     by_model: Dict[str, int] = {}
     by_mode: Dict[str, int] = {}
+    by_card_type: Dict[str, int] = {}
     for r in records:
         intent = str(r.get("detected_intent") or "UNKNOWN")
         model = str(r.get("model") or "deterministic")
@@ -236,6 +298,8 @@ def compute_telemetry_summary(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         by_intent[intent] = by_intent.get(intent, 0) + 1
         by_model[model] = by_model.get(model, 0) + 1
         by_mode[mode] = by_mode.get(mode, 0) + 1
+        for ct in (r.get("card_types") or []):
+            by_card_type[str(ct)] = by_card_type.get(str(ct), 0) + 1
 
     return {
         "total_turns": total,
@@ -250,9 +314,13 @@ def compute_telemetry_summary(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         "total_cached_tokens": cached_tok,
         "cache_hit_rate": round(cache_hits / total, 4),
         "fallback_rate": round(fallbacks / total, 4),
+        "cards_shown_rate": round(cards_shown / total, 4),
+        "videos_shown_rate": round(videos_shown / total, 4),
+        "table_rate": round(tables_shown / total, 4),
         "by_intent": by_intent,
         "by_model": by_model,
         "by_mode": by_mode,
+        "by_card_type": by_card_type,
     }
 
 

@@ -20,6 +20,19 @@ FEE_TOOLS = {"calculate_fee", "compare_programs", "get_program_info", "get_speci
 INFO_CARDS = {"placement_highlights", "hostel_facilities", "campus_tour", "curriculum"}
 VIDEO_CARDS = {"video_recommendations", "get_university_videos", "event_highlights"}
 HAS_MD_TABLE = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(?:\|\s*:?-{2,}:?\s*)+\|?\s*$", re.MULTILINE)
+_COMPOUND_TRAILING_Q = re.compile(
+    r"\n+(?:Would\s+you\s+like|Do\s+you\s+want|Shall\s+I|Want\s+(?:me\s+to|to\s+know)|"
+    r"Are\s+you\s+interested\s+in|Can\s+I\s+help\s+you\s+with)\b[^\n]*\b(?:or|and)\b[^\n]*\?\s*$",
+    re.I,
+)
+
+
+def strip_trailing_filler_question(text: str, *, keep_question: bool = False) -> str:
+    """Remove confusing compound ('A or B?' / 'A and B?') trailing questions while keeping single clear questions."""
+    if not text or keep_question:
+        return text
+    cleaned = _COMPOUND_TRAILING_Q.sub("", text.rstrip()).rstrip()
+    return cleaned if cleaned else text
 
 
 def vary(options: list[str], *seed) -> str:

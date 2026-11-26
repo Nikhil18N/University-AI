@@ -249,3 +249,93 @@ async def test_parallel_postprocess_and_batched_commit():
     assert len(committed) == 1
     assert len(added) == 1
     assert added[0].detected_intent == "FEE_QUERY"
+
+
+@pytest.mark.asyncio
+async def test_busy_503_advances_to_next_model():
+    link = {"models": ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite"], "model_idx": 0, "fixed": None, "key": "k1"}
+    wait = await llm_loop._handle_call_error(RuntimeError("503 UNAVAILABLE"), link, 0, "gemini-3.1-flash-lite")
+    assert wait is None
+    assert link["model_idx"] == 1
+
+
+def test_answer_check_does_not_corrupt_100_percent_to_130_percent():
+    from app.sru_agent import answer_check
+
+    text = "A 100% scholarship is not applicable for B.Tech CSE. You qualify for a 30% merit scholarship."
+    checked, problems = answer_check.check(text, fee_result={"status": "ok", "scholarship_percent": 30})
+    assert "130%" not in checked
+    assert "100% scholarship is not applicable" in checked
+    assert problems == []
+
+
+def test_check_people_allows_cse_head_abbreviation():
+    from app.sru_agent import answer_check
+
+    evidence = [
+        "Dr. Sandeep Chintham Associate Professor and Head, Department of Computer Science & Artificial Intelligence"
+    ]
+    text = "Dr. Sandeep Chintham is the Head of Computer Science and Engineering."
+    checked, problems = answer_check.check_people(text, evidence=evidence)
+    assert problems == []
+    assert "I couldn't verify" not in checked
+
+
+def test_whole_response_observability_and_contextual_followups():
+    from app.sru_agent import followups
+
+    t = observability.PolicyTurnTelemetry(
+        session_id="s-whole", conversation_id="c-whole", message="placements?", detected_intent="MODEL_FIRST"
+    )
+    observability.attach_response_metadata(
+        t,
+        answer="| Role | CTC |\n|---|---|\n| SDE | 51 LPA |",
+        cards=[
+            {"type": "placement_highlights"},
+            {"type": "video_recommendations", "title": "Placements at SRU", "videos": [{"id": "v1"}, {"id": "v2"}]},
+        ],
+        suggestions=["Top recruiters & packages", "Average package by branch"],
+        sources=[{"title": "Placement Policy"}],
+        used=[{"name": "calculate_fee", "status": "ok"}],
+    )
+    d = t.to_dict()
+    assert d["has_table"] is True
+    assert d["card_types"] == ["placement_highlights", "video_recommendations"]
+    assert d["video_count"] == 2
+    assert d["video_topics"] == ["Placements at SRU"]
+    assert d["sources_count"] == 1
+    assert d["tools_used"] == ["calculate_fee"]
+
+    summary = observability.compute_telemetry_summary([d])
+    assert summary["cards_shown_rate"] == 1.0
+    assert summary["videos_shown_rate"] == 1.0
+    assert summary["table_rate"] == 1.0
+    assert summary["by_card_type"]["placement_highlights"] == 1
+
+    row = observability.build_turn_telemetry_row(d)
+    assert row.response_meta["video_count"] == 2
+    assert row.response_meta["has_table"] is True
+
+    chips = followups.suggest(
+        "What are the placement packages?",
+        [],
+        answer="SRU average package is 6.5 LPA.\n\nWould you like to speak with an admissions counsellor?",
+    )
+    assert chips != ["Yes", "No"]
+    assert any("recruiter" in c.lower() or "average" in c.lower() for c in chips)
+
+    raw = "SR University has 39 student clubs and 2,700+ patents.\n\nWould you like to know more about the research opportunities or the student clubs?"
+    cleaned = postprocess.strip_trailing_filler_question(raw)
+    assert cleaned == "SR University has 39 student clubs and 2,700+ patents."
+
+    single_q = "Your B.Tech CSE tuition is ₹3,40,000.\n\nWould you like to calculate your scholarship?"
+    assert postprocess.strip_trailing_filler_question(single_q) == single_q
+
+    unmatched_q_chips = followups.suggest("Can I bring my laptop to campus?", [], answer="Yes, students can bring laptops.")
+    assert len(unmatched_q_chips) >= 2
+    assert followups.suggest("ok thanks", [], answer="You're welcome!") == []
+
+
+
+
+
