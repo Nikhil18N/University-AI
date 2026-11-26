@@ -45,6 +45,8 @@ GEMINI_API_KEYS = _all_keys()
 # Map any legacy or deprecated model name to active production Gemini models
 _raw_model = os.getenv("AGENT_MODEL") or _default_model
 AGENT_MODEL = MODEL_ALIASES.get(_raw_model, _raw_model) or "gemini-3.5-flash-lite"
+AGENT_LITE_MODEL = os.getenv("AGENT_LITE_MODEL", "gemini-3.1-flash-lite") or "gemini-3.1-flash-lite"
+AGENT_MODEL_TIERING = os.getenv("AGENT_MODEL_TIERING", "true").strip().lower() in ("1", "true", "yes", "on")
 AGENT_MAX_TOOL_ROUNDS = int(os.getenv("AGENT_MAX_TOOL_ROUNDS", "4"))
 AGENT_MAX_MESSAGE_CHARS = int(os.getenv("AGENT_MAX_MESSAGE_CHARS", "1000"))
 AGENT_RATE_LIMIT_PER_MIN = int(os.getenv("AGENT_RATE_LIMIT_PER_MIN", "20"))
