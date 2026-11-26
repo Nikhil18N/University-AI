@@ -190,6 +190,7 @@ async def test_repeated_first_question_is_never_served_from_a_saved_copy(monkeyp
             return _text(f"SR University is in Warangal, Telangana. (answer {len(calls)})")
 
     ring = agent._KeyRing()
+    monkeypatch.setattr(config, "AGENT_ANSWER_CACHE_SECONDS", 0)
     monkeypatch.setattr(config, "GEMINI_API_KEYS", ["key-A"])
     monkeypatch.setattr(ring, "client", lambda key: Counting())
     monkeypatch.setattr(agent, "_ring", ring)
@@ -212,6 +213,7 @@ async def test_daily_limit_is_not_retried_and_gets_a_useful_reply(monkeypatch):
             raise _ApiError(429, "429 RESOURCE_EXHAUSTED: GenerateRequestsPerDayPerProjectPerModel-FreeTier")
 
     ring = agent._KeyRing()
+    monkeypatch.setattr(config, "AGENT_ANSWER_CACHE_SECONDS", 0)
     monkeypatch.setattr(config, "GEMINI_API_KEYS", ["key-A"])
     monkeypatch.setattr(config, "AGENT_ANSWER_CACHE_SECONDS", 0)
     monkeypatch.setattr(ring, "client", lambda key: DailyLimit())

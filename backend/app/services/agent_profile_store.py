@@ -45,8 +45,7 @@ def _durable(profile: dict) -> dict:
         if value in (None, ""):
             continue
         encoded = json.dumps(value, ensure_ascii=False)
-        if len(encoded) <= 255:
-            out[key] = encoded
+        out[key] = encoded
     return out
 
 

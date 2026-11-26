@@ -34,11 +34,83 @@ except ImportError:
 
 from . import affordability, ai_guard, config, dialogue, eligibility, journey, faculty, fee_flow, fee_intake, fees, followups, intents, knowledge, memory, responses, tools
 from app.services import card_service
-from . import campus_life, compound, fact_service, fee_journey, fee_plan, policy_engine, policy_models, policy_service, semantic_router, observability
-from .prompt import build_system_prompt
+from . import campus_life, compound, fact_service, fee_coordinator, fee_journey, fee_plan, llm_loop, observability, policy_engine, policy_models, policy_service, postprocess, semantic_router, tool_runner
+from .llm_loop import (
+    GeminiAgentProvider,
+    ModelUnavailable,
+    _KeyRing,
+    _apply_rounds_telemetry,
+    _can_stream,
+    _error_kind,
+    _extract_usage_metadata,
+    _gate,
+    _gates,
+    _generate,
+    _generate_stream,
+    _handle_call_error,
+    _record_round_usage,
+    _remaining_budget,
+    _ring,
+    _with_thinking,
+)
+from .tool_runner import (
+    run_action as _run_action,
+    tool_declarations as _tool_declarations,
+    tool_events as _tool_events,
+)
+from .postprocess import (
+    CARD_TOOLS,
+    FEE_TOOLS as _FEE_TOOLS,
+    HAS_MD_TABLE as _HAS_MD_TABLE,
+    INFO_CARDS as _INFO_CARDS,
+    VIDEO_CARDS as _VIDEO_CARDS,
+    vary as _vary,
+    with_topic_videos as _with_topic_videos,
+)
+from .prompt import build_dynamic_suffix, build_static_prefix, build_system_prompt
 
 log = logging.getLogger("sru_agent")
 _client = None
+_TURN_STARTED: contextvars.ContextVar[float | None] = contextvars.ContextVar("_TURN_STARTED", default=None)
+_TURN_TELEMETRY_RECORDED: contextvars.ContextVar[bool] = contextvars.ContextVar("_TURN_TELEMETRY_RECORDED", default=False)
+
+
+def _extract_usage_metadata(resp) -> dict[str, int]:
+    """Extract Gemini usage_metadata token counts safely from a GenerateContentResponse."""
+    meta = getattr(resp, "usage_metadata", None)
+    if meta is None:
+        return {
+            "prompt_token_count": 0,
+            "candidates_token_count": 0,
+            "thoughts_token_count": 0,
+            "cached_content_token_count": 0,
+        }
+    return {
+        "prompt_token_count": int(getattr(meta, "prompt_token_count", None) or 0),
+        "candidates_token_count": int(getattr(meta, "candidates_token_count", None) or 0),
+        "thoughts_token_count": int(getattr(meta, "thoughts_token_count", None) or 0),
+        "cached_content_token_count": int(getattr(meta, "cached_content_token_count", None) or 0),
+    }
+
+
+def _record_round_usage(link: dict, model: str, resp, started_perf: float) -> None:
+    round_ms = round((time.perf_counter() - started_perf) * 1000, 2)
+    usage = _extract_usage_metadata(resp)
+    link.setdefault("rounds", []).append({"model": model, "latency_ms": round_ms, **usage})
+
+
+def _apply_rounds_telemetry(telemetry: observability.PolicyTurnTelemetry, link: dict | None) -> None:
+    rounds = (link or {}).get("rounds") or []
+    if not rounds:
+        return
+    telemetry.llm_rounds = len(rounds)
+    telemetry.model = rounds[-1].get("model") or telemetry.model
+    telemetry.prompt_tokens = sum(r.get("prompt_token_count", 0) for r in rounds)
+    telemetry.candidates_tokens = sum(r.get("candidates_token_count", 0) for r in rounds)
+    telemetry.thoughts_tokens = sum(r.get("thoughts_token_count", 0) for r in rounds)
+    telemetry.cached_tokens = sum(r.get("cached_content_token_count", 0) for r in rounds)
+    telemetry.round_latencies_ms = [r.get("latency_ms", 0.0) for r in rounds]
+    telemetry.generation_latency_ms = round(sum(telemetry.round_latencies_ms), 2)
 
 FALLBACK_OPTIONS = [
     f"I'm having trouble right now. Please call the Admissions Office at {config.ADMISSIONS_PHONE} or try again in a moment.",
@@ -100,61 +172,15 @@ _VISIT_DETAIL = re.compile(r"\b(?:parents?|timings?|hours?|allowed|dress|bring|d
 
 
 # ------------------------------------------------------------ model access ----
-class _KeyRing:
-    """One Gemini client per configured API key, handed out in turn."""
-
-    def __init__(self):
-        self._pool = None
-        self._clients = {}
-
-    def _get_pool(self):
-        if self._pool is None:
-            keys = list(config.GEMINI_API_KEYS) or ([config.GEMINI_API_KEY] if config.GEMINI_API_KEY else [])
-            if not keys:
-                return None
-            from app.providers.key_pool import APIKeyPool
-            self._pool = APIKeyPool(keys, default_cooldown=config.AGENT_KEY_COOLDOWN_SECONDS)
-        return self._pool
-
-    def next_key(self) -> str:
-        pool = self._get_pool()
-        return pool.get_next_key() if pool else ""
-
-    def client(self, key: str):
-        if key not in self._clients:
-            self._clients[key] = genai.Client(api_key=key)
-        return self._clients[key]
-
-    def rate_limited(self, key: str, cooldown: float | None = None) -> str:
-        """Rest this key for a while; returns the key to use next (may be the same one)."""
-        pool = self._get_pool()
-        return pool.mark_rate_limited(key, cooldown) if pool else key
-
-    def all_resting(self) -> bool:
-        """True when every key is waiting out a limit (no point calling the model right now)."""
-        pool = self._get_pool()
-        return bool(pool) and pool.active_keys_count == 0
-
-    def worked(self, key: str):
-        pool = self._get_pool()
-        if pool:
-            pool.mark_success(key)
-
-    def size(self) -> int:
-        pool = self._get_pool()
-        return len(pool) if pool else 0
-
-
-_ring = _KeyRing()
-_gates = weakref.WeakKeyDictionary()
-
-
 def get_client():
     """A Gemini client on the first configured key (kept for scripts and older code)."""
     global _client
     if _client is None:
         _client = _ring.client(_ring.next_key() or config.GEMINI_API_KEY)
     return _client
+
+
+_DEFAULT_GET_CLIENT = get_client
 
 
 def _gate() -> asyncio.Semaphore:
@@ -256,107 +282,17 @@ _MINIMAL_OK = ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-fla
                "gemini-3-flash")
 
 
-async def _generate(contents, cfg, link: dict):
-    """One model call that survives a retired model, a rate-limited key and a busy server.
-
-    `link` carries the connection for this student message: a fixed client (tests) or the
-    current key, plus the model that last worked. This function, _generate_stream and _KeyRing
-    are the only code that talks to the AI provider: moving to a paid Gemini plan needs only new
-    keys in the environment; another provider needs only a replacement for these functions.
-    """
-    attempt = 0
-    if not link["fixed"] and _ring.all_resting():
-        link["error_kind"] = "rate"
-        raise ModelUnavailable("all Gemini keys are resting after a rate limit")
-    while True:
-        client = link["fixed"] or _ring.client(link["key"])
-        model = link["models"][link["model_idx"]]
-        try:
-            timeout = _remaining_budget(link)
-            async with _gate():
-                resp = await asyncio.wait_for(
-                    client.aio.models.generate_content(model=model, contents=contents,
-                                                       config=_with_thinking(cfg, link, model)),
-                    timeout=timeout)
-            if not link["fixed"]:
-                _ring.worked(link["key"])
-            return resp
-        except Exception as exc:
-            wait = await _handle_call_error(exc, link, attempt, model)
-            if wait is None:
-                continue
-            attempt += 1
-            if link.get("deadline") is not None and time.monotonic() + wait >= link["deadline"]:
-                raise ModelUnavailable("agent request time budget exhausted") from exc
-            await asyncio.sleep(wait)
+# (_generate, _can_stream, _generate_stream are imported from .llm_loop)
 
 
-def _can_stream(link: dict) -> bool:
-    client = link["fixed"] or (_ring.client(link["key"]) if link["key"] else None)
-    return bool(config.AGENT_STREAM) and client is not None and \
-        hasattr(getattr(getattr(client, "aio", None), "models", None), "generate_content_stream")
-
-
-async def _generate_stream(contents, cfg, link: dict):
-    """Like _generate, but hands over the answer while the model is still writing it.
-
-    Yields ("text", piece) as words arrive, then ("done", response) with every part the model
-    sent (function calls and their thought signatures included), so the agent loop treats it
-    exactly like a normal response. Errors before the first piece are retried like _generate;
-    an error in the middle of an answer is raised (the words already shown are replaced by the
-    final reply or the error message)."""
-    attempt = 0
-    if not link["fixed"] and _ring.all_resting():
-        link["error_kind"] = "rate"
-        raise ModelUnavailable("all Gemini keys are resting after a rate limit")
-    while True:
-        client = link["fixed"] or _ring.client(link["key"])
-        model = link["models"][link["model_idx"]]
-        started = False
-        try:
-            timeout = _remaining_budget(link)
-            async with _gate():
-                stream = await asyncio.wait_for(
-                    client.aio.models.generate_content_stream(model=model, contents=contents,
-                                                              config=_with_thinking(cfg, link, model)),
-                    timeout=timeout)
-                parts, last = [], None
-                iterator = stream.__aiter__()
-                while True:
-                    try:
-                        chunk = await asyncio.wait_for(iterator.__anext__(), timeout=_remaining_budget(link))
-                    except StopAsyncIteration:
-                        break
-                    last = chunk
-                    cand = (chunk.candidates or [None])[0]
-                    for part in ((cand.content.parts if cand and cand.content else None) or []):
-                        parts.append(part)
-                        if part.text and not getattr(part, "thought", False):
-                            started = True
-                            yield ("text", part.text)
-            if not link["fixed"]:
-                _ring.worked(link["key"])
-            merged = types.GenerateContentResponse(candidates=[types.Candidate(
-                content=types.Content(role="model", parts=parts),
-                finish_reason=getattr((last.candidates or [None])[0], "finish_reason", None) if last else None)])
-            yield ("done", merged)
-            return
-        except Exception as exc:
-            if started:
-                link["error_kind"] = _error_kind(exc)
-                raise
-            wait = await _handle_call_error(exc, link, attempt, model)
-            if wait is None:
-                continue
-            attempt += 1
-            if link.get("deadline") is not None and time.monotonic() + wait >= link["deadline"]:
-                raise ModelUnavailable("agent request time budget exhausted") from exc
-            await asyncio.sleep(wait)
-
-
-def _tool_declarations():
-    return types.Tool(function_declarations=[
-        types.FunctionDeclaration(name=name, **decl) for name, (_fn, _label, decl) in tools.TOOLS.items()])
+def _tool_declarations(tool_names: list[str] | None = None):
+    names = tool_names if tool_names is not None else list(tools.TOOLS.keys())
+    decls = [
+        types.FunctionDeclaration(name=name, **tools.TOOLS[name][2])
+        for name in names
+        if name in tools.TOOLS
+    ]
+    return types.Tool(function_declarations=decls) if decls else None
 
 
 def _chunks(text: str, words_per_chunk: int = 6):
@@ -622,27 +558,8 @@ def _other_program_named(message: str, conv_state: dict) -> bool:
 
 
 def _open_step(profile: dict, conv_state: dict) -> dict | None:
-    """The question the fee steps are waiting on, asked again exactly (text, its card, its chips), or None.
-    v4.15.0: a "hi" or "how are you" in the middle of the steps keeps the student where they were."""
-    intake = conv_state.get("fee_intake") or {}
-    if intake.get("counsellor_mode") and intake.get("waiting_for") not in (None, "done"):
-        try:
-            r = fee_intake.decide("Calculate my scholarship", profile, dict(intake))
-        except Exception:
-            r = None
-        if r and r.get("action") == "ask":
-            return {"text": _FEE_STEP_OPENER.sub("", r.get("text") or "").strip(), "cards": r.get("cards") or [],
-                    "chips": r.get("chips") or []}
-    st = conv_state.get(fee_journey.KEY)
-    if st and st.get("active") and st.get("awaiting") not in (None, "scholarship_steps"):
-        try:
-            r = fee_journey.next_step(dict(st), profile)
-        except Exception:
-            r = None
-        if r and r.get("kind") == "reply" and r.get("text"):
-            return {"text": r["text"], "cards": r.get("cards") or [], "chips": r.get("chips") or [],
-                    "fee_state": r.get("state")}
-    return None
+    """Delegate to fee_coordinator.open_step."""
+    return fee_coordinator.open_step(profile, conv_state)
 
 
 async def _with_resume_chip(session_id, conversation_id, chips, text: str = "") -> list:
@@ -886,6 +803,39 @@ async def _say(text, message, session_id, conversation_id, used=(), cards=(), su
             profile = await memory.get_profile(session_id)
         except Exception:
             profile = None
+    if not _TURN_TELEMETRY_RECORDED.get():
+        t_obj = None
+        if isinstance(telemetry, observability.PolicyTurnTelemetry):
+            t_obj = telemetry
+        elif isinstance(telemetry, dict):
+            t_obj = observability.PolicyTurnTelemetry(
+                session_id=session_id,
+                conversation_id=conversation_id,
+                message=message,
+                detected_intent=str(telemetry.get("detected_intent") or "DETERMINISTIC"),
+                response_mode=str(telemetry.get("response_mode") or "deterministic"),
+                selected_policy_id=telemetry.get("selected_policy_id"),
+                policy_version=telemetry.get("policy_version"),
+                routing_confidence=float(telemetry.get("routing_confidence") or 0.0),
+                fallback_decision=bool(telemetry.get("fallback_decision") or False),
+                fallback_reason=telemetry.get("fallback_reason"),
+            )
+        else:
+            t_obj = observability.PolicyTurnTelemetry(
+                session_id=session_id,
+                conversation_id=conversation_id,
+                message=message,
+                detected_intent="DETERMINISTIC",
+                response_mode="fallback" if plain else "deterministic",
+                fallback_decision=bool(plain),
+                fallback_reason="model_unavailable" if plain else None,
+            )
+        t_started = _TURN_STARTED.get()
+        if t_started is not None and not t_obj.total_latency_ms:
+            t_obj.total_latency_ms = round((time.perf_counter() - t_started) * 1000, 2)
+        observability.record_policy_telemetry(t_obj)
+        _TURN_TELEMETRY_RECORDED.set(True)
+        telemetry = t_obj.to_dict()
     yield _done(conversation_id, text, used, cards, final_suggestions, telemetry=telemetry, profile=profile, eligible=eligible,
                 options=bool(exact_chips))
 
@@ -1024,7 +974,9 @@ async def _model_words(brief: str, message: str, session_id: str, *, history=Non
         link = {"fixed": client if (client is not None and not _is_mock_or_test_client(client)) else None,
                 "key": None, "models": models, "model_idx": 0, "error_kind": None, "thinking": True,
                 "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT)}
-        if link["fixed"] is None:
+        if link["fixed"] is None and get_client is not _DEFAULT_GET_CLIENT:
+            link["fixed"] = get_client()
+        elif link["fixed"] is None:
             link["key"] = _ring.next_key()
             if not link["key"]:
                 return None
@@ -1085,11 +1037,12 @@ async def _reply(text, message, session_id, conversation_id, *, client=None, his
 
 
 async def _small_talk_reply(kind: str, message, session_id, conversation_id, *, client=None, history=None,
-                            profile=None, conv_state=None, suggestions=(), name: str | None = None):
+                            profile=None, conv_state=None, suggestions=(), name: str | None = None,
+                            no_llm: bool = False):
     """A greeting, thanks, "how are you", "bye", "who are you": written by the model for this conversation (no
-    greeting bank). Without the model: one plain line (_SMALL_TALK_FALLBACK)."""
+    greeting bank). Without the model (or when no_llm=True): one plain line (_SMALL_TALK_FALLBACK)."""
     text = None
-    if _use_model(client):
+    if not no_llm and _use_model(client):
         brief = "REPLY BRIEF: " + _SMALL_TALK_BRIEFS.get(kind, _SMALL_TALK_BRIEFS["greeting"])
         text = await _model_words(brief, message, session_id, history=history, profile=profile,
                                   conv_state=conv_state, client=client)
@@ -1479,7 +1432,7 @@ def _handbook_context(query: str) -> str:
     found_by_id = {}
     for q in search_queries:
         try:
-            results = knowledge.search(q, k=3, min_score=2.2)
+            results = knowledge.search(q, k=4, min_score=1.0)
             for r in results:
                 doc_key = r.get("title", "") + r.get("text", "")[:60]
                 if doc_key not in found_by_id or r.get("score", 0) > found_by_id[doc_key].get("score", 0):
@@ -1499,6 +1452,56 @@ def _handbook_context(query: str) -> str:
     parts = [f"[{f['title'].split(' > ')[-1]} | source: {f.get('source') or 'SR University handbook'}]\n"
              f"{f['text'][:750]}" for f in sorted_found if f["score"] >= 0.40 * top]
     return "\n\n".join(parts)
+
+
+async def _hybrid_handbook_context(query: str) -> str:
+    """Hybrid RRF retrieval combining BM25 handbook search and ChromaDB vector search (admin PDFs/DOCXs)."""
+    if tools._knowledge_search is None:
+        return _handbook_context(query)
+
+    sub_questions = semantic_router.decompose_multi_questions(query)
+    search_queries = [query] + (sub_questions if len(sub_questions) > 1 else [])
+
+    bm25_hits, sem_hits = [], []
+    for q in search_queries:
+        try:
+            bm25_hits.extend(knowledge.search(q, k=4, min_score=1.0))
+        except Exception:
+            pass
+    sem_batches = await asyncio.gather(
+        *(tools._knowledge_search(q) for q in search_queries),
+        return_exceptions=True,
+    )
+    for batch in sem_batches:
+        if isinstance(batch, list):
+            sem_hits.extend(batch)
+
+    if not sem_hits and not bm25_hits:
+        return ""
+
+    # Reciprocal Rank Fusion (k=60)
+    fused: dict[str, dict] = {}
+    scores: dict[str, float] = {}
+    for rank, item in enumerate(sem_hits, start=1):
+        key = re.sub(r"\W+", " ", (item.get("text") or "").lower()).strip()[:160]
+        if key:
+            scores[key] = scores.get(key, 0.0) + 1.0 / (60 + rank)
+            fused.setdefault(key, dict(item))
+    for rank, item in enumerate(bm25_hits, start=1):
+        key = re.sub(r"\W+", " ", (item.get("text") or "").lower()).strip()[:160]
+        if key:
+            scores[key] = scores.get(key, 0.0) + 1.0 / (60 + rank)
+            fused.setdefault(key, dict(item))
+
+    ranked = [fused[k] for k in sorted(scores.keys(), key=lambda x: scores[x], reverse=True)[:4]]
+    ranked = ai_guard.screen_passages(ranked, "handbook")
+    if not ranked:
+        return ""
+    return "\n\n".join(
+        f"[{(f.get('title') or 'SRU Document').split(' > ')[-1]} | source: {f.get('source') or 'SR University knowledge base'}]\n"
+        f"{(f.get('text') or '')[:750]}"
+        for f in ranked
+    )
 
 
 _shown_offline_titles: dict = {}
@@ -2240,6 +2243,8 @@ async def run_agent(
     source: "typed" (the student typed it: understood by the model) or "button" (a chip / card / tile the bot
     offered: the fixed flow for that button). None = an internal caller (tests, replays): treated as a button."""
     started = time.perf_counter()
+    _TURN_STARTED.set(started)
+    _TURN_TELEMETRY_RECORDED.set(False)
     message = _fix_typos((message or "").strip()[:config.AGENT_MAX_MESSAGE_CHARS])
     yield {"type": "start", "conversation_id": conversation_id}
     if not message:
@@ -2256,6 +2261,7 @@ async def run_agent(
     # Three independent reads, done together (each one may need a trip to Redis or the database), plus the
     # admin panel's chat settings (cached; reloaded at most every 20 seconds).
     from app.services import app_settings
+    await memory.warm_turn_keys(session_id, conversation_id)
     profile, history, conv_state, _settings = await asyncio.gather(
         memory.get_profile(session_id), memory.get_history(session_id, conversation_id),
         memory.get_conversation_state(session_id, conversation_id), app_settings.refresh())
@@ -2414,6 +2420,58 @@ async def run_agent(
     # bot has just asked (see _structured_turn). Fee amounts still come only from the fee engine (tools).
     structured = _structured_turn(source, rewritten, conv_state, message, step_answer, dlg_busy)
     model_first = structured is None
+    # ---- Deterministic fast-path before model_first (Phase 2: 0 LLM calls for small talk, quick_facts, contact/apply)
+    if model_first and not tools.find_phone(message or "") and not intents.is_callback_request(message or ""):
+        fast_chat = intents.small_talk(message)
+        if fast_chat:
+            if fast_chat == "greeting" and not profile.get("name"):
+                await set_state(awaiting_name=True, name_asked=True)
+            fast_kind = fast_chat if fast_chat in _SMALL_TALK_BRIEFS else "greeting"
+            if fast_chat == "greeting" and not profile.get("name"):
+                fast_kind = "greeting_ask_name"
+            fast_chips = [] if fast_chat in ("thanks", "bye") else _SMALL_TALK_CHIPS
+            async for ev in _small_talk_reply(
+                fast_kind, message, session_id, conversation_id,
+                history=history, profile=profile, conv_state=conv_state,
+                suggestions=fast_chips, no_llm=True,
+            ):
+                yield ev
+            return
+        if not compound.model_note(message) and not fees.find_program(message or ""):
+            from . import quick_facts
+            fast_qa = quick_facts.answer(message, profile)
+            if fast_qa:
+                async for ev in _say(
+                    fast_qa.text, message, session_id, conversation_id,
+                    cards=list(fast_qa.cards or []), suggestions=fast_qa.chips, exact_chips=True,
+                    profile=profile,
+                ):
+                    yield ev
+                return
+            if re.match(
+                r"^\s*(?:how\s+(?:do\s+i|to)\s+apply|apply\s+link|application\s+link|"
+                r"admissions?\s+(?:contact|phone|number|email|helpline)|contact\s+(?:details|number|admissions?))\s*[?!.]*\s*$",
+                message or "",
+                re.I,
+            ):
+                contact_res = await _run_action("get_contact_and_apply_links", {"topic": message}, ctx, used, cards)
+                for ev in _tool_events("get_contact_and_apply_links", contact_res):
+                    yield ev
+                contact_text = (
+                    f"You can apply online at **{config.APPLY_URL}**.\n\n"
+                    f"• **Admissions Helpline:** {config.ADMISSIONS_PHONE}\n"
+                    f"• **Email:** {config.ADMISSIONS_EMAIL}\n"
+                    f"• **Campus Visit Helpline:** {config.CAMPUS_VISIT_PHONE}"
+                )
+                async for ev in _say(
+                    contact_text, message, session_id, conversation_id,
+                    used=used, cards=cards,
+                    suggestions=["Calculate my fee", "Check my eligibility", "Plan a campus visit"],
+                    profile=profile,
+                ):
+                    yield ev
+                return
+
     if model_first:
         intent, action, action_note, canned_action_text = "GENERAL", None, None, None
         intake_decision, is_other_fee_inquiry, early_details = None, False, {}
@@ -4080,20 +4138,58 @@ async def run_agent(
 
     # Do the look-ups the code can do for free, so the model can usually answer in ONE call:
     # the fee calculation for a plain fee question, and the handbook passages for everything else.
+    # Speculative 1-round tool execution: when a named-programme fee or faculty query is unambiguous,
+    # pre-run the tool concurrently with retrieval so Gemini can answer in 1 round instead of 2.
     prefetched_fee = None
+    speculative_single_round = False
+    is_compare_q = bool(re.search(r"\b(?:vs|versus|compare|comparison)\b", message or "", re.I))
     if intake_decision and intake_decision["action"] == "calculate":
         fee_args = dict(intake_decision["args"])
         hostel_args = _fee_args_from_message(message, profile) or {}
         if hostel_args.get("hostel"):
             fee_args["hostel"] = hostel_args["hostel"]
     elif model_first:
-        fee_args = None   # the model asks the fee engine itself (calculate_fee) when the question needs a fee
+        fee_args = (
+            _fee_args_from_message(message, profile)
+            if (
+                not action_note
+                and not is_compare_q
+                and not compound.model_note(message)
+                and fees.find_program(message or "")
+                and re.search(r"\b(?:fee|fees|tuition|scholarship|cost|payable)\b", message or "", re.I)
+            )
+            else None
+        )
     else:
         fee_args = _fee_args_from_message(message, profile) if not action_note else None
-    if fee_args:
-        fee_result = await tools.run_tool("calculate_fee", fee_args, ctx)
-        if fee_result.get("status") == "ok":
-            prefetched_fee = fee_result
+
+    want_spec_faculty = bool(
+        not fee_args
+        and not action_note
+        and not is_compare_q
+        and not compound.model_note(message)
+        and faculty.is_faculty_question(message)
+    )
+    search_q = _contextual_query(message, history, active_topic=active_topic, active_program=active_program)
+
+    async def _run_spec_fee():
+        return await tools.run_tool("calculate_fee", fee_args, ctx) if fee_args else None
+
+    async def _run_spec_faculty():
+        return await tools.run_tool("find_faculty", {"query": message}, ctx) if want_spec_faculty else None
+
+    async def _empty_passages():
+        return ""
+
+    fee_result, fac_result, passages = await asyncio.gather(
+        _run_spec_fee(),
+        _run_spec_faculty(),
+        _hybrid_handbook_context(search_q) if not (fee_args or want_spec_faculty) else _empty_passages(),
+    )
+    if fee_result and fee_result.get("status") == "ok":
+        prefetched_fee = fee_result
+        if model_first:
+            speculative_single_round = True
     fee_note = None
     if prefetched_fee:
         import json as _json
@@ -4106,31 +4202,56 @@ async def run_agent(
             fee_note += "\nThe student has no JEE Main / EAPCET score."
         fee_note += (f"\nOfficial fee & scholarship calculator to mention: {fee_intake.FEE_PORTAL_URL}")
     prefetched_faculty = None
-    if not model_first and not prefetched_fee and not action_note and faculty.is_faculty_question(message):
-        fac = await tools.run_tool("find_faculty", {"query": message}, ctx)
-        if fac.get("status") == "ok":
-            prefetched_faculty = fac
+    if fac_result and fac_result.get("status") == "ok":
+        prefetched_faculty = fac_result
+        if model_first:
+            speculative_single_round = True
     faculty_note = None
     if prefetched_faculty:
         import json as _json
         faculty_note = _json.dumps({k: v for k, v in prefetched_faculty.items() if k != "status"},
                                    ensure_ascii=False)[:3500]
-    search_q = _contextual_query(message, history, active_topic=active_topic, active_program=active_program)
-    passages = "" if (prefetched_fee or prefetched_faculty) else _handbook_context(search_q)
     if facts_note:
         # The verified facts for this question come first; the handbook passages only add detail.
         passages = ("VERIFIED FACTS FOR THIS QUESTION (use these; attribute any marked 'as stated by SRU'):\n"
                     + facts_note + ("\n\n" + passages if passages else ""))
 
+    # ---- Policy-safe Redis FAQ cache check (Phase 3: 0 LLM tokens on repeated FAQs) ----
+    use_faq_cache = (client is None and get_client is _DEFAULT_GET_CLIENT) or getattr(client, "enable_faq_cache", False)
+    faq_key = (
+        memory.faq_cache_key(message, ctx.get("profile"), conv_state, has_history=bool(history))
+        if (model_first and use_faq_cache)
+        else None
+    )
+    if faq_key:
+        cached_faq = await memory.get_faq_cache(faq_key)
+        if cached_faq and cached_faq.get("answer"):
+            async for ev in _say(
+                cached_faq["answer"],
+                message,
+                session_id,
+                conversation_id,
+                used=cached_faq.get("used") or [],
+                cards=cached_faq.get("cards") or [],
+                suggestions=cached_faq.get("suggestions") or [],
+                telemetry={"detected_intent": "FAQ_CACHE", "response_mode": "cache"},
+                profile=ctx.get("profile"),
+                exact_chips=bool(cached_faq.get("suggestions")),
+            ):
+                yield ev
+            return
+
     models = []
     for m in (config.AGENT_MODEL, *_FALLBACK_MODELS):
         if m and m not in models:
             models.append(m)
-    tool_decl = _tool_declarations()
+    selected_tools = tools.select_tools_for_message(message, conv_state, ctx.get("profile"))
+    tool_decl = _tool_declarations(selected_tools)
     final = ""
     model_text = None   # the model's own words (the self-check runs only on these)
     link = {"fixed": client, "key": None, "models": models, "model_idx": 0, "error_kind": None,
-            "thinking": True, "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT)}
+            "thinking": True, "deadline": time.monotonic() + max(1.0, config.AGENT_TOTAL_TIMEOUT),
+            "static_prefix": build_static_prefix(), "cache_tag": ",".join(selected_tools)}
     # Words are shown while Gemini writes them, except when the reply is about a callback / visit
     # request or a cancellation: those are checked for honesty first and only then shown.
     live_ok = not (pending or action_note or _CANCEL_ASK.search(message) or intents.is_callback_request(message))
@@ -4138,9 +4259,12 @@ async def run_agent(
     shown, hold_from = 0, None        # live text shown so far / where the first sensitive detail starts
     turn_evidence: list = []          # every tool result of this turn: the self-check's evidence
     try:
-        link["key"] = None if client else _ring.next_key()
-        if link["fixed"] is None and not link["key"]:
+        if link["fixed"] is None and get_client is not _DEFAULT_GET_CLIENT:
             link["fixed"] = get_client()
+        else:
+            link["key"] = None if client else _ring.next_key()
+            if link["fixed"] is None and not link["key"]:
+                link["fixed"] = get_client()
         last_assistant_text = next(
             (h.get("text", "") for h in reversed(history) if h.get("role") in ("model", "assistant")),
             ""
@@ -4153,27 +4277,31 @@ async def run_agent(
 
         for round_no in range(config.AGENT_MAX_TOOL_ROUNDS + 1):
             last_round = round_no == config.AGENT_MAX_TOOL_ROUNDS
+            prompt_kwargs = dict(
+                profile=_prompt_profile(ctx["profile"]), variant_id=variant_id, used_openings=assistant_openings,
+                about_sru_angle=about_sru_angle, pending_action=pending, action_note=action_note,
+                handbook_passages=passages, fee_result=fee_note, faculty_result=faculty_note,
+                persona=persona, name_used_recently=name_used_recently,
+                conversation_note=_conversation_note(conv_state, ctx["profile"], history),
+                reply_brief=compound.model_note(message),     # several questions: answer each (v4.15.1)
+                focus_program=(fees.clean_program_name(conv_state["active_program"])
+                               if conv_state.get("active_program") in fees.load_data()["programs"] else None),
+            )
+            link["dynamic_suffix"] = build_dynamic_suffix(**prompt_kwargs)
             cfg = types.GenerateContentConfig(
-                system_instruction=build_system_prompt(
-                    _prompt_profile(ctx["profile"]), variant_id=variant_id, used_openings=assistant_openings,
-                    about_sru_angle=about_sru_angle, pending_action=pending, action_note=action_note,
-                    handbook_passages=passages, fee_result=fee_note, faculty_result=faculty_note,
-                    persona=persona, name_used_recently=name_used_recently,
-                    conversation_note=_conversation_note(conv_state, ctx["profile"], history),
-                    reply_brief=compound.model_note(message),     # several questions: answer each (v4.15.1)
-                    focus_program=(fees.clean_program_name(conv_state["active_program"])
-                                   if conv_state.get("active_program") in fees.load_data()["programs"] else None)),
-                tools=[tool_decl],
+                system_instruction=build_system_prompt(**prompt_kwargs),
+                tools=[tool_decl] if (tool_decl and not speculative_single_round) else None,
                 temperature=0.2,
                 max_output_tokens=900,
                 automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                # On the last round the model must answer in words, not call more tools.
+                # On the last round (or speculative 1-round execution) the model answers in words.
                 tool_config=types.ToolConfig(function_calling_config=types.FunctionCallingConfig(
-                    mode="NONE" if last_round else "AUTO")),
+                    mode="NONE" if (last_round or speculative_single_round) else "AUTO")),
             )
-            if live_ok and _can_stream(link):
+            provider = GeminiAgentProvider(link, ring=_ring)
+            if live_ok and _can_stream(link, ring=_ring):
                 resp, round_text = None, ""
-                async for kind, value in _generate_stream(contents, cfg, link):
+                async for kind, value in provider.stream_with_tools(contents, cfg):
                     if kind == "text":
                         round_text += value
                         streamed += value
@@ -4182,9 +4310,29 @@ async def run_agent(
                         # self-check, so a wrong name or fee never appears and then disappears. A short tail is
                         # always held back, so a half-written detail is never shown either. A leak stops it too.
                         if hold_from is None:
-                            sens = _SENSITIVE_DETAIL.search(streamed)
+                            sens = _SENSITIVE_DETAIL.search(streamed, shown)
                             if sens:
                                 hold_from = sens.start()
+                        if hold_from is not None:
+                            # Release verified complete lines/sentences incrementally instead of stalling
+                            # the remainder of the response until generation finishes.
+                            tail = streamed[hold_from:]
+                            nl = tail.rfind("\n")
+                            if nl > 0:
+                                candidate_end = hold_from + nl + 1
+                                seg = streamed[shown:candidate_end]
+                                from . import answer_check
+                                ev_sources = [passages or "", facts_note or "", fee_note or "", faculty_note or ""] + [
+                                    str(item.get("result") or "") for item in turn_evidence
+                                ]
+                                checked_seg, seg_probs = answer_check.check(seg, sources=ev_sources)
+                                if not seg_probs:
+                                    _, seg_probs = answer_check.check_people(checked_seg, evidence=ev_sources)
+                                if not seg_probs and checked_seg == seg and not ai_guard.leak_reason(streamed):
+                                    yield {"type": "token", "delta": seg}
+                                    shown = candidate_end
+                                    next_sens = _SENSITIVE_DETAIL.search(streamed, shown)
+                                    hold_from = next_sens.start() if next_sens else None
                         limit = len(streamed) - 12 if hold_from is None else min(hold_from, len(streamed) - 12)
                         if limit > shown and not ai_guard.leak_reason(streamed):
                             yield {"type": "token", "delta": streamed[shown:limit]}
@@ -4192,7 +4340,7 @@ async def run_agent(
                     else:
                         resp = value
             else:
-                resp = await _generate(contents, cfg, link)
+                resp = await provider.generate_with_tools(contents, cfg)
             if resp is None:
                 link["error_kind"] = "busy"
                 raise RuntimeError("Model stream produced no response")
@@ -4208,11 +4356,12 @@ async def run_agent(
                 break
 
             contents.append(resp.candidates[0].content)  # keep the model's turn exactly as returned
-            result_parts = []
             for call in calls:
                 label = tools.TOOLS[call.name][1] if call.name in tools.TOOLS else "Working"
                 yield {"type": "tool", "name": call.name, "status": "running", "label": label}
-                result = await tools.run_tool(call.name, dict(call.args or {}), ctx)
+            results = await tool_runner.execute_tool_calls(calls, ctx)
+            result_parts = []
+            for call, result in zip(calls, results):
                 error = result.pop("_error", None)
                 if error:
                     log.error("tool %s failed: %s", call.name, error)
@@ -4248,7 +4397,7 @@ async def run_agent(
         # v4.17.0: no keyword-matched answer when the model can't be reached. A canned text picked from the
         # words of the question was often about something else; the student is told plainly that the assistant
         # is busy, with buttons that work without the model (each one runs its own fixed flow).
-        if not used and prefetched_fee:
+        if not model_first and not used and prefetched_fee:
             # A button / step whose fee the engine already calculated for this turn: that calculation is shown
             # as it is (exact engine figures, nothing read from the words of a typed question).
             for ev in _tool_events("calculate_fee", prefetched_fee):
@@ -4260,8 +4409,8 @@ async def run_agent(
                 yield ev
             return
         if link.get("error_kind") in ("rate", "busy"):
-            async for ev in _say(get_limit_reply(session_id), message, session_id, conversation_id, used, cards,
-                                 list(_BUSY_CHIPS), exact_chips=True, plain=True):
+            async for ev in _say(get_limit_reply(session_id), message, session_id, conversation_id, used,
+                                 cards if used else [], list(_BUSY_CHIPS), exact_chips=True, plain=True):
                 yield ev
             return
         yield {"type": "error", "detail": get_fallback_text(session_id)}
@@ -4406,8 +4555,26 @@ async def run_agent(
     except Exception as sugg_err:
         log.warning("Could not generate suggestions for agent: %s", sugg_err)
 
+    _apply_rounds_telemetry(turn_telemetry, link)
     turn_telemetry.total_latency_ms = round((time.perf_counter() - started) * 1000, 2)
-    observability.record_policy_telemetry(turn_telemetry)
+    if not _TURN_TELEMETRY_RECORDED.get():
+        observability.record_policy_telemetry(turn_telemetry)
+        _TURN_TELEMETRY_RECORDED.set(True)
+    if (
+        faq_key
+        and final
+        and not any(t.get("is_action") for t in used)
+        and not any(t.get("name") in ("calculate_fee", "check_eligibility", "remember_student_details", "share_fee_estimate") for t in used)
+    ):
+        await memory.set_faq_cache(
+            faq_key,
+            {
+                "answer": final,
+                "used": used,
+                "cards": cards,
+                "suggestions": list(suggestions),
+            },
+        )
     try:
         sources = _answer_sources(final, turn_evidence, passages)
     except Exception:

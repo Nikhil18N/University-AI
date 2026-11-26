@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
+from typing import Any
 
 
 class LLMProvider(ABC):
@@ -26,3 +27,22 @@ class LLMProvider(ABC):
     ) -> AsyncIterator[str]:
         """Stream response tokens."""
         ...
+
+    async def generate_with_tools(
+        self,
+        contents: Any,
+        config: Any,
+        model: str | None = None,
+    ) -> Any:
+        """Generate a structured response supporting function calls and usage_metadata."""
+        raise NotImplementedError("generate_with_tools is not implemented on this provider")
+
+    async def stream_with_tools(
+        self,
+        contents: Any,
+        config: Any,
+        model: str | None = None,
+    ) -> AsyncIterator[tuple[str, Any]]:
+        """Stream ('text', delta) and ('done', response) events with usage_metadata."""
+        raise NotImplementedError("stream_with_tools is not implemented on this provider")
+        yield  # pragma: no cover

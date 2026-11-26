@@ -171,8 +171,13 @@ def estimate_finance(
     request: FinanceEstimateRequest,
     catalog: dict[str, list[dict[str, Any]]] | None = None,
 ) -> FinanceEstimateResponse:
-    """Calculate only from published, versioned rules supplied by the catalog."""
-    catalog = catalog or load_finance_rules()
+    """Calculate from sru_agent/fees.py (fee_policy_2027_28.json) by default, or from an explicit test catalog.
+
+    Scholarships always apply strictly to tuition—never to hostel or transport charges.
+    """
+    if catalog is None:
+        return _estimate_from_official_policy(request)
+
     fee_rule = _find_fee_rule(request, catalog.get("fee_rules", []))
     if fee_rule is None:
         return FinanceEstimateResponse(
@@ -184,10 +189,11 @@ def estimate_finance(
         )
 
     source = str(fee_rule.get("source", "official fee schedule"))
+    tuition_amount = _money(fee_rule["tuition"])
     items = [
         FinanceLineItem(
             label="Tuition",
-            amount=_money(fee_rule["tuition"]),
+            amount=tuition_amount,
             source=source,
         )
     ]
@@ -214,7 +220,8 @@ def estimate_finance(
     scholarship_name = None
     if scholarship:
         scholarship_name = str(scholarship["name"])
-        scholarship_amount = _money(subtotal * Decimal(str(scholarship["percent"])) / Decimal("100"))
+        # Merit scholarships apply strictly to tuition—never hostel or transport.
+        scholarship_amount = _money(tuition_amount * Decimal(str(scholarship["percent"])) / Decimal("100"))
 
     return FinanceEstimateResponse(
         status="calculated",
@@ -223,4 +230,59 @@ def estimate_finance(
         scholarship_amount=scholarship_amount or None,
         scholarship_name=scholarship_name,
         sources=list(dict.fromkeys([source] + [str(scholarship["source"])] if scholarship else [source])),
+    )
+
+
+def _estimate_from_official_policy(request: FinanceEstimateRequest) -> FinanceEstimateResponse:
+    """Delegate finance estimation to sru_agent/fees.py (fee_policy_2027_28.json)."""
+    from app.sru_agent import fees
+
+    prog_key = fees.find_program(request.program)
+    if not prog_key:
+        return FinanceEstimateResponse(
+            status="insufficient_data",
+            missing_inputs=[
+                f"published fee rule for {request.program} ({request.academic_year})"
+            ],
+            assumptions=["No amount was inferred because the official fee policy has no matching programme."],
+        )
+
+    score = float(request.score_percent) if request.score_percent is not None else None
+    sch = fees.scholarship_for(prog_key, percent=score)
+    pct = sch["percent"]
+    hostel_opt = "non_ac_4" if request.hostel else "none"
+    plan = fees.fee_schedule(prog_key, pct, hostel=hostel_opt, transport=request.transport)
+    y1 = plan["years"][0]
+    data = fees.load_data()
+    source = str(data.get("source") or "fee_policy_2027_28.json")
+
+    items: list[FinanceLineItem] = [
+        FinanceLineItem(
+            label="Tuition",
+            amount=_money(y1["tuition_before_scholarship"]),
+            source=source,
+        )
+    ]
+    for sem in y1["semesters"]:
+        for row in sem["items"]:
+            if row["key"] == "tuition":
+                continue
+            items.append(
+                FinanceLineItem(
+                    label=row["label"],
+                    amount=_money(row["amount"]),
+                    source=source,
+                )
+            )
+
+    scholarship_amount = _money(y1["scholarship"]) if y1["scholarship"] else Decimal("0")
+    scholarship_name = f"Merit Scholarship ({pct}%)" if pct else None
+    return FinanceEstimateResponse(
+        status="calculated",
+        total=_money(y1["total"]),
+        line_items=items,
+        scholarship_amount=scholarship_amount or None,
+        scholarship_name=scholarship_name,
+        assumptions=[f"Calculated via sru_agent/fees.py ({data.get('academic_year', '2027-28')}); scholarship applies strictly to tuition."],
+        sources=[source],
     )

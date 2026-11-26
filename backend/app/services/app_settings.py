@@ -364,6 +364,15 @@ class ChatSettings(BaseModel):
 _cache: dict[str, Any] = ChatSettings().model_dump()
 _loaded_at = 0.0
 _meta: dict[str, Any] = {"updated_at": None}
+_SETTINGS_REDIS_KEY = "sru:app_settings"
+
+
+def _get_redis():
+    try:
+        from app.sru_agent import memory
+        return memory.get_redis()
+    except Exception:
+        return None
 
 
 def get(name: str) -> Any:
@@ -380,10 +389,21 @@ def meta() -> dict:
 
 
 async def refresh(force: bool = False) -> dict:
-    """Reload from the database when the cache is older than CACHE_SECONDS (or when forced)."""
+    """Reload from Redis/database when the cache is older than CACHE_SECONDS (or when forced)."""
     global _loaded_at
     if not force and time.monotonic() - _loaded_at < CACHE_SECONDS:
         return current()
+    r = _get_redis()
+    if not force and r is not None:
+        try:
+            raw = await r.get(_SETTINGS_REDIS_KEY)
+            if raw:
+                data = json.loads(raw)
+                _cache.update(ChatSettings(**data).model_dump())
+                _loaded_at = time.monotonic()
+                return current()
+        except Exception:
+            pass
     _loaded_at = time.monotonic()
     try:
         from sqlalchemy import select
@@ -466,6 +486,12 @@ async def update(changes: dict) -> dict:
     global _loaded_at
     _loaded_at = time.monotonic()
     _meta["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+    r = _get_redis()
+    if r is not None:
+        try:
+            await r.set(_SETTINGS_REDIS_KEY, json.dumps(valid, ensure_ascii=False), ex=CACHE_SECONDS)
+        except Exception:
+            pass
     return current()
 
 

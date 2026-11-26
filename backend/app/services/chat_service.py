@@ -566,7 +566,7 @@ async def handle_chat(
         else:
             system_prompt = prompt_service.load_prompt("system")
             messages = [{"role": "system", "content": system_prompt}] + recent
-            answer = await llm_provider.generate(messages)
+            answer = await llm_provider.generate(messages, max_tokens=900)
             logger.info("Handled via conversational LLM (%s)", intent)
 
     # Pure Semantic Vector Search for Video Recommendations (Zero Keywords)
@@ -1062,7 +1062,7 @@ async def handle_chat_stream(
                                 about_sru_angle=sq_about_sru_angle,
                             )
                             sq_tokens: list[str] = []
-                            async for token in llm_provider.stream(sq_messages, temperature=0.3):
+                            async for token in llm_provider.stream(sq_messages, temperature=0.3, max_tokens=900):
                                 sq_tokens.append(token)
                                 yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
                             sq_answer = "".join(sq_tokens)
@@ -1083,7 +1083,7 @@ async def handle_chat_stream(
                                     {"role": "assistant", "content": sq_answer},
                                     {"role": "user", "content": sq_correction},
                                 ]
-                                sq_corrected = await llm_provider.generate(sq_corr_msgs, temperature=0.1)
+                                sq_corrected = await llm_provider.generate(sq_corr_msgs, temperature=0.1, max_tokens=700)
                                 sq_check2, sq_still = verify_numeric_faithfulness(sq_corrected, sq_evidence, rag_context, effective_sq)
                                 if sq_check2 or len(sq_still) < len(sq_unsupported):
                                     sq_answer = sq_corrected
@@ -1157,7 +1157,7 @@ async def handle_chat_stream(
                             about_sru_angle=about_sru_angle,
                         )
                         streamed_tokens = []
-                        async for token in llm_provider.stream(messages, temperature=0.3):
+                        async for token in llm_provider.stream(messages, temperature=0.3, max_tokens=900):
                             streamed_tokens.append(token)
                             yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
 
@@ -1181,7 +1181,7 @@ async def handle_chat_stream(
                                 {"role": "assistant", "content": answer},
                                 {"role": "user", "content": correction_instruction},
                             ]
-                            corrected = await llm_provider.generate(correction_messages, temperature=0.1)
+                            corrected = await llm_provider.generate(correction_messages, temperature=0.1, max_tokens=700)
                             second_check, still_unsupported = verify_numeric_faithfulness(
                                 corrected, evidence_text, rag_context, effective_q
                             )
@@ -1204,7 +1204,7 @@ async def handle_chat_stream(
                     system_prompt = f"{system_prompt}\n\n{guidance}".strip()
                 messages = [{"role": "system", "content": system_prompt}] + recent
                 streamed_tokens = []
-                async for token in llm_provider.stream(messages):
+                async for token in llm_provider.stream(messages, max_tokens=900):
                     streamed_tokens.append(token)
                     yield f"data: {json.dumps({'type': 'token', 'delta': token})}\n\n"
                 answer = "".join(streamed_tokens)

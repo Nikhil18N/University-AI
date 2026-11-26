@@ -10,6 +10,7 @@ from app.models.memory import ConversationSummary, UserMemory
 from app.models.agent import AgentRun
 from app.models.calculation import CalculationScenario
 from app.models.agent_task import PendingAgentTask
+from app.models.telemetry import TurnTelemetry
 
 __all__ = [
     "Conversation",
@@ -24,4 +25,5 @@ __all__ = [
     "AgentRun",
     "CalculationScenario",
     "PendingAgentTask",
+    "TurnTelemetry",
 ]

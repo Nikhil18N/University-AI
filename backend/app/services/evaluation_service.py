@@ -54,13 +54,27 @@ async def record_evaluation(
     return record
 
 
+async def _query_sru_agent(question: str, test_id: str) -> tuple[str, list[dict]]:
+    """Run a single evaluation question through sru_agent.run_agent."""
+    from app.sru_agent.agent import run_agent
+
+    session_id = f"eval-{test_id}-{int(time.time())}"[:64]
+    answer = ""
+    sources: list[dict] = []
+    async for ev in run_agent(question, session_id, source="typed"):
+        if ev.get("type") == "done":
+            answer = ev.get("answer") or ""
+            sources = list(ev.get("sources") or [])
+    return answer, sources
+
+
 async def run_benchmark_suite(
     db: AsyncSession,
-    rag_service: RAGService,
-    llm_provider: LLMProvider,
+    rag_service: RAGService | None = None,
+    llm_provider: LLMProvider | None = None,
     dataset_path: Path | None = None,
 ) -> dict:
-    """Execute all benchmark test cases from evaluation_dataset.jsonl against the RAG engine."""
+    """Execute all benchmark test cases from evaluation_dataset.jsonl against sru_agent."""
     if dataset_path is None:
         dataset_path = (
             Path(__file__).resolve().parent.parent.parent.parent
@@ -91,7 +105,7 @@ async def run_benchmark_suite(
         negative_keywords = test.get("negative_keywords", [])
 
         start_time = time.perf_counter()
-        answer, sources = await rag_service.query(question=question)
+        answer, sources = await _query_sru_agent(question, test_id)
         elapsed_ms = int((time.perf_counter() - start_time) * 1000)
         total_latency += elapsed_ms
 
