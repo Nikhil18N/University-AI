@@ -37,3 +37,5 @@ node_modules/
 /chroma_data/
 backend/chroma_data/*/
 !backend/chroma_data/handbook.sha256
+.DS_Store
+internship_deliverables/

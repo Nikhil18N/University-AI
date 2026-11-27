@@ -880,7 +880,7 @@ _RE_FEE = re.compile(
 _RE_ELIG = re.compile(r"\b(?:eligib\w*|qualify|can\s+i\s+join|minimum\s+marks?|cutoff|cut-off|bipc|mpc|mec)\b", re.I)
 _RE_PROGS = re.compile(r"\b(?:programs?|programmes?|courses?|branch(?:es)?|offer(?:ed)?|speciali[sz]ations?)\b", re.I)
 _RE_FACULTY = re.compile(
-    r"\b(?:faculty|professors?|prof\.?|hod|head\s+of|deans?|teachers?|dr\.?\s+[a-z]|who\s+teaches|research\s+area)\b",
+    r"\b(?:faculty|professors?|prof\.?|hod|head\s+of|deans?|teachers?|dr\.?\s+[a-z]+|who\s+teaches|research\s+area)\b",
     re.I,
 )
 _RE_CANCEL = re.compile(r"\b(?:cancel|withdraw|don'?t\s+call|stop\s+calling)\b", re.I)

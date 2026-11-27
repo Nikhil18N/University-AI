@@ -1,7 +1,7 @@
 """Dependencies for API routes."""
 
 from typing import TYPE_CHECKING, Any
-from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi import Depends, Header, HTTPException, Query, Request, status
 
 from app.config import settings
 from app.db.session import get_db
@@ -88,6 +88,23 @@ async def verify_admin_key(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid admin API key",
         )
+
+
+def get_session_id(
+    x_session_id: str | None = Header(None, alias="X-Session-Id"),
+    session_id: str | None = Query(None),
+) -> str:
+    """Resolve and validate session ID from X-Session-Id header (preferred) or query parameter."""
+    import re
+    from app.security import SESSION_ID_PATTERN
+
+    raw = (x_session_id or session_id or "").strip()
+    if not raw or not (16 <= len(raw) <= 64) or not re.fullmatch(SESSION_ID_PATTERN, raw):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Valid X-Session-Id header or session_id is required.",
+        )
+    return raw
 
     if request is not None:
         security.audit(request, "admin_request", "allowed")

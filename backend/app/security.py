@@ -91,6 +91,8 @@ def startup_warnings() -> list[str]:
             warnings.append("APP_DEBUG is true on a production server: set APP_DEBUG=false.")
         if ".*\\.vercel\\.app" in (settings.CORS_ORIGIN_REGEX or ""):
             warnings.append("CORS_ORIGIN_REGEX allows every *.vercel.app site: narrow it to this project's domains.")
+        if not settings.REDIS_URL:
+            warnings.append("REDIS_URL is not set on a production server: rate limits and background job tracking are per-process only.")
     return warnings
 
 

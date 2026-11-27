@@ -25,6 +25,8 @@ from app.services.rag_service import RAGService
 from app.schemas.admin import (
     AdminConversationDetailResponse,
     AdminConversationListResponse,
+    AdminJobListResponse,
+    AdminJobResponse,
     AgentRunListResponse,
     CalculationScenarioListResponse,
     AdminStatsResponse,
@@ -726,6 +728,120 @@ async def get_telemetry(
         "summary": summary,
         "recent": records[-limit:],
     }
+
+
+@router.post(
+    "/jobs/evaluations",
+    response_model=AdminJobResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def enqueue_evaluation_job(
+    rag: RAGService = Depends(get_rag_service),
+    llm: LLMProvider = Depends(get_llm_provider),
+    _admin: str = Depends(verify_admin_key),
+) -> AdminJobResponse:
+    """Queue the benchmark evaluation suite to run asynchronously in the background."""
+    from app.db.session import async_session_factory
+    from app.services import job_queue
+    from app.services.evaluation_service import run_benchmark_suite
+
+    async def _runner():
+        async with async_session_factory() as session:
+            return await run_benchmark_suite(db=session, rag_service=rag, llm_provider=llm)
+
+    record = await job_queue.enqueue_job("evaluation_suite", _runner)
+    return AdminJobResponse(**record)
+
+
+@router.post(
+    "/jobs/documents",
+    response_model=AdminJobResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def enqueue_document_ingestion_job(
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    document_type: str = Form(...),
+    department: str | None = Form(None),
+    effective_date: str | None = Form(None),
+    publication_date: str | None = Form(None),
+    embeddings: EmbeddingProvider = Depends(get_embedding_provider),
+    _admin: str = Depends(verify_admin_key),
+) -> AdminJobResponse:
+    """Validate an uploaded document and queue ingestion/embedding in the background."""
+    from datetime import datetime
+    from app.db.session import async_session_factory
+    from app.services import job_queue
+
+    eff_date = None
+    if effective_date:
+        try:
+            eff_date = datetime.fromisoformat(effective_date)
+        except ValueError:
+            raise HTTPException(400, "Invalid effective_date format. Use ISO 8601.")
+
+    pub_date = None
+    if publication_date:
+        try:
+            pub_date = datetime.fromisoformat(publication_date)
+        except ValueError:
+            raise HTTPException(400, "Invalid publication_date format. Use ISO 8601.")
+
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(400, "Empty file")
+    if len(file_bytes) > 50 * 1024 * 1024:
+        raise HTTPException(400, "File too large. Maximum size is 50MB.")
+
+    filename = file.filename or "unknown"
+
+    async def _runner():
+        async with async_session_factory() as session:
+            ingestion = IngestionService(embeddings)
+            doc = await ingestion.ingest_document(
+                db=session,
+                file_bytes=file_bytes,
+                filename=filename,
+                title=title,
+                document_type=document_type,
+                department=department,
+                effective_date=eff_date,
+                publication_date=pub_date,
+            )
+            return {
+                "document_id": str(doc.id),
+                "title": doc.title,
+                "status": doc.status,
+            }
+
+    record = await job_queue.enqueue_job("document_ingestion", _runner)
+    return AdminJobResponse(**record)
+
+
+@router.get("/jobs", response_model=AdminJobListResponse)
+async def list_admin_jobs(
+    limit: int = Query(20, ge=1, le=100),
+    _admin: str = Depends(verify_admin_key),
+) -> AdminJobListResponse:
+    """List recent background admin jobs."""
+    from app.services import job_queue
+
+    items = await job_queue.list_jobs(limit=limit)
+    return AdminJobListResponse(items=[AdminJobResponse(**i) for i in items], total=len(items))
+
+
+@router.get("/jobs/{job_id}", response_model=AdminJobResponse)
+async def get_admin_job(
+    job_id: str,
+    _admin: str = Depends(verify_admin_key),
+) -> AdminJobResponse:
+    """Fetch status and result for a background admin job."""
+    from app.services import job_queue
+
+    record = await job_queue.get_job(job_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return AdminJobResponse(**record)
 
 
 

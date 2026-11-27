@@ -140,3 +140,20 @@ class CalculationScenarioListResponse(BaseModel):
     items: list[CalculationScenarioItem]
     total: int
 
+
+class AdminJobResponse(BaseModel):
+    job_id: str
+    job_type: str
+    status: str
+    created_at: str
+    started_at: str | None = None
+    finished_at: str | None = None
+    result: dict | list | str | int | float | bool | None = None
+    error: str | None = None
+
+
+class AdminJobListResponse(BaseModel):
+    items: list[AdminJobResponse]
+    total: int
+
+

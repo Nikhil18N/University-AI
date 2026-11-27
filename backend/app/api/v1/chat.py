@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, s
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service, get_redis
+from app.api.v1.deps import get_embedding_provider, get_llm_provider, get_rag_service, get_redis, get_session_id
 from app.db.session import get_db
 from app.providers.base import LLMProvider
 from app.providers.embedding_base import EmbeddingProvider
@@ -115,7 +115,7 @@ async def send_message_stream(
     response_model=list[ConversationSummary],
 )
 async def list_conversations(
-    session_id: str = Query(..., min_length=16, max_length=64, pattern=SESSION_ID_PATTERN),
+    session_id: str = Depends(get_session_id),
     db: AsyncSession = Depends(get_db),
 ) -> list[ConversationSummary]:
     """List all conversations for a session."""
@@ -129,7 +129,7 @@ async def list_conversations(
 )
 async def get_conversation(
     conversation_id: UUID,
-    session_id: str = Query(..., min_length=16, max_length=64, pattern=SESSION_ID_PATTERN),
+    session_id: str = Depends(get_session_id),
     db: AsyncSession = Depends(get_db),
     x_admin_key: str | None = Header(None, alias="X-Admin-Key"),
     http_request: Request = None,
@@ -191,7 +191,7 @@ async def get_conversation(
 )
 async def get_shared_conversation(
     conversation_id: UUID,
-    session_id: str = Query(..., min_length=16, max_length=64, pattern=SESSION_ID_PATTERN),
+    session_id: str = Depends(get_session_id),
     db: AsyncSession = Depends(get_db),
 ) -> ConversationDetail:
     """Get a conversation with all messages. Requires session_id verification to prevent IDOR data leakage."""
@@ -211,7 +211,7 @@ async def get_shared_conversation(
 )
 async def delete_conversation(
     conversation_id: UUID,
-    session_id: str = Query(..., min_length=16, max_length=64, pattern=SESSION_ID_PATTERN),
+    session_id: str = Depends(get_session_id),
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a conversation and all its messages."""

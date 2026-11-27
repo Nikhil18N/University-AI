@@ -174,6 +174,7 @@ async def test_profile_saves_happen_in_the_background_and_in_order():
 @pytest.mark.asyncio
 async def test_new_chat_gets_an_id_without_waiting_for_the_database():
     import app.main as main
+    import app.services.agent_bridge as agent_bridge
 
     created = []
 
@@ -181,7 +182,7 @@ async def test_new_chat_gets_an_id_without_waiting_for_the_database():
         await asyncio.sleep(0.2)
         created.append((session_id, str(conv_uuid), title))
 
-    with patch.object(main, "_create_conversation_row", slow_create):
+    with patch.object(agent_bridge, "_create_conversation_row", slow_create):
         started = time.perf_counter()
         conv_id = await main.agent_conversation_resolver("fast-sess-1", None, "What is the CSE fee?")
         assert time.perf_counter() - started < 0.1

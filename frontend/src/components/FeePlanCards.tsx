@@ -525,9 +525,9 @@ const STATUS_TEXT: Record<string, string> = {
 export function FeeSummaryCard({ card }: { card: any }) {
   const d = card.data || {};
   const rows: any[] = d.rows || [];
-  const sch = d.scholarship || {};
+  const sch = useMemo(() => d.scholarship || {}, [d.scholarship]);
   const cons = d.special_consideration || {};
-  const pending: string[] = d.pending || [];
+  const pending: string[] = useMemo(() => d.pending || [], [d.pending]);
   const imageModel = useMemo<FeeImageModel>(
     () => ({
       heading: "Fee summary",

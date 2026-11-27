@@ -251,3 +251,61 @@ def check_people(text: str, evidence: list | None = None) -> tuple[str, list[str
         if config.ADMISSIONS_PHONE not in out:
             out = out.rstrip() + f"\n\nThe Admissions Office ({config.ADMISSIONS_PHONE}) can confirm it."
     return out, problems
+
+
+_WITHDRAW_RE = re.compile(
+    r"\b(?:not\s+listed|not\s+in\s+the\s+directory|no\s+longer|isn'?t|is\s+not|was\s+mistaken|"
+    r"my\s+apologies|correction|unable\s+to\s+confirm|cannot\s+confirm|only\s+holds?|not\s+the\s+(?:director|professor|dean|hod))\b",
+    re.IGNORECASE,
+)
+
+
+def guard_faculty_withdrawal(text: str, history: list | None = None) -> tuple[str, list[str]]:
+    """Block withdrawing a faculty member's official directory designation on challenge follow-ups."""
+    if not text or not history or not _WITHDRAW_RE.search(text):
+        return text, []
+
+    prev_assistant = [
+        (h.get("text") or "")
+        for h in history
+        if isinstance(h, dict) and h.get("role") in ("assistant", "model") and (h.get("text") or "")
+    ]
+    if not prev_assistant:
+        return text, []
+
+    last_answer = prev_assistant[-1]
+    if not _PERSON.search(last_answer):
+        return text, []
+
+    from . import faculty
+
+    problems: list[str] = []
+    additions: list[str] = []
+    low_out = text.lower()
+    for m in _PERSON.finditer(last_answer):
+        candidate = m.group(0).strip()
+        res = faculty.search(query=candidate)
+        if res.get("status") != "ok":
+            continue
+        matches = res.get("matches") or res.get("faculty") or []
+        if not matches:
+            continue
+        person = matches[0]
+        name = person.get("name") or candidate
+        designation = person.get("designation") or person.get("role") or ""
+        department = person.get("department") or ""
+        if not designation:
+            continue
+        # Only intervene if the previous answer stated this designation and the new answer omits/denies it.
+        if designation.lower() in last_answer.lower() and (
+            designation.lower() not in low_out or _WITHDRAW_RE.search(text)
+        ):
+            problems.append(f"blocked withdrawal of verified faculty designation for {name}")
+            dept_part = f" ({department})" if department else ""
+            note = f"Per the official SRU faculty directory, **{name}** holds the designation **{designation}**{dept_part}."
+            if note not in additions and designation.lower() not in low_out:
+                additions.append(note)
+
+    if not additions:
+        return text, problems
+    return text.rstrip() + "\n\n" + " ".join(additions), problems

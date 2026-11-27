@@ -59,9 +59,9 @@ RECOVERY_RESUME_AFTER_MINUTES = int(os.getenv("RECOVERY_RESUME_AFTER_MINUTES", "
 AGENT_MAX_CONCURRENCY = int(os.getenv("AGENT_MAX_CONCURRENCY", "6"))
 # Shorter waits than before (1.5, 4, 8 s): with several keys the next key is tried at once anyway,
 # and a student would rather get the quick fee-table answer than wait 13 seconds.
-AGENT_RETRY_DELAYS = tuple(float(x) for x in os.getenv("AGENT_RETRY_DELAYS", "1,2.5").split(",") if x.strip())
-AGENT_CALL_TIMEOUT = float(os.getenv("AGENT_CALL_TIMEOUT", "25"))
-AGENT_TOTAL_TIMEOUT = float(os.getenv("AGENT_TOTAL_TIMEOUT", "45"))
+AGENT_RETRY_DELAYS = tuple(float(x) for x in os.getenv("AGENT_RETRY_DELAYS", "0.5,1.5").split(",") if x.strip())
+AGENT_CALL_TIMEOUT = float(os.getenv("AGENT_CALL_TIMEOUT", "10"))
+AGENT_TOTAL_TIMEOUT = float(os.getenv("AGENT_TOTAL_TIMEOUT", "22"))
 # Thinking makes Gemini 3 models slower. MINIMAL (or LOW where a model has no MINIMAL) is right for
 # an admissions assistant whose facts come from tools; DEFAULT leaves the model's own setting.
 AGENT_THINKING_LEVEL = os.getenv("AGENT_THINKING_LEVEL", "MINIMAL")

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   fetchAdminStats,
   fetchAdminDocuments,
-  uploadDocument,
+  enqueueDocumentUploadJob,
+  pollAdminJob,
   deactivateDocument,
   fetchAdminFeedback,
   fetchAdminConversations,
@@ -27,6 +28,10 @@ import MarkdownContent from "../components/MarkdownContent";
 import { RenderCard } from "../components/Cards";
 import AgentControlTab, { LiveRequestBanner } from "../components/admin/AgentControlTab";
 import CampusMediaTab from "../components/admin/CampusMediaTab";
+import { DocumentsTab } from "../components/admin/DocumentsTab";
+import { FeedbackTab } from "../components/admin/FeedbackTab";
+import { LeadsTab } from "../components/admin/LeadsTab";
+import { OverviewTab } from "../components/admin/OverviewTab";
 import AdminLogin from "../components/admin/AdminLogin";
 import "../components/admin/AdminShell.css";
 import "./AdminMobile.css";
@@ -302,6 +307,34 @@ export default function AdminPage({ onBackToChat }: Props) {
     []
   );
 
+  const handleSelectConversation = useCallback(
+    async (convId: string) => {
+      setSelectedConvId(convId);
+      setIsLoadingDetail(true);
+      setActionNotice(null);
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", "chats");
+        url.searchParams.set("cid", convId);
+        window.history.replaceState(null, "", url.toString());
+      } catch {}
+      try {
+        const detail = await fetchAdminConversationDetail(adminKey, convId);
+        setSelectedConvDetail(detail);
+        setTimeout(() => {
+          if (detailScrollRef.current) {
+            detailScrollRef.current.scrollTop = 0;
+          }
+        }, 50);
+      } catch (err: unknown) {
+        alert(err instanceof Error ? err.message : "Failed to load conversation details");
+      } finally {
+        setIsLoadingDetail(false);
+      }
+    },
+    [adminKey]
+  );
+
   useEffect(() => {
     if (adminKey) {
       loadData(adminKey);
@@ -318,7 +351,7 @@ export default function AdminPage({ onBackToChat }: Props) {
         }
       } catch {}
     }
-  }, [adminKey, loadData]);
+  }, [adminKey, loadData, handleSelectConversation]);
 
   // Refetch conversations when page, pageSize, filters or search change
   useEffect(() => {
@@ -417,7 +450,9 @@ export default function AdminPage({ onBackToChat }: Props) {
       formData.append("document_type", uploadType);
       if (uploadDept.trim()) formData.append("department", uploadDept.trim());
 
-      await uploadDocument(adminKey, formData);
+      const queued = await enqueueDocumentUploadJob(adminKey, formData);
+      setUploadSuccess(`Queued "${uploadTitle}" for indexing...`);
+      await pollAdminJob(adminKey, queued.job_id);
       setUploadSuccess(`Successfully ingested "${uploadTitle}"!`);
       setUploadTitle("");
       setUploadDept("");
@@ -437,31 +472,6 @@ export default function AdminPage({ onBackToChat }: Props) {
       loadData(adminKey);
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "Deactivation failed");
-    }
-  };
-
-  const handleSelectConversation = async (convId: string) => {
-    setSelectedConvId(convId);
-    setIsLoadingDetail(true);
-    setActionNotice(null);
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set("tab", "chats");
-      url.searchParams.set("cid", convId);
-      window.history.replaceState(null, "", url.toString());
-    } catch {}
-    try {
-      const detail = await fetchAdminConversationDetail(adminKey, convId);
-      setSelectedConvDetail(detail);
-      setTimeout(() => {
-        if (detailScrollRef.current) {
-          detailScrollRef.current.scrollTop = 0;
-        }
-      }, 50);
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to load conversation details");
-    } finally {
-      setIsLoadingDetail(false);
     }
   };
 
@@ -765,282 +775,41 @@ export default function AdminPage({ onBackToChat }: Props) {
                 TAB 1: PROSPECTIVE LEADS & ADMISSIONS CONVERSION
                 ========================================================================= */}
             {activeTab === "leads" && (
-              <div className="tab-pane-container">
-                {/* Metric Quick Stats Ribbon */}
-                <div className="admin-metrics-grid">
-                  <div className="metric-box">
-                    <span className="metric-title">Total Verified Leads</span>
-                    <span className="metric-num num-indigo">{leadStats?.total_leads ?? leadsTotal}</span>
-                    <span className="metric-caption">Authenticated prospects</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Chat Inquiries</span>
-                    <span className="metric-num num-green">{leadStats?.chat_leads ?? 0}</span>
-                    <span className="metric-caption">Admissions & fee questions</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Calculator Submissions</span>
-                    <span className="metric-num num-amber">{leadStats?.calculator_leads ?? 0}</span>
-                    <span className="metric-caption">Scholarship & merit inquiries</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Today's Leads</span>
-                    <span className="metric-num num-pink">{leadStats?.today_leads ?? 0}</span>
-                    <span className="metric-caption">Fresh high-intent inquiries</span>
-                  </div>
-                </div>
-
-                {/* Search & Filter Toolbar */}
-                <div className="admin-toolbar-card">
-                  <div className="toolbar-filters">
-                    <div className="admin-search-wrap">
-                      <input
-                        type="text"
-                        className="admin-input-search"
-                        placeholder="Search student name or mobile number..."
-                        value={leadSearch}
-                        onChange={(e) => {
-                          setLeadSearch(e.target.value);
-                          setLeadPage(1);
-                        }}
-                      />
-                      {leadSearch && (
-                        <button
-                          className="search-clear-btn"
-                          onClick={() => {
-                            setLeadSearch("");
-                            setLeadPage(1);
-                          }}
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-
-                    <select
-                      className="admin-select"
-                      value={leadProgramFilter}
-                      onChange={(e) => {
-                        setLeadProgramFilter(e.target.value);
-                        setLeadPage(1);
-                      }}
-                    >
-                      <option value="all">All Programs</option>
-                      <option value="B.Tech CSE">B.Tech CSE</option>
-                      <option value="B.Tech ECE">B.Tech ECE</option>
-                      <option value="B.Tech AI & Data Science">B.Tech AI & Data Science</option>
-                      <option value="B.Tech Mechanical">B.Tech Mechanical</option>
-                      <option value="B.Tech Civil">B.Tech Civil</option>
-                      <option value="B.Tech EEE">B.Tech EEE</option>
-                      <option value="BBA">BBA</option>
-                      <option value="MBA">MBA</option>
-                    </select>
-
-                    <select
-                      className="admin-select"
-                      value={leadSourceFilter}
-                      onChange={(e) => {
-                        setLeadSourceFilter(e.target.value);
-                        setLeadPage(1);
-                      }}
-                    >
-                      <option value="all">All Sources</option>
-                      <option value="chat_inquiry">Chat Inquiry</option>
-                      <option value="calculator">Calculator</option>
-                    </select>
-
-                    <select
-                      className="admin-select"
-                      value={leadStatusFilter}
-                      onChange={(e) => {
-                        setLeadStatusFilter(e.target.value);
-                        setLeadPage(1);
-                      }}
-                    >
-                      <option value="all">All Statuses</option>
-                      <option value="new">New</option>
-                      <option value="contacted">Contacted</option>
-                      <option value="counselled">Counselled</option>
-                      <option value="applied">Applied</option>
-                      <option value="enrolled">Enrolled</option>
-                      <option value="lost">Lost</option>
-                      <option value="do_not_contact">Do not contact</option>
-                    </select>
-                  </div>
-
-                  <div className="toolbar-actions">
-                    <button
-                      className="admin-btn-secondary"
-                      onClick={() =>
-                        loadLeadsOnly(
-                          adminKey,
-                          leadPage,
-                          leadPageSize,
-                          leadSearch,
-                          leadProgramFilter,
-                          leadSourceFilter,
-                          leadStatusFilter
-                        )
-                      }
-                      title="Refresh Leads Table"
-                    >
-                      ↻ Refresh
-                    </button>
-                    <button
-                      className="admin-btn-primary"
-                      onClick={handleExportLeads}
-                      disabled={isExportingLeads}
-                    >
-                      {isExportingLeads ? "Exporting..." : "Export CSV"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Leads Data Table */}
-                <div className="admin-table-card">
-                  {leads.length === 0 ? (
-                    <div className="admin-empty-state">
-                      <div className="empty-icon"></div>
-                      <h3>No Prospective Leads Found</h3>
-                      <p>
-                        {leadSearch || leadProgramFilter !== "all" || leadStatusFilter !== "all" || leadSourceFilter !== "all"
-                          ? "No leads matched your current filters. Try resetting the search or filter criteria."
-                          : "Leads captured via Chat Fee Inquiries or Scholarship Calculator will appear here automatically."}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="admin-table-wrapper">
-                      <table className="admin-clean-table">
-                        <thead>
-                          <tr>
-                            <th className="col-name">Student Name</th>
-                            <th className="col-phone">Mobile Number</th>
-                            <th className="col-program">Program Interest</th>
-                            <th className="col-score">Score / Qualifying Exam</th>
-                            <th className="col-source">Lead Source</th>
-                            <th className="col-date">Captured On</th>
-                            <th className="col-status">Admission Status</th>
-                            <th className="col-actions">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {leads.map((lead) => {
-                            const formattedDate = new Date(lead.created_at).toLocaleString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            });
-
-                            return (
-                              <tr key={lead.id} className="lead-row">
-                                <td className="col-name" data-label="Student">
-                                  <div className="student-name-text">{lead.name}</div>
-                                  {lead.email && <div className="student-sub-email">{lead.email}</div>}
-                                </td>
-                                <td className="col-phone" data-label="Mobile">
-                                  <a href={`tel:${lead.phone}`} className="student-phone-link">
-                                    {lead.phone}
-                                  </a>
-                                </td>
-                                <td className="col-program" data-label="Programme">
-                                  <span className="program-badge">
-                                    {formatProgramInterest(lead.program_interest, lead.metadata)}
-                                  </span>
-                                </td>
-                                <td className="col-score" data-label="Score / exam">
-                                  {lead.score || lead.exam_type ? (
-                                    <div className="score-cell">
-                                      {lead.score && <span className="score-val">{lead.score}</span>}
-                                      {lead.exam_type && (
-                                        <span className="exam-type-val">({lead.exam_type})</span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <span className="cell-muted">—</span>
-                                  )}
-                                </td>
-                                <td className="col-source" data-label="Source">
-                                  <span className={`source-pill source-${lead.source}`}>
-                                    {lead.source === "calculator" ? "Calculator" : "Chat Inquiry"}
-                                  </span>
-                                </td>
-                                <td className="col-date" data-label="Captured">{formattedDate}</td>
-                                <td className="col-status" data-label="Status">
-                                  <select
-                                    className={`status-select status-${lead.status}`}
-                                    value={lead.status}
-                                    disabled={updatingLeadId === lead.id}
-                                    onChange={(e) => handleUpdateLeadStatus(lead.id, e.target.value)}
-                                  >
-                                    <option value="new">New</option>
-                                    <option value="contacted">Contacted</option>
-                                    <option value="counselled">Counselled</option>
-                                    <option value="applied">Applied</option>
-                                    <option value="enrolled">Enrolled</option>
-                                    <option value="lost">Lost</option>
-                                    <option value="do_not_contact">Do not contact</option>
-                                  </select>
-                                </td>
-                                <td className="col-actions" data-label="Actions">
-                                  <div className="lead-actions-flex">
-                                    <button
-                                      className="admin-btn-action-view"
-                                      title={lead.conversation_id ? `Inspect conversation #${lead.conversation_id.slice(0, 8)} in Admin` : "Search and inspect conversation in Admin"}
-                                      onClick={() => handleViewLeadChat(lead)}
-                                    >
-                                      Inspect
-                                    </button>
-                                    {lead.conversation_id ? (
-                                      <button
-                                        className="admin-btn-action-student"
-                                        title="Open conversation in Live Student Portal"
-                                        onClick={() => handleOpenLiveStudentChat(lead.conversation_id!)}
-                                      >
-                                        Live ↗
-                                      </button>
-                                    ) : null}
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {/* Pagination Footer */}
-                  {leadsTotal > leadPageSize && (
-                    <div className="admin-pagination-footer">
-                      <span className="pagination-info">
-                        Showing {Math.min((leadPage - 1) * leadPageSize + 1, leadsTotal)}–
-                        {Math.min(leadPage * leadPageSize, leadsTotal)} of {leadsTotal} leads
-                      </span>
-                      <div className="pagination-ctrls">
-                        <button
-                          className="admin-btn-secondary"
-                          disabled={leadPage <= 1}
-                          onClick={() => setLeadPage((p) => Math.max(1, p - 1))}
-                        >
-                          ← Previous
-                        </button>
-                        <span className="pagination-page-label">
-                          Page {leadPage} of {Math.ceil(leadsTotal / leadPageSize)}
-                        </span>
-                        <button
-                          className="admin-btn-secondary"
-                          disabled={leadPage >= Math.ceil(leadsTotal / leadPageSize)}
-                          onClick={() => setLeadPage((p) => p + 1)}
-                        >
-                          Next →
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <LeadsTab
+                adminKey={adminKey}
+                leads={leads}
+                leadsTotal={leadsTotal}
+                leadStats={leadStats}
+                leadSearch={leadSearch}
+                setLeadSearch={setLeadSearch}
+                leadProgramFilter={leadProgramFilter}
+                setLeadProgramFilter={setLeadProgramFilter}
+                leadSourceFilter={leadSourceFilter}
+                setLeadSourceFilter={setLeadSourceFilter}
+                leadStatusFilter={leadStatusFilter}
+                setLeadStatusFilter={setLeadStatusFilter}
+                leadPage={leadPage}
+                setLeadPage={setLeadPage}
+                leadPageSize={leadPageSize}
+                isExportingLeads={isExportingLeads}
+                updatingLeadId={updatingLeadId}
+                formatProgramInterest={formatProgramInterest}
+                onRefresh={() =>
+                  loadLeadsOnly(
+                    adminKey,
+                    leadPage,
+                    leadPageSize,
+                    leadSearch,
+                    leadProgramFilter,
+                    leadSourceFilter,
+                    leadStatusFilter
+                  )
+                }
+                onExportLeads={handleExportLeads}
+                onUpdateLeadStatus={handleUpdateLeadStatus}
+                onViewLeadChat={handleViewLeadChat}
+                onOpenLiveStudentChat={handleOpenLiveStudentChat}
+              />
             )}
 
             {/* =========================================================================
@@ -1556,234 +1325,29 @@ export default function AdminPage({ onBackToChat }: Props) {
             {/* =========================================================================
                 TAB 3: OVERVIEW STATS & AI TRAINING GUIDE
                 ========================================================================= */}
-            {activeTab === "overview" && stats && (
-              <div className="tab-pane-container">
-                <div className="admin-metrics-grid">
-                  <div className="metric-box">
-                    <span className="metric-title">Total Student Conversations</span>
-                    <span className="metric-num num-indigo">{stats.total_conversations}</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Total Messages Exchanged</span>
-                    <span className="metric-num">{stats.total_messages}</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Active Knowledge Documents</span>
-                    <span className="metric-num">{stats.active_documents}</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Total Knowledge Base Docs</span>
-                    <span className="metric-num">{stats.total_documents}</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Positive Feedback 👍</span>
-                    <span className="metric-num num-green">{stats.positive_feedback}</span>
-                  </div>
-                  <div className="metric-box">
-                    <span className="metric-title">Negative Feedback 👎</span>
-                    <span className="metric-num num-red">{stats.negative_feedback}</span>
-                  </div>
-                </div>
+            {activeTab === "overview" && stats && <OverviewTab stats={stats} />}
 
-                <div className="admin-card-panel">
-                  <h3 className="panel-headline">Model Improvement & AI Training Guide</h3>
-                  <p className="panel-subtext">
-                    Follow these steps to continuously align and fine-tune your SRU Companion:
-                  </p>
-                  <ol className="guide-steps-list">
-                    <li>
-                      <strong>Audit Real Student Queries:</strong> Go to the <strong>Student Chats</strong> tab to review the exact queries students are asking and identify knowledge gaps.
-                    </li>
-                    <li>
-                      <strong>One-Click Few-Shot Learning:</strong> Click <strong>"⭐ Promote to Verified Exemplar"</strong> on any verified high-quality response to immediately embed it in ChromaDB's <code>verified_exemplars</code> collection.
-                    </li>
-                    <li>
-                      <strong>Bulk Export for Fine-Tuning:</strong> Click <strong>"Export All Chats (.md)"</strong> to export all student interactions into a single clean training document ready for evaluation benchmarks or fine-tuning models like Gemini, Llama, or Mistral.
-                    </li>
-                  </ol>
-                </div>
-              </div>
-            )}
-
-            {/* =========================================================================
-                TAB 4: KNOWLEDGE BASE DOCUMENTS
-                ========================================================================= */}
             {activeTab === "documents" && (
-              <div className="tab-pane-container">
-                <div className="admin-card-panel">
-                  <h3 className="panel-headline">Upload & Ingest Document</h3>
-                  {uploadSuccess && (
-                    <div className="admin-toast toast-success" style={{ marginBottom: "16px" }}>
-                      <span>{uploadSuccess}</span>
-                    </div>
-                  )}
-                  <form onSubmit={handleUpload}>
-                    <div className="form-responsive-grid">
-                      <div className="form-field-group">
-                        <label>Document Title *</label>
-                        <input
-                          type="text"
-                          className="admin-input"
-                          placeholder="e.g. Examination Regulations 2026"
-                          value={uploadTitle}
-                          onChange={(e) => setUploadTitle(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="form-field-group">
-                        <label>Document Type *</label>
-                        <select
-                          className="admin-select"
-                          value={uploadType}
-                          onChange={(e) => setUploadType(e.target.value)}
-                        >
-                          <option value="policy">Policy</option>
-                          <option value="calendar">Academic Calendar</option>
-                          <option value="regulation">Regulations / Rules</option>
-                          <option value="syllabus">Syllabus / Course</option>
-                          <option value="circular">Notice / Circular</option>
-                        </select>
-                      </div>
-                      <div className="form-field-group">
-                        <label>Department</label>
-                        <input
-                          type="text"
-                          className="admin-input"
-                          placeholder="e.g. Office of Academic Affairs"
-                          value={uploadDept}
-                          onChange={(e) => setUploadDept(e.target.value)}
-                        />
-                      </div>
-                      <div className="form-field-group">
-                        <label>File (PDF, DOCX, TXT, MD) *</label>
-                        <input
-                          type="file"
-                          className="admin-input-file"
-                          accept=".pdf,.docx,.txt,.md"
-                          onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="submit"
-                      className="admin-btn-primary"
-                      disabled={isUploading}
-                      style={{ marginTop: "16px" }}
-                    >
-                      {isUploading ? "Extracting & Embedding..." : "Ingest Document"}
-                    </button>
-                  </form>
-                </div>
-
-                <div className="admin-table-card">
-                  <h3 className="card-headline">Knowledge Base Documents</h3>
-                  {documents.length === 0 ? (
-                    <div className="admin-empty-state">
-                      <p>No documents indexed yet.</p>
-                    </div>
-                  ) : (
-                    <div className="admin-table-wrapper">
-                      <table className="admin-clean-table">
-                        <thead>
-                          <tr>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Department</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {documents.map((doc) => (
-                            <tr key={doc.id}>
-                              <td data-label="Title" style={{ fontWeight: 600 }}>{doc.title}</td>
-                              <td data-label="Type">{doc.document_type}</td>
-                              <td data-label="Department">{doc.department || "—"}</td>
-                              <td data-label="Status">
-                                <span className={`status-pill pill-${doc.status}`}>
-                                  {doc.status}
-                                </span>
-                              </td>
-                              <td data-label="Date" className="cell-date">{new Date(doc.created_at).toLocaleDateString()}</td>
-                              <td data-label="Action">
-                                {doc.status === "active" && (
-                                  <button
-                                    className="admin-btn-danger"
-                                    onClick={() => handleDeactivate(doc.id)}
-                                  >
-                                    Deactivate
-                                  </button>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <DocumentsTab
+                documents={documents}
+                uploadSuccess={uploadSuccess}
+                uploadTitle={uploadTitle}
+                setUploadTitle={setUploadTitle}
+                uploadType={uploadType}
+                setUploadType={setUploadType}
+                uploadDept={uploadDept}
+                setUploadDept={setUploadDept}
+                setUploadFile={setUploadFile}
+                isUploading={isUploading}
+                onUpload={handleUpload}
+                onDeactivate={handleDeactivate}
+              />
             )}
 
-            {/* =========================================================================
-                TAB 5: STUDENT FEEDBACK
-                ========================================================================= */}
             {activeTab === "agent" && adminKey && <AgentControlTab adminKey={adminKey} />}
             {activeTab === "media" && adminKey && <CampusMediaTab adminKey={adminKey} />}
 
-            {activeTab === "feedback" && (
-              <div className="tab-pane-container">
-                <div className="admin-table-card">
-                  <h3 className="card-headline">Student & User Feedback</h3>
-                  {feedback.length === 0 ? (
-                    <div className="admin-empty-state">
-                      <p>No feedback submitted yet.</p>
-                    </div>
-                  ) : (
-                    <div className="admin-table-wrapper">
-                      <table className="admin-clean-table">
-                        <thead>
-                          <tr>
-                            <th>Rating</th>
-                            <th>User Question</th>
-                            <th>AI Response</th>
-                            <th>Comment</th>
-                            <th>Date</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {feedback.map((f) => (
-                            <tr key={f.id}>
-                              <td data-label="Rating">
-                                {f.rating === 1 ? (
-                                  <span className="rating-tag rating-pos">👍 Helpful</span>
-                                ) : (
-                                  <span className="rating-tag rating-neg">👎 Inaccurate</span>
-                                )}
-                              </td>
-                              <td data-label="Question" style={{ maxWidth: "260px", wordBreak: "break-word" }}>
-                                {f.question || <span className="cell-muted">—</span>}
-                              </td>
-                              <td data-label="AI answer" style={{ maxWidth: "340px", wordBreak: "break-word", fontSize: "0.85rem" }}>
-                                {f.answer ? (
-                                  <span>{f.answer.length > 160 ? `${f.answer.slice(0, 160)}...` : f.answer}</span>
-                                ) : (
-                                  <span className="cell-muted">—</span>
-                                )}
-                              </td>
-                              <td data-label="Comment">{f.comment || <span className="cell-muted">—</span>}</td>
-                              <td data-label="Date" className="cell-date">{new Date(f.created_at).toLocaleString()}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {activeTab === "feedback" && <FeedbackTab feedback={feedback} />}
           </>
         )}
       </main>

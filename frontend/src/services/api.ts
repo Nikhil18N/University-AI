@@ -423,9 +423,9 @@ export async function listConversations(
   }
 
   try {
-    const res = await fetch(
-      `${API_BASE}/api/v1/conversations?session_id=${encodeURIComponent(sessionId)}`
-    );
+    const res = await fetch(`${API_BASE}/api/v1/conversations`, {
+      headers: { "X-Session-Id": sessionId },
+    });
     const data = await handleResponse<ConversationSummary[]>(res, "Failed to load conversations");
     try {
       sessionStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
@@ -447,13 +447,13 @@ export async function getConversation(
   adminKey?: string
 ): Promise<ConversationDetail> {
   try {
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = { "X-Session-Id": sessionId };
     if (adminKey) {
       headers["X-Admin-Key"] = adminKey;
     }
     const res = await fetch(
-      // The admin key travels only in the X-Admin-Key header, never in the URL (history, logs, shared links).
-      `${API_BASE}/api/v1/conversations/${conversationId}?session_id=${encodeURIComponent(sessionId)}`,
+      // Both session and admin keys travel in headers, never in the URL.
+      `${API_BASE}/api/v1/conversations/${conversationId}`,
       { headers }
     );
     return await handleResponse<ConversationDetail>(res, "Failed to load conversation");
@@ -470,9 +470,9 @@ export async function getSharedConversation(
   sessionId: string
 ): Promise<ConversationDetail> {
   try {
-    const res = await fetch(
-      `${API_BASE}/api/v1/shared/${conversationId}?session_id=${encodeURIComponent(sessionId)}`
-    );
+    const res = await fetch(`${API_BASE}/api/v1/shared/${conversationId}`, {
+      headers: { "X-Session-Id": sessionId },
+    });
     return await handleResponse<ConversationDetail>(res, "Failed to load shared conversation");
   } catch (err) {
     handleNetworkError(err, "Failed to load shared conversation");
@@ -487,10 +487,10 @@ export async function deleteConversation(
   sessionId: string
 ): Promise<void> {
   try {
-    const res = await fetch(
-      `${API_BASE}/api/v1/conversations/${conversationId}?session_id=${encodeURIComponent(sessionId)}`,
-      { method: "DELETE" }
-    );
+    const res = await fetch(`${API_BASE}/api/v1/conversations/${conversationId}`, {
+      method: "DELETE",
+      headers: { "X-Session-Id": sessionId },
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.detail || "Failed to delete conversation");
@@ -856,6 +856,68 @@ export async function fetchAdminEvaluations(
   );
   if (!res.ok) throw new Error("Failed to load evaluation records");
   return res.json();
+}
+
+export interface AdminJobItem {
+  job_id: string;
+  job_type: string;
+  status: "queued" | "running" | "completed" | "failed" | string;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+  result: Record<string, unknown> | unknown[] | string | number | boolean | null;
+  error: string | null;
+}
+
+export async function enqueueDocumentUploadJob(adminKey: string, formData: FormData): Promise<AdminJobItem> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/jobs/documents`, {
+    method: "POST",
+    headers: { "X-Admin-Key": adminKey },
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to queue document upload");
+  }
+  return res.json();
+}
+
+export async function enqueueEvaluationJob(adminKey: string): Promise<AdminJobItem> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/jobs/evaluations`, {
+    method: "POST",
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to queue evaluation job");
+  }
+  return res.json();
+}
+
+export async function fetchAdminJob(adminKey: string, jobId: string): Promise<AdminJobItem> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/jobs/${encodeURIComponent(jobId)}`, {
+    headers: { "X-Admin-Key": adminKey },
+  });
+  if (!res.ok) throw new Error("Failed to fetch background job status");
+  return res.json();
+}
+
+export async function pollAdminJob(
+  adminKey: string,
+  jobId: string,
+  intervalMs: number = 1200,
+  timeoutMs: number = 120000
+): Promise<AdminJobItem> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const job = await fetchAdminJob(adminKey, jobId);
+    if (job.status === "completed") return job;
+    if (job.status === "failed") {
+      throw new Error(job.error || "Background job failed");
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+  throw new Error("Background job timed out");
 }
 
 export async function runAdminBenchmark(adminKey: string): Promise<any> {

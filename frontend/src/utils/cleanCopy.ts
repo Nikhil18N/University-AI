@@ -93,7 +93,7 @@ export function stripMarkdown(markdown: string): string {
   });
 
   // 11. Normalize bullets: convert * and - bullets to clean dot bullet
-  text = text.replace(/^[*\-]\s+/gm, "• ");
+  text = text.replace(/^[*-]\s+/gm, "• ");
 
   // 12. Normalize multiple empty lines to at most 2
   text = text.replace(/\n{3,}/g, "\n\n");

@@ -183,7 +183,9 @@ def record_policy_telemetry(
                     await r.lpush(_TELEMETRY_REDIS_KEY, payload)
                     await r.ltrim(_TELEMETRY_REDIS_KEY, 0, _MAX_TELEMETRY_LOG - 1)
                     await r.expire(_TELEMETRY_REDIS_KEY, _TELEMETRY_TTL)
-                memory.in_background(_push_redis(), "telemetry redis")
+                coro = _push_redis()
+                if memory.in_background(coro, "telemetry redis") is None:
+                    coro.close()
         except Exception:
             pass
 

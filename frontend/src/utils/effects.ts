@@ -38,7 +38,7 @@ export function playChime() {
     gain2.connect(ctx.destination);
     osc2.start(now + 0.1);
     osc2.stop(now + 0.55);
-  } catch (e) {
+  } catch {
     // Audio autoplay restrictions or unsupported
   }
 }

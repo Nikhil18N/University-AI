@@ -45,7 +45,7 @@
         if (origin && origin !== "null" && origin.indexOf("sru.edu.in") === -1) {
           return origin;
         }
-      } catch (e) {}
+      } catch {}
     }
     if (typeof location !== "undefined") {
       if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || /vercel\.app$/.test(location.hostname)) {
@@ -70,7 +70,7 @@
       ) {
         return u.href;
       }
-    } catch (e) {}
+    } catch {}
     return base + "/?mode=widget";
   })();
 
@@ -189,7 +189,7 @@
     greet = null;
     try {
       sessionStorage.setItem("sru_buddy_greeted", "1");
-    } catch (e) {
+    } catch {
       /* storage blocked: fine */
     }
   }
@@ -206,7 +206,7 @@
     setTimeout(function () {
       try {
         frame.focus();
-      } catch (e) {
+      } catch {
         /* ignore */
       }
     }, 50);
@@ -234,7 +234,7 @@
         if (frame && frame.contentWindow) {
           frame.contentWindow.postMessage({ type: "sru-buddy:register" }, base);
         }
-      } catch (err) {}
+      } catch {}
     }, 350);
   });
   // Start loading as soon as the student shows interest: the chat is ready when they click.
@@ -269,7 +269,7 @@
     var greeted = false;
     try {
       greeted = sessionStorage.getItem("sru_buddy_greeted") === "1";
-    } catch (e) {
+    } catch {
       greeted = false;
     }
     if (startOpen) {
