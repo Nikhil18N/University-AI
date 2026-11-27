@@ -65,6 +65,10 @@ jobs:
         working-directory: backend
         run: python -m compileall -q app
 
+      - name: Initialize database schema
+        working-directory: backend
+        run: python -m alembic upgrade head
+
       - name: Run backend tests
         working-directory: backend
         run: pytest -q -k "not test_feedback_submission"
