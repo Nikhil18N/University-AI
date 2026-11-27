@@ -89,6 +89,10 @@ async def verify_admin_key(
             detail="Invalid admin API key",
         )
 
+    if request is not None:
+        security.audit(request, "admin_request", "allowed")
+    return x_admin_key
+
 
 def get_session_id(
     x_session_id: str | None = Header(None, alias="X-Session-Id"),
@@ -105,10 +109,6 @@ def get_session_id(
             detail="Valid X-Session-Id header or session_id is required.",
         )
     return raw
-
-    if request is not None:
-        security.audit(request, "admin_request", "allowed")
-    return x_admin_key
 
 
 def get_redis(request: Request) -> Any | None:
