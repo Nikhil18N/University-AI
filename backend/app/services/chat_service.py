@@ -564,7 +564,10 @@ async def handle_chat(
                 )
 
         else:
-            system_prompt = prompt_service.load_prompt("system")
+            system_prompt = prompt_service.load_prompt(
+                "system",
+                include_fee_policy=prompt_service.needs_fee_policy(request.message),
+            )
             messages = [{"role": "system", "content": system_prompt}] + recent
             answer = await llm_provider.generate(messages, max_tokens=900)
             logger.info("Handled via conversational LLM (%s)", intent)
@@ -1198,7 +1201,10 @@ async def handle_chat_stream(
                             answer = sanitize_hallucinated_urls(answer, unverified_urls)
 
             else:
-                system_prompt = prompt_service.load_prompt("system")
+                system_prompt = prompt_service.load_prompt(
+                    "system",
+                    include_fee_policy=prompt_service.needs_fee_policy(request.message),
+                )
                 guidance = build_counsellor_guidance(profile, current_query=request.message)
                 if guidance:
                     system_prompt = f"{system_prompt}\n\n{guidance}".strip()

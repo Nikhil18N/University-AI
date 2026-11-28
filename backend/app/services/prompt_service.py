@@ -1,6 +1,7 @@
 """Prompt service — loads versioned prompts from the prompts/ directory."""
 
 import logging
+import re
 from pathlib import Path
 
 from app.config import settings
@@ -10,15 +11,34 @@ logger = logging.getLogger(__name__)
 # Cache loaded prompts in memory
 _prompt_cache: dict[str, str] = {}
 
+_FEE_POLICY_QUERY_RE = re.compile(
+    r"\b(?:fee|fees|tuition|scholarship|scholarships|waiver|concession|concessions|"
+    r"hostel|mess|bus|transport|enrollment|enrolment|exam\s*fee|application\s*fee|"
+    r"cost|costs|price|afford|expensive|installment|instalment|semester\s*fee|"
+    r"slab|slabs|deposit|refund|pay|payment|charges|discount|net\s*fee)\b|₹",
+    re.IGNORECASE,
+)
 
-def load_prompt(name: str) -> str:
+_OMITTED_FEE_POLICY_NOTE = (
+    "FEE POLICY: Omitted for this non-fee query. If the student asks for fees, "
+    "do not invent figures; refer to the Admissions Office (833 100 3030)."
+)
+
+
+def needs_fee_policy(*texts: str) -> bool:
+    """Return True if any text mentions fees, scholarships, hostel/bus charges, or payments."""
+    return any(bool(t and _FEE_POLICY_QUERY_RE.search(t)) for t in texts)
+
+
+def load_prompt(name: str, include_fee_policy: bool = True) -> str:
     """Load a prompt template by name (without extension).
 
     Prompts are loaded from the prompts/ directory and cached.
     For example: load_prompt("system") loads prompts/system.md
     """
-    if name in _prompt_cache:
-        return _prompt_cache[name]
+    cache_key = name if include_fee_policy else f"{name}:no_fee"
+    if cache_key in _prompt_cache:
+        return _prompt_cache[cache_key]
 
     prompt_path = settings.PROMPTS_DIR / f"{name}.md"
     if not prompt_path.exists():
@@ -34,13 +54,14 @@ def load_prompt(name: str) -> str:
     # Fee figures are never typed into a prompt: the {{FEE_POLICY}} block is generated from the one fee policy
     # (app/sru_agent/fee_policy_2027_28.json) by the fee engine, so a prompt can never carry an outdated fee.
     if "{{FEE_POLICY}}" in content:
-        content = content.replace("{{FEE_POLICY}}", fee_policy_block())
+        replacement = fee_policy_block() if include_fee_policy else _OMITTED_FEE_POLICY_NOTE
+        content = content.replace("{{FEE_POLICY}}", replacement)
     # The answer layout (how every answer looks in the chat) is written once, in prompts/answer_layout.md.
     if "{{ANSWER_LAYOUT}}" in content and name != "answer_layout":
         content = content.replace("{{ANSWER_LAYOUT}}", load_prompt("answer_layout").strip())
 
-    _prompt_cache[name] = content
-    logger.info("Loaded prompt template: %s", name)
+    _prompt_cache[cache_key] = content
+    logger.info("Loaded prompt template: %s (fee_policy=%s)", name, include_fee_policy)
     return content
 
 
@@ -76,9 +97,9 @@ def fee_policy_block() -> str:
     return "\n".join(lines)
 
 
-def render_prompt(name: str, **variables: str) -> str:
+def render_prompt(name: str, include_fee_policy: bool = True, **variables: str) -> str:
     """Load a prompt and fill in {{variable}} placeholders."""
-    template = load_prompt(name)
+    template = load_prompt(name, include_fee_policy=include_fee_policy)
     for key, value in variables.items():
         template = template.replace(f"{{{{{key}}}}}", value)
     return template
