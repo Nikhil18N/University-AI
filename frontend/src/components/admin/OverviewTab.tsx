@@ -1,10 +1,42 @@
-import type { AdminStats } from "../../services/api";
+import { useState, type FormEvent } from "react";
+import { promoteExemplar, type AdminStats } from "../../services/api";
 
 interface OverviewTabProps {
   stats: AdminStats;
+  adminKey: string;
 }
 
-export function OverviewTab({ stats }: OverviewTabProps) {
+export function OverviewTab({ stats, adminKey }: OverviewTabProps) {
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  async function handleAddExemplar(e: FormEvent) {
+    e.preventDefault();
+    const q = question.trim();
+    const a = answer.trim();
+    if (!q || !a) return;
+    setSaving(true);
+    setStatusMsg(null);
+    try {
+      const res = await promoteExemplar(adminKey, {
+        message_id: crypto.randomUUID(),
+        question: q,
+        answer: a,
+      });
+      setStatusMsg({ type: "ok", text: res.message });
+      setQuestion("");
+      setAnswer("");
+    } catch (err) {
+      setStatusMsg({
+        type: "err",
+        text: err instanceof Error ? err.message : "Failed to save approved Q&A",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
   return (
     <div className="tab-pane-container">
       <div className="admin-metrics-grid">
@@ -50,6 +82,41 @@ export function OverviewTab({ stats }: OverviewTabProps) {
             <strong>Bulk Export for Fine-Tuning:</strong> Click <strong>"Export All Chats (.md)"</strong> to export all student interactions into a single clean training document ready for evaluation benchmarks or fine-tuning models like Gemini, Llama, or Mistral.
           </li>
         </ol>
+      </div>
+
+      <div className="admin-card-panel">
+        <h3 className="panel-headline">Add Approved Q&amp;A (Verified Exemplar)</h3>
+        <p className="panel-subtext">
+          Save an ideal leadership-approved response for a specific student question so the AI mirrors its tone, structure, and framing.
+        </p>
+        <form onSubmit={handleAddExemplar} style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}>
+          <input
+            type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Student question (e.g. Why should I choose SR University?)"
+            required
+            style={{ padding: "8px 10px", borderRadius: "6px", border: "1px solid #d1d5db" }}
+          />
+          <textarea
+            rows={4}
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            placeholder="Approved response..."
+            required
+            style={{ padding: "8px 10px", borderRadius: "6px", border: "1px solid #d1d5db", resize: "vertical" }}
+          />
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button type="submit" className="btn-exemplar-promote" disabled={saving || !question.trim() || !answer.trim()}>
+              {saving ? "Saving..." : "⭐ Save Approved Q&A"}
+            </button>
+            {statusMsg && (
+              <span style={{ fontSize: "0.875rem", color: statusMsg.type === "ok" ? "#15803d" : "#b91c1c" }}>
+                {statusMsg.text}
+              </span>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );

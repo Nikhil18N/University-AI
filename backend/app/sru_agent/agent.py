@@ -1717,6 +1717,30 @@ def _structured_turn(source, rewritten: bool, conv_state: dict, message: str, st
     return None
 
 
+async def _lookup_exemplar_block(message: str) -> str:
+    """Return a formatted approved-exemplar prompt block if a close match exists."""
+    if not (message or "").strip():
+        return ""
+    try:
+        from app.api.v1.deps import get_embedding_provider
+        from app.services.exemplar_service import ExemplarService
+
+        svc = ExemplarService(get_embedding_provider())
+        if getattr(svc, "_exemplar_count", 0) <= 0:
+            return ""
+        match = await asyncio.wait_for(svc.find_matching_exemplar(message), timeout=1.5)
+        if not match or not match.get("answer"):
+            return ""
+        return (
+            "APPROVED EXEMPLAR ANSWER (mirror this tone, structure, and framing; "
+            "keep all figures grounded in tool results/evidence):\n"
+            f"Q: {match.get('question', '')}\n"
+            f"A: {match['answer']}"
+        )
+    except Exception:
+        return ""
+
+
 async def run_agent(
     message: str,
     session_id: str,
@@ -3662,6 +3686,8 @@ async def run_agent(
             first_name and re.search(rf"\b{re.escape(first_name)}\b", last_assistant_text, re.IGNORECASE)
         )
 
+        exemplar_block = await _lookup_exemplar_block(message)
+
         for round_no in range(config.AGENT_MAX_TOOL_ROUNDS + 1):
             last_round = round_no == config.AGENT_MAX_TOOL_ROUNDS
             prompt_kwargs = dict(
@@ -3673,6 +3699,7 @@ async def run_agent(
                 reply_brief=_reply_brief(message, reply_context),  # several questions / a reply to a message
                 focus_program=(fees.clean_program_name(conv_state["active_program"])
                                if conv_state.get("active_program") in fees.load_data()["programs"] else None),
+                exemplar_block=exemplar_block or None,
             )
             link["dynamic_suffix"] = build_dynamic_suffix(**prompt_kwargs)
             cfg = types.GenerateContentConfig(
