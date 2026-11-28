@@ -1325,7 +1325,7 @@ export default function AdminPage({ onBackToChat }: Props) {
             {/* =========================================================================
                 TAB 3: OVERVIEW STATS & AI TRAINING GUIDE
                 ========================================================================= */}
-            {activeTab === "overview" && stats && <OverviewTab stats={stats} />}
+            {activeTab === "overview" && stats && <OverviewTab stats={stats} adminKey={adminKey} />}
 
             {activeTab === "documents" && (
               <DocumentsTab
