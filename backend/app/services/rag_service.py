@@ -20,7 +20,7 @@ from app.services.guardrail_service import (
     verify_retrieval_confidence,
     verify_url_faithfulness,
 )
-from app.services.prompt_service import render_prompt
+from app.services.prompt_service import needs_fee_policy, render_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -390,6 +390,7 @@ class RAGService:
 
         rag_prompt = render_prompt(
             "rag",
+            include_fee_policy=needs_fee_policy(question, conversation_context),
             question=question,
             conversation=conversation_context,
             evidence=evidence_text,
